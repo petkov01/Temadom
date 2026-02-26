@@ -2237,6 +2237,12 @@ const ClientDashboard = () => {
                   <p className="text-xs text-slate-500 mt-2">{newProject.images.length} от 10 снимки</p>
                 )}
               </div>
+
+              {/* Budget Estimator */}
+              <ProjectEstimator 
+                initialCity={newProject.city}
+                onEstimateChange={(estimate) => setNewProject(d => ({ ...d, estimated_budget: estimate }))}
+              />
             </div>
 
             <DialogFooter>
