@@ -1246,7 +1246,15 @@ const LoginPage = () => {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
       <Card className="w-full max-w-md" data-testid="login-form">
         <CardHeader className="text-center">
-          <Building2 className="h-12 w-12 mx-auto mb-4 text-orange-600" />
+          <div className="flex justify-center mb-4">
+            <div className="bg-slate-900 p-3 rounded-lg">
+              <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none">
+                <path d="M12 2L2 10H5V20H19V10H22L12 2Z" fill="white"/>
+                <rect x="9" y="11" width="6" height="9" fill="#F59E0B"/>
+                <path d="M10 15L12 17L15 13" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </div>
           <CardTitle className="text-2xl">Вход в профила</CardTitle>
           <CardDescription>Въведете вашите данни за вход</CardDescription>
         </CardHeader>
