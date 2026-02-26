@@ -2025,12 +2025,13 @@ const ClientDashboard = () => {
       const data = {
         ...newProject,
         budget_min: newProject.budget_min ? parseFloat(newProject.budget_min) : null,
-        budget_max: newProject.budget_max ? parseFloat(newProject.budget_max) : null
+        budget_max: newProject.budget_max ? parseFloat(newProject.budget_max) : null,
+        estimated_budget: newProject.estimated_budget
       };
       await axios.post(`${API}/projects`, data, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Проектът е създаден успешно!');
       setCreateDialogOpen(false);
-      setNewProject({ title: '', description: '', category: '', city: '', budget_min: '', budget_max: '', images: [] });
+      setNewProject({ title: '', description: '', category: '', city: '', budget_min: '', budget_max: '', images: [], estimated_budget: null });
       
       // Refresh projects
       const res = await axios.get(`${API}/my-projects`, { headers: { Authorization: `Bearer ${token}` } });
