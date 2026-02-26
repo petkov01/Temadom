@@ -430,7 +430,7 @@ const PRICING_TYPES = {
 
 const PriceCalculator = () => {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [region, setRegion] = useState('sofia');
+  const [region, setRegion] = useState('sofia_city');
   const [pricingType, setPricingType] = useState('laborAndMaterial');
   const [qualityLevel, setQualityLevel] = useState('standard');
 
