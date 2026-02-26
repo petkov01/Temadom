@@ -653,9 +653,27 @@ const ProjectCard = ({ project }) => {
       onClick={() => navigate(`/projects/${project.id}`)}
       data-testid={`project-card-${project.id}`}
     >
+      {/* Show first image if available */}
+      {project.images && project.images.length > 0 && (
+        <div className="aspect-video bg-slate-100 overflow-hidden">
+          <img 
+            src={project.images[0]} 
+            alt={project.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+      )}
+      
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start mb-2">
-          <Badge className="bg-orange-100 text-orange-800">{project.category_name}</Badge>
+          <div className="flex items-center gap-2">
+            <Badge className="bg-orange-100 text-orange-800">{project.category_name}</Badge>
+            {project.images && project.images.length > 0 && (
+              <span className="text-xs text-slate-400 flex items-center gap-1">
+                <Image className="h-3 w-3" /> {project.images.length}
+              </span>
+            )}
+          </div>
           {project.contact_locked && (
             <Lock className="h-4 w-4 text-slate-400" />
           )}
@@ -672,6 +690,14 @@ const ProjectCard = ({ project }) => {
             <MapPin className="h-4 w-4" />
             <span>{project.city}</span>
           </div>
+          
+          {/* Show estimated budget if available */}
+          {project.estimated_budget && (
+            <div className="flex items-center gap-2 text-orange-600 font-medium">
+              <Calculator className="h-4 w-4" />
+              <span>~{project.estimated_budget} € оценка</span>
+            </div>
+          )}
           
           {(project.budget_min || project.budget_max) && (
             <div className="flex items-center gap-2 text-slate-500">
