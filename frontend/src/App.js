@@ -713,6 +713,8 @@ const ProjectDetailPage = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -755,6 +757,15 @@ const ProjectDetailPage = () => {
     }
   };
 
+  const navigateImage = (direction) => {
+    if (!project?.images?.length) return;
+    if (direction === 'next') {
+      setSelectedImageIndex((prev) => (prev + 1) % project.images.length);
+    } else {
+      setSelectedImageIndex((prev) => (prev - 1 + project.images.length) % project.images.length);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 py-8">
@@ -779,12 +790,76 @@ const ProjectDetailPage = () => {
         </Button>
 
         <Card className="overflow-hidden" data-testid="project-detail">
+          {/* Project Images Gallery */}
+          {project.images && project.images.length > 0 && (
+            <div className="relative bg-slate-900">
+              <div 
+                className="aspect-[16/9] cursor-pointer"
+                onClick={() => setLightboxOpen(true)}
+              >
+                <img 
+                  src={project.images[selectedImageIndex]} 
+                  alt={`Снимка ${selectedImageIndex + 1}`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              
+              {/* Navigation arrows */}
+              {project.images.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); navigateImage('prev'); }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); navigateImage('next'); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </>
+              )}
+              
+              {/* Image counter */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 px-4 py-2 rounded-full text-white text-sm">
+                {selectedImageIndex + 1} / {project.images.length}
+              </div>
+              
+              {/* Thumbnails */}
+              {project.images.length > 1 && (
+                <div className="flex gap-2 p-3 bg-slate-800 overflow-x-auto">
+                  {project.images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImageIndex(idx)}
+                      className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-colors ${
+                        idx === selectedImageIndex ? 'border-orange-500' : 'border-transparent hover:border-slate-500'
+                      }`}
+                    >
+                      <img src={img} alt={`Миниатюра ${idx + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <CardHeader>
             <div className="flex justify-between items-start mb-4">
               <Badge className="bg-orange-100 text-orange-800 text-sm">{project.category_name}</Badge>
-              <div className="flex items-center gap-2 text-sm text-slate-500">
-                <Eye className="h-4 w-4" />
-                {project.views} преглеждания
+              <div className="flex items-center gap-4 text-sm text-slate-500">
+                {project.images?.length > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Image className="h-4 w-4" />
+                    {project.images.length} снимки
+                  </span>
+                )}
+                <span className="flex items-center gap-1">
+                  <Eye className="h-4 w-4" />
+                  {project.views} преглеждания
+                </span>
               </div>
             </div>
             <CardTitle className="text-2xl md:text-3xl">{project.title}</CardTitle>
