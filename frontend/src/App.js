@@ -335,67 +335,181 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 overflow-hidden">
+      {/* CALCULATOR HERO SECTION - FIRST THING VISITORS SEE */}
+      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+        {/* Background decoration */}
         <div className="absolute inset-0 opacity-20">
-          <img 
-            src="https://images.unsplash.com/photo-1758548157747-285c7012db5b?crop=entropy&cs=srgb&fm=jpg&q=85" 
-            alt="Background" 
-            className="w-full h-full object-cover"
-          />
+          <div className="absolute top-0 left-0 w-96 h-96 bg-orange-500 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="animate-slideUp">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
-                Намерете <span className="text-orange-500">перфектния майстор</span> за вашия проект
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left side - Calculator Info */}
+            <div className="text-white">
+              <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 rounded-full px-4 py-2 mb-6">
+                <Calculator className="h-5 w-5 text-orange-400" />
+                <span className="text-orange-300 font-medium">Безплатен калкулатор • Единствен в България</span>
+              </div>
+              
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+                Изчислете цената на вашия <span className="text-orange-500">ремонт</span> за секунди
               </h1>
+              
               <p className="text-xl text-slate-300 mb-8">
-                Свържете се с проверени строителни фирми и майстори. Получете оферти за вашите ремонтни и строителни проекти.
+                Нашият интелигентен калкулатор ви помага да планирате бюджета си с реални пазарни цени от всички 28 области в България.
               </p>
+              
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="flex items-center gap-3 bg-white/10 rounded-lg p-3">
+                  <div className="flex-shrink-0 w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 text-orange-400" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">28 услуги</p>
+                    <p className="text-xs text-slate-400">Пълен обхват</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-white/10 rounded-lg p-3">
+                  <div className="flex-shrink-0 w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <MapPin className="h-5 w-5 text-orange-400" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">28 области</p>
+                    <p className="text-xs text-slate-400">Цяла България</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-white/10 rounded-lg p-3">
+                  <div className="flex-shrink-0 w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <Award className="h-5 w-5 text-orange-400" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">3 нива качество</p>
+                    <p className="text-xs text-slate-400">Спрямо бюджет</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-white/10 rounded-lg p-3">
+                  <div className="flex-shrink-0 w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <Euro className="h-5 w-5 text-orange-400" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Труд ± материали</p>
+                    <p className="text-xs text-slate-400">Гъвкави опции</p>
+                  </div>
+                </div>
+              </div>
+              
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   size="lg" 
-                  className="bg-orange-600 hover:bg-orange-700 text-lg px-8"
-                  onClick={() => navigate('/register')}
-                  data-testid="hero-cta-client"
+                  className="bg-orange-600 hover:bg-orange-700 text-lg px-8 h-14"
+                  onClick={() => navigate('/calculator')}
+                  data-testid="calculator-hero-cta"
                 >
-                  Публикувай проект
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <Calculator className="mr-2 h-6 w-6" />
+                  Изчисли цената сега
                 </Button>
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-white text-white hover:bg-white/10 text-lg px-8"
-                  onClick={() => navigate('/projects')}
-                  data-testid="hero-cta-company"
+                  className="border-white/50 text-white hover:bg-white/10 text-lg px-8 h-14"
+                  onClick={() => navigate('/register')}
                 >
-                  Разгледай проекти
+                  Публикувай проект
                 </Button>
               </div>
             </div>
             
-            <div className="hidden md:grid grid-cols-2 gap-4 animate-slideUp stagger-2">
-              <Card className="bg-white/10 backdrop-blur border-white/20 p-6">
-                <Users className="h-10 w-10 text-orange-500 mb-4" />
-                <h3 className="text-2xl font-bold text-white">{stats.total_companies}+</h3>
-                <p className="text-slate-300">Регистрирани фирми</p>
+            {/* Right side - Live Calculator Preview */}
+            <div className="hidden lg:block">
+              <Card className="bg-white/10 backdrop-blur-xl border-white/20 p-6 rounded-2xl shadow-2xl">
+                <div className="text-white mb-6">
+                  <h3 className="text-xl font-semibold mb-2">Примерна калкулация</h3>
+                  <p className="text-slate-400 text-sm">Ремонт на апартамент 80 м² в София</p>
+                </div>
+                
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between items-center py-2 border-b border-white/10">
+                    <span className="text-slate-300 flex items-center gap-2">
+                      <Paintbrush className="h-4 w-4" /> Боядисване (160 м²)
+                    </span>
+                    <span className="text-white font-medium">1,152 €</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-white/10">
+                    <span className="text-slate-300 flex items-center gap-2">
+                      <Layers className="h-4 w-4" /> Шпакловка (160 м²)
+                    </span>
+                    <span className="text-white font-medium">1,344 €</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-white/10">
+                    <span className="text-slate-300 flex items-center gap-2">
+                      <Square className="h-4 w-4" /> Подови настилки (80 м²)
+                    </span>
+                    <span className="text-white font-medium">3,840 €</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-white/10">
+                    <span className="text-slate-300 flex items-center gap-2">
+                      <Zap className="h-4 w-4" /> Ел. инсталация (30 точки)
+                    </span>
+                    <span className="text-white font-medium">1,800 €</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-white/10">
+                    <span className="text-slate-300 flex items-center gap-2">
+                      <Droplets className="h-4 w-4" /> ВиК (6 точки)
+                    </span>
+                    <span className="text-white font-medium">792 €</span>
+                  </div>
+                </div>
+                
+                <div className="bg-orange-600 rounded-xl p-5 text-center">
+                  <p className="text-orange-100 text-sm mb-1">Приблизителна цена</p>
+                  <p className="text-4xl font-bold text-white">8,928 €</p>
+                  <p className="text-orange-200 text-sm mt-1">≈ 17,411 лв.</p>
+                </div>
+                
+                <p className="text-slate-500 text-xs text-center mt-4">
+                  * Стандартно качество, труд + материали, София (+20%)
+                </p>
               </Card>
-              <Card className="bg-white/10 backdrop-blur border-white/20 p-6 mt-8">
-                <Boxes className="h-10 w-10 text-orange-500 mb-4" />
-                <h3 className="text-2xl font-bold text-white">{stats.total_projects}+</h3>
-                <p className="text-slate-300">Активни проекти</p>
-              </Card>
-              <Card className="bg-white/10 backdrop-blur border-white/20 p-6 -mt-4">
-                <Award className="h-10 w-10 text-orange-500 mb-4" />
-                <h3 className="text-2xl font-bold text-white">{stats.total_reviews}+</h3>
-                <p className="text-slate-300">Отзиви</p>
-              </Card>
-              <Card className="bg-white/10 backdrop-blur border-white/20 p-6 mt-4">
-                <Shield className="h-10 w-10 text-orange-500 mb-4" />
-                <h3 className="text-2xl font-bold text-white">100%</h3>
-                <p className="text-slate-300">Проверени контакти</p>
-              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Secondary Hero - For Companies */}
+      <section className="py-12 bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-6 text-center">
+            <div className="p-4">
+              <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Users className="h-7 w-7 text-orange-600" />
+              </div>
+              <p className="text-2xl font-bold text-slate-900">{stats.total_companies}+</p>
+              <p className="text-slate-600 text-sm">Регистрирани фирми</p>
+            </div>
+            <div className="p-4">
+              <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Boxes className="h-7 w-7 text-orange-600" />
+              </div>
+              <p className="text-2xl font-bold text-slate-900">{stats.total_projects}+</p>
+              <p className="text-slate-600 text-sm">Активни проекти</p>
+            </div>
+            <div className="p-4">
+              <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Star className="h-7 w-7 text-orange-600" />
+              </div>
+              <p className="text-2xl font-bold text-slate-900">{stats.total_reviews}+</p>
+              <p className="text-slate-600 text-sm">Отзиви</p>
+            </div>
+            <div className="p-4">
+              <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Shield className="h-7 w-7 text-orange-600" />
+              </div>
+              <p className="text-2xl font-bold text-slate-900">28</p>
+              <p className="text-slate-600 text-sm">Области в България</p>
             </div>
           </div>
         </div>
