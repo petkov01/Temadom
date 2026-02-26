@@ -1077,25 +1077,55 @@ const ProjectDetailPage = () => {
                       <h4 className="text-xl font-semibold mb-2">Контактите са заключени</h4>
                       <p className="text-slate-600 mb-6">Закупете достъп, за да видите информацията за контакт</p>
                       
-                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button 
-                          className="bg-orange-600 hover:bg-orange-700"
-                          onClick={() => handlePurchase('single_lead')}
-                          disabled={paymentLoading}
-                          data-testid="buy-single-lead"
-                        >
-                          <Lock className="mr-2 h-4 w-4" />
-                          Единичен контакт - 25€
-                        </Button>
-                        <Button 
-                          variant="outline"
-                          onClick={() => handlePurchase('subscription')}
-                          disabled={paymentLoading}
-                          data-testid="buy-subscription"
-                        >
-                          Месечен абонамент - 100€
-                        </Button>
+                      <div className="flex flex-col gap-4 justify-center">
+                        {/* Free lead button for companies with remaining free leads */}
+                        {user?.user_type === 'company' && freeLeadsRemaining > 0 && (
+                          <Button 
+                            className="bg-green-600 hover:bg-green-700 w-full"
+                            onClick={handleClaimFreeLead}
+                            disabled={paymentLoading}
+                            data-testid="claim-free-lead"
+                          >
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Безплатен контакт ({freeLeadsRemaining} от 3 остават)
+                          </Button>
+                        )}
+                        
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                          <Button 
+                            className="bg-orange-600 hover:bg-orange-700"
+                            onClick={() => handlePurchase('single_lead')}
+                            disabled={paymentLoading}
+                            data-testid="buy-single-lead"
+                          >
+                            <Lock className="mr-2 h-4 w-4" />
+                            Единичен контакт - 25€
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            onClick={() => handlePurchase('subscription')}
+                            disabled={paymentLoading}
+                            data-testid="buy-subscription"
+                          >
+                            Месечен абонамент - 100€
+                          </Button>
+                        </div>
                       </div>
+
+                      {/* Send message button */}
+                      {user && project.client_id && user.id !== project.client_id && (
+                        <div className="mt-4 pt-4 border-t border-slate-200">
+                          <Button 
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => navigate(`/messages?to=${project.client_id}&project=${id}`)}
+                            data-testid="send-message-btn"
+                          >
+                            <MessageSquare className="mr-2 h-4 w-4" />
+                            Изпрати съобщение на клиента
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                   
