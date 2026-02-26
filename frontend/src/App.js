@@ -139,6 +139,9 @@ const Navbar = () => {
                 <Calculator className="h-4 w-4" />
                 Калкулатор
               </Link>
+              <Link to="/services" className="text-slate-600 hover:text-slate-900 font-medium transition-colors" data-testid="nav-services">
+                Услуги
+              </Link>
             </div>
           </div>
 
