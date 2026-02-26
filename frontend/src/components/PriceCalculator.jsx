@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Calculator, Paintbrush, Zap, Droplets, Boxes, LayoutGrid, Square, Layers, ChevronDown, Info, Euro, Hammer } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Calculator, Paintbrush, Zap, Droplets, Boxes, LayoutGrid, Square, Layers, ChevronDown, Info, Euro, Hammer, Lock, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { useAuth } from '@/App';
+import { toast } from 'sonner';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const CALC_API = `${BACKEND_URL}/api`;
 
 // Bulgarian Construction Price Database (2025-2026 market research)
 // Prices in EUR, adjusted for regional variations
