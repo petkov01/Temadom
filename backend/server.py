@@ -158,6 +158,25 @@ class PaymentTransaction(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class PortfolioProjectCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    category: Optional[str] = None
+    location: Optional[str] = None
+    before_images: List[str] = []  # Base64 or URLs
+    after_images: List[str] = []
+
+class PortfolioProject(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    title: str
+    description: Optional[str] = None
+    category: Optional[str] = None
+    location: Optional[str] = None
+    before_images: List[str] = []
+    after_images: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # ============== AUTH HELPERS ==============
 
 def hash_password(password: str) -> str:
