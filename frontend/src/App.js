@@ -170,10 +170,11 @@ const Navbar = () => {
                     </Button>
                   </Link>
                 )}
-                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="text-slate-600 hover:text-slate-900 font-medium" data-testid="nav-dashboard">
+                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1.5" data-testid="nav-dashboard">
+                  <LayoutGrid className="h-4 w-4" />
                   Табло
                 </Link>
-                <Link to="/messages" className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1" data-testid="nav-messages">
+                <Link to="/messages" className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1.5" data-testid="nav-messages">
                   <MessageSquare className="h-4 w-4" />
                   Съобщения
                 </Link>
