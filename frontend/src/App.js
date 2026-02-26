@@ -13,33 +13,43 @@ import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 import ProjectEstimator from '@/components/ProjectEstimator';
 
-// TemaDom Logo Component
-const TemaDomLogo = ({ className = "h-10" }) => (
-  <svg viewBox="0 0 200 50" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* House icon replacing 'o' in Dom */}
-    <g>
+// TemaDom Logo Component - Official Logo
+const TemaDomLogo = ({ className = "h-10", variant = "default" }) => {
+  const isDark = variant === "dark";
+  const textColor = isDark ? "#FFFFFF" : "#1A2B3C";
+  const subtextColor = isDark ? "#94A3B8" : "#64748B";
+  
+  return (
+    <svg viewBox="0 0 220 55" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* Text: Tema */}
-      <text x="0" y="32" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="28" fill="#0F172A">Tema</text>
+      <text x="0" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>T</text>
+      <text x="20" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>e</text>
+      <text x="40" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>m</text>
+      {/* House integrated in 'a' */}
+      <g transform="translate(66, 8)">
+        <path d="M12 2L2 12H5V24H19V12H22L12 2Z" fill="#1A2B3C"/>
+        <rect x="8" y="13" width="8" height="11" fill="#FF9900"/>
+      </g>
       {/* Text: D */}
-      <text x="72" y="32" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="28" fill="#0F172A">D</text>
-      {/* House icon (replacing 'o') */}
-      <g transform="translate(94, 8)">
-        {/* House roof */}
-        <path d="M12 0L0 10H4V20H20V10H24L12 0Z" fill="#0F172A"/>
-        {/* Orange door/window */}
-        <rect x="8" y="10" width="8" height="10" fill="#F59E0B"/>
-        {/* Checkmark inside */}
-        <path d="M10 15L12 17L15 13" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <text x="92" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>D</text>
+      {/* 'o' with wrench icon */}
+      <g transform="translate(116, 10)">
+        <circle cx="12" cy="14" r="12" fill="#1A2B3C"/>
+        <circle cx="12" cy="14" r="7" fill="#FF9900"/>
+        {/* Wrench icon inside */}
+        <path d="M9 11L12 14L15 11M12 14V18" stroke="#1A2B3C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </g>
       {/* Text: m */}
-      <text x="122" y="32" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="28" fill="#0F172A">m</text>
-    </g>
-    {/* Orange underline */}
-    <rect x="0" y="38" width="150" height="3" rx="1" fill="#F59E0B"/>
-    {/* Tagline */}
-    <text x="0" y="48" fontFamily="'Public Sans', sans-serif" fontWeight="500" fontSize="6" fill="#64748B" letterSpacing="1">РЕМОНТИ И СТРОИТЕЛСТВО</text>
-  </svg>
-);
+      <text x="142" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>m</text>
+      
+      {/* Orange/Gold underline */}
+      <rect x="0" y="40" width="170" height="3" rx="1.5" fill="#FF9900"/>
+      
+      {/* Tagline: РЕМОНТ И СТРОИТЕЛСТВО */}
+      <text x="0" y="52" fontFamily="'Public Sans', sans-serif" fontWeight="600" fontSize="8" fill={subtextColor} letterSpacing="1.5">РЕМОНТ И СТРОИТЕЛСТВО</text>
+    </svg>
+  );
+};
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
