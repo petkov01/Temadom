@@ -7,8 +7,10 @@ import {
   Building2, Zap, Droplets, Paintbrush, Boxes, Grid3x3, LayoutGrid, Square, Home, 
   AppWindow, Thermometer, Layers, Hammer, BrickWall, Axe, Search, Filter, Star, 
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
-  ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check
+  ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator
 } from 'lucide-react';
+import PriceCalculator from '@/components/PriceCalculator';
+import { PortfolioGallery } from '@/components/PortfolioGallery';
 
 // TemaDom Logo Component
 const TemaDomLogo = ({ className = "h-10" }) => (
