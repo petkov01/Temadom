@@ -1,0 +1,139 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Creative Designer",
+    "philosophy": "Fusion over Imitation. Emotion First. Content is King."
+  },
+  "theme_strategy": {
+    "default_mode": "light",
+    "allow_toggle": false,
+    "emotional_archetype": "The Performance Pro",
+    "description": "High-visibility, precision, and trust. A clean, professional environment for serious business."
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["600", "700", "800"],
+      "usage": "Use for all H1-H6. Tight tracking (tracking-tight) for sizes above 32px.",
+      "google_font_url": "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+    },
+    "body": {
+      "font_family": "Public Sans, sans-serif",
+      "weights": ["400", "500", "600"],
+      "usage": "Use for all paragraphs, labels, and inputs. Highly legible.",
+      "google_font_url": "https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap"
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "name": "Slate Obsidian",
+        "hex": "#0F172A",
+        "tailwind": "bg-slate-900 text-white"
+      },
+      "secondary": {
+        "name": "Concrete Grey",
+        "hex": "#64748B",
+        "tailwind": "text-slate-500"
+      },
+      "accent": {
+        "name": "Safety Orange",
+        "hex": "#EA580C",
+        "tailwind": "bg-orange-600 hover:bg-orange-700 text-white",
+        "usage": "Use STRICTLY for Primary CTAs (Sign Up, Buy Lead) and critical alerts."
+      },
+      "background": {
+        "page": "#F8FAFC",
+        "card": "#FFFFFF",
+        "tailwind": "bg-slate-50"
+      },
+      "border": {
+        "default": "#E2E8F0",
+        "tailwind": "border-slate-200"
+      }
+    },
+    "rules": [
+      "No Gradients on Buttons. Flat, high-contrast only.",
+      "Text on colored backgrounds must be White (#FFFFFF).",
+      "Never use Teal (#1B93A4) for dashboards."
+    ]
+  },
+  "spacing_and_layout": {
+    "scale_multiplier": "2x",
+    "container_padding": "p-6 md:p-12",
+    "grid_strategy": "The Bento Grid (Mode B)",
+    "mobile_rule": "Images max-h-[60vh]. Stack columns.",
+    "border_radius": "rounded-md (6px)"
+  },
+  "component_styles": {
+    "buttons": {
+      "primary": "bg-orange-600 hover:bg-orange-700 text-white font-semibold px-8 py-3 rounded-md shadow-sm transition-all hover:-translate-y-0.5",
+      "secondary": "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium px-6 py-3 rounded-md",
+      "ghost": "text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-4 py-2 rounded-md"
+    },
+    "cards": {
+      "base": "bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200",
+      "listing": "relative overflow-hidden group border border-slate-200 bg-white rounded-lg p-0"
+    },
+    "inputs": {
+      "base": "h-11 border-slate-300 focus:border-orange-500 focus:ring-orange-500 rounded-md bg-white"
+    },
+    "badges": {
+      "status": "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+      "neutral": "bg-slate-100 text-slate-800",
+      "success": "bg-green-100 text-green-800",
+      "warning": "bg-yellow-100 text-yellow-800"
+    }
+  },
+  "visual_enhancers": {
+    "blur_overlays": "Use backdrop-blur-md bg-white/60 to hide contact info for non-paying users.",
+    "textures": "Use subtle noise texture on the main background to reduce digital sterility.",
+    "shadows": "Use concise, tight shadows: shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+  },
+  "images": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1758548157747-285c7012db5b?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Modern bright living room interior"
+    },
+    "craftsman_hero": {
+      "url": "https://images.pexels.com/photos/6474493/pexels-photo-6474493.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Professional contractor with blueprints"
+    },
+    "categories": {
+      "electrician": "https://images.unsplash.com/photo-1727377255383-fb304fb08262?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "plumbing": "https://images.pexels.com/photos/8488058/pexels-photo-8488058.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "painting": "https://images.pexels.com/photos/5493669/pexels-photo-5493669.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "general": "https://images.pexels.com/photos/4756489/pexels-photo-4756489.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    },
+    "placeholders": {
+      "user_avatar": "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop",
+      "project_thumb": "https://images.unsplash.com/photo-1581094794329-cd1096d7a43f?w=600&h=400&fit=crop"
+    }
+  },
+  "icons": {
+    "library": "lucide-react",
+    "style": "Stroke width 1.5px (clean, technical look)"
+  },
+  "instructions_to_main_agent": {
+    "general": [
+      "Implement the 'Blur Overlay' logic for project details immediately. This is the core business model.",
+      "Use the 'Bento Grid' for the project listing page.",
+      "Ensure the 'Rating System' is prominent on profile pages.",
+      "The 'Orange' accent color is ONLY for conversion actions. Do not overuse it."
+    ],
+    "specific_pages": {
+      "landing": "Split screen hero. Left: 'For Homeowners' (Clean interior image). Right: 'For Pros' (Blueprint/Worker image). Clear value prop.",
+      "project_details": "Locked state must look enticing. Show 'Project Type', 'Location', 'Budget' clearly, but blur 'Phone' and 'Email'.",
+      "dashboard": "High density. Use tables for leads. Use badges for status."
+    }
+  },
+  "universal_guidelines": [
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid this.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Every interaction needs micro-animations - hover states, transitions.",
+    "Use 'sonner' for toasts.",
+    "Components MUST use named exports.",
+    "Pages MUST use default exports."
+  ]
+}
