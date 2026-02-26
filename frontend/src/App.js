@@ -16,14 +16,21 @@ import ServicesPage from '@/components/ServicesPage';
 import ChatPage from '@/components/ChatPage';
 
 // TemaDom Logo Component - Uses the exact user-provided logo image
-const TemaDomLogo = ({ className = "h-10" }) => (
-  <img 
-    src="/logo-nav.png" 
-    alt="TemaDom - Ремонти и строителство" 
-    className={className}
-    style={{ objectFit: 'contain' }}
-    data-testid="temadom-logo"
-  />
+const TemaDomLogo = ({ className = "h-10", showSubtitle = false }) => (
+  <div className="flex flex-col items-center">
+    <img 
+      src="/logo-nav.png" 
+      alt="TemaDom - Ремонти и строителство" 
+      className={className}
+      style={{ objectFit: 'contain' }}
+      data-testid="temadom-logo"
+    />
+    {showSubtitle && (
+      <span className="text-orange-500 text-[10px] font-bold tracking-[0.15em] uppercase mt-0.5">
+        Ремонт и строителство
+      </span>
+    )}
+  </div>
 );
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -125,7 +132,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
-              <TemaDomLogo className="h-10 w-auto" />
+              <TemaDomLogo className="h-10 w-auto" showSubtitle={true} />
             </Link>
             
             <div className="hidden md:flex items-center ml-10 gap-6">
