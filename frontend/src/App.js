@@ -1696,9 +1696,11 @@ const ClientDashboard = () => {
     category: '',
     city: '',
     budget_min: '',
-    budget_max: ''
+    budget_max: '',
+    images: []
   });
   const [submitting, setSubmitting] = useState(false);
+  const imageInputRef = React.useRef(null);
 
   useEffect(() => {
     if (!user || user.user_type !== 'client') {
@@ -1722,6 +1724,33 @@ const ClientDashboard = () => {
     fetchData();
   }, [user, token, navigate]);
 
+  const handleImageUpload = (files) => {
+    const remainingSlots = 10 - newProject.images.length;
+    const filesToProcess = Array.from(files).slice(0, remainingSlots);
+    
+    const newImages = filesToProcess.map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(newImages).then(images => {
+      setNewProject(prev => ({
+        ...prev,
+        images: [...prev.images, ...images].slice(0, 10)
+      }));
+    });
+  };
+
+  const removeImage = (index) => {
+    setNewProject(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleCreateProject = async () => {
     if (!newProject.title || !newProject.description || !newProject.category || !newProject.city) {
       toast.error('Моля, попълнете всички задължителни полета');
@@ -1738,7 +1767,7 @@ const ClientDashboard = () => {
       await axios.post(`${API}/projects`, data, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Проектът е създаден успешно!');
       setCreateDialogOpen(false);
-      setNewProject({ title: '', description: '', category: '', city: '', budget_min: '', budget_max: '' });
+      setNewProject({ title: '', description: '', category: '', city: '', budget_min: '', budget_max: '', images: [] });
       
       // Refresh projects
       const res = await axios.get(`${API}/my-projects`, { headers: { Authorization: `Bearer ${token}` } });
