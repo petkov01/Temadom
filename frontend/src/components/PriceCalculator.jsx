@@ -436,10 +436,58 @@ const PRICING_TYPES = {
 };
 
 const PriceCalculator = () => {
+  const { user, token } = useAuth();
   const [selectedItems, setSelectedItems] = useState([]);
   const [region, setRegion] = useState('sofia_city');
   const [pricingType, setPricingType] = useState('laborAndMaterial');
   const [qualityLevel, setQualityLevel] = useState('standard');
+  const [calcStatus, setCalcStatus] = useState(null); // null = not checked, object = status
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [calcBlocked, setCalcBlocked] = useState(false);
+  const [calcLogged, setCalcLogged] = useState(false);
+
+  // Check calculator status for company users
+  useEffect(() => {
+    if (user?.user_type === 'company' && token) {
+      axios.get(`${CALC_API}/calculator/status`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => {
+          setCalcStatus(res.data);
+          if (!res.data.unlimited && res.data.remaining <= 0) {
+            setCalcBlocked(true);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [user, token]);
+
+  // Log calculator use when company adds first item
+  useEffect(() => {
+    if (user?.user_type === 'company' && token && selectedItems.length > 0 && !calcLogged && !calcBlocked) {
+      axios.post(`${CALC_API}/calculator/log-use`, {}, { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => {
+          setCalcLogged(true);
+          if (!res.data.allowed) {
+            setCalcBlocked(true);
+            setShowPaywall(true);
+          } else if (res.data.remaining <= 1) {
+            toast.warning(`Остава ви ${res.data.remaining} безплатна калкулация!`);
+          }
+          setCalcStatus(prev => prev ? { ...prev, remaining: res.data.remaining } : null);
+        })
+        .catch(() => {});
+    }
+  }, [selectedItems.length, user, token, calcLogged, calcBlocked]);
+
+  const handlePayForCalculator = async () => {
+    try {
+      const res = await axios.post(`${CALC_API}/calculator/pay`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      window.location.href = res.data.checkout_url;
+    } catch (err) {
+      toast.error('Грешка при плащане');
+    }
+  };
 
   const addItem = (categoryKey) => {
     const category = PRICE_DATABASE[categoryKey];
