@@ -13,40 +13,43 @@ import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 import ProjectEstimator from '@/components/ProjectEstimator';
 
-// TemaDom Logo Component - Official Logo
+// TemaDom Logo Component - EXACT from design
 const TemaDomLogo = ({ className = "h-10", variant = "default" }) => {
   const isDark = variant === "dark";
-  const textColor = isDark ? "#FFFFFF" : "#1A2B3C";
-  const subtextColor = isDark ? "#94A3B8" : "#64748B";
   
   return (
-    <svg viewBox="0 0 220 55" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Text: Tema */}
-      <text x="0" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>T</text>
-      <text x="20" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>e</text>
-      <text x="40" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>m</text>
-      {/* House integrated in 'a' */}
-      <g transform="translate(66, 8)">
-        <path d="M12 2L2 12H5V24H19V12H22L12 2Z" fill="#1A2B3C"/>
-        <rect x="8" y="13" width="8" height="11" fill="#FF9900"/>
-      </g>
-      {/* Text: D */}
-      <text x="92" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>D</text>
-      {/* 'o' with wrench icon */}
-      <g transform="translate(116, 10)">
-        <circle cx="12" cy="14" r="12" fill="#1A2B3C"/>
-        <circle cx="12" cy="14" r="7" fill="#FF9900"/>
-        {/* Wrench icon inside */}
-        <path d="M9 11L12 14L15 11M12 14V18" stroke="#1A2B3C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      </g>
-      {/* Text: m */}
-      <text x="142" y="34" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="30" fill={textColor}>m</text>
+    <svg viewBox="0 0 280 60" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* T */}
+      <text x="0" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#2C3E50">T</text>
+      {/* e */}
+      <text x="24" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#2C3E50">e</text>
+      {/* m */}
+      <text x="48" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#2C3E50">m</text>
       
-      {/* Orange/Gold underline */}
-      <rect x="0" y="40" width="170" height="3" rx="1.5" fill="#FF9900"/>
+      {/* 'a' with house - the key element */}
+      <g transform="translate(88, 4)">
+        {/* House roof (forms top of 'a') */}
+        <path d="M16 0L0 14H6V28H26V14H32L16 0Z" fill="#2C3E50"/>
+        {/* Orange hexagon door with wrench */}
+        <g transform="translate(6, 12)">
+          <rect x="0" y="0" width="20" height="16" rx="2" fill="#E67E22"/>
+          {/* Wrench icon inside */}
+          <path d="M7 4L10 8L13 4M10 8V13" stroke="#2C3E50" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </g>
+      </g>
       
-      {/* Tagline: РЕМОНТ И СТРОИТЕЛСТВО */}
-      <text x="0" y="52" fontFamily="'Public Sans', sans-serif" fontWeight="600" fontSize="8" fill={subtextColor} letterSpacing="1.5">РЕМОНТ И СТРОИТЕЛСТВО</text>
+      {/* D */}
+      <text x="124" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#34495E">D</text>
+      {/* o */}
+      <text x="156" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#34495E">o</text>
+      {/* m */}
+      <text x="184" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#34495E">m</text>
+      
+      {/* Orange underline */}
+      <rect x="0" y="44" width="220" height="4" rx="2" fill="#E67E22"/>
+      
+      {/* Tagline */}
+      <text x="0" y="58" fontFamily="'Manrope', sans-serif" fontWeight="700" fontSize="9" fill="#34495E" letterSpacing="2">РЕМОНТИ И СТРОИТЕЛСТВО</text>
     </svg>
   );
 };
