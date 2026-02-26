@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
+import ProjectEstimator from '@/components/ProjectEstimator';
 
 // TemaDom Logo Component
 const TemaDomLogo = ({ className = "h-10" }) => (
