@@ -107,6 +107,7 @@ class ProjectCreate(BaseModel):
     budget_min: Optional[float] = None
     budget_max: Optional[float] = None
     deadline: Optional[str] = None
+    images: List[str] = []  # Up to 10 images (base64 or URLs)
 
 class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -122,6 +123,7 @@ class Project(BaseModel):
     budget_min: Optional[float] = None
     budget_max: Optional[float] = None
     deadline: Optional[str] = None
+    images: List[str] = []  # Project images
     status: str = "active"  # active, closed, in_progress
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     views: int = 0
