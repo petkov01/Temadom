@@ -7,8 +7,36 @@ import {
   Building2, Zap, Droplets, Paintbrush, Boxes, Grid3x3, LayoutGrid, Square, Home, 
   AppWindow, Thermometer, Layers, Hammer, BrickWall, Axe, Search, Filter, Star, 
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
-  ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award
+  ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check
 } from 'lucide-react';
+
+// TemaDom Logo Component
+const TemaDomLogo = ({ className = "h-10" }) => (
+  <svg viewBox="0 0 200 50" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* House icon replacing 'o' in Dom */}
+    <g>
+      {/* Text: Tema */}
+      <text x="0" y="32" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="28" fill="#0F172A">Tema</text>
+      {/* Text: D */}
+      <text x="72" y="32" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="28" fill="#0F172A">D</text>
+      {/* House icon (replacing 'o') */}
+      <g transform="translate(94, 8)">
+        {/* House roof */}
+        <path d="M12 0L0 10H4V20H20V10H24L12 0Z" fill="#0F172A"/>
+        {/* Orange door/window */}
+        <rect x="8" y="10" width="8" height="10" fill="#F59E0B"/>
+        {/* Checkmark inside */}
+        <path d="M10 15L12 17L15 13" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </g>
+      {/* Text: m */}
+      <text x="122" y="32" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="28" fill="#0F172A">m</text>
+    </g>
+    {/* Orange underline */}
+    <rect x="0" y="38" width="150" height="3" rx="1" fill="#F59E0B"/>
+    {/* Tagline */}
+    <text x="0" y="48" fontFamily="'Public Sans', sans-serif" fontWeight="500" fontSize="6" fill="#64748B" letterSpacing="1">РЕМОНТИ И СТРОИТЕЛСТВО</text>
+  </svg>
+);
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
