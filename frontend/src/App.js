@@ -158,6 +158,10 @@ const Navbar = () => {
                 <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="text-slate-600 hover:text-slate-900 font-medium" data-testid="nav-dashboard">
                   Табло
                 </Link>
+                <Link to="/messages" className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1" data-testid="nav-messages">
+                  <MessageSquare className="h-4 w-4" />
+                  Съобщения
+                </Link>
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-slate-600">{user.name}</span>
                   {user.subscription_active && (
