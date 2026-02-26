@@ -19,16 +19,21 @@ import AboutPage from '@/components/AboutPage';
 import TermsPage from '@/components/TermsPage';
 import ProfessionsPage from '@/components/ProfessionsPage';
 
-// TemaDom Logo Component - Uses the exact user-provided logo image
+// TemaDom Logo Component - SVG text logo with house icon
 const TemaDomLogo = ({ className = "h-10", showSubtitle = false }) => (
   <div className="flex flex-col items-center">
-    <img 
-      src="/logo-nav.png" 
-      alt="TemaDom - Ремонти и строителство" 
-      className={className}
-      style={{ objectFit: 'contain' }}
-      data-testid="temadom-logo"
-    />
+    <svg viewBox="0 0 220 42" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" data-testid="temadom-logo">
+      <text x="0" y="30" fontFamily="'Manrope', 'Inter', system-ui, sans-serif" fontWeight="800" fontSize="32" fill="#1E293B">Tem</text>
+      <g transform="translate(76, 2)">
+        <path d="M14 0L0 12H5V24H23V12H28L14 0Z" fill="#1E293B"/>
+        <g transform="translate(5, 10)">
+          <rect x="0" y="0" width="18" height="14" rx="2" fill="#F97316"/>
+          <path d="M6 3L9 7L12 3M9 7V12" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </g>
+      </g>
+      <text x="108" y="30" fontFamily="'Manrope', 'Inter', system-ui, sans-serif" fontWeight="800" fontSize="32" fill="#334155">Dom</text>
+      <rect x="0" y="34" width="180" height="3" rx="1.5" fill="#F97316"/>
+    </svg>
     {showSubtitle && (
       <span className="text-orange-500 text-[10px] font-bold tracking-[0.15em] uppercase mt-0.5">
         Ремонт и строителство
