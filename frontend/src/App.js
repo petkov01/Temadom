@@ -144,7 +144,7 @@ const Navbar = () => {
             
             <div className="hidden md:flex items-center ml-10 gap-6">
               <Link to="/projects" className="text-slate-600 hover:text-slate-900 font-medium transition-colors" data-testid="nav-projects">
-                Проекти
+                Намери проекти
               </Link>
               <Link to="/companies" className="text-slate-600 hover:text-slate-900 font-medium transition-colors" data-testid="nav-companies">
                 Фирми
@@ -159,7 +159,14 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
-                <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 font-medium" data-testid="nav-dashboard">
+                {user.user_type === 'client' && (
+                  <Link to="/dashboard/client">
+                    <Button className="bg-orange-600 hover:bg-orange-700" data-testid="nav-publish-project">
+                      + Публикувай проект
+                    </Button>
+                  </Link>
+                )}
+                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="text-slate-600 hover:text-slate-900 font-medium" data-testid="nav-dashboard">
                   Табло
                 </Link>
                 <div className="flex items-center gap-3">
@@ -179,7 +186,7 @@ const Navbar = () => {
                 </Link>
                 <Link to="/register">
                   <Button className="bg-orange-600 hover:bg-orange-700" data-testid="register-btn">
-                    Регистрация
+                    Публикувай проект
                   </Button>
                 </Link>
               </>
