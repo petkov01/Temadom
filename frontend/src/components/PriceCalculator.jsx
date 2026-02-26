@@ -553,6 +553,19 @@ const PriceCalculator = () => {
             Изчислете приблизителната цена на вашия строителен или ремонтен проект. 
             Цените са базирани на актуални пазарни данни за България (2025-2026).
           </p>
+          {/* Calculator usage info for companies */}
+          {user?.user_type === 'company' && calcStatus && !calcStatus.unlimited && (
+            <div className={`mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm ${
+              calcStatus.remaining > 2 ? 'bg-green-100 text-green-800' :
+              calcStatus.remaining > 0 ? 'bg-amber-100 text-amber-800' :
+              'bg-red-100 text-red-800'
+            }`}>
+              <Calculator className="h-4 w-4" />
+              {calcStatus.remaining > 0 
+                ? `${calcStatus.remaining} от 5 безплатни калкулации остават`
+                : 'Безплатните калкулации са изчерпани'}
+            </div>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
