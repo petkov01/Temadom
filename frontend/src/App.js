@@ -137,18 +137,25 @@ const Navbar = () => {
             </Link>
             
             <div className="hidden md:flex items-center ml-10 gap-6">
-              <Link to="/projects" className="text-slate-600 hover:text-slate-900 font-medium transition-colors" data-testid="nav-projects">
+              <Link to="/projects" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-projects">
+                <FolderSearch className="h-4 w-4" />
                 Намери проекти
               </Link>
-              <Link to="/companies" className="text-slate-600 hover:text-slate-900 font-medium transition-colors" data-testid="nav-companies">
+              <Link to="/companies" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-companies">
+                <Building2 className="h-4 w-4" />
                 Фирми
               </Link>
-              <Link to="/calculator" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1" data-testid="nav-calculator">
+              <Link to="/calculator" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-calculator">
                 <Calculator className="h-4 w-4" />
                 Калкулатор
               </Link>
-              <Link to="/services" className="text-slate-600 hover:text-slate-900 font-medium transition-colors" data-testid="nav-services">
+              <Link to="/services" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-services">
+                <Hammer className="h-4 w-4" />
                 Услуги
+              </Link>
+              <Link to="/professions" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-professions">
+                <HardHat className="h-4 w-4" />
+                Професии
               </Link>
             </div>
           </div>
