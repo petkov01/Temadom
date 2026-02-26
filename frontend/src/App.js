@@ -1019,19 +1019,28 @@ const CompanyDetailPage = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
   const [company, setCompany] = useState(null);
+  const [portfolio, setPortfolio] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    axios.get(`${API}/companies/${id}`)
-      .then(res => setCompany(res.data))
-      .catch(() => {
+    const fetchData = async () => {
+      try {
+        const [companyRes, portfolioRes] = await Promise.all([
+          axios.get(`${API}/companies/${id}`),
+          axios.get(`${API}/portfolio/${id}`)
+        ]);
+        setCompany(companyRes.data);
+        setPortfolio(portfolioRes.data.projects || []);
+      } catch {
         toast.error('Фирмата не е намерена');
         navigate('/companies');
-      })
-      .finally(() => setLoading(false));
+      }
+      setLoading(false);
+    };
+    fetchData();
   }, [id, navigate]);
 
   const handleSubmitReview = async () => {
