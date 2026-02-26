@@ -1170,6 +1170,19 @@ const ProjectDetailPage = () => {
                       </a>
                     </div>
                   </div>
+                  {user && user.id !== project.client_id && (
+                    <div className="mt-4 pt-4 border-t border-green-200">
+                      <Button 
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => navigate(`/messages?to=${project.client_id}&project=${id}`)}
+                        data-testid="send-message-unlocked"
+                      >
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Изпрати съобщение
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
