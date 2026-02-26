@@ -534,6 +534,87 @@ async def get_my_company(user: dict = Depends(get_current_user)):
     
     return profile
 
+# ============== PORTFOLIO ROUTES ==============
+
+@api_router.get("/portfolio/{company_id}")
+async def get_company_portfolio(company_id: str):
+    """Get all portfolio projects for a company"""
+    projects = await db.portfolio_projects.find(
+        {"company_id": company_id}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    return {"projects": projects}
+
+@api_router.post("/portfolio")
+async def add_portfolio_project(
+    project_data: PortfolioProjectCreate, 
+    user: dict = Depends(get_current_user)
+):
+    """Add a new portfolio project (company only)"""
+    if user["user_type"] != "company":
+        raise HTTPException(status_code=403, detail="Само фирми могат да добавят проекти в портфолиото")
+    
+    # Get company profile
+    profile = await db.company_profiles.find_one({"user_id": user["id"]})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Профилът не е намерен")
+    
+    project_dict = {
+        "id": str(uuid.uuid4()),
+        "company_id": profile["id"],
+        "title": project_data.title,
+        "description": project_data.description,
+        "category": project_data.category,
+        "location": project_data.location,
+        "before_images": project_data.before_images[:5],  # Limit to 5
+        "after_images": project_data.after_images[:5],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.portfolio_projects.insert_one(project_dict)
+    
+    return {"message": "Проектът е добавен успешно", "project_id": project_dict["id"]}
+
+@api_router.delete("/portfolio/{project_id}")
+async def delete_portfolio_project(project_id: str, user: dict = Depends(get_current_user)):
+    """Delete a portfolio project (owner only)"""
+    if user["user_type"] != "company":
+        raise HTTPException(status_code=403, detail="Само фирми могат да изтриват проекти")
+    
+    # Get company profile
+    profile = await db.company_profiles.find_one({"user_id": user["id"]})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Профилът не е намерен")
+    
+    # Check ownership
+    project = await db.portfolio_projects.find_one({"id": project_id})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    
+    if project["company_id"] != profile["id"]:
+        raise HTTPException(status_code=403, detail="Нямате права да изтривате този проект")
+    
+    await db.portfolio_projects.delete_one({"id": project_id})
+    
+    return {"message": "Проектът е изтрит успешно"}
+
+@api_router.get("/my-portfolio")
+async def get_my_portfolio(user: dict = Depends(get_current_user)):
+    """Get portfolio for current company user"""
+    if user["user_type"] != "company":
+        raise HTTPException(status_code=403, detail="Тази функция е само за фирми")
+    
+    profile = await db.company_profiles.find_one({"user_id": user["id"]})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Профилът не е намерен")
+    
+    projects = await db.portfolio_projects.find(
+        {"company_id": profile["id"]}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    return {"projects": projects}
+
 # ============== REVIEWS ROUTES ==============
 
 @api_router.post("/reviews")
