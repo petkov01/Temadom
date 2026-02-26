@@ -272,7 +272,7 @@ const Footer = () => (
       </div>
       <Separator className="my-8 bg-slate-700" />
       <p className="text-center text-slate-500 text-sm">
-        © 2024 Maistori. Всички права запазени.
+        © 2024 TemaDom. Всички права запазени.
       </p>
     </div>
   </footer>
