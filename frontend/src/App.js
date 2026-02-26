@@ -215,17 +215,23 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-slate-200 animate-slideDown">
           <div className="px-4 py-4 space-y-3">
-            <Link to="/projects" className="block py-2 text-slate-600" onClick={() => setMobileMenuOpen(false)}>
-              Проекти
+            <Link to="/projects" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <FolderSearch className="h-4 w-4" /> Проекти
             </Link>
-            <Link to="/companies" className="block py-2 text-slate-600" onClick={() => setMobileMenuOpen(false)}>
-              Фирми
+            <Link to="/companies" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <Building2 className="h-4 w-4" /> Фирми
             </Link>
             <Link to="/calculator" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
               <Calculator className="h-4 w-4" /> Калкулатор
             </Link>
-            <Link to="/services" className="block py-2 text-slate-600" onClick={() => setMobileMenuOpen(false)}>
-              Услуги
+            <Link to="/services" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <Hammer className="h-4 w-4" /> Услуги
+            </Link>
+            <Link to="/professions" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <HardHat className="h-4 w-4" /> Професии
+            </Link>
+            <Link to="/about" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <Info className="h-4 w-4" /> За нас
             </Link>
             {user ? (
               <>
