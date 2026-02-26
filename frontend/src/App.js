@@ -255,6 +255,8 @@ const Footer = () => (
           <ul className="space-y-2 text-slate-400 text-sm">
             <li><Link to="/register" className="hover:text-white transition-colors">Публикувай проект</Link></li>
             <li><Link to="/companies" className="hover:text-white transition-colors">Намери фирма</Link></li>
+            <li><Link to="/services" className="hover:text-white transition-colors">Услуги</Link></li>
+            <li><Link to="/calculator" className="hover:text-white transition-colors">Калкулатор</Link></li>
           </ul>
         </div>
         <div>
