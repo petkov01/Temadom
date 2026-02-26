@@ -792,6 +792,38 @@ const PriceCalculator = () => {
                       </p>
                     </div>
 
+                    {/* Download PDF button */}
+                    {calculation.total > 0 && (
+                      <Button 
+                        className="w-full mt-4 bg-orange-600 hover:bg-orange-700"
+                        onClick={async () => {
+                          try {
+                            const res = await axios.post(`${CALC_API}/calculator/pdf`, {
+                              items: calculation.items,
+                              regionName: calculation.regionName,
+                              regionMultiplier: calculation.regionMultiplier,
+                              pricingType,
+                              qualityLevel,
+                              total: calculation.total
+                            }, { responseType: 'blob' });
+                            const url = window.URL.createObjectURL(new Blob([res.data]));
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = 'temadom_kalkulaciya.pdf';
+                            link.click();
+                            window.URL.revokeObjectURL(url);
+                            toast.success('PDF офертата е изтеглена');
+                          } catch {
+                            toast.error('Грешка при генериране на PDF');
+                          }
+                        }}
+                        data-testid="download-pdf-btn"
+                      >
+                        <FileDown className="mr-2 h-4 w-4" />
+                        Изтегли PDF оферта
+                      </Button>
+                    )}
+
                     <p className="text-xs text-slate-500 mt-4 text-center">
                       * Цените са ориентировъчни и могат да варират в зависимост от специфичните условия на обекта.
                     </p>
