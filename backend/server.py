@@ -995,6 +995,264 @@ async def get_free_leads_status(user: dict = Depends(get_current_user)):
 
 # ============== STATS ROUTES ==============
 
+# ============== CALCULATOR USAGE TRACKING ==============
+
+@api_router.post("/calculator/log-use")
+async def log_calculator_use(user: dict = Depends(get_current_user)):
+    """Log a calculator use for a company user. Returns remaining free uses."""
+    if user["user_type"] != "company":
+        return {"allowed": True, "remaining": -1}  # Clients have unlimited access
+    
+    if user.get("subscription_active"):
+        return {"allowed": True, "remaining": -1}  # Subscribers have unlimited access
+    
+    uses = user.get("calculator_uses", 0)
+    if uses >= CALCULATOR_FREE_USES:
+        return {"allowed": False, "remaining": 0, "message": "Изчерпахте безплатните калкулации. Моля, платете €10 или се абонирайте."}
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$inc": {"calculator_uses": 1}}
+    )
+    
+    remaining = CALCULATOR_FREE_USES - uses - 1
+    return {"allowed": True, "remaining": remaining}
+
+@api_router.get("/calculator/status")
+async def get_calculator_status(user: dict = Depends(get_current_user)):
+    """Get calculator usage status for current user."""
+    if user["user_type"] != "company":
+        return {"unlimited": True, "uses": 0, "remaining": -1}
+    
+    if user.get("subscription_active"):
+        return {"unlimited": True, "uses": 0, "remaining": -1}
+    
+    uses = user.get("calculator_uses", 0)
+    remaining = max(0, CALCULATOR_FREE_USES - uses)
+    return {"unlimited": False, "uses": uses, "limit": CALCULATOR_FREE_USES, "remaining": remaining}
+
+@api_router.post("/calculator/pay")
+async def pay_calculator_use(request: Request, user: dict = Depends(get_current_user)):
+    """Create Stripe checkout for calculator usage payment (€10)"""
+    if user["user_type"] != "company":
+        raise HTTPException(status_code=403, detail="Само фирми")
+    
+    origin = request.headers.get("origin", str(request.base_url).rstrip("/"))
+    host_url = str(request.base_url).rstrip("/")
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    
+    success_url = f"{origin}/calculator?paid=true"
+    cancel_url = f"{origin}/calculator?paid=false"
+    
+    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+    
+    metadata = {"user_id": user["id"], "package_type": "calculator_use"}
+    
+    checkout_request = CheckoutSessionRequest(
+        amount=CALCULATOR_PAY_AMOUNT,
+        currency="eur",
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata=metadata
+    )
+    
+    session = await stripe_checkout.create_checkout_session(checkout_request)
+    
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "session_id": session.session_id,
+        "package_type": "calculator_use",
+        "amount": CALCULATOR_PAY_AMOUNT,
+        "currency": "eur",
+        "status": "pending",
+        "payment_status": "pending",
+        "project_id": None,
+        "metadata": metadata,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.payment_transactions.insert_one(transaction)
+    
+    return {"checkout_url": session.url, "session_id": session.session_id}
+
+# ============== CHAT / MESSAGING ROUTES ==============
+
+@api_router.get("/conversations")
+async def get_conversations(user: dict = Depends(get_current_user)):
+    """Get all conversations for the current user"""
+    conversations = await db.messages.aggregate([
+        {"$match": {"$or": [{"sender_id": user["id"]}, {"receiver_id": user["id"]}]}},
+        {"$sort": {"created_at": -1}},
+        {"$group": {
+            "_id": "$conversation_id",
+            "last_message": {"$first": "$$ROOT"},
+            "unread_count": {"$sum": {"$cond": [
+                {"$and": [
+                    {"$eq": ["$receiver_id", user["id"]]},
+                    {"$eq": ["$read", False]}
+                ]}, 1, 0
+            ]}}
+        }},
+        {"$sort": {"last_message.created_at": -1}}
+    ]).to_list(50)
+    
+    result = []
+    for conv in conversations:
+        msg = conv["last_message"]
+        other_id = msg["receiver_id"] if msg["sender_id"] == user["id"] else msg["sender_id"]
+        other_user = await db.users.find_one({"id": other_id}, {"_id": 0, "password_hash": 0})
+        
+        result.append({
+            "conversation_id": conv["_id"],
+            "other_user": {
+                "id": other_user["id"] if other_user else other_id,
+                "name": other_user.get("name", "Неизвестен") if other_user else "Неизвестен",
+                "user_type": other_user.get("user_type", "") if other_user else ""
+            },
+            "last_message": msg.get("content", ""),
+            "last_message_at": msg.get("created_at"),
+            "unread_count": conv["unread_count"],
+            "project_id": msg.get("project_id")
+        })
+    
+    return {"conversations": result}
+
+@api_router.get("/messages/{conversation_id}")
+async def get_messages(conversation_id: str, user: dict = Depends(get_current_user)):
+    """Get messages for a conversation"""
+    messages = await db.messages.find(
+        {"conversation_id": conversation_id},
+        {"_id": 0}
+    ).sort("created_at", 1).to_list(200)
+    
+    # Verify user is part of conversation
+    if messages and messages[0]["sender_id"] != user["id"] and messages[0]["receiver_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Нямате достъп до тази кореспонденция")
+    
+    # Mark as read
+    await db.messages.update_many(
+        {"conversation_id": conversation_id, "receiver_id": user["id"], "read": False},
+        {"$set": {"read": True}}
+    )
+    
+    return {"messages": messages}
+
+@api_router.post("/messages")
+async def send_message(
+    data: dict,
+    user: dict = Depends(get_current_user)
+):
+    """Send a message. Contact info is filtered for companies without access."""
+    receiver_id = data.get("receiver_id")
+    content = data.get("content", "").strip()
+    project_id = data.get("project_id")
+    
+    if not receiver_id or not content:
+        raise HTTPException(status_code=400, detail="Получателят и съдържанието са задължителни")
+    
+    if len(content) > 2000:
+        raise HTTPException(status_code=400, detail="Съобщението е прекалено дълго (макс. 2000 символа)")
+    
+    # Check if receiver exists
+    receiver = await db.users.find_one({"id": receiver_id}, {"_id": 0})
+    if not receiver:
+        raise HTTPException(status_code=404, detail="Получателят не е намерен")
+    
+    # Determine if sender is a company that hasn't paid for this project's contact
+    is_contact_filtered = False
+    if user["user_type"] == "company" and not user.get("subscription_active"):
+        purchased = user.get("purchased_leads", [])
+        # If there's a project context, check if company has access
+        if project_id and project_id not in purchased:
+            is_contact_filtered = True
+        # Even without project context, filter if company hasn't paid in general
+        elif not project_id:
+            is_contact_filtered = True
+    
+    # Filter contact info from company messages if they haven't paid
+    filtered_content = content
+    was_filtered = False
+    if is_contact_filtered and contains_contact_info(content):
+        filtered_content = censor_contact_info(content)
+        was_filtered = True
+    
+    # Also filter client messages if they contain contact info and company hasn't paid
+    # Actually, clients should be free to share - but companies shouldn't share their own contact info to bypass
+    # The key rule: if EITHER party hasn't paid, contact info is blocked in messages
+    if user["user_type"] == "client":
+        # Check if the receiving company has paid
+        if receiver.get("user_type") == "company" and not receiver.get("subscription_active"):
+            recv_purchased = receiver.get("purchased_leads", [])
+            # Check if the company has access to any project from this client
+            client_projects = await db.projects.find({"client_id": user["id"]}, {"id": 1, "_id": 0}).to_list(100)
+            client_project_ids = [p["id"] for p in client_projects]
+            has_any_access = any(pid in recv_purchased for pid in client_project_ids)
+            if not has_any_access and contains_contact_info(content):
+                filtered_content = censor_contact_info(content)
+                was_filtered = True
+    
+    # Generate conversation ID (sorted user IDs to ensure consistency)
+    sorted_ids = sorted([user["id"], receiver_id])
+    conv_id = f"{sorted_ids[0]}_{sorted_ids[1]}"
+    if project_id:
+        conv_id = f"{conv_id}_{project_id}"
+    
+    message = {
+        "id": str(uuid.uuid4()),
+        "conversation_id": conv_id,
+        "sender_id": user["id"],
+        "sender_name": user["name"],
+        "receiver_id": receiver_id,
+        "content": filtered_content,
+        "original_content": content if was_filtered else None,
+        "was_filtered": was_filtered,
+        "project_id": project_id,
+        "read": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.messages.insert_one(message)
+    
+    response = {
+        "id": message["id"],
+        "conversation_id": conv_id,
+        "sender_id": message["sender_id"],
+        "sender_name": message["sender_name"],
+        "receiver_id": message["receiver_id"],
+        "content": message["content"],
+        "was_filtered": was_filtered,
+        "project_id": message["project_id"],
+        "read": message["read"],
+        "created_at": message["created_at"]
+    }
+    
+    if was_filtered:
+        response["filter_notice"] = "Съобщението е филтрирано. Контактната информация е скрита, защото фирмата не е заплатила за достъп."
+    
+    return response
+
+@api_router.get("/unread-count")
+async def get_unread_count(user: dict = Depends(get_current_user)):
+    """Get total unread message count"""
+    count = await db.messages.count_documents({
+        "receiver_id": user["id"],
+        "read": False
+    })
+    return {"unread_count": count}
+
+@api_router.get("/user/{user_id}/basic")
+async def get_user_basic(user_id: str):
+    """Get basic user info for chat"""
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    if not u:
+        raise HTTPException(status_code=404, detail="Потребителят не е намерен")
+    return {
+        "id": u["id"],
+        "name": u["name"],
+        "user_type": u.get("user_type", "")
+    }
+
 @api_router.get("/stats")
 async def get_stats():
     total_projects = await db.projects.count_documents({"status": "active"})
