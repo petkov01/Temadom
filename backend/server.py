@@ -108,6 +108,7 @@ class ProjectCreate(BaseModel):
     budget_max: Optional[float] = None
     deadline: Optional[str] = None
     images: List[str] = []  # Up to 10 images (base64 or URLs)
+    estimated_budget: Optional[float] = None  # Calculator estimate in EUR
 
 class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
