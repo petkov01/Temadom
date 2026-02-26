@@ -848,6 +848,7 @@ const ProjectDetailPage = () => {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [freeLeadsRemaining, setFreeLeadsRemaining] = useState(0);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -862,7 +863,30 @@ const ProjectDetailPage = () => {
       setLoading(false);
     };
     fetchProject();
-  }, [id, token, navigate]);
+    // Fetch free leads status for companies
+    if (token && user?.user_type === 'company') {
+      axios.get(`${API}/leads/free-status`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => setFreeLeadsRemaining(res.data.free_leads_remaining))
+        .catch(() => {});
+    }
+  }, [id, token, navigate, user]);
+
+  const handleClaimFreeLead = async () => {
+    setPaymentLoading(true);
+    try {
+      const res = await axios.post(`${API}/leads/claim-free/${id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(res.data.message);
+      setFreeLeadsRemaining(res.data.free_leads_remaining);
+      // Refresh project to show contact info
+      const projRes = await axios.get(`${API}/projects/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      setProject(projRes.data);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка');
+    }
+    setPaymentLoading(false);
+  };
 
   const handlePurchase = async (type) => {
     if (!user) {
