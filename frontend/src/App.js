@@ -13,46 +13,16 @@ import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 import ProjectEstimator from '@/components/ProjectEstimator';
 
-// TemaDom Logo Component - EXACT from design
-const TemaDomLogo = ({ className = "h-10", variant = "default" }) => {
-  const isDark = variant === "dark";
-  
-  return (
-    <svg viewBox="0 0 280 60" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* T */}
-      <text x="0" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#2C3E50">T</text>
-      {/* e */}
-      <text x="24" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#2C3E50">e</text>
-      {/* m */}
-      <text x="48" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#2C3E50">m</text>
-      
-      {/* 'a' with house - the key element */}
-      <g transform="translate(88, 4)">
-        {/* House roof (forms top of 'a') */}
-        <path d="M16 0L0 14H6V28H26V14H32L16 0Z" fill="#2C3E50"/>
-        {/* Orange hexagon door with wrench */}
-        <g transform="translate(6, 12)">
-          <rect x="0" y="0" width="20" height="16" rx="2" fill="#E67E22"/>
-          {/* Wrench icon inside */}
-          <path d="M7 4L10 8L13 4M10 8V13" stroke="#2C3E50" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </g>
-      </g>
-      
-      {/* D */}
-      <text x="124" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#34495E">D</text>
-      {/* o */}
-      <text x="156" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#34495E">o</text>
-      {/* m */}
-      <text x="184" y="38" fontFamily="'Manrope', sans-serif" fontWeight="800" fontSize="36" fill="#34495E">m</text>
-      
-      {/* Orange underline */}
-      <rect x="0" y="44" width="220" height="4" rx="2" fill="#E67E22"/>
-      
-      {/* Tagline */}
-      <text x="0" y="58" fontFamily="'Manrope', sans-serif" fontWeight="700" fontSize="9" fill="#34495E" letterSpacing="2">РЕМОНТИ И СТРОИТЕЛСТВО</text>
-    </svg>
-  );
-};
+// TemaDom Logo Component - Uses the exact user-provided logo image
+const TemaDomLogo = ({ className = "h-10" }) => (
+  <img 
+    src="/logo-nav.png" 
+    alt="TemaDom - Ремонти и строителство" 
+    className={className}
+    style={{ objectFit: 'contain' }}
+    data-testid="temadom-logo"
+  />
+);
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
