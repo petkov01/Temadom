@@ -1136,6 +1136,22 @@ const CompanyDetailPage = () => {
           </CardContent>
         </Card>
 
+        {/* Portfolio Section */}
+        {portfolio.length > 0 && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Портфолио</CardTitle>
+              <CardDescription>Снимки преди и след извършени проекти</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PortfolioGallery 
+                projects={portfolio} 
+                isOwner={false}
+              />
+            </CardContent>
+          </Card>
+        )}
+
         {/* Reviews Section */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
