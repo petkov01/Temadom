@@ -1959,7 +1959,8 @@ const ClientDashboard = () => {
     city: '',
     budget_min: '',
     budget_max: '',
-    images: []
+    images: [],
+    estimated_budget: null
   });
   const [submitting, setSubmitting] = useState(false);
   const imageInputRef = React.useRef(null);
