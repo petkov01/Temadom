@@ -82,6 +82,9 @@ class User(UserBase):
     subscription_active: bool = False
     subscription_expires: Optional[datetime] = None
     purchased_leads: List[str] = []  # List of project IDs
+    free_leads_used: int = 0  # Track free leads (first 3 are free)
+
+FREE_LEADS_LIMIT = 3  # First 3 contacts are free for companies
 
 class CompanyProfile(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
