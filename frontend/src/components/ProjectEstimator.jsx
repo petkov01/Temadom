@@ -79,12 +79,14 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
     return Math.round(total);
   }, [selectedServices, region]);
 
-  // Notify parent of estimate change
+  // Notify parent of estimate change - use ref to avoid infinite loop
+  const prevEstimateRef = React.useRef(null);
   React.useEffect(() => {
-    if (onEstimateChange) {
+    if (onEstimateChange && prevEstimateRef.current !== estimate) {
+      prevEstimateRef.current = estimate;
       onEstimateChange(estimate > 0 ? estimate : null);
     }
-  }, [estimate, onEstimateChange]);
+  }, [estimate]);
 
   return (
     <Card className="border-orange-200 bg-orange-50/50">
