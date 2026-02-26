@@ -125,6 +125,7 @@ class Project(BaseModel):
     budget_max: Optional[float] = None
     deadline: Optional[str] = None
     images: List[str] = []  # Project images
+    estimated_budget: Optional[float] = None  # Calculator estimate in EUR
     status: str = "active"  # active, closed, in_progress
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     views: int = 0
