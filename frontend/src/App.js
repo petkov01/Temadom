@@ -972,6 +972,51 @@ const ProjectDetailPage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Image Lightbox */}
+        {project.images && project.images.length > 0 && (
+          <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+            <DialogContent className="max-w-5xl p-0 bg-black/95">
+              <div className="relative">
+                <div className="aspect-[16/10]">
+                  <img 
+                    src={project.images[selectedImageIndex]} 
+                    alt={`Снимка ${selectedImageIndex + 1}`}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                
+                {project.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => navigateImage('prev')}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors"
+                    >
+                      <ChevronLeft className="h-8 w-8" />
+                    </button>
+                    <button
+                      onClick={() => navigateImage('next')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors"
+                    >
+                      <ChevronRight className="h-8 w-8" />
+                    </button>
+                  </>
+                )}
+                
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 px-4 py-2 rounded-full text-white text-sm">
+                  {selectedImageIndex + 1} / {project.images.length}
+                </div>
+                
+                <button
+                  onClick={() => setLightboxOpen(false)}
+                  className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   );
