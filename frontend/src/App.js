@@ -1060,6 +1060,22 @@ const ProjectDetailPage = () => {
               </div>
             )}
 
+            {/* Estimated Budget from Calculator */}
+            {project.estimated_budget && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-8">
+                <div className="flex items-center gap-3 mb-2">
+                  <Calculator className="h-5 w-5 text-orange-600" />
+                  <h4 className="font-semibold text-orange-800">Оценка от калкулатора</h4>
+                </div>
+                <p className="text-3xl font-bold text-orange-600">
+                  ~{project.estimated_budget} €
+                </p>
+                <p className="text-sm text-orange-700 mt-1">
+                  ≈ {Math.round(project.estimated_budget * 1.95)} лв. (ориентировъчна стойност)
+                </p>
+              </div>
+            )}
+
             {/* Contact Info Section */}
             <div className="border-t border-slate-200 pt-8">
               <h3 className="text-lg font-semibold mb-4">Информация за контакт</h3>
