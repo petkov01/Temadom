@@ -188,6 +188,36 @@ class TemaDomAPITester:
             return response["project_id"]
         return None
 
+    def test_create_project_with_images(self):
+        """Test project creation with images array (requires client login)"""
+        if not self.token:
+            self.log_test("Create Project with Images", False, error="No auth token")
+            return None
+
+        # Test with sample base64 image URLs (using placeholder images)
+        test_images = [
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDAREAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/wA=",
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDAREAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/wA="
+        ]
+
+        project_data = {
+            "title": "Тест ремонт с изображения",
+            "description": "Проект за тестване на функционалността за качване на изображения.",
+            "category": "painting", 
+            "city": "София",
+            "address": "ул. Тест 456",
+            "budget_min": 1000.0,
+            "budget_max": 3000.0,
+            "deadline": "2024-07-30",
+            "images": test_images
+        }
+        
+        response = self.run_test("Create Project with Images", "POST", "/projects", 200, project_data)
+        if response and "project_id" in response:
+            self.log_test("Project Images Support", True, "Project created with images array")
+            return response["project_id"]
+        return None
+
     def test_get_projects(self):
         """Test get projects list"""
         response = self.run_test("Get Projects List", "GET", "/projects", 200)
