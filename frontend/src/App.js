@@ -267,6 +267,7 @@ const Footer = () => (
         <div>
           <div className="mb-4">
             <img src="/logo-footer.png" alt="TemaDom" className="h-12 brightness-0 invert" />
+            <p className="text-orange-400 text-xs font-bold tracking-widest uppercase mt-1">Ремонт и строителство</p>
           </div>
           <p className="text-slate-400 text-sm">
             Свържете се с най-добрите майстори и фирми за вашите строителни проекти.
@@ -279,6 +280,7 @@ const Footer = () => (
             <li><Link to="/companies" className="hover:text-white transition-colors">Намери фирма</Link></li>
             <li><Link to="/services" className="hover:text-white transition-colors">Услуги</Link></li>
             <li><Link to="/calculator" className="hover:text-white transition-colors">Калкулатор</Link></li>
+            <li><Link to="/professions" className="hover:text-white transition-colors">Наръчник за професии</Link></li>
           </ul>
         </div>
         <div>
@@ -289,9 +291,11 @@ const Footer = () => (
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-4">Контакти</h4>
+          <h4 className="font-semibold mb-4">Информация</h4>
           <ul className="space-y-2 text-slate-400 text-sm">
-            <li>info@maistori.bg</li>
+            <li><Link to="/about" className="hover:text-white transition-colors">За нас</Link></li>
+            <li><Link to="/terms" className="hover:text-white transition-colors">Правила и условия</Link></li>
+            <li>info@temadom.bg</li>
             <li>+359 88 888 8888</li>
           </ul>
         </div>
