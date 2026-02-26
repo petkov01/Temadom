@@ -231,18 +231,8 @@ const Footer = () => (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="bg-white p-2 rounded">
-              <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none">
-                <path d="M12 2L2 10H5V20H19V10H22L12 2Z" fill="#0F172A"/>
-                <rect x="9" y="11" width="6" height="9" fill="#F59E0B"/>
-                <path d="M10 15L12 17L15 13" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <div>
-              <span className="text-xl font-bold">TemaDom</span>
-              <p className="text-xs text-slate-400">Ремонти и строителство</p>
-            </div>
+          <div className="mb-4">
+            <img src="/logo-footer.png" alt="TemaDom" className="h-12 brightness-0 invert" />
           </div>
           <p className="text-slate-400 text-sm">
             Свържете се с най-добрите майстори и фирми за вашите строителни проекти.
