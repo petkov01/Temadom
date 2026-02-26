@@ -85,6 +85,34 @@ class User(UserBase):
     free_leads_used: int = 0  # Track free leads (first 3 are free)
 
 FREE_LEADS_LIMIT = 3  # First 3 contacts are free for companies
+CALCULATOR_FREE_USES = 5  # Companies get 5 free calculator uses
+CALCULATOR_PAY_AMOUNT = 10.0  # €10 per additional use
+
+# Contact info patterns for chat filtering
+import re
+BLOCKED_PATTERNS = [
+    re.compile(r'\+?\d[\d\s\-()]{7,}'),  # Phone numbers
+    re.compile(r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}'),  # Emails
+    re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'),  # IP addresses
+    re.compile(r'@[a-zA-Z0-9_]{3,}'),  # Social media handles
+    re.compile(r'(viber|whatsapp|telegram|skype|facebook|messenger|instagram)\s*[:\-]?\s*\S+', re.IGNORECASE),  # Messenger refs
+    re.compile(r'0\d{9}'),  # Bulgarian phone (0888123456)
+    re.compile(r'\b\d{2,4}[\s\-\.]\d{3}[\s\-\.]\d{3,4}\b'),  # Formatted phones
+]
+
+def contains_contact_info(text: str) -> bool:
+    """Check if text contains phone numbers, emails, or other contact info"""
+    for pattern in BLOCKED_PATTERNS:
+        if pattern.search(text):
+            return True
+    return False
+
+def censor_contact_info(text: str) -> str:
+    """Replace contact info with [***]"""
+    result = text
+    for pattern in BLOCKED_PATTERNS:
+        result = pattern.sub('[*** контактна информация скрита ***]', result)
+    return result
 
 class CompanyProfile(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
