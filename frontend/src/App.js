@@ -205,6 +205,9 @@ const Navbar = () => {
             <Link to="/companies" className="block py-2 text-slate-600" onClick={() => setMobileMenuOpen(false)}>
               Фирми
             </Link>
+            <Link to="/calculator" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <Calculator className="h-4 w-4" /> Калкулатор
+            </Link>
             {user ? (
               <>
                 <Link to="/dashboard" className="block py-2 text-slate-600" onClick={() => setMobileMenuOpen(false)}>
