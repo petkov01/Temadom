@@ -329,9 +329,18 @@ def main():
     if tester.test_login("client@test.bg", "test123", "client"):
         tester.test_auth_me()
         project_id = tester.test_create_project()
+        project_with_images_id = tester.test_create_project_with_images()
         tester.test_get_projects()
         if project_id:
             tester.test_get_project_detail(project_id)
+        if project_with_images_id:
+            project_detail = tester.test_get_project_detail(project_with_images_id)
+            # Check if images are present in project detail
+            if project_detail and "images" in project_detail:
+                images_count = len(project_detail.get("images", []))
+                tester.log_test("Project Images in Detail", images_count > 0, f"Found {images_count} images")
+            else:
+                tester.log_test("Project Images in Detail", False, error="No images field in project detail")
     
     # Test company login and operations
     print("\n🏢 Testing Company Operations...")  
