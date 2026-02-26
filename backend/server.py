@@ -1262,6 +1262,132 @@ async def get_user_basic(user_id: str):
         "user_type": u.get("user_type", "")
     }
 
+# ============== PDF GENERATION ==============
+
+@api_router.post("/calculator/pdf")
+async def generate_calculator_pdf(data: dict):
+    """Generate a PDF quote from calculator data"""
+    from fpdf import FPDF
+    import io
+    
+    items = data.get("items", [])
+    region_name = data.get("regionName", "")
+    region_multiplier = data.get("regionMultiplier", 1.0)
+    pricing_type = data.get("pricingType", "laborAndMaterial")
+    quality_level = data.get("qualityLevel", "standard")
+    total = data.get("total", 0)
+    
+    quality_labels = {"economy": "Икономичен", "standard": "Стандартен", "premium": "Премиум"}
+    type_labels = {"labor": "Само труд", "laborAndMaterial": "Труд + материали"}
+    
+    # Create PDF with Unicode support
+    pdf = FPDF()
+    pdf.add_page()
+    
+    # Add Unicode font
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    bold_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    
+    try:
+        pdf.add_font("DejaVu", "", font_path, uni=True)
+        pdf.add_font("DejaVu", "B", bold_font_path, uni=True)
+        font_name = "DejaVu"
+    except Exception:
+        font_name = "Helvetica"
+    
+    # Header
+    pdf.set_fill_color(242, 109, 33)  # Orange
+    pdf.rect(0, 0, 210, 40, 'F')
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(font_name, 'B', 22)
+    pdf.set_y(8)
+    pdf.cell(0, 12, "TemaDom", ln=True, align='C')
+    pdf.set_font(font_name, '', 10)
+    pdf.cell(0, 8, "РЕМОНТИ И СТРОИТЕЛСТВО", ln=True, align='C')
+    
+    # Title
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_y(50)
+    pdf.set_font(font_name, 'B', 16)
+    pdf.cell(0, 10, "Ценова оферта / Калкулация", ln=True, align='C')
+    
+    # Details
+    pdf.set_font(font_name, '', 10)
+    pdf.set_text_color(100, 100, 100)
+    pdf.ln(5)
+    from datetime import datetime, timezone
+    pdf.cell(0, 6, f"Дата: {datetime.now(timezone.utc).strftime('%d.%m.%Y')}", ln=True)
+    pdf.cell(0, 6, f"Регион: {region_name} (x{region_multiplier:.2f})", ln=True)
+    pdf.cell(0, 6, f"Тип: {type_labels.get(pricing_type, pricing_type)}", ln=True)
+    pdf.cell(0, 6, f"Качество: {quality_labels.get(quality_level, quality_level)}", ln=True)
+    
+    pdf.ln(8)
+    
+    # Table header
+    pdf.set_fill_color(45, 55, 72)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(font_name, 'B', 10)
+    pdf.cell(70, 8, "Услуга", 1, 0, 'L', True)
+    pdf.cell(30, 8, "Количество", 1, 0, 'C', True)
+    pdf.cell(30, 8, "Ед. цена", 1, 0, 'C', True)
+    pdf.cell(30, 8, "Цена (EUR)", 1, 0, 'C', True)
+    pdf.cell(30, 8, "Цена (BGN)", 1, 1, 'C', True)
+    
+    # Table body
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font(font_name, '', 9)
+    fill = False
+    for item in items:
+        if item.get("quantity", 0) <= 0:
+            continue
+        if fill:
+            pdf.set_fill_color(245, 245, 245)
+        else:
+            pdf.set_fill_color(255, 255, 255)
+        
+        name = item.get("name", "")
+        qty = item.get("quantity", 0)
+        unit = item.get("unit", "")
+        base_price = item.get("basePrice", 0)
+        item_total = item.get("total", 0)
+        
+        pdf.cell(70, 7, f"{name}", 1, 0, 'L', fill)
+        pdf.cell(30, 7, f"{qty} {unit}", 1, 0, 'C', fill)
+        pdf.cell(30, 7, f"{base_price:.2f} EUR", 1, 0, 'C', fill)
+        pdf.cell(30, 7, f"{item_total:.2f} EUR", 1, 0, 'C', fill)
+        pdf.cell(30, 7, f"{item_total * 1.9558:.2f} BGN", 1, 1, 'C', fill)
+        fill = not fill
+    
+    # Total
+    pdf.ln(3)
+    pdf.set_fill_color(242, 109, 33)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(font_name, 'B', 12)
+    pdf.cell(130, 10, "ОБЩА СУМА:", 0, 0, 'R')
+    pdf.cell(30, 10, f"{total:.2f} EUR", 0, 0, 'C')
+    pdf.cell(30, 10, f"{total * 1.9558:.2f} BGN", 0, 1, 'C')
+    
+    # Footer note
+    pdf.ln(15)
+    pdf.set_text_color(120, 120, 120)
+    pdf.set_font(font_name, '', 8)
+    pdf.multi_cell(0, 5, 
+        "* Тази оферта е ориентировъчна и базирана на средни пазарни цени за 2025-2026 г. "
+        "Реалните цени могат да варират. За точна оферта, свържете се с фирмите чрез TemaDom.\n"
+        "* Генерирано от калкулатора на TemaDom - https://temadom.bg"
+    )
+    
+    # Output
+    pdf_bytes = pdf.output()
+    buffer = io.BytesIO(pdf_bytes)
+    buffer.seek(0)
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=temadom_kalkulaciya.pdf"}
+    )
+
 @api_router.get("/stats")
 async def get_stats():
     total_projects = await db.projects.count_documents({"status": "active"})
