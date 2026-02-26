@@ -28,11 +28,34 @@ const QUICK_PRICES = {
 };
 
 const REGIONS = {
-  sofia: { name: "София", multiplier: 1.15 },
-  plovdiv: { name: "Пловдив", multiplier: 1.0 },
-  varna: { name: "Варна", multiplier: 1.05 },
-  burgas: { name: "Бургас", multiplier: 1.0 },
-  other: { name: "Друг град", multiplier: 0.90 }
+  sofia_city: { name: "София (столица)", multiplier: 1.20 },
+  sofia_oblast: { name: "Софийска област", multiplier: 1.05 },
+  plovdiv: { name: "Пловдив", multiplier: 1.05 },
+  varna: { name: "Варна", multiplier: 1.08 },
+  burgas: { name: "Бургас", multiplier: 1.05 },
+  stara_zagora: { name: "Стара Загора", multiplier: 0.98 },
+  ruse: { name: "Русе", multiplier: 0.95 },
+  pleven: { name: "Плевен", multiplier: 0.92 },
+  blagoevgrad: { name: "Благоевград", multiplier: 0.95 },
+  veliko_tarnovo: { name: "Велико Търново", multiplier: 0.93 },
+  dobrich: { name: "Добрич", multiplier: 0.95 },
+  vidin: { name: "Видин", multiplier: 0.82 },
+  montana: { name: "Монтана", multiplier: 0.83 },
+  vratsa: { name: "Враца", multiplier: 0.85 },
+  lovech: { name: "Ловеч", multiplier: 0.88 },
+  gabrovo: { name: "Габрово", multiplier: 0.90 },
+  targovishte: { name: "Търговище", multiplier: 0.85 },
+  razgrad: { name: "Разград", multiplier: 0.84 },
+  shumen: { name: "Шумен", multiplier: 0.88 },
+  silistra: { name: "Силистра", multiplier: 0.82 },
+  pazardzhik: { name: "Пазарджик", multiplier: 0.92 },
+  smolyan: { name: "Смолян", multiplier: 0.88 },
+  kardzhali: { name: "Кърджали", multiplier: 0.85 },
+  haskovo: { name: "Хасково", multiplier: 0.90 },
+  yambol: { name: "Ямбол", multiplier: 0.88 },
+  sliven: { name: "Сливен", multiplier: 0.88 },
+  pernik: { name: "Перник", multiplier: 0.95 },
+  kyustendil: { name: "Кюстендил", multiplier: 0.87 }
 };
 
 // Mini calculator for project creation
