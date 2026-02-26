@@ -1479,8 +1479,10 @@ const CompanyDashboard = () => {
   const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
   const [profile, setProfile] = useState(null);
+  const [portfolio, setPortfolio] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
+  const [activeTab, setActiveTab] = useState('leads');
 
   useEffect(() => {
     if (!user || user.user_type !== 'company') {
@@ -1490,14 +1492,16 @@ const CompanyDashboard = () => {
 
     const fetchData = async () => {
       try {
-        const [leadsRes, profileRes, catsRes] = await Promise.all([
+        const [leadsRes, profileRes, catsRes, portfolioRes] = await Promise.all([
           axios.get(`${API}/my-leads`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${API}/my-company`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API}/categories`)
+          axios.get(`${API}/categories`),
+          axios.get(`${API}/my-portfolio`, { headers: { Authorization: `Bearer ${token}` } })
         ]);
         setLeads(leadsRes.data.leads);
         setProfile(profileRes.data);
         setCategories(catsRes.data.categories);
+        setPortfolio(portfolioRes.data.projects || []);
       } catch (err) {
         toast.error('Грешка при зареждане на данните');
       }
@@ -1517,6 +1521,24 @@ const CompanyDashboard = () => {
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка при плащане');
     }
+  };
+
+  const handleAddPortfolio = async (projectData) => {
+    const res = await axios.post(
+      `${API}/portfolio`,
+      projectData,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    // Refresh portfolio
+    const portfolioRes = await axios.get(`${API}/my-portfolio`, { headers: { Authorization: `Bearer ${token}` } });
+    setPortfolio(portfolioRes.data.projects || []);
+    return res.data;
+  };
+
+  const handleDeletePortfolio = async (projectId) => {
+    await axios.delete(`${API}/portfolio/${projectId}`, { headers: { Authorization: `Bearer ${token}` } });
+    setPortfolio(prev => prev.filter(p => p.id !== projectId));
+    toast.success('Проектът е изтрит');
   };
 
   if (loading) {
