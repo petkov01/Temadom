@@ -274,7 +274,7 @@ const Footer = () => (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <div className="mb-4">
-            <img src="/logo-footer.png" alt="TemaDom" className="h-12 brightness-0 invert" />
+            <TemaDomLogo className="h-10 w-auto" />
             <p className="text-orange-400 text-xs font-bold tracking-widest uppercase mt-1">Ремонт и строителство</p>
           </div>
           <p className="text-slate-400 text-sm">
