@@ -176,6 +176,201 @@ const PRICE_DATABASE = {
       laborAndMaterial: { economy: 25, standard: 40, premium: 65 }
     },
     description: "EPS, XPS или минерална вата"
+  },
+
+  // ИЗКОПНИ РАБОТИ (Excavation)
+  excavation: {
+    name: "Изкопни работи",
+    icon: "Hammer",
+    unit: "м³",
+    unitLabel: "Кубични метри изкоп",
+    prices: {
+      labor: { economy: 15, standard: 22, premium: 35 },
+      laborAndMaterial: { economy: 20, standard: 30, premium: 45 }
+    },
+    description: "Ръчен или машинен изкоп"
+  },
+
+  // ОСНОВИ (Foundations)
+  foundations: {
+    name: "Основи",
+    icon: "Boxes",
+    unit: "м³",
+    unitLabel: "Кубични метри бетон за основи",
+    prices: {
+      labor: { economy: 35, standard: 50, premium: 75 },
+      laborAndMaterial: { economy: 90, standard: 130, premium: 180 }
+    },
+    description: "Фундаменти, ивични основи"
+  },
+
+  // ПОКРИВИ (Roofing)
+  roofing: {
+    name: "Покриви",
+    icon: "Layers",
+    unit: "м²",
+    unitLabel: "Квадратни метри покрив",
+    prices: {
+      labor: { economy: 15, standard: 25, premium: 40 },
+      laborAndMaterial: { economy: 45, standard: 70, premium: 110 }
+    },
+    description: "Керемиди, ламарина, хидроизолация"
+  },
+
+  // ДОГРАМА (Windows & Doors)
+  windows: {
+    name: "Дограма",
+    icon: "LayoutGrid",
+    unit: "бр",
+    unitLabel: "Брой прозорци/врати",
+    prices: {
+      labor: { economy: 25, standard: 40, premium: 60 },
+      laborAndMaterial: { economy: 180, standard: 280, premium: 450 }
+    },
+    description: "PVC, алуминиева или дървена дограма"
+  },
+
+  // ГИПСОКАРТОН (Drywall)
+  drywall: {
+    name: "Гипсокартон",
+    icon: "Square",
+    unit: "м²",
+    unitLabel: "Квадратни метри",
+    prices: {
+      labor: { economy: 8, standard: 12, premium: 18 },
+      laborAndMaterial: { economy: 18, standard: 28, premium: 45 }
+    },
+    description: "Стени, тавани, преградни стени"
+  },
+
+  // МАЗИЛКА (Render/Plaster)
+  render: {
+    name: "Външна мазилка",
+    icon: "Paintbrush",
+    unit: "м²",
+    unitLabel: "Квадратни метри фасада",
+    prices: {
+      labor: { economy: 8, standard: 12, premium: 18 },
+      laborAndMaterial: { economy: 20, standard: 32, premium: 50 }
+    },
+    description: "Циментова или варова мазилка"
+  },
+
+  // КАНАЛИЗАЦИЯ (Sewage)
+  sewage: {
+    name: "Канализация",
+    icon: "Droplets",
+    unit: "м",
+    unitLabel: "Линейни метри тръби",
+    prices: {
+      labor: { economy: 12, standard: 18, premium: 28 },
+      laborAndMaterial: { economy: 25, standard: 40, premium: 60 }
+    },
+    description: "Канализационни тръби и шахти"
+  },
+
+  // ОГРАДИ (Fencing)
+  fencing: {
+    name: "Огради",
+    icon: "LayoutGrid",
+    unit: "м",
+    unitLabel: "Линейни метри ограда",
+    prices: {
+      labor: { economy: 15, standard: 25, premium: 40 },
+      laborAndMaterial: { economy: 50, standard: 85, premium: 140 }
+    },
+    description: "Метални, бетонни или дървени огради"
+  },
+
+  // НАСТИЛКИ ДВОР (Outdoor Paving)
+  paving: {
+    name: "Настилки двор",
+    icon: "Square",
+    unit: "м²",
+    unitLabel: "Квадратни метри",
+    prices: {
+      labor: { economy: 12, standard: 18, premium: 28 },
+      laborAndMaterial: { economy: 35, standard: 55, premium: 90 }
+    },
+    description: "Павета, бетонни плочи, асфалт"
+  },
+
+  // СУХО СТРОИТЕЛСТВО (Prefab Construction)
+  prefab: {
+    name: "Сухо строителство",
+    icon: "Boxes",
+    unit: "м²",
+    unitLabel: "Квадратни метри РЗП",
+    prices: {
+      labor: { economy: 80, standard: 120, premium: 180 },
+      laborAndMaterial: { economy: 250, standard: 380, premium: 550 }
+    },
+    description: "Сглобяеми конструкции, контейнери"
+  },
+
+  // ДЪРВОДЕЛСКИ РАБОТИ (Carpentry)
+  carpentry: {
+    name: "Дърводелство",
+    icon: "Hammer",
+    unit: "м²",
+    unitLabel: "Квадратни метри или брой изделия",
+    prices: {
+      labor: { economy: 20, standard: 35, premium: 55 },
+      laborAndMaterial: { economy: 60, standard: 100, premium: 160 }
+    },
+    description: "Дървени конструкции, мебели по поръчка"
+  },
+
+  // ХИДРОИЗОЛАЦИЯ (Waterproofing)
+  waterproofing: {
+    name: "Хидроизолация",
+    icon: "Droplets",
+    unit: "м²",
+    unitLabel: "Квадратни метри",
+    prices: {
+      labor: { economy: 6, standard: 10, premium: 16 },
+      laborAndMaterial: { economy: 15, standard: 25, premium: 40 }
+    },
+    description: "Бани, тераси, основи, покриви"
+  },
+
+  // ОТОПЛЕНИЕ (Heating)
+  heating: {
+    name: "Отопление",
+    icon: "Zap",
+    unit: "точки",
+    unitLabel: "Брой радиатори/конвектори",
+    prices: {
+      labor: { economy: 50, standard: 80, premium: 120 },
+      laborAndMaterial: { economy: 150, standard: 250, premium: 400 }
+    },
+    description: "Радиатори, подово отопление, котли"
+  },
+
+  // КЛИМАТИЗАЦИЯ (Air Conditioning)
+  aircon: {
+    name: "Климатизация",
+    icon: "Zap",
+    unit: "бр",
+    unitLabel: "Брой климатици",
+    prices: {
+      labor: { economy: 80, standard: 120, premium: 180 },
+      laborAndMaterial: { economy: 400, standard: 650, premium: 1000 }
+    },
+    description: "Монтаж на климатични системи"
+  },
+
+  // БАСЕЙНИ (Swimming Pools)
+  pools: {
+    name: "Басейни",
+    icon: "Droplets",
+    unit: "м³",
+    unitLabel: "Кубични метри вода",
+    prices: {
+      labor: { economy: 150, standard: 250, premium: 400 },
+      laborAndMaterial: { economy: 400, standard: 650, premium: 1000 }
+    },
+    description: "Изграждане и облицовка на басейни"
   }
 };
 
