@@ -849,6 +849,12 @@ async def grant_access(transaction: dict):
             {"id": project_id},
             {"$inc": {"purchases": 1}}
         )
+    elif package_type == "calculator_use":
+        # Grant 5 more calculator uses
+        await db.users.update_one(
+            {"id": user_id},
+            {"$inc": {"calculator_uses": -5}}  # Reset 5 uses
+        )
 
 @api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
