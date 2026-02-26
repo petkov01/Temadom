@@ -335,6 +335,8 @@ async def create_project(project_data: ProjectCreate, user: dict = Depends(get_c
     project_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     project_dict["views"] = 0
     project_dict["purchases"] = 0
+    # Limit images to 10
+    project_dict["images"] = project_dict.get("images", [])[:10]
     
     await db.projects.insert_one(project_dict)
     
