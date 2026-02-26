@@ -137,8 +137,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
-              <Building2 className="h-8 w-8 text-orange-600" />
-              <span className="text-xl font-bold text-slate-900">Maistori</span>
+              <TemaDomLogo className="h-10 w-auto" />
             </Link>
             
             <div className="hidden md:flex items-center ml-10 gap-6">
