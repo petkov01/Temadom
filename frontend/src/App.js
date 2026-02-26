@@ -1,53 +1,1923 @@
-import { useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useNavigate, useSearchParams, useParams } from "react-router-dom";
 import axios from "axios";
+import { Toaster, toast } from 'sonner';
+import { 
+  Building2, Zap, Droplets, Paintbrush, Boxes, Grid3x3, LayoutGrid, Square, Home, 
+  AppWindow, Thermometer, Layers, Hammer, BrickWall, Axe, Search, Filter, Star, 
+  MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
+  ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award
+} from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
+// Auth Context
+const AuthContext = createContext(null);
+
+export const useAuth = () => useContext(AuthContext);
+
+const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem('token'));
+
+  const api = axios.create({
+    baseURL: API,
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
+
+  useEffect(() => {
+    if (token) {
+      api.get('/auth/me')
+        .then(res => setUser(res.data))
+        .catch(() => {
+          localStorage.removeItem('token');
+          setToken(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
+
+  const login = async (email, password) => {
+    const res = await axios.post(`${API}/auth/login`, { email, password });
+    localStorage.setItem('token', res.data.token);
+    setToken(res.data.token);
+    setUser(res.data.user);
+    return res.data;
+  };
+
+  const register = async (data) => {
+    const res = await axios.post(`${API}/auth/register`, data);
+    localStorage.setItem('token', res.data.token);
+    setToken(res.data.token);
+    setUser(res.data.user);
+    return res.data;
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setUser(null);
+  };
+
+  const refreshUser = async () => {
+    if (token) {
+      const res = await api.get('/auth/me');
+      setUser(res.data);
     }
   };
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+  return (
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, api, refreshUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// Icon mapping
+const ICON_MAP = {
+  'Zap': Zap, 'Droplets': Droplets, 'Paintbrush': Paintbrush, 'Boxes': Boxes,
+  'Grid3x3': Grid3x3, 'LayoutGrid': LayoutGrid, 'Square': Square, 'Home': Home,
+  'AppWindow': AppWindow, 'Thermometer': Thermometer, 'Layers': Layers,
+  'Hammer': Hammer, 'BrickWall': BrickWall, 'Axe': Axe, 'Building2': Building2
+};
+
+// ============== NAVBAR ==============
+const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
+    <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
+              <Building2 className="h-8 w-8 text-orange-600" />
+              <span className="text-xl font-bold text-slate-900">Maistori</span>
+            </Link>
+            
+            <div className="hidden md:flex items-center ml-10 gap-6">
+              <Link to="/projects" className="text-slate-600 hover:text-slate-900 font-medium transition-colors" data-testid="nav-projects">
+                Проекти
+              </Link>
+              <Link to="/companies" className="text-slate-600 hover:text-slate-900 font-medium transition-colors" data-testid="nav-companies">
+                Фирми
+              </Link>
+            </div>
+          </div>
+
+          <div className="hidden md:flex items-center gap-4">
+            {user ? (
+              <>
+                <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 font-medium" data-testid="nav-dashboard">
+                  Табло
+                </Link>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-slate-600">{user.name}</span>
+                  {user.subscription_active && (
+                    <Badge className="bg-green-100 text-green-800">Абонамент</Badge>
+                  )}
+                  <Button variant="ghost" size="sm" onClick={logout} data-testid="logout-btn">
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" data-testid="login-btn">Вход</Button>
+                </Link>
+                <Link to="/register">
+                  <Button className="bg-orange-600 hover:bg-orange-700" data-testid="register-btn">
+                    Регистрация
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
+
+          <button 
+            className="md:hidden p-2"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            data-testid="mobile-menu-btn"
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
+      </div>
+
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white border-t border-slate-200 animate-slideDown">
+          <div className="px-4 py-4 space-y-3">
+            <Link to="/projects" className="block py-2 text-slate-600" onClick={() => setMobileMenuOpen(false)}>
+              Проекти
+            </Link>
+            <Link to="/companies" className="block py-2 text-slate-600" onClick={() => setMobileMenuOpen(false)}>
+              Фирми
+            </Link>
+            {user ? (
+              <>
+                <Link to="/dashboard" className="block py-2 text-slate-600" onClick={() => setMobileMenuOpen(false)}>
+                  Табло
+                </Link>
+                <Button variant="ghost" className="w-full justify-start" onClick={() => { logout(); setMobileMenuOpen(false); }}>
+                  <LogOut className="h-4 w-4 mr-2" /> Изход
+                </Button>
+              </>
+            ) : (
+              <div className="flex gap-3 pt-3">
+                <Link to="/login" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full">Вход</Button>
+                </Link>
+                <Link to="/register" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full bg-orange-600 hover:bg-orange-700">Регистрация</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+// ============== FOOTER ==============
+const Footer = () => (
+  <footer className="bg-slate-900 text-white py-12 mt-auto">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Building2 className="h-8 w-8 text-orange-500" />
+            <span className="text-xl font-bold">Maistori</span>
+          </div>
+          <p className="text-slate-400 text-sm">
+            Свържете се с най-добрите майстори и фирми за вашите строителни проекти.
+          </p>
+        </div>
+        <div>
+          <h4 className="font-semibold mb-4">За клиенти</h4>
+          <ul className="space-y-2 text-slate-400 text-sm">
+            <li><Link to="/register" className="hover:text-white transition-colors">Публикувай проект</Link></li>
+            <li><Link to="/companies" className="hover:text-white transition-colors">Намери фирма</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-semibold mb-4">За фирми</h4>
+          <ul className="space-y-2 text-slate-400 text-sm">
+            <li><Link to="/register" className="hover:text-white transition-colors">Регистрирай се</Link></li>
+            <li><Link to="/projects" className="hover:text-white transition-colors">Виж проекти</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-semibold mb-4">Контакти</h4>
+          <ul className="space-y-2 text-slate-400 text-sm">
+            <li>info@maistori.bg</li>
+            <li>+359 88 888 8888</li>
+          </ul>
+        </div>
+      </div>
+      <Separator className="my-8 bg-slate-700" />
+      <p className="text-center text-slate-500 text-sm">
+        © 2024 Maistori. Всички права запазени.
+      </p>
+    </div>
+  </footer>
+);
+
+// ============== STAR RATING ==============
+const StarRating = ({ rating, size = 'sm' }) => {
+  const sizeClass = size === 'sm' ? 'h-4 w-4' : 'h-5 w-5';
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map(i => (
+        <Star 
+          key={i} 
+          className={`${sizeClass} ${i <= rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} 
+        />
+      ))}
     </div>
   );
 };
 
+// ============== LANDING PAGE ==============
+const LandingPage = () => {
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, total_reviews: 0 });
+  const [featuredProjects, setFeaturedProjects] = useState([]);
+
+  useEffect(() => {
+    axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
+    axios.get(`${API}/stats`).then(res => setStats(res.data));
+    axios.get(`${API}/projects?limit=6`).then(res => setFeaturedProjects(res.data.projects));
+  }, []);
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative bg-slate-900 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <img 
+            src="https://images.unsplash.com/photo-1758548157747-285c7012db5b?crop=entropy&cs=srgb&fm=jpg&q=85" 
+            alt="Background" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="animate-slideUp">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
+                Намерете <span className="text-orange-500">перфектния майстор</span> за вашия проект
+              </h1>
+              <p className="text-xl text-slate-300 mb-8">
+                Свържете се с проверени строителни фирми и майстори. Получете оферти за вашите ремонтни и строителни проекти.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  size="lg" 
+                  className="bg-orange-600 hover:bg-orange-700 text-lg px-8"
+                  onClick={() => navigate('/register')}
+                  data-testid="hero-cta-client"
+                >
+                  Публикувай проект
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white/10 text-lg px-8"
+                  onClick={() => navigate('/projects')}
+                  data-testid="hero-cta-company"
+                >
+                  Разгледай проекти
+                </Button>
+              </div>
+            </div>
+            
+            <div className="hidden md:grid grid-cols-2 gap-4 animate-slideUp stagger-2">
+              <Card className="bg-white/10 backdrop-blur border-white/20 p-6">
+                <Users className="h-10 w-10 text-orange-500 mb-4" />
+                <h3 className="text-2xl font-bold text-white">{stats.total_companies}+</h3>
+                <p className="text-slate-300">Регистрирани фирми</p>
+              </Card>
+              <Card className="bg-white/10 backdrop-blur border-white/20 p-6 mt-8">
+                <Boxes className="h-10 w-10 text-orange-500 mb-4" />
+                <h3 className="text-2xl font-bold text-white">{stats.total_projects}+</h3>
+                <p className="text-slate-300">Активни проекти</p>
+              </Card>
+              <Card className="bg-white/10 backdrop-blur border-white/20 p-6 -mt-4">
+                <Award className="h-10 w-10 text-orange-500 mb-4" />
+                <h3 className="text-2xl font-bold text-white">{stats.total_reviews}+</h3>
+                <p className="text-slate-300">Отзиви</p>
+              </Card>
+              <Card className="bg-white/10 backdrop-blur border-white/20 p-6 mt-4">
+                <Shield className="h-10 w-10 text-orange-500 mb-4" />
+                <h3 className="text-2xl font-bold text-white">100%</h3>
+                <p className="text-slate-300">Проверени контакти</p>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Категории услуги</h2>
+            <p className="text-lg text-slate-600">Изберете сектора, от който се нуждаете</p>
+          </div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {categories.map((cat, idx) => {
+              const IconComponent = ICON_MAP[cat.icon] || Building2;
+              return (
+                <Link 
+                  key={cat.id} 
+                  to={`/projects?category=${cat.id}`}
+                  className="group"
+                  data-testid={`category-${cat.id}`}
+                >
+                  <Card className="p-4 text-center hover:border-orange-300 hover:shadow-md transition-all duration-200 group-hover:-translate-y-1">
+                    <IconComponent className="h-8 w-8 mx-auto mb-3 text-slate-600 group-hover:text-orange-600 transition-colors" />
+                    <span className="text-sm font-medium text-slate-700">{cat.name}</span>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Как работи?</h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-orange-600">1</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Публикувайте проект</h3>
+              <p className="text-slate-600">Опишете какво търсите - ремонт, строителство или друга услуга</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-orange-600">2</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Получете оферти</h3>
+              <p className="text-slate-600">Фирмите виждат вашия проект и се свързват с вас директно</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-orange-600">3</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Изберете най-добрия</h3>
+              <p className="text-slate-600">Сравнете рейтинги и отзиви, за да изберете правилната фирма</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Projects */}
+      {featuredProjects.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-bold text-slate-900">Последни проекти</h2>
+              <Link to="/projects">
+                <Button variant="ghost" className="text-orange-600 hover:text-orange-700">
+                  Виж всички <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProjects.map(project => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* CTA Section */}
+      <section className="py-16 bg-orange-600">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Готови ли сте да започнете?
+          </h2>
+          <p className="text-xl text-orange-100 mb-8">
+            Регистрирайте се безплатно и започнете да получавате клиенти днес
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="bg-white text-orange-600 hover:bg-orange-50 text-lg px-8"
+              onClick={() => navigate('/register')}
+              data-testid="cta-register"
+            >
+              Регистрирай фирма
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-white text-white hover:bg-white/10 text-lg px-8"
+              onClick={() => navigate('/register')}
+            >
+              Публикувай проект
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ============== PROJECT CARD ==============
+const ProjectCard = ({ project }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  return (
+    <Card 
+      className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group"
+      onClick={() => navigate(`/projects/${project.id}`)}
+      data-testid={`project-card-${project.id}`}
+    >
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-start mb-2">
+          <Badge className="bg-orange-100 text-orange-800">{project.category_name}</Badge>
+          {project.contact_locked && (
+            <Lock className="h-4 w-4 text-slate-400" />
+          )}
+        </div>
+        <CardTitle className="text-lg group-hover:text-orange-600 transition-colors line-clamp-2">
+          {project.title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <p className="text-slate-600 text-sm line-clamp-2 mb-4">{project.description}</p>
+        
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center gap-2 text-slate-500">
+            <MapPin className="h-4 w-4" />
+            <span>{project.city}</span>
+          </div>
+          
+          {(project.budget_min || project.budget_max) && (
+            <div className="flex items-center gap-2 text-slate-500">
+              <Euro className="h-4 w-4" />
+              <span>
+                {project.budget_min && `${project.budget_min}€`}
+                {project.budget_min && project.budget_max && ' - '}
+                {project.budget_max && `${project.budget_max}€`}
+              </span>
+            </div>
+          )}
+          
+          <div className="flex items-center gap-2 text-slate-500">
+            <Calendar className="h-4 w-4" />
+            <span>{new Date(project.created_at).toLocaleDateString('bg-BG')}</span>
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+          <span className="text-xs text-slate-400">{project.views} преглеждания</span>
+          <span className="text-orange-600 text-sm font-medium group-hover:underline">
+            Виж детайли →
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// ============== PROJECTS LIST PAGE ==============
+const ProjectsPage = () => {
+  const [projects, setProjects] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [category, setCategory] = useState(searchParams.get('category') || '');
+  const [city, setCity] = useState(searchParams.get('city') || '');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const { token } = useAuth();
+
+  const fetchProjects = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (category) params.set('category', category);
+      if (city) params.set('city', city);
+      params.set('page', page);
+      
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const res = await axios.get(`${API}/projects?${params}`, config);
+      setProjects(res.data.projects);
+      setTotalPages(res.data.pages);
+    } catch (err) {
+      toast.error('Грешка при зареждане на проектите');
+    }
+    setLoading(false);
+  }, [search, category, city, page, token]);
+
+  useEffect(() => {
+    axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
+  }, []);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(1);
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (category) params.set('category', category);
+    if (city) params.set('city', city);
+    setSearchParams(params);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Намерете проекти</h1>
+          <p className="text-slate-600">Разгледайте активните строителни и ремонтни проекти</p>
+        </div>
+
+        {/* Filters */}
+        <Card className="p-4 mb-8">
+          <form onSubmit={handleSearch} className="grid md:grid-cols-4 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input 
+                placeholder="Търсене..." 
+                className="pl-10"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                data-testid="search-input"
+              />
+            </div>
+            
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger data-testid="category-filter">
+                <SelectValue placeholder="Всички категории" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Всички категории</SelectItem>
+                {categories.map(cat => (
+                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Input 
+              placeholder="Град" 
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              data-testid="city-filter"
+            />
+            
+            <Button type="submit" className="bg-orange-600 hover:bg-orange-700" data-testid="search-btn">
+              <Filter className="mr-2 h-4 w-4" /> Филтрирай
+            </Button>
+          </form>
+        </Card>
+
+        {/* Results */}
+        {loading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1,2,3,4,5,6].map(i => (
+              <Card key={i} className="h-64 animate-pulse bg-slate-100" />
+            ))}
+          </div>
+        ) : projects.length === 0 ? (
+          <Card className="p-12 text-center">
+            <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+            <h3 className="text-xl font-semibold text-slate-700 mb-2">Няма намерени проекти</h3>
+            <p className="text-slate-500">Опитайте с други филтри или проверете по-късно</p>
+          </Card>
+        ) : (
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map(project => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+            
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-8">
+                <Button 
+                  variant="outline" 
+                  disabled={page === 1}
+                  onClick={() => setPage(p => p - 1)}
+                >
+                  Предишна
+                </Button>
+                <span className="flex items-center px-4 text-slate-600">
+                  Страница {page} от {totalPages}
+                </span>
+                <Button 
+                  variant="outline" 
+                  disabled={page === totalPages}
+                  onClick={() => setPage(p => p + 1)}
+                >
+                  Следваща
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============== PROJECT DETAIL PAGE ==============
+const ProjectDetailPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, token } = useAuth();
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+        const res = await axios.get(`${API}/projects/${id}`, config);
+        setProject(res.data);
+      } catch (err) {
+        toast.error('Проектът не е намерен');
+        navigate('/projects');
+      }
+      setLoading(false);
+    };
+    fetchProject();
+  }, [id, token, navigate]);
+
+  const handlePurchase = async (type) => {
+    if (!user) {
+      toast.error('Моля, влезте в профила си');
+      navigate('/login');
+      return;
+    }
+    
+    if (user.user_type !== 'company') {
+      toast.error('Само фирми могат да закупуват контакти');
+      return;
+    }
+
+    setPaymentLoading(true);
+    try {
+      const res = await axios.post(
+        `${API}/payments/checkout?package_type=${type}${type === 'single_lead' ? `&project_id=${id}` : ''}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      window.location.href = res.data.checkout_url;
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при плащане');
+      setPaymentLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <Card className="h-96 animate-pulse bg-slate-100" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!project) return null;
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Button 
+          variant="ghost" 
+          className="mb-4"
+          onClick={() => navigate('/projects')}
+        >
+          ← Обратно към проекти
+        </Button>
+
+        <Card className="overflow-hidden" data-testid="project-detail">
+          <CardHeader>
+            <div className="flex justify-between items-start mb-4">
+              <Badge className="bg-orange-100 text-orange-800 text-sm">{project.category_name}</Badge>
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Eye className="h-4 w-4" />
+                {project.views} преглеждания
+              </div>
+            </div>
+            <CardTitle className="text-2xl md:text-3xl">{project.title}</CardTitle>
+            <div className="flex items-center gap-4 mt-4 text-slate-600">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                {project.city}
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                {new Date(project.created_at).toLocaleDateString('bg-BG')}
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            <div className="prose max-w-none mb-8">
+              <h3 className="text-lg font-semibold mb-3">Описание на проекта</h3>
+              <p className="text-slate-600 whitespace-pre-wrap">{project.description}</p>
+            </div>
+
+            {(project.budget_min || project.budget_max) && (
+              <div className="bg-slate-50 rounded-lg p-4 mb-8">
+                <h4 className="font-semibold text-slate-700 mb-2">Бюджет</h4>
+                <p className="text-2xl font-bold text-slate-900">
+                  {project.budget_min && `${project.budget_min}€`}
+                  {project.budget_min && project.budget_max && ' - '}
+                  {project.budget_max && `${project.budget_max}€`}
+                </p>
+              </div>
+            )}
+
+            {/* Contact Info Section */}
+            <div className="border-t border-slate-200 pt-8">
+              <h3 className="text-lg font-semibold mb-4">Информация за контакт</h3>
+              
+              {project.contact_locked ? (
+                <div className="relative">
+                  <div className="blur-overlay absolute inset-0 rounded-lg flex items-center justify-center z-10">
+                    <div className="text-center p-6">
+                      <Lock className="h-12 w-12 mx-auto mb-4 text-slate-400" />
+                      <h4 className="text-xl font-semibold mb-2">Контактите са заключени</h4>
+                      <p className="text-slate-600 mb-6">Закупете достъп, за да видите информацията за контакт</p>
+                      
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Button 
+                          className="bg-orange-600 hover:bg-orange-700"
+                          onClick={() => handlePurchase('single_lead')}
+                          disabled={paymentLoading}
+                          data-testid="buy-single-lead"
+                        >
+                          <Lock className="mr-2 h-4 w-4" />
+                          Единичен контакт - 25€
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => handlePurchase('subscription')}
+                          disabled={paymentLoading}
+                          data-testid="buy-subscription"
+                        >
+                          Месечен абонамент - 100€
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-slate-100 rounded-lg p-6 opacity-30">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <User className="h-5 w-5 text-slate-400" />
+                        <span className="blur-sm">Име на клиента</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-5 w-5 text-slate-400" />
+                        <span className="blur-sm">+359 88 888 8888</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-5 w-5 text-slate-400" />
+                        <span className="blur-sm">email@example.com</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6" data-testid="contact-unlocked">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="font-semibold text-green-800">Контактите са отключени</span>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <User className="h-5 w-5 text-slate-600" />
+                      <span className="font-medium">{project.client_name}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-5 w-5 text-slate-600" />
+                      <a href={`tel:${project.client_phone}`} className="text-orange-600 hover:underline">
+                        {project.client_phone}
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-5 w-5 text-slate-600" />
+                      <a href={`mailto:${project.client_email}`} className="text-orange-600 hover:underline">
+                        {project.client_email}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+// ============== COMPANIES PAGE ==============
+const CompaniesPage = () => {
+  const [companies, setCompanies] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState('');
+  const [city, setCity] = useState('');
+
+  useEffect(() => {
+    axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
+  }, []);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (category && category !== 'all') params.set('category', category);
+      if (city) params.set('city', city);
+      
+      const res = await axios.get(`${API}/companies?${params}`);
+      setCompanies(res.data.companies);
+      setLoading(false);
+    };
+    fetchCompanies();
+  }, [category, city]);
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Фирми и майстори</h1>
+          <p className="text-slate-600">Намерете надеждни строителни фирми с проверени отзиви</p>
+        </div>
+
+        <Card className="p-4 mb-8">
+          <div className="grid md:grid-cols-3 gap-4">
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Всички категории" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Всички категории</SelectItem>
+                {categories.map(cat => (
+                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Input 
+              placeholder="Град" 
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            />
+            
+            <Button className="bg-orange-600 hover:bg-orange-700">
+              <Search className="mr-2 h-4 w-4" /> Търси
+            </Button>
+          </div>
+        </Card>
+
+        {loading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1,2,3].map(i => <Card key={i} className="h-48 animate-pulse bg-slate-100" />)}
+          </div>
+        ) : companies.length === 0 ? (
+          <Card className="p-12 text-center">
+            <Building2 className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+            <h3 className="text-xl font-semibold text-slate-700 mb-2">Няма намерени фирми</h3>
+            <p className="text-slate-500">Опитайте с други филтри</p>
+          </Card>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {companies.map(company => (
+              <Link key={company.id} to={`/companies/${company.id}`}>
+                <Card className="p-6 hover:shadow-lg transition-all duration-300 h-full">
+                  <div className="flex items-center gap-4 mb-4">
+                    <Avatar className="h-14 w-14">
+                      <AvatarFallback className="bg-orange-100 text-orange-700 text-lg">
+                        {company.company_name?.charAt(0) || 'F'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold text-lg">{company.company_name}</h3>
+                      {company.city && (
+                        <p className="text-sm text-slate-500 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> {company.city}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 mb-4">
+                    <StarRating rating={company.rating} />
+                    <span className="text-sm text-slate-600">
+                      ({company.review_count} отзива)
+                    </span>
+                  </div>
+                  
+                  {company.description && (
+                    <p className="text-sm text-slate-600 line-clamp-2">{company.description}</p>
+                  )}
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============== COMPANY DETAIL PAGE ==============
+const CompanyDetailPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, token } = useAuth();
+  const [company, setCompany] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    axios.get(`${API}/companies/${id}`)
+      .then(res => setCompany(res.data))
+      .catch(() => {
+        toast.error('Фирмата не е намерена');
+        navigate('/companies');
+      })
+      .finally(() => setLoading(false));
+  }, [id, navigate]);
+
+  const handleSubmitReview = async () => {
+    if (!user) {
+      toast.error('Моля, влезте в профила си');
+      navigate('/login');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await axios.post(
+        `${API}/reviews`,
+        { company_id: id, ...reviewData },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success('Отзивът е добавен успешно');
+      setReviewDialogOpen(false);
+      // Refresh company data
+      const res = await axios.get(`${API}/companies/${id}`);
+      setCompany(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при добавяне на отзив');
+    }
+    setSubmitting(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <Card className="h-96 animate-pulse bg-slate-100" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!company) return null;
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Button variant="ghost" className="mb-4" onClick={() => navigate('/companies')}>
+          ← Обратно към фирми
+        </Button>
+
+        <Card className="overflow-hidden mb-8" data-testid="company-detail">
+          <CardHeader>
+            <div className="flex items-center gap-6">
+              <Avatar className="h-20 w-20">
+                <AvatarFallback className="bg-orange-100 text-orange-700 text-2xl">
+                  {company.company_name?.charAt(0) || 'F'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <CardTitle className="text-2xl">{company.company_name}</CardTitle>
+                {company.city && (
+                  <p className="text-slate-500 flex items-center gap-2 mt-2">
+                    <MapPin className="h-4 w-4" /> {company.city}
+                  </p>
+                )}
+                <div className="flex items-center gap-2 mt-2">
+                  <StarRating rating={company.rating} size="md" />
+                  <span className="text-slate-600">
+                    {company.rating.toFixed(1)} ({company.review_count} отзива)
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            {company.description && (
+              <div className="mb-6">
+                <h3 className="font-semibold mb-2">За нас</h3>
+                <p className="text-slate-600">{company.description}</p>
+              </div>
+            )}
+
+            {company.categories?.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-semibold mb-2">Услуги</h3>
+                <div className="flex flex-wrap gap-2">
+                  {company.categories.map(catId => {
+                    const cat = categories.find(c => c.id === catId);
+                    return (
+                      <Badge key={catId} variant="secondary">{cat?.name || catId}</Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Reviews Section */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Отзиви</CardTitle>
+              <CardDescription>{company.reviews?.length || 0} отзива</CardDescription>
+            </div>
+            {user?.user_type === 'client' && (
+              <Button 
+                className="bg-orange-600 hover:bg-orange-700"
+                onClick={() => setReviewDialogOpen(true)}
+                data-testid="add-review-btn"
+              >
+                Добави отзив
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent>
+            {company.reviews?.length === 0 ? (
+              <p className="text-slate-500 text-center py-8">Все още няма отзиви</p>
+            ) : (
+              <div className="space-y-6">
+                {company.reviews?.map(review => (
+                  <div key={review.id} className="border-b border-slate-100 pb-6 last:border-0">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback>{review.client_name?.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{review.client_name}</p>
+                          <p className="text-xs text-slate-500">
+                            {new Date(review.created_at).toLocaleDateString('bg-BG')}
+                          </p>
+                        </div>
+                      </div>
+                      <StarRating rating={review.rating} />
+                    </div>
+                    <p className="text-slate-600 mt-2">{review.comment}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Review Dialog */}
+        <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Добави отзив</DialogTitle>
+              <DialogDescription>Споделете вашето мнение за {company.company_name}</DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <div>
+                <Label>Рейтинг</Label>
+                <div className="flex gap-2 mt-2">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <button
+                      key={i}
+                      onClick={() => setReviewData(d => ({ ...d, rating: i }))}
+                      className="focus:outline-none"
+                    >
+                      <Star 
+                        className={`h-8 w-8 ${i <= reviewData.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <Label>Коментар</Label>
+                <Textarea 
+                  placeholder="Напишете вашия отзив..."
+                  value={reviewData.comment}
+                  onChange={(e) => setReviewData(d => ({ ...d, comment: e.target.value }))}
+                  rows={4}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>Отказ</Button>
+              <Button 
+                className="bg-orange-600 hover:bg-orange-700"
+                onClick={handleSubmitReview}
+                disabled={!reviewData.comment || submitting}
+              >
+                {submitting ? 'Изпращане...' : 'Изпрати отзив'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
+// Categories for company detail (needs to be loaded)
+const categories = [];
+
+// ============== AUTH PAGES ==============
+const LoginPage = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const data = await login(formData.email, formData.password);
+      toast.success('Успешен вход!');
+      navigate(data.user.user_type === 'client' ? '/dashboard/client' : '/dashboard');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при вход');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
+      <Card className="w-full max-w-md" data-testid="login-form">
+        <CardHeader className="text-center">
+          <Building2 className="h-12 w-12 mx-auto mb-4 text-orange-600" />
+          <CardTitle className="text-2xl">Вход в профила</CardTitle>
+          <CardDescription>Въведете вашите данни за вход</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label>Имейл</Label>
+              <Input 
+                type="email"
+                placeholder="email@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData(d => ({ ...d, email: e.target.value }))}
+                required
+                data-testid="login-email"
+              />
+            </div>
+            <div>
+              <Label>Парола</Label>
+              <Input 
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={(e) => setFormData(d => ({ ...d, password: e.target.value }))}
+                required
+                data-testid="login-password"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full bg-orange-600 hover:bg-orange-700"
+              disabled={loading}
+              data-testid="login-submit"
+            >
+              {loading ? 'Влизане...' : 'Вход'}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="justify-center">
+          <p className="text-sm text-slate-600">
+            Нямате профил?{' '}
+            <Link to="/register" className="text-orange-600 hover:underline">
+              Регистрирайте се
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
+
+const RegisterPage = () => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const [userType, setUserType] = useState('client');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Паролите не съвпадат');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { confirmPassword, ...data } = formData;
+      await register({ ...data, user_type: userType });
+      toast.success('Успешна регистрация!');
+      navigate(userType === 'client' ? '/dashboard/client' : '/dashboard');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при регистрация');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
+      <Card className="w-full max-w-md" data-testid="register-form">
+        <CardHeader className="text-center">
+          <Building2 className="h-12 w-12 mx-auto mb-4 text-orange-600" />
+          <CardTitle className="text-2xl">Регистрация</CardTitle>
+          <CardDescription>Създайте нов профил</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={userType} onValueChange={setUserType} className="mb-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="client" data-testid="register-client-tab">Клиент</TabsTrigger>
+              <TabsTrigger value="company" data-testid="register-company-tab">Фирма</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label>{userType === 'company' ? 'Име на фирма' : 'Име'}</Label>
+              <Input 
+                placeholder={userType === 'company' ? 'Фирма ЕООД' : 'Иван Иванов'}
+                value={formData.name}
+                onChange={(e) => setFormData(d => ({ ...d, name: e.target.value }))}
+                required
+                data-testid="register-name"
+              />
+            </div>
+            <div>
+              <Label>Имейл</Label>
+              <Input 
+                type="email"
+                placeholder="email@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData(d => ({ ...d, email: e.target.value }))}
+                required
+                data-testid="register-email"
+              />
+            </div>
+            <div>
+              <Label>Телефон</Label>
+              <Input 
+                type="tel"
+                placeholder="+359 88 888 8888"
+                value={formData.phone}
+                onChange={(e) => setFormData(d => ({ ...d, phone: e.target.value }))}
+                data-testid="register-phone"
+              />
+            </div>
+            <div>
+              <Label>Парола</Label>
+              <Input 
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={(e) => setFormData(d => ({ ...d, password: e.target.value }))}
+                required
+                data-testid="register-password"
+              />
+            </div>
+            <div>
+              <Label>Потвърди парола</Label>
+              <Input 
+                type="password"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData(d => ({ ...d, confirmPassword: e.target.value }))}
+                required
+                data-testid="register-confirm-password"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full bg-orange-600 hover:bg-orange-700"
+              disabled={loading}
+              data-testid="register-submit"
+            >
+              {loading ? 'Регистриране...' : 'Регистрация'}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="justify-center">
+          <p className="text-sm text-slate-600">
+            Имате профил?{' '}
+            <Link to="/login" className="text-orange-600 hover:underline">
+              Влезте
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
+
+// ============== DASHBOARD PAGES ==============
+const CompanyDashboard = () => {
+  const { user, token, refreshUser } = useAuth();
+  const navigate = useNavigate();
+  const [leads, setLeads] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    if (!user || user.user_type !== 'company') {
+      navigate('/login');
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const [leadsRes, profileRes, catsRes] = await Promise.all([
+          axios.get(`${API}/my-leads`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API}/my-company`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API}/categories`)
+        ]);
+        setLeads(leadsRes.data.leads);
+        setProfile(profileRes.data);
+        setCategories(catsRes.data.categories);
+      } catch (err) {
+        toast.error('Грешка при зареждане на данните');
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [user, token, navigate]);
+
+  const handlePurchaseSubscription = async () => {
+    try {
+      const res = await axios.post(
+        `${API}/payments/checkout?package_type=subscription`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      window.location.href = res.data.checkout_url;
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при плащане');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-8">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="animate-pulse space-y-6">
+            <Card className="h-32 bg-slate-100" />
+            <Card className="h-64 bg-slate-100" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8" data-testid="company-dashboard">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900">Табло на фирмата</h1>
+          <p className="text-slate-600">Управлявайте вашите контакти и абонамент</p>
+        </div>
+
+        {/* Subscription Status */}
+        <Card className="mb-8 overflow-hidden">
+          <div className={`p-6 ${user.subscription_active ? 'bg-green-50' : 'bg-orange-50'}`}>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  {user.subscription_active ? (
+                    <CheckCircle className="h-6 w-6 text-green-600" />
+                  ) : (
+                    <AlertCircle className="h-6 w-6 text-orange-600" />
+                  )}
+                  <h2 className="text-xl font-semibold">
+                    {user.subscription_active ? 'Активен абонамент' : 'Няма активен абонамент'}
+                  </h2>
+                </div>
+                {user.subscription_active ? (
+                  <p className="text-slate-600">
+                    Валиден до: {new Date(user.subscription_expires).toLocaleDateString('bg-BG')}
+                  </p>
+                ) : (
+                  <p className="text-slate-600">
+                    Закупете абонамент за неограничен достъп до всички проекти
+                  </p>
+                )}
+              </div>
+              
+              {!user.subscription_active && (
+                <Button 
+                  className="bg-orange-600 hover:bg-orange-700"
+                  onClick={handlePurchaseSubscription}
+                  data-testid="buy-subscription-dashboard"
+                >
+                  <Lock className="mr-2 h-4 w-4" />
+                  Месечен абонамент - 100€
+                </Button>
+              )}
+            </div>
+          </div>
+        </Card>
+
+        {/* Leads */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Вашите контакти</CardTitle>
+            <CardDescription>
+              {user.subscription_active 
+                ? 'Имате достъп до всички проекти' 
+                : `${leads.length} закупени контакта`}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {leads.length === 0 ? (
+              <div className="text-center py-12">
+                <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+                <h3 className="text-lg font-medium text-slate-700 mb-2">Все още нямате контакти</h3>
+                <p className="text-slate-500 mb-4">Разгледайте проектите и закупете контакти</p>
+                <Button onClick={() => navigate('/projects')} className="bg-orange-600 hover:bg-orange-700">
+                  Виж проекти
+                </Button>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {leads.map(lead => (
+                  <div key={lead.id} className="py-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-semibold">{lead.title}</h4>
+                        <Badge className="mt-1">{lead.category_name}</Badge>
+                      </div>
+                      <span className="text-sm text-slate-500">
+                        {new Date(lead.created_at).toLocaleDateString('bg-BG')}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-slate-400" />
+                        <span>{lead.client_name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-slate-400" />
+                        <a href={`tel:${lead.client_phone}`} className="text-orange-600 hover:underline">
+                          {lead.client_phone}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-slate-400" />
+                        <a href={`mailto:${lead.client_email}`} className="text-orange-600 hover:underline">
+                          {lead.client_email}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+const ClientDashboard = () => {
+  const { user, token } = useAuth();
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [newProject, setNewProject] = useState({
+    title: '',
+    description: '',
+    category: '',
+    city: '',
+    budget_min: '',
+    budget_max: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!user || user.user_type !== 'client') {
+      navigate('/login');
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const [projRes, catsRes] = await Promise.all([
+          axios.get(`${API}/my-projects`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API}/categories`)
+        ]);
+        setProjects(projRes.data.projects);
+        setCategories(catsRes.data.categories);
+      } catch (err) {
+        toast.error('Грешка при зареждане');
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [user, token, navigate]);
+
+  const handleCreateProject = async () => {
+    if (!newProject.title || !newProject.description || !newProject.category || !newProject.city) {
+      toast.error('Моля, попълнете всички задължителни полета');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const data = {
+        ...newProject,
+        budget_min: newProject.budget_min ? parseFloat(newProject.budget_min) : null,
+        budget_max: newProject.budget_max ? parseFloat(newProject.budget_max) : null
+      };
+      await axios.post(`${API}/projects`, data, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Проектът е създаден успешно!');
+      setCreateDialogOpen(false);
+      setNewProject({ title: '', description: '', category: '', city: '', budget_min: '', budget_max: '' });
+      
+      // Refresh projects
+      const res = await axios.get(`${API}/my-projects`, { headers: { Authorization: `Bearer ${token}` } });
+      setProjects(res.data.projects);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при създаване');
+    }
+    setSubmitting(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-8">
+        <div className="max-w-7xl mx-auto px-4">
+          <Card className="h-64 animate-pulse bg-slate-100" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8" data-testid="client-dashboard">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Моите проекти</h1>
+            <p className="text-slate-600">Управлявайте вашите строителни проекти</p>
+          </div>
+          <Button 
+            className="bg-orange-600 hover:bg-orange-700"
+            onClick={() => setCreateDialogOpen(true)}
+            data-testid="create-project-btn"
+          >
+            + Нов проект
+          </Button>
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            {projects.length === 0 ? (
+              <div className="text-center py-12">
+                <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+                <h3 className="text-lg font-medium text-slate-700 mb-2">Все още нямате проекти</h3>
+                <p className="text-slate-500 mb-4">Създайте първия си проект и получете оферти</p>
+                <Button 
+                  className="bg-orange-600 hover:bg-orange-700"
+                  onClick={() => setCreateDialogOpen(true)}
+                >
+                  Създай проект
+                </Button>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {projects.map(project => (
+                  <div key={project.id} className="py-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-semibold text-lg">{project.title}</h4>
+                        <div className="flex items-center gap-3 mt-2">
+                          <Badge>{project.category_name}</Badge>
+                          <span className="text-sm text-slate-500 flex items-center gap-1">
+                            <MapPin className="h-3 w-3" /> {project.city}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
+                          {project.status === 'active' ? 'Активен' : 'Затворен'}
+                        </Badge>
+                        <p className="text-sm text-slate-500 mt-2">
+                          {project.views} преглеждания • {project.purchases} закупувания
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-slate-600 mt-3 line-clamp-2">{project.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Create Project Dialog */}
+        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Създай нов проект</DialogTitle>
+              <DialogDescription>Опишете вашия проект, за да получите оферти от фирми</DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div>
+                <Label>Заглавие *</Label>
+                <Input 
+                  placeholder="Напр. Ремонт на апартамент 80 кв.м."
+                  value={newProject.title}
+                  onChange={(e) => setNewProject(d => ({ ...d, title: e.target.value }))}
+                  data-testid="project-title-input"
+                />
+              </div>
+
+              <div>
+                <Label>Категория *</Label>
+                <Select value={newProject.category} onValueChange={(v) => setNewProject(d => ({ ...d, category: v }))}>
+                  <SelectTrigger data-testid="project-category-select">
+                    <SelectValue placeholder="Изберете категория" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(cat => (
+                      <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Град *</Label>
+                <Input 
+                  placeholder="Напр. София"
+                  value={newProject.city}
+                  onChange={(e) => setNewProject(d => ({ ...d, city: e.target.value }))}
+                  data-testid="project-city-input"
+                />
+              </div>
+
+              <div>
+                <Label>Описание *</Label>
+                <Textarea 
+                  placeholder="Опишете подробно какво търсите..."
+                  value={newProject.description}
+                  onChange={(e) => setNewProject(d => ({ ...d, description: e.target.value }))}
+                  rows={4}
+                  data-testid="project-description-input"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Мин. бюджет (€)</Label>
+                  <Input 
+                    type="number"
+                    placeholder="1000"
+                    value={newProject.budget_min}
+                    onChange={(e) => setNewProject(d => ({ ...d, budget_min: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label>Макс. бюджет (€)</Label>
+                  <Input 
+                    type="number"
+                    placeholder="5000"
+                    value={newProject.budget_max}
+                    onChange={(e) => setNewProject(d => ({ ...d, budget_max: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>Отказ</Button>
+              <Button 
+                className="bg-orange-600 hover:bg-orange-700"
+                onClick={handleCreateProject}
+                disabled={submitting}
+                data-testid="submit-project-btn"
+              >
+                {submitting ? 'Създаване...' : 'Създай проект'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
+// ============== PAYMENT PAGES ==============
+const PaymentSuccessPage = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { token, refreshUser } = useAuth();
+  const [status, setStatus] = useState('checking');
+  const sessionId = searchParams.get('session_id');
+
+  useEffect(() => {
+    if (!sessionId || !token) return;
+
+    const checkStatus = async (attempts = 0) => {
+      if (attempts >= 5) {
+        setStatus('timeout');
+        return;
+      }
+
+      try {
+        const res = await axios.get(`${API}/payments/status/${sessionId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (res.data.payment_status === 'paid' || res.data.status === 'completed') {
+          setStatus('success');
+          await refreshUser();
+        } else if (res.data.status === 'expired' || res.data.status === 'failed') {
+          setStatus('failed');
+        } else {
+          setTimeout(() => checkStatus(attempts + 1), 2000);
+        }
+      } catch {
+        setTimeout(() => checkStatus(attempts + 1), 2000);
+      }
+    };
+
+    checkStatus();
+  }, [sessionId, token, refreshUser]);
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
+      <Card className="w-full max-w-md text-center p-8" data-testid="payment-success">
+        {status === 'checking' && (
+          <>
+            <Clock className="h-16 w-16 mx-auto mb-4 text-orange-500 animate-pulse" />
+            <h2 className="text-2xl font-bold mb-2">Проверяване на плащането...</h2>
+            <p className="text-slate-600">Моля, изчакайте</p>
+          </>
+        )}
+        
+        {status === 'success' && (
+          <>
+            <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
+            <h2 className="text-2xl font-bold mb-2">Плащането е успешно!</h2>
+            <p className="text-slate-600 mb-6">Благодарим ви! Вече имате достъп.</p>
+            <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => navigate('/dashboard')}>
+              Към таблото
+            </Button>
+          </>
+        )}
+        
+        {status === 'failed' && (
+          <>
+            <AlertCircle className="h-16 w-16 mx-auto mb-4 text-red-500" />
+            <h2 className="text-2xl font-bold mb-2">Плащането не бе успешно</h2>
+            <p className="text-slate-600 mb-6">Моля, опитайте отново</p>
+            <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => navigate('/projects')}>
+              Обратно към проекти
+            </Button>
+          </>
+        )}
+        
+        {status === 'timeout' && (
+          <>
+            <AlertCircle className="h-16 w-16 mx-auto mb-4 text-yellow-500" />
+            <h2 className="text-2xl font-bold mb-2">Времето за проверка изтече</h2>
+            <p className="text-slate-600 mb-6">Проверете имейла си за потвърждение</p>
+            <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => navigate('/dashboard')}>
+              Към таблото
+            </Button>
+          </>
+        )}
+      </Card>
+    </div>
+  );
+};
+
+const PaymentCancelPage = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
+      <Card className="w-full max-w-md text-center p-8" data-testid="payment-cancel">
+        <AlertCircle className="h-16 w-16 mx-auto mb-4 text-slate-400" />
+        <h2 className="text-2xl font-bold mb-2">Плащането е отменено</h2>
+        <p className="text-slate-600 mb-6">Можете да опитате отново по всяко време</p>
+        <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => navigate('/projects')}>
+          Обратно към проекти
+        </Button>
+      </Card>
+    </div>
+  );
+};
+
+// ============== MAIN APP ==============
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <AuthProvider>
+      <div className="App min-h-screen flex flex-col">
+        <BrowserRouter>
+          <Navbar />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/projects/:id" element={<ProjectDetailPage />} />
+              <Route path="/companies" element={<CompaniesPage />} />
+              <Route path="/companies/:id" element={<CompanyDetailPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/dashboard" element={<CompanyDashboard />} />
+              <Route path="/dashboard/client" element={<ClientDashboard />} />
+              <Route path="/payment/success" element={<PaymentSuccessPage />} />
+              <Route path="/payment/cancel" element={<PaymentCancelPage />} />
+            </Routes>
+          </main>
+          <Footer />
+        </BrowserRouter>
+        <Toaster position="top-right" richColors />
+      </div>
+    </AuthProvider>
   );
 }
 
