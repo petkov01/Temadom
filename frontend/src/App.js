@@ -1602,63 +1602,82 @@ const CompanyDashboard = () => {
           </div>
         </Card>
 
-        {/* Leads */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Вашите контакти</CardTitle>
-            <CardDescription>
-              {user.subscription_active 
-                ? 'Имате достъп до всички проекти' 
-                : `${leads.length} закупени контакта`}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {leads.length === 0 ? (
-              <div className="text-center py-12">
-                <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                <h3 className="text-lg font-medium text-slate-700 mb-2">Все още нямате контакти</h3>
-                <p className="text-slate-500 mb-4">Разгледайте проектите и закупете контакти</p>
-                <Button onClick={() => navigate('/projects')} className="bg-orange-600 hover:bg-orange-700">
-                  Виж проекти
-                </Button>
-              </div>
-            ) : (
-              <div className="divide-y">
-                {leads.map(lead => (
-                  <div key={lead.id} className="py-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h4 className="font-semibold">{lead.title}</h4>
-                        <Badge className="mt-1">{lead.category_name}</Badge>
-                      </div>
-                      <span className="text-sm text-slate-500">
-                        {new Date(lead.created_at).toLocaleDateString('bg-BG')}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-slate-400" />
-                        <span>{lead.client_name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-slate-400" />
-                        <a href={`tel:${lead.client_phone}`} className="text-orange-600 hover:underline">
-                          {lead.client_phone}
-                        </a>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-slate-400" />
-                        <a href={`mailto:${lead.client_email}`} className="text-orange-600 hover:underline">
-                          {lead.client_email}
-                        </a>
-                      </div>
-                    </div>
+        {/* Tabs for Leads and Portfolio */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsTrigger value="leads">Контакти</TabsTrigger>
+            <TabsTrigger value="portfolio">Портфолио</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="leads" className="mt-6">
+            {/* Leads */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Вашите контакти</CardTitle>
+                <CardDescription>
+                  {user.subscription_active 
+                    ? 'Имате достъп до всички проекти' 
+                    : `${leads.length} закупени контакта`}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {leads.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+                    <h3 className="text-lg font-medium text-slate-700 mb-2">Все още нямате контакти</h3>
+                    <p className="text-slate-500 mb-4">Разгледайте проектите и закупете контакти</p>
+                    <Button onClick={() => navigate('/projects')} className="bg-orange-600 hover:bg-orange-700">
+                      Виж проекти
+                    </Button>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                ) : (
+                  <div className="divide-y">
+                    {leads.map(lead => (
+                      <div key={lead.id} className="py-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-semibold">{lead.title}</h4>
+                            <Badge className="mt-1">{lead.category_name}</Badge>
+                          </div>
+                          <span className="text-sm text-slate-500">
+                            {new Date(lead.created_at).toLocaleDateString('bg-BG')}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-slate-400" />
+                            <span>{lead.client_name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-slate-400" />
+                            <a href={`tel:${lead.client_phone}`} className="text-orange-600 hover:underline">
+                              {lead.client_phone}
+                            </a>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-slate-400" />
+                            <a href={`mailto:${lead.client_email}`} className="text-orange-600 hover:underline">
+                              {lead.client_email}
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="portfolio" className="mt-6">
+            <PortfolioGallery 
+              projects={portfolio}
+              isOwner={true}
+              onAddProject={handleAddPortfolio}
+              onDeleteProject={handleDeletePortfolio}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
