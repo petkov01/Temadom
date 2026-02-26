@@ -819,6 +819,41 @@ const PriceCalculator = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Calculator Paywall Dialog */}
+      <Dialog open={showPaywall || calcBlocked} onOpenChange={(open) => { if (!open && !calcBlocked) setShowPaywall(false); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-orange-600" />
+              Калкулаторът е ограничен
+            </DialogTitle>
+            <DialogDescription>
+              Като фирма, имате 5 безплатни калкулации. За да продължите, изберете една от опциите:
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Card className="p-4 border-orange-200 bg-orange-50 cursor-pointer hover:bg-orange-100 transition-colors" onClick={handlePayForCalculator}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold">Единично плащане</h4>
+                  <p className="text-sm text-slate-600">5 допълнителни калкулации</p>
+                </div>
+                <Badge className="bg-orange-600 text-lg px-3 py-1">10€</Badge>
+              </div>
+            </Card>
+            <Card className="p-4 border-green-200 bg-green-50 cursor-pointer hover:bg-green-100 transition-colors" onClick={() => window.location.href = '/register'}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold">Месечен абонамент</h4>
+                  <p className="text-sm text-slate-600">Неограничени калкулации + всички контакти</p>
+                </div>
+                <Badge className="bg-green-600 text-lg px-3 py-1">100€/мес</Badge>
+              </div>
+            </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
