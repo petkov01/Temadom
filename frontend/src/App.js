@@ -15,6 +15,9 @@ import { PortfolioGallery } from '@/components/PortfolioGallery';
 import ProjectEstimator from '@/components/ProjectEstimator';
 import ServicesPage from '@/components/ServicesPage';
 import ChatPage from '@/components/ChatPage';
+import AboutPage from '@/components/AboutPage';
+import TermsPage from '@/components/TermsPage';
+import ProfessionsPage from '@/components/ProfessionsPage';
 
 // TemaDom Logo Component - Uses the exact user-provided logo image
 const TemaDomLogo = ({ className = "h-10", showSubtitle = false }) => (
