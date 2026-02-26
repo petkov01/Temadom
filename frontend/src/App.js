@@ -1924,6 +1924,55 @@ const ClientDashboard = () => {
                   />
                 </div>
               </div>
+
+              {/* Image Upload Section */}
+              <div>
+                <Label className="flex items-center gap-2 mb-3">
+                  <Camera className="h-4 w-4" />
+                  Снимки на проекта (до 10)
+                </Label>
+                <p className="text-xs text-slate-500 mb-3">
+                  Добавете снимки на помещенията, чертежи или скици за да могат майсторите да разберат по-добре какво търсите
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {newProject.images.map((img, idx) => (
+                    <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden group">
+                      <img src={img} alt={`Снимка ${idx + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                      >
+                        <X className="h-5 w-5 text-white" />
+                      </button>
+                      <span className="absolute bottom-0 right-0 bg-black/60 text-white text-xs px-1">
+                        {idx + 1}
+                      </span>
+                    </div>
+                  ))}
+                  {newProject.images.length < 10 && (
+                    <button
+                      type="button"
+                      onClick={() => imageInputRef.current?.click()}
+                      className="w-20 h-20 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
+                    >
+                      <Camera className="h-5 w-5 mb-1" />
+                      <span className="text-xs">Добави</span>
+                    </button>
+                  )}
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => handleImageUpload(e.target.files)}
+                  />
+                </div>
+                {newProject.images.length > 0 && (
+                  <p className="text-xs text-slate-500 mt-2">{newProject.images.length} от 10 снимки</p>
+                )}
+              </div>
             </div>
 
             <DialogFooter>
