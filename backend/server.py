@@ -873,6 +873,8 @@ async def get_my_leads(user: dict = Depends(get_current_user)):
     
     purchased_ids = user.get("purchased_leads", [])
     has_subscription = user.get("subscription_active", False)
+    free_leads_used = user.get("free_leads_used", 0)
+    free_leads_remaining = max(0, FREE_LEADS_LIMIT - free_leads_used)
     
     if has_subscription:
         # Return all active projects
@@ -880,7 +882,12 @@ async def get_my_leads(user: dict = Depends(get_current_user)):
     else:
         # Return only purchased projects
         if not purchased_ids:
-            return {"leads": [], "subscription_active": False}
+            return {
+                "leads": [], 
+                "subscription_active": False,
+                "free_leads_used": free_leads_used,
+                "free_leads_remaining": free_leads_remaining
+            }
         projects = await db.projects.find({"id": {"$in": purchased_ids}}, {"_id": 0}).to_list(100)
     
     for p in projects:
@@ -891,7 +898,71 @@ async def get_my_leads(user: dict = Depends(get_current_user)):
     return {
         "leads": projects,
         "subscription_active": has_subscription,
-        "subscription_expires": user.get("subscription_expires")
+        "subscription_expires": user.get("subscription_expires"),
+        "free_leads_used": free_leads_used,
+        "free_leads_remaining": free_leads_remaining
+    }
+
+@api_router.post("/leads/claim-free/{project_id}")
+async def claim_free_lead(project_id: str, user: dict = Depends(get_current_user)):
+    """Claim a free lead (first 3 are free for new companies)"""
+    if user["user_type"] != "company":
+        raise HTTPException(status_code=403, detail="Само фирми могат да вземат контакти")
+    
+    # Check if already has this lead
+    if project_id in user.get("purchased_leads", []):
+        raise HTTPException(status_code=400, detail="Вече имате този контакт")
+    
+    # Check if has subscription
+    if user.get("subscription_active"):
+        raise HTTPException(status_code=400, detail="Имате активен абонамент - всички контакти са достъпни")
+    
+    # Check free leads limit
+    free_leads_used = user.get("free_leads_used", 0)
+    if free_leads_used >= FREE_LEADS_LIMIT:
+        raise HTTPException(status_code=400, detail="Изчерпахте безплатните контакти. Моля, закупете абонамент или единичен контакт.")
+    
+    # Verify project exists
+    project = await db.projects.find_one({"id": project_id})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    
+    # Grant free lead
+    await db.users.update_one(
+        {"id": user["id"]},
+        {
+            "$addToSet": {"purchased_leads": project_id},
+            "$inc": {"free_leads_used": 1}
+        }
+    )
+    
+    # Increment purchase count on project
+    await db.projects.update_one(
+        {"id": project_id},
+        {"$inc": {"purchases": 1}}
+    )
+    
+    remaining = FREE_LEADS_LIMIT - free_leads_used - 1
+    
+    return {
+        "message": f"Контактът е добавен безплатно! Остават ви {remaining} безплатни контакта.",
+        "free_leads_remaining": remaining
+    }
+
+@api_router.get("/leads/free-status")
+async def get_free_leads_status(user: dict = Depends(get_current_user)):
+    """Get free leads status for current company"""
+    if user["user_type"] != "company":
+        raise HTTPException(status_code=403, detail="Тази функция е само за фирми")
+    
+    free_leads_used = user.get("free_leads_used", 0)
+    free_leads_remaining = max(0, FREE_LEADS_LIMIT - free_leads_used)
+    
+    return {
+        "free_leads_limit": FREE_LEADS_LIMIT,
+        "free_leads_used": free_leads_used,
+        "free_leads_remaining": free_leads_remaining,
+        "subscription_active": user.get("subscription_active", False)
     }
 
 # ============== STATS ROUTES ==============
