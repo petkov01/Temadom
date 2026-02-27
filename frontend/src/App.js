@@ -290,7 +290,7 @@ const Navbar = () => {
 
           <div className="md:hidden flex items-center gap-2">
             {/* Mobile language switcher */}
-            <div className="relative" ref={langRef}>
+            <div className="relative" ref={mobileLangRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
                 className="p-2 text-slate-500 hover:text-slate-900"
