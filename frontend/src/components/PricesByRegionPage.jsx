@@ -23,7 +23,7 @@ const PricesByRegionPage = () => {
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-14">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <MapPin className="h-10 w-10 text-orange-400 mx-auto mb-4" />
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3">Строителни цени по <span className="text-orange-400">области</span> 2026</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">{isEn ? <>Construction prices by <span className="text-orange-400">regions</span> 2026</> : <>Строителни цени по <span className="text-orange-400">области</span> 2026</>}</h1>
           <p className="text-slate-300 max-w-2xl mx-auto">Сравнение на строителните цени във всички 28 области на България</p>
         </div>
       </section>
