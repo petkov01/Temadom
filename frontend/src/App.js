@@ -151,7 +151,8 @@ const Navbar = () => {
   useEffect(() => {
     const handleClick = (e) => {
       if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false);
-      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
+      if (langRef.current && !langRef.current.contains(e.target) && 
+          mobileLangRef.current && !mobileLangRef.current.contains(e.target)) setLangOpen(false);
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
