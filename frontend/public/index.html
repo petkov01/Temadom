@@ -1,27 +1,81 @@
 <!doctype html>
-<html lang="en">
+<html lang="bg">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="A product of emergent.sh" />
+        <meta name="theme-color" content="#F97316" />
+        <meta name="description" content="TemaDom - Калкулатор за строителни цени 2026. 28 професии, 28 области, актуални пазарни цени. Намерете проверени майстори и фирми в България." />
+        <meta name="keywords" content="калкулатор строителство, цени ремонт 2026, майстори България, оферта строителство, TemaDom" />
+        <meta name="author" content="TemaDom" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://temadom.bg/" />
+        <link rel="alternate" hreflang="bg-BG" href="https://temadom.bg/" />
+        
+        <!-- Open Graph -->
+        <meta property="og:title" content="TemaDom - Калкулатор за строителни цени 2026" />
+        <meta property="og:description" content="Безплатен калкулатор за строителни цени. 28 професии, 28 области, актуални цени 2026." />
+        <meta property="og:type" content="website" />
+        <meta property="og:locale" content="bg_BG" />
+        <meta property="og:site_name" content="TemaDom" />
+        
+        <!-- Schema.org -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "TemaDom",
+          "alternateName": "ТемаДом",
+          "url": "https://temadom.bg",
+          "description": "Маркетплейс за строителство и ремонти в България",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://temadom.bg/blog?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+        </script>
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "TemaDom",
+          "url": "https://temadom.bg",
+          "description": "Платформа за строителство и ремонти в България. Калкулатор за цени, проверени фирми, отзиви.",
+          "areaServed": { "@type": "Country", "name": "Bulgaria" },
+          "serviceType": ["Construction", "Home Renovation", "Price Calculator"]
+        }
+        </script>
+        
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
+        
+        <!-- Google Analytics 4 (placeholder - replace G-XXXXXXXXXX with your ID) -->
         <!--
-        manifest.json provides metadata used when your web app is installed on a
-        user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        </script>
         -->
-        <!--
-        Notice the use of %PUBLIC_URL% in the tags above.
-        It will be replaced with the URL of the `public` folder during the build.
-        Only files inside the `public` folder can be referenced from the HTML.
 
-        Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-        work correctly both with client-side routing and a non-root public URL.
-        Learn how to configure a non-root public URL by running `npm run build`.
+        <!-- Hotjar (placeholder - replace XXXXXXX with your Site ID) -->
+        <!--
+        <script>
+          (function(h,o,t,j,a,r){
+            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+            h._hjSettings={hjid:XXXXXXX,hjsv:6};
+            a=o.getElementsByTagName('head')[0];
+            r=o.createElement('script');r.async=1;
+            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+            a.appendChild(r);
+          })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+        </script>
         -->
-        <title>Emergent | Fullstack App</title>
+
+        <title>TemaDom - Калкулатор за строителни цени 2026 | 28 професии | Всички области България</title>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
         <!--
