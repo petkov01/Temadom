@@ -2818,44 +2818,53 @@ export const trackEvent = (eventName, metadata = {}) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <div className="App min-h-screen flex flex-col">
-        <BrowserRouter>
-          <PageTracker />
-          <Navbar />
-          <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/projects" element={<ProjectsPage />} />
-              <Route path="/projects/:id" element={<ProjectDetailPage />} />
-              <Route path="/companies" element={<CompaniesPage />} />
-              <Route path="/companies/:id" element={<CompanyDetailPage />} />
-              <Route path="/find-master" element={<FindMasterPage />} />
-              <Route path="/calculator" element={<PriceCalculator />} />
-              <Route path="/services" element={<ServicesPage />} />
-              <Route path="/messages" element={<ChatPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/professions" element={<ProfessionsPage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/blog/:slug" element={<BlogArticle />} />
-              <Route path="/prices" element={<PricesByRegionPage />} />
-              <Route path="/region/:slug" element={<RegionalPage />} />
-              <Route path="/analytics" element={<AnalyticsDashboard />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/dashboard" element={<CompanyDashboard />} />
-              <Route path="/dashboard/client" element={<ClientDashboard />} />
-              <Route path="/payment/success" element={<PaymentSuccessPage />} />
-              <Route path="/payment/cancel" element={<PaymentCancelPage />} />
-            </Routes>
-          </main>
-          <Footer />
-        </BrowserRouter>
-        <Toaster position="top-right" richColors />
-      </div>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <div className="App min-h-screen flex flex-col">
+          <BrowserRouter>
+            <PageTracker />
+            <Navbar />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/projects/:id" element={<ProjectDetailPage />} />
+                <Route path="/companies" element={<CompaniesPage />} />
+                <Route path="/companies/:id" element={<CompanyDetailPage />} />
+                <Route path="/find-master" element={<FindMasterPage />} />
+                <Route path="/calculator" element={<PriceCalculator />} />
+                <Route path="/services" element={<ServicesPage />} />
+                <Route path="/messages" element={<ChatPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/professions" element={<ProfessionsPage />} />
+                <Route path="/blog" element={<BlogPage />} />
+                <Route path="/blog/:slug" element={<BlogArticle />} />
+                <Route path="/prices" element={<PricesByRegionPage />} />
+                <Route path="/region/:slug" element={<RegionalPage />} />
+                <Route path="/analytics" element={<AnalyticsDashboard />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/dashboard" element={<CompanyDashboard />} />
+                <Route path="/dashboard/client" element={<ClientDashboard />} />
+                <Route path="/payment/success" element={<PaymentSuccessPage />} />
+                <Route path="/payment/cancel" element={<PaymentCancelPage />} />
+              </Routes>
+            </main>
+            <Footer />
+            <ChatbotWrapper />
+          </BrowserRouter>
+          <Toaster position="top-right" richColors />
+        </div>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
+
+// Wrapper to access AuthContext inside BrowserRouter
+const ChatbotWrapper = () => {
+  const { user } = useAuth();
+  return <Chatbot user={user} />;
+};
 
 export default App;
