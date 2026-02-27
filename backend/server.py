@@ -1316,7 +1316,7 @@ async def generate_calculator_pdf(data: dict):
     pdf.multi_cell(0, 5, 
         "* Тази оферта е ориентировъчна и базирана на средни пазарни цени за 2025-2026 г. "
         "Реалните цени могат да варират. За точна оферта, свържете се с фирмите чрез TemaDom.\n"
-        "* Генерирано от калкулатора на TemaDom - https://temadom.bg"
+        "* Генерирано от калкулатора на TemaDom - https://temadom.com"
     )
     
     # Output
@@ -1586,14 +1586,14 @@ async def telegram_webhook(request: Request):
                 else:
                     await send_telegram_message(chat_id,
                         "Добре дошли в TemaDom бот!\n"
-                        "За да свържете акаунта си, моля влезте в профила си на temadom.bg "
+                        "За да свържете акаунта си, моля влезте в профила си на temadom.com "
                         "и натиснете бутона 'Свържи Telegram'."
                     )
             else:
                 await send_telegram_message(chat_id,
                     "Добре дошли в TemaDom бот!\n\n"
                     "За да получавате известия за нови проекти:\n"
-                    "1. Регистрирайте се на temadom.bg\n"
+                    "1. Регистрирайте се на temadom.com\n"
                     "2. Влезте в профила си\n"
                     "3. Натиснете 'Свържи Telegram'\n\n"
                     "Платформата е БЕЗПЛАТНА за ограничен период!"
@@ -1609,7 +1609,7 @@ async def telegram_webhook(request: Request):
 @api_router.get("/sitemap")
 async def sitemap():
     """Generate dynamic sitemap.xml"""
-    base = "https://temadom.bg"
+    base = "https://temadom.com"
     
     # Static pages
     urls = [
