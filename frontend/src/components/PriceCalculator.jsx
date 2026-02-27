@@ -536,6 +536,19 @@ const PriceCalculator = () => {
     };
   }, [selectedItems, region, pricingType, qualityLevel]);
 
+  // GA4: Track calculator submission when total changes
+  useEffect(() => {
+    if (calculation.total > 0 && selectedItems.length > 0) {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'calculator_submit', {
+          event_category: 'conversion',
+          event_label: 'offer_generated',
+          value: 1
+        });
+      }
+    }
+  }, [calculation.total]);
+
   return (
     <div className="min-h-screen bg-slate-50 py-8" data-testid="price-calculator">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
