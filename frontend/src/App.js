@@ -1578,7 +1578,7 @@ const FindMasterPage = () => {
                             </span>
                           )}
                           <Badge variant="outline" className={`text-[10px] ${pro.user_type === 'master' ? 'border-blue-300 text-blue-700' : 'border-orange-300 text-orange-700'}`}>
-                            {pro.user_type === 'master' ? 'Майстор' : 'Фирма'}
+                            {pro.user_type === 'master' ? t('fm_master_badge') : t('fm_company_badge')}
                           </Badge>
                         </div>
                       </div>
