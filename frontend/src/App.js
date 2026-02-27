@@ -919,7 +919,7 @@ const ProjectsPage = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input 
-                placeholder="Търсене..." 
+                placeholder={t('projects_search')} 
                 className="pl-10"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
