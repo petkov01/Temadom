@@ -2501,6 +2501,11 @@ function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/professions" element={<ProfessionsPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:slug" element={<BlogArticle />} />
+              <Route path="/prices" element={<PricesByRegionPage />} />
+              <Route path="/region/:slug" element={<RegionalPage />} />
+              <Route path="/analytics" element={<AnalyticsDashboard />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/dashboard" element={<CompanyDashboard />} />
