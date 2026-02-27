@@ -24,20 +24,27 @@ import PricesByRegionPage from '@/components/PricesByRegionPage';
 import RegionalPage from '@/components/RegionalPage';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 
-// TemaDom Logo Component - SVG text logo with house icon
+// TemaDom Logo Component - Big orange house above TemaDom text
 const TemaDomLogo = ({ className = "h-10", showSubtitle = false }) => (
-  <div className="flex flex-col items-center">
-    <svg viewBox="0 0 220 42" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" data-testid="temadom-logo">
-      <text x="0" y="30" fontFamily="'Manrope', 'Inter', system-ui, sans-serif" fontWeight="800" fontSize="32" fill="#1E293B">Tem</text>
-      <g transform="translate(76, 2)">
-        <path d="M14 0L0 12H5V24H23V12H28L14 0Z" fill="#1E293B"/>
-        <g transform="translate(5, 10)">
-          <rect x="0" y="0" width="18" height="14" rx="2" fill="#F97316"/>
-          <path d="M6 3L9 7L12 3M9 7V12" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </g>
+  <div className="flex flex-col items-center" data-testid="temadom-logo">
+    <svg viewBox="0 0 160 65" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Big orange house on top */}
+      <g transform="translate(52, 0)">
+        <path d="M28 2L4 22H10V38H46V22H52L28 2Z" fill="#F97316"/>
+        {/* Door */}
+        <rect x="21" y="22" width="14" height="16" rx="1.5" fill="#1E293B"/>
+        {/* Window left */}
+        <rect x="12" y="22" width="7" height="7" rx="1" fill="#FED7AA" stroke="#EA580C" strokeWidth="0.5"/>
+        {/* Window right */}
+        <rect x="37" y="22" width="7" height="7" rx="1" fill="#FED7AA" stroke="#EA580C" strokeWidth="0.5"/>
+        {/* Wrench icon in door */}
+        <path d="M25 26L28 30L31 26M28 30V35" stroke="#F97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
       </g>
-      <text x="108" y="30" fontFamily="'Manrope', 'Inter', system-ui, sans-serif" fontWeight="800" fontSize="32" fill="#334155">Dom</text>
-      <rect x="0" y="34" width="180" height="3" rx="1.5" fill="#F97316"/>
+      {/* TemaDom text */}
+      <text x="80" y="54" fontFamily="'Manrope', 'Inter', system-ui, sans-serif" fontWeight="800" fontSize="18" fill="#1E293B" textAnchor="middle">Tema</text>
+      <text x="80" y="54" fontFamily="'Manrope', 'Inter', system-ui, sans-serif" fontWeight="800" fontSize="18" fill="#334155" textAnchor="middle" dx="36">Dom</text>
+      {/* Orange underline */}
+      <rect x="20" y="58" width="120" height="2.5" rx="1.25" fill="#F97316"/>
     </svg>
     {showSubtitle && (
       <span className="text-orange-500 text-[10px] font-bold tracking-[0.15em] uppercase mt-0.5">
