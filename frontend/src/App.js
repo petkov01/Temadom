@@ -171,12 +171,12 @@ const Navbar = () => {
                 <HardHat className="h-3.5 w-3.5" />
                 Професии
               </Link>
-              <Link to="/blog" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-blog">
-                <BookOpen className="h-4 w-4" />
+              <Link to="/blog" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-blog">
+                <BookOpen className="h-3.5 w-3.5" />
                 Блог
               </Link>
-              <Link to="/prices" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-prices">
-                <MapPin className="h-4 w-4" />
+              <Link to="/prices" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-prices">
+                <MapPin className="h-3.5 w-3.5" />
                 Цени по области
               </Link>
             </div>
