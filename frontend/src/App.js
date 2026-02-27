@@ -2585,10 +2585,10 @@ const ClientDashboard = () => {
               </div>
 
               <div>
-                <Label>Категория *</Label>
+                <Label>{t('cl_category')} *</Label>
                 <Select value={newProject.category} onValueChange={(v) => setNewProject(d => ({ ...d, category: v }))}>
                   <SelectTrigger data-testid="project-category-select">
-                    <SelectValue placeholder="Изберете категория" />
+                    <SelectValue placeholder={t('cl_select_cat')} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map(cat => (
