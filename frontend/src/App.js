@@ -1947,6 +1947,7 @@ const LoginPage = () => {
 const RegisterPage = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [userType, setUserType] = useState('client');
   const [formData, setFormData] = useState({
     name: '',
