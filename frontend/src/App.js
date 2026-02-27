@@ -655,8 +655,8 @@ const LandingPage = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Категории услуги</h2>
-            <p className="text-lg text-slate-600">Изберете сектора, от който се нуждаете</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{t('cat_title')}</h2>
+            <p className="text-lg text-slate-600">{t('cat_subtitle')}</p>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
