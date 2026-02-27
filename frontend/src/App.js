@@ -329,7 +329,7 @@ const Footer = () => (
           <ul className="space-y-2 text-slate-400 text-sm">
             <li><Link to="/about" className="hover:text-white transition-colors">За нас</Link></li>
             <li><Link to="/terms" className="hover:text-white transition-colors">Правила и условия</Link></li>
-            <li>info@temadom.bg</li>
+            <li>info@temadom.com</li>
             <li>+359 88 888 8888</li>
           </ul>
         </div>
@@ -1907,11 +1907,33 @@ const RegisterPage = () => {
         </CardHeader>
         <CardContent>
           {/* Free platform banner */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4" data-testid="register-free-banner">
-            <p className="text-sm text-green-800 font-medium text-center">
-              Платформата е БЕЗПЛАТНА! Регистрирайте се сега.
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-4" data-testid="register-free-banner">
+            <div className="flex items-center gap-2 mb-1">
+              <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+              <span className="text-sm font-bold text-green-800">Платформата е БЕЗПЛАТНА!</span>
+            </div>
+            <p className="text-xs text-green-700">
+              Регистрирайте се сега и се възползвайте докато е безплатно.
             </p>
           </div>
+
+          {(userType === 'company' || userType === 'master') && (
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 rounded-lg p-4 mb-4" data-testid="register-promo-banner">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl flex-shrink-0">&#9889;</span>
+                <div>
+                  <p className="text-sm font-bold text-amber-900 mb-1">
+                    Бъдете крачка пред конкуренцията!
+                  </p>
+                  <p className="text-xs text-amber-800 leading-relaxed">
+                    Точно сега TemaDom.com е напълно безплатна - без абонаменти, без такси за контакти, без лимити.
+                    Това няма да е завинаги. Изградете профила и репутацията си сега, 
+                    докато достъпът е свободен, и бъдете сред първите, когато клиентите ви потърсят!
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <Tabs value={userType} onValueChange={setUserType} className="mb-6">
             <TabsList className="grid w-full grid-cols-3">

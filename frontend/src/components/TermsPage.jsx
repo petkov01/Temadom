@@ -244,7 +244,7 @@ const TermsPage = () => {
         </Card>
 
         <div className="text-center text-slate-500 text-sm pt-8">
-          <p>При въпроси относно правилата и условията, моля свържете се с нас на info@temadom.bg</p>
+          <p>При въпроси относно правилата и условията, моля свържете се с нас на info@temadom.com</p>
         </div>
       </div>
     </div>

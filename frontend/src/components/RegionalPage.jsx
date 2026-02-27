@@ -140,7 +140,7 @@ const RegionalPage = () => {
           "description": `Строителни услуги и ремонти в ${region.name}. 28 професии, актуални цени 2026.`,
           "areaServed": { "@type": "AdministrativeArea", "name": region.name },
           "priceRange": `${(6*region.multiplier).toFixed(0)}-${(50*region.multiplier).toFixed(0)} EUR`,
-          "url": `https://temadom.bg/region/${region.slug}`
+          "url": `https://temadom.com/region/${region.slug}`
         })}} />
       </div>
     </div>

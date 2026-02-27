@@ -113,7 +113,7 @@ const PricesByRegionPage = () => {
           "@type": "WebPage",
           "name": "Строителни цени по области 2026 - TemaDom",
           "description": "Сравнение на строителните цени във всички 28 области на България за 2026 г.",
-          "url": "https://temadom.bg/prices"
+          "url": "https://temadom.com/prices"
         })}} />
       </div>
     </div>
