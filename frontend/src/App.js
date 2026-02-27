@@ -1587,7 +1587,7 @@ const FindMasterPage = () => {
                     <div className="flex items-center gap-2 mb-3">
                       <StarRating rating={pro.rating} />
                       <span className="text-sm text-slate-600">
-                        ({pro.review_count} отзива)
+                        ({pro.review_count} {t('comp_reviews')})
                       </span>
                     </div>
                     
