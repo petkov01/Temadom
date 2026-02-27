@@ -245,13 +245,22 @@ const Navbar = () => {
             <Link to="/professions" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
               <HardHat className="h-4 w-4" /> Професии
             </Link>
+            <Link to="/blog" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-blog">
+              <BookOpen className="h-4 w-4" /> Блог
+            </Link>
+            <Link to="/prices" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-prices">
+              <MapPin className="h-4 w-4" /> Цени по области
+            </Link>
             <Link to="/about" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
               <Info className="h-4 w-4" /> За нас
             </Link>
             {user ? (
               <>
-                <Link to="/dashboard" className="block py-2 text-slate-600" onClick={() => setMobileMenuOpen(false)}>
-                  Табло
+                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                  <LayoutGrid className="h-4 w-4" /> Табло
+                </Link>
+                <Link to="/messages" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                  <MessageSquare className="h-4 w-4" /> Съобщения
                 </Link>
                 <Button variant="ghost" className="w-full justify-start" onClick={() => { logout(); setMobileMenuOpen(false); }}>
                   <LogOut className="h-4 w-4 mr-2" /> Изход
