@@ -2719,6 +2719,7 @@ const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { token, refreshUser } = useAuth();
+  const { t } = useLanguage();
   const [status, setStatus] = useState('checking');
   const sessionId = searchParams.get('session_id');
 
