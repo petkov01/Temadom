@@ -1233,7 +1233,7 @@ const ProjectDetailPage = () => {
                   ~{project.estimated_budget} €
                 </p>
                 <p className="text-sm text-orange-700 mt-1">
-                  ≈ {Math.round(project.estimated_budget * 1.95)} лв. (ориентировъчна стойност)
+                  ≈ {Math.round(project.estimated_budget * 1.95)} лв. ({t('pd_approx_bgn')})
                 </p>
               </div>
             )}
