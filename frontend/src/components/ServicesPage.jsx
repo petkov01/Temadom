@@ -493,12 +493,12 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                 <div className="mt-6 p-4 bg-slate-100 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-semibold">Нужда от майстор?</p>
-                      <p className="text-sm text-slate-600">Намерете проверен специалист</p>
+                      <p className="font-semibold">{isEn ? 'Need a craftsman?' : 'Нужда от майстор?'}</p>
+                      <p className="text-sm text-slate-600">{isEn ? 'Find a verified specialist' : 'Намерете проверен специалист'}</p>
                     </div>
                     <Link to="/companies">
                       <Button className="bg-orange-600 hover:bg-orange-700">
-                        Намери фирма <ArrowRight className="ml-2 h-4 w-4" />
+                        {isEn ? 'Find company' : 'Намери фирма'} <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
                   </div>
