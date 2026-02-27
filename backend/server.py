@@ -1406,8 +1406,8 @@ async def get_stats():
 async def root():
     return {"message": "Maistori Marketplace API", "version": "1.0.0"}
 
-# Include router and middleware
-app.include_router(api_router)
+# Include router and middleware - MUST be after all route definitions
+# (moved to end of file)
 
 app.add_middleware(
     CORSMiddleware,
