@@ -2129,12 +2129,17 @@ const RegisterPage = () => {
 
             <div>
               <Label>{t('reg_password')}</Label>
+              <Input 
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={(e) => setFormData(d => ({ ...d, password: e.target.value }))}
                 required
                 data-testid="register-password"
               />
             </div>
             <div>
-              <Label>Потвърди парола</Label>
+              <Label>{t('reg_confirm_password')}</Label>
               <Input 
                 type="password"
                 placeholder="••••••••"
