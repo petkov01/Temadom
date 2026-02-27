@@ -5,6 +5,8 @@ import { Separator } from "@/components/ui/separator";
 import { useLanguage } from '@/i18n/LanguageContext';
 
 const TermsPage = () => {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   return (
     <div className="min-h-screen bg-slate-50" data-testid="terms-page">
       {/* Header */}
