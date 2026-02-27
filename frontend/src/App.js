@@ -2113,13 +2113,13 @@ const RegisterPage = () => {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3" data-testid="telegram-info-box">
                 <div className="flex items-center gap-2 mb-2">
                   <svg className="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.13l-1.97 9.28c-.15.66-.54.82-1.09.51l-3.01-2.22-1.45 1.4c-.16.16-.3.3-.61.3l.22-3.06 5.55-5.01c.24-.22-.05-.33-.37-.13l-6.86 4.32-2.95-.92c-.64-.2-.66-.64.14-.95l11.54-4.45c.53-.2 1-.05.86.93z"/></svg>
-                  <span className="text-sm font-semibold text-blue-800">Telegram известия</span>
+                  <span className="text-sm font-semibold text-blue-800">{t('reg_telegram_title')}</span>
                 </div>
                 <p className="text-xs text-blue-700 mb-2">
-                  Инсталирайте Telegram и ще получавате моментални известия за нови проекти във вашата област!
+                  {t('reg_telegram_desc')}
                 </p>
                 <Input 
-                  placeholder="@вашият_telegram_username (по желание)"
+                  placeholder={t('reg_telegram_placeholder')}
                   value={formData.telegram_username}
                   onChange={(e) => setFormData(d => ({ ...d, telegram_username: e.target.value }))}
                   data-testid="register-telegram"
