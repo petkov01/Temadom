@@ -771,6 +771,7 @@ const LandingPage = () => {
 // ============== PROJECT CARD ==============
 const ProjectCard = ({ project }) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   
   return (
