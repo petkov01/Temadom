@@ -2490,6 +2490,20 @@ const PaymentCancelPage = () => {
 };
 
 // ============== MAIN APP ==============
+// Page view tracker
+const PageTracker = () => {
+  const location = useLocation();
+  useEffect(() => {
+    axios.post(`${API}/analytics/track`, { path: location.pathname, referrer: document.referrer }).catch(() => {});
+  }, [location.pathname]);
+  return null;
+};
+
+// Track custom events helper
+export const trackEvent = (eventName, metadata = {}) => {
+  axios.post(`${API}/analytics/event`, { event_name: eventName, metadata, path: window.location.pathname }).catch(() => {});
+};
+
 function App() {
   return (
     <AuthProvider>
