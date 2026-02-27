@@ -349,6 +349,8 @@ async def get_me(user: dict = Depends(get_current_user)):
         "email": user["email"],
         "name": user["name"],
         "phone": user.get("phone"),
+        "city": user.get("city"),
+        "telegram_username": user.get("telegram_username"),
         "user_type": user["user_type"],
         "subscription_active": user.get("subscription_active", False),
         "subscription_expires": user.get("subscription_expires"),
