@@ -138,8 +138,25 @@ const ICON_MAP = {
 // ============== NAVBAR ==============
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { t, lang, switchLang } = useLanguage();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const moreRef = useRef(null);
+  const langRef = useRef(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false);
+      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   return (
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
@@ -153,62 +170,103 @@ const Navbar = () => {
             <div className="hidden md:flex items-center ml-6 gap-3 lg:gap-4">
               <Link to="/projects" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-projects">
                 <FolderSearch className="h-3.5 w-3.5" />
-                Проекти
+                {t('nav_projects')}
               </Link>
               <Link to="/find-master" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-find-master">
                 <Wrench className="h-3.5 w-3.5" />
-                Майстори
+                {t('nav_masters')}
               </Link>
               <Link to="/companies" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-companies">
                 <Building2 className="h-3.5 w-3.5" />
-                Фирми
+                {t('nav_companies')}
               </Link>
               <Link to="/calculator" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-calculator">
                 <Calculator className="h-3.5 w-3.5" />
-                Калкулатор
+                {t('nav_calculator')}
               </Link>
-              <Link to="/services" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-services">
-                <Hammer className="h-3.5 w-3.5" />
-                Услуги
-              </Link>
-              <Link to="/professions" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-professions">
-                <HardHat className="h-3.5 w-3.5" />
-                Професии
-              </Link>
-              <Link to="/blog" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-blog">
-                <BookOpen className="h-3.5 w-3.5" />
-                Блог
-              </Link>
-              <Link to="/prices" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-prices">
-                <MapPin className="h-3.5 w-3.5" />
-                Цени по области
-              </Link>
+
+              {/* More dropdown */}
+              <div className="relative" ref={moreRef}>
+                <button
+                  onClick={() => setMoreOpen(!moreOpen)}
+                  className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1"
+                  data-testid="nav-more-btn"
+                >
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
+                  {t('nav_more')}
+                </button>
+                {moreOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-52 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50" data-testid="nav-more-dropdown">
+                    <Link to="/services" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-services">
+                      <Hammer className="h-4 w-4" /> {t('nav_services')}
+                    </Link>
+                    <Link to="/professions" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-professions">
+                      <HardHat className="h-4 w-4" /> {t('nav_professions')}
+                    </Link>
+                    <Link to="/blog" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-blog">
+                      <BookOpen className="h-4 w-4" /> {t('nav_blog')}
+                    </Link>
+                    <Link to="/prices" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-prices">
+                      <MapPin className="h-4 w-4" /> {t('nav_prices')}
+                    </Link>
+                    <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-about">
+                      <Info className="h-4 w-4" /> {t('nav_about')}
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
+            {/* Language switcher */}
+            <div className="relative" ref={langRef}>
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 text-sm transition-colors px-2 py-1 rounded-md hover:bg-slate-50"
+                data-testid="lang-switcher-btn"
+              >
+                <Globe className="h-4 w-4" />
+                <span className="text-xs font-medium uppercase">{lang}</span>
+              </button>
+              {langOpen && (
+                <div className="absolute top-full right-0 mt-2 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50" data-testid="lang-dropdown">
+                  {LANGUAGES.map(l => (
+                    <button
+                      key={l.code}
+                      onClick={() => { switchLang(l.code); setLangOpen(false); }}
+                      className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${
+                        l.code === lang ? 'bg-orange-50 text-orange-700 font-medium' : 'text-slate-600 hover:bg-slate-50'
+                      }`}
+                      data-testid={`lang-option-${l.code}`}
+                    >
+                      <span className="text-base">{l.flag}</span>
+                      <span>{l.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {user ? (
               <>
                 {user.user_type === 'client' && (
                   <Link to="/dashboard/client">
                     <Button className="bg-orange-600 hover:bg-orange-700" data-testid="nav-publish-project">
-                      + Публикувай проект
+                      + {t('nav_register')}
                     </Button>
                   </Link>
                 )}
                 <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1.5" data-testid="nav-dashboard">
                   <LayoutGrid className="h-4 w-4" />
-                  Табло
+                  {t('nav_dashboard')}
                 </Link>
                 <Link to="/messages" className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1.5" data-testid="nav-messages">
                   <MessageSquare className="h-4 w-4" />
-                  Съобщения
+                  {t('nav_messages')}
                 </Link>
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-slate-600">{user.name}</span>
-                  {user.subscription_active && (
-                    <Badge className="bg-green-100 text-green-800">Абонамент</Badge>
-                  )}
                   <Button variant="ghost" size="sm" onClick={logout} data-testid="logout-btn">
                     <LogOut className="h-4 w-4" />
                   </Button>
@@ -217,24 +275,52 @@ const Navbar = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" data-testid="login-btn">Вход</Button>
+                  <Button variant="ghost" data-testid="login-btn">{t('nav_login')}</Button>
                 </Link>
                 <Link to="/register">
                   <Button className="bg-orange-600 hover:bg-orange-700" data-testid="register-btn">
-                    Публикувай проект
+                    {t('nav_register')}
                   </Button>
                 </Link>
               </>
             )}
           </div>
 
-          <button 
-            className="md:hidden p-2"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            data-testid="mobile-menu-btn"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            {/* Mobile language switcher */}
+            <div className="relative" ref={langRef}>
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="p-2 text-slate-500 hover:text-slate-900"
+                data-testid="mobile-lang-btn"
+              >
+                <Globe className="h-5 w-5" />
+              </button>
+              {langOpen && (
+                <div className="absolute top-full right-0 mt-2 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50">
+                  {LANGUAGES.map(l => (
+                    <button
+                      key={l.code}
+                      onClick={() => { switchLang(l.code); setLangOpen(false); }}
+                      className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm ${
+                        l.code === lang ? 'bg-orange-50 text-orange-700 font-medium' : 'text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="text-base">{l.flag}</span>
+                      <span>{l.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <button 
+              className="p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              data-testid="mobile-menu-btn"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -242,51 +328,51 @@ const Navbar = () => {
         <div className="md:hidden bg-white border-t border-slate-200 animate-slideDown">
           <div className="px-4 py-4 space-y-3">
             <Link to="/projects" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-              <FolderSearch className="h-4 w-4" /> Проекти
-            </Link>
-            <Link to="/companies" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-              <Building2 className="h-4 w-4" /> Фирми
-            </Link>
-            <Link to="/calculator" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-              <Calculator className="h-4 w-4" /> Калкулатор
-            </Link>
-            <Link to="/services" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-              <Hammer className="h-4 w-4" /> Услуги
-            </Link>
-            <Link to="/professions" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-              <HardHat className="h-4 w-4" /> Професии
+              <FolderSearch className="h-4 w-4" /> {t('nav_projects')}
             </Link>
             <Link to="/find-master" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-find-master">
-              <Wrench className="h-4 w-4" /> Намери майстор
+              <Wrench className="h-4 w-4" /> {t('nav_find_master')}
+            </Link>
+            <Link to="/companies" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <Building2 className="h-4 w-4" /> {t('nav_companies')}
+            </Link>
+            <Link to="/calculator" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <Calculator className="h-4 w-4" /> {t('nav_calculator')}
+            </Link>
+            <Link to="/services" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <Hammer className="h-4 w-4" /> {t('nav_services')}
+            </Link>
+            <Link to="/professions" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <HardHat className="h-4 w-4" /> {t('nav_professions')}
             </Link>
             <Link to="/blog" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-blog">
-              <BookOpen className="h-4 w-4" /> Блог
+              <BookOpen className="h-4 w-4" /> {t('nav_blog')}
             </Link>
             <Link to="/prices" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-prices">
-              <MapPin className="h-4 w-4" /> Цени по области
+              <MapPin className="h-4 w-4" /> {t('nav_prices')}
             </Link>
             <Link to="/about" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-              <Info className="h-4 w-4" /> За нас
+              <Info className="h-4 w-4" /> {t('nav_about')}
             </Link>
             {user ? (
               <>
                 <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                  <LayoutGrid className="h-4 w-4" /> Табло
+                  <LayoutGrid className="h-4 w-4" /> {t('nav_dashboard')}
                 </Link>
                 <Link to="/messages" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                  <MessageSquare className="h-4 w-4" /> Съобщения
+                  <MessageSquare className="h-4 w-4" /> {t('nav_messages')}
                 </Link>
                 <Button variant="ghost" className="w-full justify-start" onClick={() => { logout(); setMobileMenuOpen(false); }}>
-                  <LogOut className="h-4 w-4 mr-2" /> Изход
+                  <LogOut className="h-4 w-4 mr-2" /> {t('nav_logout')}
                 </Button>
               </>
             ) : (
               <div className="flex gap-3 pt-3">
                 <Link to="/login" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full">Вход</Button>
+                  <Button variant="outline" className="w-full">{t('nav_login')}</Button>
                 </Link>
                 <Link to="/register" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full bg-orange-600 hover:bg-orange-700">Регистрация</Button>
+                  <Button className="w-full bg-orange-600 hover:bg-orange-700">{t('nav_register_short')}</Button>
                 </Link>
               </div>
             )}
