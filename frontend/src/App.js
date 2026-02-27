@@ -1240,23 +1240,23 @@ const ProjectDetailPage = () => {
 
             {/* Contact Info Section */}
             <div className="border-t border-slate-200 pt-8">
-              <h3 className="text-lg font-semibold mb-4">Информация за контакт</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('pd_contact')}</h3>
               
               {/* Free platform notice */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6" data-testid="free-platform-notice">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span className="font-semibold text-green-800">Безплатен достъп до контактите!</span>
+                  <span className="font-semibold text-green-800">{t('pd_free_access')}</span>
                 </div>
                 <p className="text-sm text-green-700">
-                  Виждате пълната информация за контакт на клиента. Свържете се директно!
+                  {t('pd_free_desc')}
                 </p>
               </div>
 
               <div className="bg-green-50 border border-green-200 rounded-lg p-6" data-testid="contact-unlocked">
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span className="font-semibold text-green-800">Контактите са отключени</span>
+                  <span className="font-semibold text-green-800">{t('pd_contacts_unlocked')}</span>
                 </div>
                 <div className="space-y-4">
                   {project.client_name && (
