@@ -2203,7 +2203,7 @@ const CompanyDashboard = () => {
         setCategories(catsRes.data.categories);
         setPortfolio(portfolioRes.data.projects || []);
       } catch (err) {
-        toast.error('Грешка при зареждане на данните');
+        toast.error(t('common_error'));
       }
       setLoading(false);
     };
@@ -2219,7 +2219,7 @@ const CompanyDashboard = () => {
       );
       window.location.href = res.data.checkout_url;
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Грешка при плащане');
+      toast.error(err.response?.data?.detail || t('common_error'));
     }
   };
 
