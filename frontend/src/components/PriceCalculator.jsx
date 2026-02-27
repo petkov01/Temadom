@@ -440,43 +440,6 @@ const PriceCalculator = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [selectedItems, setSelectedItems] = useState([]);
-
-  // Auth guard - if not logged in, show registration prompt
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center py-16 px-4" data-testid="calculator-auth-guard">
-        <div className="max-w-md w-full text-center">
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-            <div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Lock className="h-8 w-8 text-orange-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              Калкулаторът изисква регистрация
-            </h2>
-            <p className="text-slate-600 mb-8">
-              За да използвате калкулатора за ремонт, моля регистрирайте се или влезте в акаунта си. Регистрацията е напълно безплатна!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => navigate('/register')}
-                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
-                data-testid="calculator-register-btn"
-              >
-                Регистрация
-              </button>
-              <button
-                onClick={() => navigate('/login')}
-                className="flex-1 bg-white hover:bg-slate-50 text-slate-700 font-medium py-3 px-6 rounded-lg border border-slate-300 transition-colors"
-                data-testid="calculator-login-btn"
-              >
-                Вход
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
   const [region, setRegion] = useState('sofia_city');
   const [pricingType, setPricingType] = useState('laborAndMaterial');
   const [qualityLevel, setQualityLevel] = useState('standard');
