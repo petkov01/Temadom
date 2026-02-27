@@ -2017,10 +2017,10 @@ const RegisterPage = () => {
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-4" data-testid="register-free-banner">
             <div className="flex items-center gap-2 mb-1">
               <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-              <span className="text-sm font-bold text-green-800">Платформата е БЕЗПЛАТНА!</span>
+              <span className="text-sm font-bold text-green-800">{t('reg_free_banner')}</span>
             </div>
             <p className="text-xs text-green-700">
-              Регистрирайте се сега и се възползвайте докато е безплатно.
+              {t('reg_free_desc')}
             </p>
           </div>
 
