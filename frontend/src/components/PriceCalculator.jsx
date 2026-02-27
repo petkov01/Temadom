@@ -624,12 +624,11 @@ const PriceCalculator = () => {
               <Calculator className="h-8 w-8 text-orange-600" />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
-              Калкулатор за ремонт
+              {t('calc_title')}
             </h1>
           </div>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Изчислете приблизителната цена на вашия строителен или ремонтен проект. 
-            Цените са базирани на актуални пазарни данни за България (2025-2026).
+            {t('calc_subtitle')}
           </p>
           
           {/* AI Blueprint Analysis Button */}
