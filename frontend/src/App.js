@@ -1719,7 +1719,7 @@ const CompanyDetailPage = () => {
           <CardContent>
             {company.description && (
               <div className="mb-6">
-                <h3 className="font-semibold mb-2">За нас</h3>
+                <h3 className="font-semibold mb-2">{t('cd_about')}</h3>
                 <p className="text-slate-600">{company.description}</p>
               </div>
             )}
