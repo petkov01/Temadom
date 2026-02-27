@@ -191,7 +191,8 @@ const translations = {
 
     // Common
     common_error: "Възникна грешка",
-    dash_contacts: "Контакти", dash_portfolio: "Портфолио",
+
+    // Dashboard extra aliases, dash_portfolio: "Портфолио",
     dash_your_contacts: "Вашите контакти",
     dash_access_all: "Имате достъп до всички проекти",
     dash_no_contacts_sub: "Разгледайте проектите и закупете контакти",
