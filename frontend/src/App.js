@@ -962,8 +962,8 @@ const ProjectsPage = () => {
         ) : projects.length === 0 ? (
           <Card className="p-12 text-center">
             <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-            <h3 className="text-xl font-semibold text-slate-700 mb-2">Няма намерени проекти</h3>
-            <p className="text-slate-500">Опитайте с други филтри или проверете по-късно</p>
+            <h3 className="text-xl font-semibold text-slate-700 mb-2">{t('projects_empty')}</h3>
+            <p className="text-slate-500">{t('projects_empty_sub')}</p>
           </Card>
         ) : (
           <>
