@@ -1419,7 +1419,7 @@ async def analytics_dashboard(request: Request):
     
     # Users
     total_users = await db.users.count_documents({})
-    total_companies = await db.users.count_documents({"user_type": "company"})
+    total_companies = await db.users.count_documents({"user_type": {"$in": ["company", "master"]}})
     total_clients = await db.users.count_documents({"user_type": "client"})
     
     # Top pages today
