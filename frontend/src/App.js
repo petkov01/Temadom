@@ -1207,7 +1207,7 @@ const ProjectDetailPage = () => {
 
           <CardContent>
             <div className="prose max-w-none mb-8">
-              <h3 className="text-lg font-semibold mb-3">Описание на проекта</h3>
+              <h3 className="text-lg font-semibold mb-3">{t('pd_description')}</h3>
               <p className="text-slate-600 whitespace-pre-wrap">{project.description}</p>
             </div>
 
