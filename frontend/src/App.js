@@ -1937,42 +1937,56 @@ const CompanyDashboard = () => {
           <p className="text-slate-600">Управлявайте вашите контакти и абонамент</p>
         </div>
 
-        {/* Subscription Status */}
-        <Card className="mb-8 overflow-hidden">
-          <div className={`p-6 ${user.subscription_active ? 'bg-green-50' : 'bg-orange-50'}`}>
+        {/* Free Platform Banner */}
+        <Card className="mb-8 overflow-hidden" data-testid="free-platform-dashboard-banner">
+          <div className="p-6 bg-green-50 border border-green-200">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  {user.subscription_active ? (
-                    <CheckCircle className="h-6 w-6 text-green-600" />
-                  ) : (
-                    <AlertCircle className="h-6 w-6 text-orange-600" />
-                  )}
-                  <h2 className="text-xl font-semibold">
-                    {user.subscription_active ? 'Активен абонамент' : 'Няма активен абонамент'}
+                  <CheckCircle className="h-6 w-6 text-green-600" />
+                  <h2 className="text-xl font-semibold text-green-800">
+                    Платформата е безплатна!
                   </h2>
                 </div>
-                {user.subscription_active ? (
-                  <p className="text-slate-600">
-                    Валиден до: {new Date(user.subscription_expires).toLocaleDateString('bg-BG')}
-                  </p>
-                ) : (
-                  <p className="text-slate-600">
-                    Закупете абонамент за неограничен достъп до всички проекти
-                  </p>
-                )}
+                <p className="text-green-700">
+                  Възползвайте се от пълен безплатен достъп, докато платформата е в тестов режим. 
+                  Всички контакти, калкулации и функции са напълно безплатни. Бъдете сред първите, 
+                  които ще изградят репутацията си тук, преди услугата да стане платена!
+                </p>
               </div>
-              
-              {!user.subscription_active && (
-                <Button 
-                  className="bg-orange-600 hover:bg-orange-700"
-                  onClick={handlePurchaseSubscription}
-                  data-testid="buy-subscription-dashboard"
-                >
-                  <Lock className="mr-2 h-4 w-4" />
-                  Месечен абонамент - 100€
+              <Button 
+                className="bg-green-600 hover:bg-green-700 flex-shrink-0"
+                onClick={() => navigate('/projects')}
+              >
+                Виж проекти
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Telegram Link Section */}
+        <Card className="mb-8 overflow-hidden">
+          <div className="p-6 bg-blue-50 border border-blue-200">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <svg className="h-6 w-6 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.13l-1.97 9.28c-.15.66-.54.82-1.09.51l-3.01-2.22-1.45 1.4c-.16.16-.3.3-.61.3l.22-3.06 5.55-5.01c.24-.22-.05-.33-.37-.13l-6.86 4.32-2.95-.92c-.64-.2-.66-.64.14-.95l11.54-4.45c.53-.2 1-.05.86.93z"/></svg>
+                  <h2 className="text-lg font-semibold text-blue-800">Telegram известия</h2>
+                </div>
+                <p className="text-sm text-blue-700">
+                  Свържете Telegram акаунта си и получавайте моментални известия за нови проекти във вашата област!
+                </p>
+              </div>
+              <a 
+                href={`https://t.me/TemaDomBot?start=${user.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex"
+              >
+                <Button className="bg-blue-500 hover:bg-blue-600 flex-shrink-0" data-testid="link-telegram-btn">
+                  Свържи Telegram
                 </Button>
-              )}
+              </a>
             </div>
           </div>
         </Card>
