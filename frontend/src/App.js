@@ -2163,7 +2163,7 @@ const RegisterPage = () => {
           <p className="text-sm text-slate-600">
             Имате профил?{' '}
             <Link to="/login" className="text-orange-600 hover:underline">
-              Влезте
+              {t('reg_login')}
             </Link>
           </p>
         </CardFooter>
