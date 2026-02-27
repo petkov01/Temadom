@@ -458,6 +458,7 @@ const StarRating = ({ rating, size = 'sm' }) => {
 // ============== LANDING PAGE ==============
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, total_reviews: 0 });
   const [featuredProjects, setFeaturedProjects] = useState([]);
