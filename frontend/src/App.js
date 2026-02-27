@@ -546,7 +546,7 @@ const LandingPage = () => {
                   data-testid="calculator-hero-cta"
                 >
                   <Calculator className="mr-2 h-6 w-6" />
-                  Изчисли цената сега
+                  {t('hero_cta')}
                 </Button>
                 <Button 
                   size="lg" 
@@ -554,7 +554,7 @@ const LandingPage = () => {
                   className="border-white/50 text-white hover:bg-white/10 text-lg px-8 h-14"
                   onClick={() => navigate('/register')}
                 >
-                  Публикувай проект
+                  {t('hero_cta2')}
                 </Button>
               </div>
             </div>
