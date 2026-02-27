@@ -167,6 +167,10 @@ const Navbar = () => {
                 <HardHat className="h-4 w-4" />
                 Професии
               </Link>
+              <Link to="/find-master" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-find-master">
+                <Wrench className="h-4 w-4" />
+                Намери майстор
+              </Link>
               <Link to="/blog" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-blog">
                 <BookOpen className="h-4 w-4" />
                 Блог
