@@ -1494,8 +1494,8 @@ const FindMasterPage = () => {
     <div className="min-h-screen bg-slate-50 py-8" data-testid="find-master-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Намери майстор</h1>
-          <p className="text-slate-600">Търсете по град, професия или тип изпълнител</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('fm_title')}</h1>
+          <p className="text-slate-600">{t('fm_subtitle')}</p>
         </div>
 
         {/* Free platform notice */}
@@ -1503,7 +1503,7 @@ const FindMasterPage = () => {
           <div className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
             <p className="text-sm text-green-800">
-              <strong>Безплатен достъп!</strong> Свържете се директно с всеки майстор или фирма.
+              <strong>{t('fm_free')}</strong> {t('fm_free_desc')}
             </p>
           </div>
         </div>
@@ -1512,21 +1512,21 @@ const FindMasterPage = () => {
           <div className="grid md:grid-cols-4 gap-4">
             <Select value={proType} onValueChange={setProType}>
               <SelectTrigger data-testid="filter-pro-type">
-                <SelectValue placeholder="Тип изпълнител" />
+                <SelectValue placeholder={t('fm_type')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Всички</SelectItem>
-                <SelectItem value="company">Фирми</SelectItem>
-                <SelectItem value="master">Майстори</SelectItem>
+                <SelectItem value="all">{t('fm_all')}</SelectItem>
+                <SelectItem value="company">{t('fm_companies')}</SelectItem>
+                <SelectItem value="master">{t('fm_masters')}</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger data-testid="filter-category">
-                <SelectValue placeholder="Всички професии" />
+                <SelectValue placeholder={t('fm_all_prof')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Всички професии</SelectItem>
+                <SelectItem value="all">{t('fm_all_prof')}</SelectItem>
                 {categories.map(cat => (
                   <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                 ))}
