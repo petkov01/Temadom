@@ -29,8 +29,9 @@ TEST_COMPANY_EMAIL = f"test_company_{TEST_ID}@test.bg"
 TEST_MASTER_EMAIL = f"test_master_{TEST_ID}@test.bg"
 TEST_CLIENT_EMAIL = f"test_client_{TEST_ID}@test.bg"
 TEST_PASSWORD = "test12345"
-# Use unique bulstat based on test ID to avoid duplicates
-VALID_BULSTAT = f"9{TEST_ID[:8]}".replace('-', '')[:9].ljust(9, '0')  # 9 digits, unique per test run
+# Use unique bulstat based on test ID to avoid duplicates (9 digits only)
+import time
+VALID_BULSTAT = f"9{int(time.time()) % 100000000:08d}"  # 9 digits, unique per test run
 
 
 class TestCompanyRegistrationBulstat:
