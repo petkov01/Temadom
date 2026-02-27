@@ -1558,7 +1558,7 @@ const FindMasterPage = () => {
           </Card>
         ) : (
           <>
-            <p className="text-sm text-slate-500 mb-4">Намерени: {professionals.length} специалиста</p>
+            <p className="text-sm text-slate-500 mb-4">{t('fm_found')} {professionals.length} {t('fm_specialists')}</p>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {professionals.map(pro => (
                 <Link key={pro.id} to={`/companies/${pro.id}`}>
