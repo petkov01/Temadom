@@ -296,7 +296,7 @@ async def register(user_data: UserCreate):
             "company_name": user_data.name,
             "description": None,
             "categories": [],
-            "city": None,
+            "city": user_data.city,
             "address": None,
             "website": None,
             "logo_url": None,
