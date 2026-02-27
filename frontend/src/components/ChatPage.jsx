@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '@/App';
+import { useLanguage } from '@/i18n/LanguageContext';
 import { MessageSquare, Send, ArrowLeft, User, Clock, Image, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
