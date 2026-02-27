@@ -577,19 +577,21 @@ const ServicesPage = () => {
         {/* CTA */}
         <Card className="mt-12 bg-orange-600 text-white">
           <CardContent className="py-8 text-center">
-            <h3 className="text-2xl font-bold mb-4">Готови да започнете вашия проект?</h3>
+            <h3 className="text-2xl font-bold mb-4">{isEn ? 'Ready to start your project?' : 'Готови да започнете вашия проект?'}</h3>
             <p className="text-orange-100 mb-6">
-              Използвайте нашия калкулатор за ориентировъчна цена или публикувайте проект за оферти
+              {isEn 
+                ? 'Use our calculator for an estimate or publish a project for offers'
+                : 'Използвайте нашия калкулатор за ориентировъчна цена или публикувайте проект за оферти'}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/calculator">
                 <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50">
-                  Калкулатор за цени
+                  {isEn ? 'Price Calculator' : 'Калкулатор за цени'}
                 </Button>
               </Link>
               <Link to="/register">
                 <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                  Публикувай проект
+                  {isEn ? 'Publish project' : 'Публикувай проект'}
                 </Button>
               </Link>
             </div>
