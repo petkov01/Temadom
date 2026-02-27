@@ -2042,9 +2042,9 @@ const RegisterPage = () => {
 
           <Tabs value={userType} onValueChange={setUserType} className="mb-6">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="client" data-testid="register-client-tab">Клиент</TabsTrigger>
-              <TabsTrigger value="company" data-testid="register-company-tab">Фирма</TabsTrigger>
-              <TabsTrigger value="master" data-testid="register-master-tab">Майстор</TabsTrigger>
+              <TabsTrigger value="client" data-testid="register-client-tab">{t('reg_tab_client')}</TabsTrigger>
+              <TabsTrigger value="company" data-testid="register-company-tab">{t('reg_tab_company')}</TabsTrigger>
+              <TabsTrigger value="master" data-testid="register-master-tab">{t('reg_tab_master')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
