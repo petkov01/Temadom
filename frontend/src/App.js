@@ -1388,10 +1388,10 @@ const CompaniesPage = () => {
           <div className="grid md:grid-cols-3 gap-4">
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="Всички категории" />
+                <SelectValue placeholder={t('projects_all_cat')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Всички категории</SelectItem>
+                <SelectItem value="all">{t('projects_all_cat')}</SelectItem>
                 {categories.map(cat => (
                   <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                 ))}
@@ -1399,13 +1399,13 @@ const CompaniesPage = () => {
             </Select>
             
             <Input 
-              placeholder="Град" 
+              placeholder={t('projects_city')} 
               value={city}
               onChange={(e) => setCity(e.target.value)}
             />
             
             <Button className="bg-orange-600 hover:bg-orange-700">
-              <Search className="mr-2 h-4 w-4" /> Търси
+              <Search className="mr-2 h-4 w-4" /> {t('comp_search')}
             </Button>
           </div>
         </Card>
