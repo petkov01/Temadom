@@ -1485,8 +1485,8 @@ async def notify_companies_new_project(project_dict: dict):
     cat = next((c for c in CATEGORIES if c["id"] == project_dict.get("category")), None)
     cat_name = cat["name"] if cat else project_dict.get("category", "")
     
-    # Find companies with matching city and telegram_chat_id
-    query = {"user_type": "company", "telegram_chat_id": {"$exists": True, "$ne": None}}
+    # Find companies/masters with matching city and telegram_chat_id
+    query = {"user_type": {"$in": ["company", "master"]}, "telegram_chat_id": {"$exists": True, "$ne": None}}
     if project_city:
         query["city"] = {"$regex": project_city, "$options": "i"}
     
