@@ -76,7 +76,7 @@ export const Chatbot = ({ user }) => {
       {/* Chat window */}
       {open && (
         <div 
-          className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-4rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
+          className="fixed bottom-20 right-6 z-[100] w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
           data-testid="chatbot-window"
         >
           {/* Header */}
