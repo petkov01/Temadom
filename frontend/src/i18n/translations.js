@@ -189,6 +189,37 @@ const translations = {
     pay_timeout: "Времето за проверка изтече", pay_check_email: "Проверете имейла си за потвърждение",
     pay_cancelled: "Плащането е отменено", pay_can_retry: "Можете да опитате отново по всяко време",
 
+    // Common
+    common_error: "Възникна грешка",
+
+    // Dashboard extra aliases
+    dash_contacts: "Контакти", dash_portfolio: "Портфолио",
+    dash_your_contacts: "Вашите контакти",
+    dash_access_all: "Имате достъп до всички проекти",
+    dash_no_contacts_sub: "Разгледайте проектите и закупете контакти",
+    dash_telegram_link: "Свържи Telegram",
+    dash_portfolio_deleted: "Проектът е изтрит",
+
+    // Client dashboard
+    cl_my_projects: "Моите проекти", cl_manage: "Управлявайте вашите строителни проекти",
+    cl_new_project: "Нов проект", cl_no_projects: "Все още нямате проекти",
+    cl_no_projects_sub: "Създайте първия си проект и получете оферти",
+    cl_active: "Активен", cl_closed: "Затворен", cl_purchases: "закупувания",
+    cl_create_project: "Създай проект",
+    cl_create_desc: "Опишете вашия проект, за да получите оферти от фирми",
+    cl_title: "Заглавие", cl_title_placeholder: "Напр. Ремонт на апартамент 80 кв.м.",
+    cl_category: "Категория", cl_select_cat: "Изберете категория",
+    cl_city_label: "Град", cl_city_placeholder: "Напр. София",
+    cl_description: "Описание", cl_desc_placeholder: "Опишете подробно какво търсите...",
+    cl_min_budget: "Мин. бюджет (€)", cl_max_budget: "Макс. бюджет (€)",
+    cl_photos: "Снимки на проекта (до 10)",
+    cl_photos_desc: "Добавете снимки на помещенията, чертежи или скици за да могат майсторите да разберат по-добре какво търсите",
+    cl_add_photo: "Добави", cl_of_10: "от 10 снимки",
+    cl_creating: "Създаване...",
+    cd_fill_required: "Моля, попълнете всички задължителни полета",
+    cd_project_created: "Проектът е създаден успешно!",
+    reg_confirm_password: "Потвърди парола",
+
     // Calculator auth guard
     calc_auth_title: "Калкулаторът изисква регистрация",
     calc_auth_desc: "За да използвате калкулатора за ремонт, моля регистрирайте се или влезте в акаунта си. Регистрацията е напълно безплатна!",
