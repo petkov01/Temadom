@@ -34,7 +34,10 @@ const TemaDomLogo = ({ className = "h-12", showSubtitle = false }) => (
       style={{ objectFit: 'contain' }}
     />
     {showSubtitle && (
-      <span className="text-orange-500 text-[9px] font-bold tracking-[0.18em] uppercase" style={{ marginTop: '-2px' }}>
+      <span 
+        className="text-orange-500 font-bold tracking-[0.18em] uppercase text-center block w-full" 
+        style={{ fontSize: '8px', marginTop: '-1px', letterSpacing: '0.15em' }}
+      >
         Ремонт и строителство
       </span>
     )}
