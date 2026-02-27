@@ -1621,6 +1621,7 @@ const CompanyDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const [company, setCompany] = useState(null);
   const [portfolio, setPortfolio] = useState([]);
   const [loading, setLoading] = useState(true);
