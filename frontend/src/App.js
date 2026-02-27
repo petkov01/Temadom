@@ -1896,7 +1896,7 @@ const CompanyDashboard = () => {
   const [activeTab, setActiveTab] = useState('leads');
 
   useEffect(() => {
-    if (!user || user.user_type !== 'company') {
+    if (!user || (user.user_type !== 'company' && user.user_type !== 'master')) {
       navigate('/login');
       return;
     }
