@@ -67,7 +67,7 @@ export const Chatbot = ({ user }) => {
         <button
           onClick={() => setOpen(true)}
           data-testid="chatbot-open-btn"
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg flex items-center justify-center transition-transform hover:scale-110"
+          className="fixed bottom-20 right-6 z-[100] w-14 h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg flex items-center justify-center transition-transform hover:scale-110"
         >
           <MessageSquare className="h-6 w-6" />
         </button>
