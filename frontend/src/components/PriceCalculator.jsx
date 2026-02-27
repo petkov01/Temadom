@@ -178,8 +178,8 @@ const PRICE_DATABASE = {
     unit: "м²",
     unitLabel: "Квадратни метри",
     prices: {
-      labor: { economy: 8, standard: 12, premium: 18 },
-      laborAndMaterial: { economy: 25, standard: 40, premium: 65 }
+      labor: { economy: 12, standard: 20, premium: 32 },
+      laborAndMaterial: { economy: 35, standard: 55, premium: 85 }
     },
     description: "EPS, XPS или минерална вата"
   },
@@ -217,8 +217,8 @@ const PRICE_DATABASE = {
     unit: "м²",
     unitLabel: "Квадратни метри покрив",
     prices: {
-      labor: { economy: 15, standard: 25, premium: 40 },
-      laborAndMaterial: { economy: 45, standard: 70, premium: 110 }
+      labor: { economy: 30, standard: 50, premium: 75 },
+      laborAndMaterial: { economy: 65, standard: 100, premium: 160 }
     },
     description: "Керемиди, ламарина, хидроизолация"
   },
@@ -334,8 +334,8 @@ const PRICE_DATABASE = {
     unit: "м²",
     unitLabel: "Квадратни метри",
     prices: {
-      labor: { economy: 6, standard: 10, premium: 16 },
-      laborAndMaterial: { economy: 15, standard: 25, premium: 40 }
+      labor: { economy: 10, standard: 18, premium: 28 },
+      laborAndMaterial: { economy: 25, standard: 42, premium: 70 }
     },
     description: "Бани, тераси, основи, покриви"
   },
