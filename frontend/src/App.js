@@ -2062,7 +2062,7 @@ const RegisterPage = () => {
 
             {userType === 'company' && (
               <div>
-                <Label>Булстат (ЕИК) <span className="text-red-500">*</span></Label>
+                <Label>{t('reg_bulstat')} <span className="text-red-500">*</span></Label>
                 <Input 
                   placeholder="123456789"
                   value={formData.bulstat}
