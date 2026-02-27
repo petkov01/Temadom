@@ -2697,14 +2697,14 @@ const ClientDashboard = () => {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>Отказ</Button>
+              <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>{t('cd_cancel')}</Button>
               <Button 
                 className="bg-orange-600 hover:bg-orange-700"
                 onClick={handleCreateProject}
                 disabled={submitting}
                 data-testid="submit-project-btn"
               >
-                {submitting ? 'Създаване...' : 'Създай проект'}
+                {submitting ? t('cl_creating') : t('cl_create_project')}
               </Button>
             </DialogFooter>
           </DialogContent>
