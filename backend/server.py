@@ -1582,6 +1582,9 @@ async def sitemap():
     
     return Response(content=xml, media_type="application/xml")
 
+# Include router - MUST be after all route definitions
+app.include_router(api_router)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
