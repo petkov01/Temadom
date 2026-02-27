@@ -8,7 +8,7 @@ import {
   AppWindow, Thermometer, Layers, Hammer, BrickWall, Axe, Search, Filter, Star, 
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
   ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator, Camera, ChevronLeft, Image, MessageSquare,
-  FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3
+  FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench
 } from 'lucide-react';
 import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
