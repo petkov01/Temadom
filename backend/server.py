@@ -1271,15 +1271,22 @@ async def generate_calculator_pdf(data: dict):
     
     pdf.ln(8)
     
+    # Column widths
+    w_activity = 60
+    w_qty = 25
+    w_unit_price = 30
+    w_eur = 35
+    w_bgn = 40
+    
     # Table header
     pdf.set_fill_color(45, 55, 72)
     pdf.set_text_color(255, 255, 255)
     pdf.set_font(font_name, 'B', 10)
-    pdf.cell(70, 8, "Услуга", 1, 0, 'L', True)
-    pdf.cell(30, 8, "Количество", 1, 0, 'C', True)
-    pdf.cell(30, 8, "Ед. цена", 1, 0, 'C', True)
-    pdf.cell(30, 8, "Цена (EUR)", 1, 0, 'C', True)
-    pdf.cell(30, 8, "Цена (BGN)", 1, 1, 'C', True)
+    pdf.cell(w_activity, 8, "Вид дейност", 1, 0, 'L', True)
+    pdf.cell(w_qty, 8, "Кол-во", 1, 0, 'C', True)
+    pdf.cell(w_unit_price, 8, "Ед. цена", 1, 0, 'C', True)
+    pdf.cell(w_eur, 8, "Цена (EUR)", 1, 0, 'C', True)
+    pdf.cell(w_bgn, 8, "Цена (BGN)", 1, 1, 'C', True)
     
     # Table body
     pdf.set_text_color(0, 0, 0)
@@ -1298,22 +1305,24 @@ async def generate_calculator_pdf(data: dict):
         unit = item.get("unit", "")
         base_price = item.get("basePrice", 0)
         item_total = item.get("total", 0)
+        bgn_total = item_total * 1.9558
         
-        pdf.cell(70, 7, f"{name}", 1, 0, 'L', fill)
-        pdf.cell(30, 7, f"{qty} {unit}", 1, 0, 'C', fill)
-        pdf.cell(30, 7, f"{base_price:.2f} EUR", 1, 0, 'C', fill)
-        pdf.cell(30, 7, f"{item_total:.2f} EUR", 1, 0, 'C', fill)
-        pdf.cell(30, 7, f"{item_total * 1.9558:.2f} BGN", 1, 1, 'C', fill)
+        pdf.cell(w_activity, 7, f"{name}", 1, 0, 'L', fill)
+        pdf.cell(w_qty, 7, f"{qty} {unit}", 1, 0, 'C', fill)
+        pdf.cell(w_unit_price, 7, f"{base_price:.2f} \u20ac", 1, 0, 'C', fill)
+        pdf.cell(w_eur, 7, f"{item_total:.2f} \u20ac", 1, 0, 'C', fill)
+        pdf.cell(w_bgn, 7, f"{bgn_total:.2f} лв.", 1, 1, 'C', fill)
         fill = not fill
     
-    # Total
-    pdf.ln(3)
+    # Total row
+    pdf.ln(5)
     pdf.set_fill_color(242, 109, 33)
     pdf.set_text_color(255, 255, 255)
-    pdf.set_font(font_name, 'B', 12)
-    pdf.cell(130, 10, "ОБЩА СУМА:", 0, 0, 'R')
-    pdf.cell(30, 10, f"{total:.2f} EUR", 0, 0, 'C')
-    pdf.cell(30, 10, f"{total * 1.9558:.2f} BGN", 0, 1, 'C')
+    pdf.set_font(font_name, 'B', 11)
+    total_bgn = total * 1.9558
+    pdf.cell(w_activity + w_qty + w_unit_price, 10, "ОБЩА ЦЕНА НА ПРОЕКТА:", 1, 0, 'R', True)
+    pdf.cell(w_eur, 10, f"{total:.2f} \u20ac", 1, 0, 'C', True)
+    pdf.cell(w_bgn, 10, f"{total_bgn:.2f} лв.", 1, 1, 'C', True)
     
     # Footer note
     pdf.ln(15)
