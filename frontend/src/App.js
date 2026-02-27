@@ -1760,8 +1760,8 @@ const CompanyDetailPage = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Отзиви</CardTitle>
-              <CardDescription>{company.reviews?.length || 0} отзива</CardDescription>
+              <CardTitle>{t('cd_reviews')}</CardTitle>
+              <CardDescription>{company.reviews?.length || 0} {t('comp_reviews')}</CardDescription>
             </div>
             {user?.user_type === 'client' && (
               <Button 
@@ -1769,7 +1769,7 @@ const CompanyDetailPage = () => {
                 onClick={() => setReviewDialogOpen(true)}
                 data-testid="add-review-btn"
               >
-                Добави отзив
+                {t('cd_add_review')}
               </Button>
             )}
           </CardHeader>
