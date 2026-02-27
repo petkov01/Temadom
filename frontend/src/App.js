@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useSearchParams, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -8,7 +8,8 @@ import {
   AppWindow, Thermometer, Layers, Hammer, BrickWall, Axe, Search, Filter, Star, 
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
   ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator, Camera, ChevronLeft, Image, MessageSquare,
-  FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench
+  FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench,
+  ChevronDown, Globe
 } from 'lucide-react';
 import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
@@ -23,6 +24,9 @@ import BlogArticle from '@/components/BlogArticle';
 import PricesByRegionPage from '@/components/PricesByRegionPage';
 import RegionalPage from '@/components/RegionalPage';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import { LanguageProvider, useLanguage } from '@/i18n/LanguageContext';
+import { LANGUAGES } from '@/i18n/translations';
+import { Chatbot } from '@/components/Chatbot';
 
 // TemaDom Logo Component - Generated logo image with HTML subtitle
 const TemaDomLogo = ({ className = "h-12", showSubtitle = false }) => (
