@@ -1829,9 +1829,9 @@ const CompanyDetailPage = () => {
               </div>
               
               <div>
-                <Label>Коментар</Label>
+                <Label>{t('cd_comment')}</Label>
                 <Textarea 
-                  placeholder="Напишете вашия отзив..."
+                  placeholder={t('cd_comment_placeholder')}
                   value={reviewData.comment}
                   onChange={(e) => setReviewData(d => ({ ...d, comment: e.target.value }))}
                   rows={4}
