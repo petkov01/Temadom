@@ -485,15 +485,15 @@ const LandingPage = () => {
             <div className="text-white">
               <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 rounded-full px-4 py-2 mb-6">
                 <Calculator className="h-5 w-5 text-orange-400" />
-                <span className="text-orange-300 font-medium">Безплатен калкулатор • Единствен в България</span>
+                <span className="text-orange-300 font-medium">{t('hero_badge')}</span>
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-                Изчислете цената на вашия <span className="text-orange-500">ремонт</span> за секунди
+                {t('hero_title_1')}<span className="text-orange-500">{t('hero_highlight')}</span>{t('hero_title_2')}
               </h1>
               
               <p className="text-xl text-slate-300 mb-8">
-                Нашият интелигентен калкулатор ви помага да планирате бюджета си с реални пазарни цени от всички 28 области в България.
+                {t('hero_subtitle')}
               </p>
               
               <div className="grid grid-cols-2 gap-4 mb-8">
