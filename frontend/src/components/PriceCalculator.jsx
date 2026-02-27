@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAuth } from '@/App';
+import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from 'sonner';
 import axios from 'axios';
 
