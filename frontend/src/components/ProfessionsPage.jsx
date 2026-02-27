@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { HardHat, Search, Clock, CheckCircle, AlertTriangle, ChevronDown, ChevronUp, Paintbrush, Zap, Droplets, Square, Layers, Hammer, BrickWall, Thermometer, Building2, Axe, Shield, Eye, Star, Wrench, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from '@/i18n/LanguageContext';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
