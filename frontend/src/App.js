@@ -2238,7 +2238,7 @@ const CompanyDashboard = () => {
   const handleDeletePortfolio = async (projectId) => {
     await axios.delete(`${API}/portfolio/${projectId}`, { headers: { Authorization: `Bearer ${token}` } });
     setPortfolio(prev => prev.filter(p => p.id !== projectId));
-    toast.success('Проектът е изтрит');
+    toast.success(t('dash_portfolio_deleted'));
   };
 
   if (loading) {
