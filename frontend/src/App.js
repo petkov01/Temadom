@@ -929,10 +929,10 @@ const ProjectsPage = () => {
             
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger data-testid="category-filter">
-                <SelectValue placeholder="Всички категории" />
+                <SelectValue placeholder={t('projects_all_cat')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Всички категории</SelectItem>
+                <SelectItem value="all">{t('projects_all_cat')}</SelectItem>
                 {categories.map(cat => (
                   <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                 ))}
@@ -940,7 +940,7 @@ const ProjectsPage = () => {
             </Select>
             
             <Input 
-              placeholder="Град" 
+              placeholder={t('projects_city')} 
               value={city}
               onChange={(e) => setCity(e.target.value)}
               data-testid="city-filter"
