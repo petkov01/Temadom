@@ -1417,8 +1417,8 @@ const CompaniesPage = () => {
         ) : companies.length === 0 ? (
           <Card className="p-12 text-center">
             <Building2 className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-            <h3 className="text-xl font-semibold text-slate-700 mb-2">Няма намерени фирми</h3>
-            <p className="text-slate-500">Опитайте с други филтри</p>
+            <h3 className="text-xl font-semibold text-slate-700 mb-2">{t('comp_empty')}</h3>
+            <p className="text-slate-500">{t('comp_empty_sub')}</p>
           </Card>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
