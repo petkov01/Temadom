@@ -2009,8 +2009,8 @@ const RegisterPage = () => {
               </svg>
             </div>
           </div>
-          <CardTitle className="text-2xl">Регистрация</CardTitle>
-          <CardDescription>Създайте нов профил</CardDescription>
+          <CardTitle className="text-2xl">{t('reg_title')}</CardTitle>
+          <CardDescription>{t('reg_subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           {/* Free platform banner */}
