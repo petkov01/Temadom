@@ -137,7 +137,7 @@ const BlogArticle = () => {
             "datePublished": detailedArticle.date,
             "dateModified": "2026-02-27",
             "author": { "@type": "Organization", "name": "TemaDom" },
-            "publisher": { "@type": "Organization", "name": "TemaDom", "url": "https://temadom.bg" },
+            "publisher": { "@type": "Organization", "name": "TemaDom", "url": "https://temadom.com" },
             "keywords": detailedArticle.keywords
           })}} />
         </article>
@@ -338,7 +338,7 @@ const BlogArticle = () => {
           "datePublished": "2026-02-01",
           "dateModified": "2026-02-27",
           "author": { "@type": "Organization", "name": "TemaDom" },
-          "publisher": { "@type": "Organization", "name": "TemaDom", "url": "https://temadom.bg" }
+          "publisher": { "@type": "Organization", "name": "TemaDom", "url": "https://temadom.com" }
         })}} />
       </article>
     </div>
