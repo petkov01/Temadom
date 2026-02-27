@@ -964,6 +964,15 @@ const ProjectDetailPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       window.location.href = res.data.checkout_url;
+      // GA4: Track purchase initiation
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'purchase', {
+          event_category: 'revenue',
+          event_label: type === 'subscription' ? 'subscription' : 'paid_offer',
+          value: type === 'subscription' ? 195.58 : 48.90,
+          currency: 'BGN'
+        });
+      }
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка при плащане');
       setPaymentLoading(false);
