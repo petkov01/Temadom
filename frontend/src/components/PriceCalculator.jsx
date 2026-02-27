@@ -590,6 +590,20 @@ const PriceCalculator = () => {
             Изчислете приблизителната цена на вашия строителен или ремонтен проект. 
             Цените са базирани на актуални пазарни данни за България (2025-2026).
           </p>
+          
+          {/* AI Blueprint Analysis Button */}
+          <div className="mt-6">
+            <Button 
+              onClick={() => setShowBlueprintDialog(true)}
+              className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-6 py-3 h-auto shadow-lg"
+              data-testid="open-blueprint-ai"
+            >
+              <FileImage className="mr-2 h-5 w-5" />
+              AI Анализ на чертеж
+              <Badge className="ml-2 bg-white/20 text-white text-[10px]">НОВО</Badge>
+            </Button>
+            <p className="text-xs text-slate-500 mt-2">Качете строителен чертеж и AI ще извлече автоматично количествата</p>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
