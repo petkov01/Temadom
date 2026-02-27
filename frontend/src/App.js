@@ -146,30 +146,30 @@ const Navbar = () => {
               <TemaDomLogo className="h-10 w-auto" showSubtitle={true} />
             </Link>
             
-            <div className="hidden md:flex items-center ml-10 gap-6">
-              <Link to="/projects" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-projects">
-                <FolderSearch className="h-4 w-4" />
-                Намери проекти
+            <div className="hidden md:flex items-center ml-6 gap-3 lg:gap-4">
+              <Link to="/projects" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-projects">
+                <FolderSearch className="h-3.5 w-3.5" />
+                Проекти
               </Link>
-              <Link to="/companies" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-companies">
-                <Building2 className="h-4 w-4" />
+              <Link to="/find-master" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-find-master">
+                <Wrench className="h-3.5 w-3.5" />
+                Майстори
+              </Link>
+              <Link to="/companies" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-companies">
+                <Building2 className="h-3.5 w-3.5" />
                 Фирми
               </Link>
-              <Link to="/calculator" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-calculator">
-                <Calculator className="h-4 w-4" />
+              <Link to="/calculator" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-calculator">
+                <Calculator className="h-3.5 w-3.5" />
                 Калкулатор
               </Link>
-              <Link to="/services" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-services">
-                <Hammer className="h-4 w-4" />
+              <Link to="/services" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-services">
+                <Hammer className="h-3.5 w-3.5" />
                 Услуги
               </Link>
-              <Link to="/professions" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-professions">
-                <HardHat className="h-4 w-4" />
+              <Link to="/professions" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-professions">
+                <HardHat className="h-3.5 w-3.5" />
                 Професии
-              </Link>
-              <Link to="/find-master" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-find-master">
-                <Wrench className="h-4 w-4" />
-                Намери майстор
               </Link>
               <Link to="/blog" className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-1.5" data-testid="nav-blog">
                 <BookOpen className="h-4 w-4" />
