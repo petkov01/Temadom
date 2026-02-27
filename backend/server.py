@@ -1122,54 +1122,22 @@ async def send_message(
     data: dict,
     user: dict = Depends(get_current_user)
 ):
-    """Send a message. Contact info is filtered for companies without access."""
+    """Send a message. Platform is free - no filtering."""
     receiver_id = data.get("receiver_id")
     content = data.get("content", "").strip()
     project_id = data.get("project_id")
+    image = data.get("image")  # base64 image support
     
-    if not receiver_id or not content:
+    if not receiver_id or (not content and not image):
         raise HTTPException(status_code=400, detail="Получателят и съдържанието са задължителни")
     
-    if len(content) > 2000:
+    if content and len(content) > 2000:
         raise HTTPException(status_code=400, detail="Съобщението е прекалено дълго (макс. 2000 символа)")
     
     # Check if receiver exists
     receiver = await db.users.find_one({"id": receiver_id}, {"_id": 0})
     if not receiver:
         raise HTTPException(status_code=404, detail="Получателят не е намерен")
-    
-    # Determine if sender is a company that hasn't paid for this project's contact
-    is_contact_filtered = False
-    if user["user_type"] == "company" and not user.get("subscription_active"):
-        purchased = user.get("purchased_leads", [])
-        # If there's a project context, check if company has access
-        if project_id and project_id not in purchased:
-            is_contact_filtered = True
-        # Even without project context, filter if company hasn't paid in general
-        elif not project_id:
-            is_contact_filtered = True
-    
-    # Filter contact info from company messages if they haven't paid
-    filtered_content = content
-    was_filtered = False
-    if is_contact_filtered and contains_contact_info(content):
-        filtered_content = censor_contact_info(content)
-        was_filtered = True
-    
-    # Also filter client messages if they contain contact info and company hasn't paid
-    # Actually, clients should be free to share - but companies shouldn't share their own contact info to bypass
-    # The key rule: if EITHER party hasn't paid, contact info is blocked in messages
-    if user["user_type"] == "client":
-        # Check if the receiving company has paid
-        if receiver.get("user_type") == "company" and not receiver.get("subscription_active"):
-            recv_purchased = receiver.get("purchased_leads", [])
-            # Check if the company has access to any project from this client
-            client_projects = await db.projects.find({"client_id": user["id"]}, {"id": 1, "_id": 0}).to_list(100)
-            client_project_ids = [p["id"] for p in client_projects]
-            has_any_access = any(pid in recv_purchased for pid in client_project_ids)
-            if not has_any_access and contains_contact_info(content):
-                filtered_content = censor_contact_info(content)
-                was_filtered = True
     
     # Generate conversation ID (sorted user IDs to ensure consistency)
     sorted_ids = sorted([user["id"], receiver_id])
@@ -1183,9 +1151,9 @@ async def send_message(
         "sender_id": user["id"],
         "sender_name": user["name"],
         "receiver_id": receiver_id,
-        "content": filtered_content,
-        "original_content": content if was_filtered else None,
-        "was_filtered": was_filtered,
+        "content": content,
+        "image": image,
+        "was_filtered": False,
         "project_id": project_id,
         "read": False,
         "created_at": datetime.now(timezone.utc).isoformat()
@@ -1193,23 +1161,19 @@ async def send_message(
     
     await db.messages.insert_one(message)
     
-    response = {
+    return {
         "id": message["id"],
         "conversation_id": conv_id,
         "sender_id": message["sender_id"],
         "sender_name": message["sender_name"],
         "receiver_id": message["receiver_id"],
         "content": message["content"],
-        "was_filtered": was_filtered,
+        "image": message["image"],
+        "was_filtered": False,
         "project_id": message["project_id"],
         "read": message["read"],
         "created_at": message["created_at"]
     }
-    
-    if was_filtered:
-        response["filter_notice"] = "Съобщението е филтрирано. Контактната информация е скрита, защото фирмата не е заплатила за достъп."
-    
-    return response
 
 @api_router.get("/unread-count")
 async def get_unread_count(user: dict = Depends(get_current_user)):
