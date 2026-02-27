@@ -684,7 +684,7 @@ const LandingPage = () => {
       <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Как работи?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{t('how_title')}</h2>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -692,22 +692,22 @@ const LandingPage = () => {
               <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-orange-600">1</span>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Публикувайте проект</h3>
-              <p className="text-slate-600">Опишете какво търсите - ремонт, строителство или друга услуга</p>
+              <h3 className="text-xl font-semibold mb-3">{t('how_step1')}</h3>
+              <p className="text-slate-600">{t('how_step1_desc')}</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-orange-600">2</span>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Получете оферти</h3>
-              <p className="text-slate-600">Фирмите виждат вашия проект и се свързват с вас директно</p>
+              <h3 className="text-xl font-semibold mb-3">{t('how_step2')}</h3>
+              <p className="text-slate-600">{t('how_step2_desc')}</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-orange-600">3</span>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Изберете най-добрия</h3>
-              <p className="text-slate-600">Сравнете рейтинги и отзиви, за да изберете правилната фирма</p>
+              <h3 className="text-xl font-semibold mb-3">{t('how_step3')}</h3>
+              <p className="text-slate-600">{t('how_step3_desc')}</p>
             </div>
           </div>
         </div>
