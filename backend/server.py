@@ -1523,7 +1523,7 @@ async def analytics_dashboard(request: Request):
 
 # ============== SITEMAP ==============
 
-@api_router.get("/sitemap.xml")
+@api_router.get("/sitemap")
 async def sitemap():
     """Generate dynamic sitemap.xml"""
     base = "https://temadom.bg"
