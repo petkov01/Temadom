@@ -1469,6 +1469,7 @@ const FindMasterPage = () => {
   const [category, setCategory] = useState('');
   const [city, setCity] = useState('');
   const [proType, setProType] = useState('all'); // all, company, master
+  const { t } = useLanguage();
 
   useEffect(() => {
     axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
