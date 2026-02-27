@@ -702,13 +702,14 @@ const PriceCalculator = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="space-y-3 mb-6">
+                    <div className="space-y-3 mb-4">
                       {calculation.items.map(item => (
-                        <div key={item.id} className="flex justify-between text-sm">
-                          <span className="text-slate-600">
-                            {item.name} ({item.quantity} {PRICE_DATABASE[item.category].unit})
-                          </span>
-                          <span className="font-medium">
+                        <div key={item.id} className="flex justify-between text-sm py-2 border-b border-slate-100 last:border-0">
+                          <div className="flex-1">
+                            <span className="text-slate-700 font-medium">{item.name}</span>
+                            <span className="text-slate-400 ml-1">({item.quantity} {PRICE_DATABASE[item.category].unit})</span>
+                          </div>
+                          <span className="font-semibold text-slate-900 ml-3">
                             {item.total.toFixed(0)} €
                           </span>
                         </div>
@@ -730,16 +731,20 @@ const PriceCalculator = () => {
                         <span>Регион:</span>
                         <span>{calculation.regionName}</span>
                       </div>
+                      <div className="flex justify-between font-medium text-slate-700">
+                        <span>Брой дейности:</span>
+                        <span>{calculation.items.filter(i => i.quantity > 0).length}</span>
+                      </div>
                     </div>
 
                     <Separator className="my-4" />
 
-                    <div className="bg-slate-900 text-white rounded-lg p-4 text-center">
-                      <p className="text-sm text-slate-300 mb-1">Приблизителна цена</p>
-                      <p className="text-3xl font-bold" data-testid="total-price">
+                    <div className="bg-slate-900 text-white rounded-lg p-5 text-center" data-testid="grand-total-box">
+                      <p className="text-sm text-slate-300 mb-1">ОБЩА ЦЕНА ЗА ВСИЧКО</p>
+                      <p className="text-4xl font-bold" data-testid="total-price">
                         {calculation.total.toFixed(0)} €
                       </p>
-                      <p className="text-sm text-slate-400 mt-1">
+                      <p className="text-lg text-orange-400 font-semibold mt-1">
                         ≈ {(calculation.total * 1.95).toFixed(0)} лв.
                       </p>
                     </div>
