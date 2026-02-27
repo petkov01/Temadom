@@ -2030,12 +2030,10 @@ const RegisterPage = () => {
                 <span className="text-2xl flex-shrink-0">&#9889;</span>
                 <div>
                   <p className="text-sm font-bold text-amber-900 mb-1">
-                    Бъдете крачка пред конкуренцията!
+                    {t('reg_promo_title')}
                   </p>
                   <p className="text-xs text-amber-800 leading-relaxed">
-                    Точно сега TemaDom.com е напълно безплатна - без абонаменти, без такси за контакти, без лимити.
-                    Това няма да е завинаги. Изградете профила и репутацията си сега, 
-                    докато достъпът е свободен, и бъдете сред първите, когато клиентите ви потърсят!
+                    {t('reg_promo_desc')}
                   </p>
                 </div>
               </div>
