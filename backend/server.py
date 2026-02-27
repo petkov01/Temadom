@@ -1417,6 +1417,171 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+ANALYTICS_ADMIN_PASSWORD = os.environ.get("ANALYTICS_PASSWORD", "temadom2026")
+
+# ============== ANALYTICS ROUTES ==============
+
+@api_router.post("/analytics/track")
+async def track_pageview(data: dict, request: Request):
+    """Track a page view"""
+    event = {
+        "id": str(uuid.uuid4()),
+        "event_type": "pageview",
+        "path": data.get("path", "/"),
+        "referrer": data.get("referrer", ""),
+        "user_agent": request.headers.get("user-agent", ""),
+        "ip": request.client.host if request.client else "",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.analytics_events.insert_one(event)
+    return {"ok": True}
+
+@api_router.post("/analytics/event")
+async def track_event(data: dict, request: Request):
+    """Track a custom event (calculator_submit, pdf_generated, etc.)"""
+    event = {
+        "id": str(uuid.uuid4()),
+        "event_type": "custom",
+        "event_name": data.get("event_name", "unknown"),
+        "metadata": data.get("metadata", {}),
+        "path": data.get("path", "/"),
+        "user_agent": request.headers.get("user-agent", ""),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.analytics_events.insert_one(event)
+    return {"ok": True}
+
+@api_router.get("/analytics/dashboard")
+async def analytics_dashboard(request: Request):
+    """Admin analytics dashboard data"""
+    pw = request.headers.get("X-Admin-Password", "")
+    if pw != ANALYTICS_ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Грешна парола")
+    
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Pageviews today
+    pageviews_today = await db.analytics_events.count_documents({
+        "event_type": "pageview",
+        "created_at": {"$gte": today}
+    })
+    
+    # Calculator uses
+    calculator_uses = await db.analytics_events.count_documents({
+        "event_name": "calculator_submit"
+    })
+    
+    # PDF downloads
+    pdf_downloads = await db.analytics_events.count_documents({
+        "event_name": "pdf_generated"
+    })
+    
+    # Payments
+    payments = await db.payment_transactions.count_documents({
+        "payment_status": "paid"
+    })
+    
+    # Users
+    total_users = await db.users.count_documents({})
+    total_companies = await db.users.count_documents({"user_type": "company"})
+    total_clients = await db.users.count_documents({"user_type": "client"})
+    
+    # Top pages today
+    top_pages = await db.analytics_events.aggregate([
+        {"$match": {"event_type": "pageview", "created_at": {"$gte": today}}},
+        {"$group": {"_id": "$path", "views": {"$sum": 1}}},
+        {"$sort": {"views": -1}},
+        {"$limit": 10}
+    ]).to_list(10)
+    
+    # Recent events
+    recent_events = await db.analytics_events.find(
+        {"event_type": "custom"},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
+    # Top regions from calculator
+    top_regions = await db.analytics_events.aggregate([
+        {"$match": {"event_name": "calculator_submit"}},
+        {"$group": {"_id": "$metadata.region", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 8}
+    ]).to_list(8)
+    
+    return {
+        "pageviews_today": pageviews_today,
+        "calculator_uses": calculator_uses,
+        "pdf_downloads": pdf_downloads,
+        "payments": payments,
+        "total_users": total_users,
+        "total_companies": total_companies,
+        "total_clients": total_clients,
+        "top_pages": [{"path": p["_id"] or "/", "views": p["views"]} for p in top_pages],
+        "recent_events": recent_events,
+        "top_regions": [{"region": r["_id"] or "N/A", "count": r["count"]} for r in top_regions]
+    }
+
+# ============== SITEMAP ==============
+
+@api_router.get("/sitemap.xml")
+async def sitemap():
+    """Generate dynamic sitemap.xml"""
+    base = "https://temadom.bg"
+    
+    # Static pages
+    urls = [
+        (f"{base}/", "1.0", "daily"),
+        (f"{base}/calculator", "0.9", "weekly"),
+        (f"{base}/services", "0.8", "weekly"),
+        (f"{base}/professions", "0.8", "weekly"),
+        (f"{base}/about", "0.7", "monthly"),
+        (f"{base}/terms", "0.5", "monthly"),
+        (f"{base}/blog", "0.9", "daily"),
+        (f"{base}/prices", "0.9", "weekly"),
+        (f"{base}/projects", "0.8", "daily"),
+        (f"{base}/companies", "0.7", "daily"),
+    ]
+    
+    # Regional pages
+    regions = [
+        "sofia", "sofiyska-oblast", "plovdiv", "varna", "burgas",
+        "stara-zagora", "ruse", "pleven", "blagoevgrad", "veliko-tarnovo",
+        "dobrich", "vidin", "montana", "vratsa", "lovech", "gabrovo",
+        "targovishte", "razgrad", "shumen", "silistra", "pazardzhik",
+        "smolyan", "kardzhali", "haskovo", "yambol", "sliven", "pernik", "kyustendil"
+    ]
+    for r in regions:
+        urls.append((f"{base}/region/{r}", "0.8", "weekly"))
+    
+    # Blog articles
+    professions = [
+        "boyadzhiya", "shpaklovchik", "fayansdzhiya", "elektrotehnik",
+        "vodoprovodchik", "klimatik-montazh", "pokrivdzhiya", "zidar",
+        "zamazchik", "izolator", "hidroizolator", "gipskartонist",
+        "podovi-nastilki", "dogramdzhiya", "demontazh", "betondzhiya",
+        "izkopni-raboti", "fasaden-rabotnik", "mebelist", "alarmena-sistema",
+        "solarni-sistemi", "interiorni-vrati", "dekorativni-pokritiya",
+        "kamenodelets", "zavarchik-metal", "ozelenyavane", "shumoizolatsiya", "baseyni"
+    ]
+    
+    urls.append((f"{base}/blog/kalkulator-ceni-stroitelstvo-2026", "0.9", "weekly"))
+    urls.append((f"{base}/blog/grub-stroezh-ceni-2026", "0.8", "weekly"))
+    urls.append((f"{base}/blog/dovarshitelni-raboti-ceni-2026", "0.8", "weekly"))
+    
+    for p in professions:
+        urls.append((f"{base}/blog/ceni-{p}-2026", "0.7", "weekly"))
+    
+    for r in ["sofia", "plovdiv", "varna", "burgas", "stara-zagora", "ruse"]:
+        urls.append((f"{base}/blog/stroitelstvo-{r}-2026", "0.7", "weekly"))
+    
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for loc, priority, freq in urls:
+        xml += f'  <url>\n    <loc>{loc}</loc>\n    <priority>{priority}</priority>\n    <changefreq>{freq}</changefreq>\n  </url>\n'
+    xml += '</urlset>'
+    
+    return Response(content=xml, media_type="application/xml")
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
