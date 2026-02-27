@@ -1336,8 +1336,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ANALYTICS_ADMIN_PASSWORD = os.environ.get("ANALYTICS_PASSWORD", "temadom2026")
-
 # ============== ANALYTICS ROUTES ==============
 
 @api_router.post("/analytics/track")
