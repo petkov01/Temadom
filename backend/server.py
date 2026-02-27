@@ -903,8 +903,8 @@ async def get_payment_history(user: dict = Depends(get_current_user)):
 
 @api_router.get("/my-leads")
 async def get_my_leads(user: dict = Depends(get_current_user)):
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Тази функция е само за фирми")
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Тази функция е само за фирми и майстори")
     
     purchased_ids = user.get("purchased_leads", [])
     has_subscription = user.get("subscription_active", False)
@@ -941,8 +941,8 @@ async def get_my_leads(user: dict = Depends(get_current_user)):
 @api_router.post("/leads/claim-free/{project_id}")
 async def claim_free_lead(project_id: str, user: dict = Depends(get_current_user)):
     """Claim a free lead (first 3 are free for new companies)"""
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Само фирми могат да вземат контакти")
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Само фирми и майстори могат да вземат контакти")
     
     # Check if already has this lead
     if project_id in user.get("purchased_leads", []):
@@ -987,8 +987,8 @@ async def claim_free_lead(project_id: str, user: dict = Depends(get_current_user
 @api_router.get("/leads/free-status")
 async def get_free_leads_status(user: dict = Depends(get_current_user)):
     """Get free leads status for current company"""
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Тази функция е само за фирми")
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Тази функция е само за фирми и майстори")
     
     free_leads_used = user.get("free_leads_used", 0)
     free_leads_remaining = max(0, FREE_LEADS_LIMIT - free_leads_used)
@@ -1017,8 +1017,8 @@ async def get_calculator_status(user: dict = Depends(get_current_user)):
 @api_router.post("/calculator/pay")
 async def pay_calculator_use(request: Request, user: dict = Depends(get_current_user)):
     """Create Stripe checkout for calculator usage payment (€10)"""
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Само фирми")
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Само фирми и майстори")
     
     origin = request.headers.get("origin", str(request.base_url).rstrip("/"))
     host_url = str(request.base_url).rstrip("/")
