@@ -552,7 +552,7 @@ const ServicesPage = () => {
                 onClick={() => setCategoryFilter(cat)}
                 className={categoryFilter === cat ? "bg-orange-600 hover:bg-orange-700" : ""}
               >
-                {cat === 'all' ? 'Всички' : cat}
+                {cat === 'all' ? (isEn ? 'All' : 'Всички') : cat}
               </Button>
             ))}
           </div>
