@@ -32,7 +32,13 @@ JWT_EXPIRATION_HOURS = 24
 # Stripe Config
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
 
-# Payment packages (server-side only - security)
+# Telegram Config
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+
+# PLATFORM IS FREE - all payment gates disabled
+PLATFORM_FREE = True
+
+# Payment packages (server-side only - security) - DISABLED while PLATFORM_FREE
 PAYMENT_PACKAGES = {
     "subscription": {"amount": 100.00, "currency": "eur", "type": "subscription", "name": "Месечен абонамент"},
     "single_lead": {"amount": 25.00, "currency": "eur", "type": "one_time", "name": "Единичен контакт"}
