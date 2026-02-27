@@ -2644,10 +2644,10 @@ const ClientDashboard = () => {
               <div>
                 <Label className="flex items-center gap-2 mb-3">
                   <Camera className="h-4 w-4" />
-                  Снимки на проекта (до 10)
+                  {t('cl_photos')}
                 </Label>
                 <p className="text-xs text-slate-500 mb-3">
-                  Добавете снимки на помещенията, чертежи или скици за да могат майсторите да разберат по-добре какво търсите
+                  {t('cl_photos_desc')}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {newProject.images.map((img, idx) => (
