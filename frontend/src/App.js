@@ -2128,12 +2128,7 @@ const RegisterPage = () => {
             )}
 
             <div>
-              <Label>Парола</Label>
-              <Input 
-                type="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) => setFormData(d => ({ ...d, password: e.target.value }))}
+              <Label>{t('reg_password')}</Label>
                 required
                 data-testid="register-password"
               />
