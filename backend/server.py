@@ -542,8 +542,8 @@ async def update_company_profile(
     profile_data: dict,
     user: dict = Depends(get_current_user)
 ):
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Само фирми могат да редактират профила си")
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Само фирми и майстори могат да редактират профила си")
     
     # Find existing profile
     profile = await db.company_profiles.find_one({"user_id": user["id"]})
@@ -563,8 +563,8 @@ async def update_company_profile(
 
 @api_router.get("/my-company")
 async def get_my_company(user: dict = Depends(get_current_user)):
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Тази функция е само за фирми")
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Тази функция е само за фирми и майстори")
     
     profile = await db.company_profiles.find_one({"user_id": user["id"]}, {"_id": 0})
     if not profile:
@@ -588,9 +588,9 @@ async def add_portfolio_project(
     project_data: PortfolioProjectCreate, 
     user: dict = Depends(get_current_user)
 ):
-    """Add a new portfolio project (company only)"""
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Само фирми могат да добавят проекти в портфолиото")
+    """Add a new portfolio project (company/master only)"""
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Само фирми и майстори могат да добавят проекти в портфолиото")
     
     # Get company profile
     profile = await db.company_profiles.find_one({"user_id": user["id"]})
