@@ -2509,6 +2509,7 @@ function App() {
     <AuthProvider>
       <div className="App min-h-screen flex flex-col">
         <BrowserRouter>
+          <PageTracker />
           <Navbar />
           <main className="flex-1">
             <Routes>
