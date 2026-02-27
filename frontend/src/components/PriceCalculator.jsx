@@ -439,6 +439,7 @@ const PRICING_TYPES = {
 
 const PriceCalculator = () => {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [selectedItems, setSelectedItems] = useState([]);
   const [region, setRegion] = useState('sofia_city');
