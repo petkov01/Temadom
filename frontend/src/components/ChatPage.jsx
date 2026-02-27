@@ -3,13 +3,12 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '@/App';
-import { MessageSquare, Send, ArrowLeft, AlertTriangle, User, Clock, Shield } from 'lucide-react';
+import { MessageSquare, Send, ArrowLeft, User, Clock, Image, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -25,8 +24,10 @@ const ChatPage = () => {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [otherUser, setOtherUser] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const messagesEndRef = useRef(null);
   const pollRef = useRef(null);
+  const imageInputRef = useRef(null);
 
   const toUserId = searchParams.get('to');
   const projectId = searchParams.get('project');
@@ -40,7 +41,6 @@ const ChatPage = () => {
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [user, token]);
 
-  // If navigated with ?to= param, start/open that conversation
   useEffect(() => {
     if (toUserId && token) {
       startConversation(toUserId, projectId);
@@ -53,9 +53,7 @@ const ChatPage = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setConversations(res.data.conversations);
-    } catch (err) {
-      // silent
-    }
+    } catch (err) {}
     setLoading(false);
   };
 
@@ -82,7 +80,6 @@ const ChatPage = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessages(res.data.messages);
-      // Find the other user from messages
       if (res.data.messages.length > 0 && !otherUser) {
         const msg = res.data.messages[0];
         const otherId = msg.sender_id === user.id ? msg.receiver_id : msg.sender_id;
@@ -92,12 +89,10 @@ const ChatPage = () => {
         } catch {}
       }
     } catch (err) {
-      // May be new conversation with no messages yet
       setMessages([]);
     }
   }, [token, user, otherUser]);
 
-  // Poll for new messages
   useEffect(() => {
     if (pollRef.current) clearInterval(pollRef.current);
     if (activeConversation) {
@@ -106,14 +101,25 @@ const ChatPage = () => {
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [activeConversation, fetchMessages]);
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Файлът е прекалено голям (макс. 5MB)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result);
+    reader.readAsDataURL(file);
+  };
+
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || sending) return;
+    if ((!newMessage.trim() && !imagePreview) || sending) return;
     
     const receiverId = otherUser?.id || toUserId;
     if (!receiverId) return;
@@ -123,6 +129,7 @@ const ChatPage = () => {
       const res = await axios.post(`${API}/messages`, {
         receiver_id: receiverId,
         content: newMessage,
+        image: imagePreview || null,
         project_id: projectId || null
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -130,12 +137,7 @@ const ChatPage = () => {
       
       setMessages(prev => [...prev, res.data]);
       setNewMessage('');
-      
-      if (res.data.was_filtered) {
-        toast.warning('Контактната информация в съобщението е скрита. Фирмата трябва да заплати за достъп до контакти.', {
-          duration: 5000
-        });
-      }
+      setImagePreview(null);
       
       if (!activeConversation) {
         setActiveConversation(res.data.conversation_id);
@@ -237,20 +239,6 @@ const ChatPage = () => {
                       {otherUser?.user_type === 'client' ? 'Клиент' : 'Фирма'}
                     </span>
                   </div>
-                  <div className="ml-auto">
-                    <div className="flex items-center gap-1 text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
-                      <Shield className="h-3 w-3" />
-                      Защитен чат
-                    </div>
-                  </div>
-                </div>
-
-                {/* Filter notice */}
-                <div className="bg-amber-50 border-b border-amber-200 px-4 py-2">
-                  <p className="text-xs text-amber-800 flex items-center gap-1">
-                    <AlertTriangle className="h-3 w-3 flex-shrink-0" />
-                    Телефонни номера, имейли и координати се скриват автоматично в съобщенията, ако фирмата не е заплатила за достъп.
-                  </p>
                 </div>
 
                 {/* Messages */}
@@ -271,12 +259,16 @@ const ChatPage = () => {
                             ? 'bg-orange-600 text-white rounded-br-md' 
                             : 'bg-white border border-slate-200 text-slate-800 rounded-bl-md'
                         }`}>
-                          <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
-                          {msg.was_filtered && (
-                            <p className={`text-[10px] mt-1 flex items-center gap-1 ${isMine ? 'text-orange-200' : 'text-amber-600'}`}>
-                              <AlertTriangle className="h-2.5 w-2.5" />
-                              Филтрирано
-                            </p>
+                          {msg.image && (
+                            <img 
+                              src={msg.image} 
+                              alt="Снимка" 
+                              className="max-w-full rounded-lg mb-2 max-h-64 object-contain cursor-pointer"
+                              onClick={() => window.open(msg.image, '_blank')}
+                            />
+                          )}
+                          {msg.content && (
+                            <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
                           )}
                           <p className={`text-[10px] mt-1 ${isMine ? 'text-orange-200' : 'text-slate-400'}`}>
                             {new Date(msg.created_at).toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' })}
@@ -288,9 +280,39 @@ const ChatPage = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
+                {/* Image preview */}
+                {imagePreview && (
+                  <div className="px-3 pt-2 bg-white border-t">
+                    <div className="relative inline-block">
+                      <img src={imagePreview} alt="Преглед" className="h-20 rounded-lg object-cover" />
+                      <button
+                        onClick={() => setImagePreview(null)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Message input */}
                 <div className="p-3 border-t bg-white">
                   <form onSubmit={handleSend} className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => imageInputRef.current?.click()}
+                      className="p-2 text-slate-400 hover:text-orange-600 transition-colors"
+                      data-testid="chat-image-btn"
+                    >
+                      <Image className="h-5 w-5" />
+                    </button>
+                    <input
+                      ref={imageInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageSelect}
+                    />
                     <Input
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
@@ -302,7 +324,7 @@ const ChatPage = () => {
                     <Button 
                       type="submit" 
                       className="bg-orange-600 hover:bg-orange-700"
-                      disabled={!newMessage.trim() || sending}
+                      disabled={(!newMessage.trim() && !imagePreview) || sending}
                       data-testid="send-message-submit"
                     >
                       <Send className="h-4 w-4" />
