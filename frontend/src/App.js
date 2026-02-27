@@ -2431,7 +2431,7 @@ const ClientDashboard = () => {
         setProjects(projRes.data.projects);
         setCategories(catsRes.data.categories);
       } catch (err) {
-        toast.error('Грешка при зареждане');
+        toast.error(t('common_error'));
       }
       setLoading(false);
     };
