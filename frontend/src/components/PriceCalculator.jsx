@@ -587,10 +587,10 @@ const PriceCalculator = () => {
               <Lock className="h-8 w-8 text-orange-600" />
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              Калкулаторът изисква регистрация
+              {t('calc_auth_title')}
             </h2>
             <p className="text-slate-600 mb-8">
-              За да използвате калкулатора за ремонт, моля регистрирайте се или влезте в акаунта си. Регистрацията е напълно безплатна!
+              {t('calc_auth_desc')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <button
@@ -598,14 +598,14 @@ const PriceCalculator = () => {
                 className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
                 data-testid="calculator-register-btn"
               >
-                Регистрация
+                {t('calc_auth_register')}
               </button>
               <button
                 onClick={() => navigate('/login')}
                 className="flex-1 bg-white hover:bg-slate-50 text-slate-700 font-medium py-3 px-6 rounded-lg border border-slate-300 transition-colors"
                 data-testid="calculator-login-btn"
               >
-                Вход
+                {t('calc_auth_login')}
               </button>
             </div>
           </div>
