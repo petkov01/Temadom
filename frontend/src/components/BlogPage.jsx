@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Search, ArrowRight, Calendar, Clock, Tag } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from '@/i18n/LanguageContext';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BLOG_ARTICLES } from '@/data/seoData';
