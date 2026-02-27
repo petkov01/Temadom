@@ -895,7 +895,7 @@ const PriceCalculator = () => {
                             link.download = 'temadom_kalkulaciya.pdf';
                             link.click();
                             window.URL.revokeObjectURL(url);
-                            toast.success('PDF офертата е изтеглена');
+                            toast.success(t('calc_download_pdf'));
                             // GA4: Track PDF download
                             if (typeof window.gtag === 'function') {
                               window.gtag('event', 'pdf_download', {
@@ -905,13 +905,13 @@ const PriceCalculator = () => {
                               });
                             }
                           } catch {
-                            toast.error('Грешка при генериране на PDF');
+                            toast.error(t('common_error'));
                           }
                         }}
                         data-testid="download-pdf-btn"
                       >
                         <FileDown className="mr-2 h-4 w-4" />
-                        Изтегли PDF оферта
+                        {t('calc_download_pdf')}
                       </Button>
                     )}
 
