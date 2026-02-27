@@ -2569,15 +2569,15 @@ const ClientDashboard = () => {
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>Създай нов проект</DialogTitle>
-              <DialogDescription>Опишете вашия проект, за да получите оферти от фирми</DialogDescription>
+              <DialogTitle>{t('cl_create_project')}</DialogTitle>
+              <DialogDescription>{t('cl_create_desc')}</DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-4">
               <div>
-                <Label>Заглавие *</Label>
+                <Label>{t('cl_title')} *</Label>
                 <Input 
-                  placeholder="Напр. Ремонт на апартамент 80 кв.м."
+                  placeholder={t('cl_title_placeholder')}
                   value={newProject.title}
                   onChange={(e) => setNewProject(d => ({ ...d, title: e.target.value }))}
                   data-testid="project-title-input"
