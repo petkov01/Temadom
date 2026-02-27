@@ -640,7 +640,7 @@ const PriceCalculator = () => {
             >
               <FileImage className="mr-2 h-5 w-5" />
               AI Анализ на чертеж
-              <Badge className="ml-2 bg-white/20 text-white text-[10px]">НОВО</Badge>
+              <Badge className="ml-2 bg-white/20 text-white text-[10px]">NEW</Badge>
             </Button>
             <p className="text-xs text-slate-500 mt-2">Качете строителен чертеж и AI ще извлече автоматично количествата</p>
           </div>
