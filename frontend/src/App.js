@@ -2176,6 +2176,7 @@ const RegisterPage = () => {
 const CompanyDashboard = () => {
   const { user, token, refreshUser } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [leads, setLeads] = useState([]);
   const [profile, setProfile] = useState(null);
   const [portfolio, setPortfolio] = useState([]);
