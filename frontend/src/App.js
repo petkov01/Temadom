@@ -1806,13 +1806,13 @@ const CompanyDetailPage = () => {
         <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Добави отзив</DialogTitle>
-              <DialogDescription>Споделете вашето мнение за {company.company_name}</DialogDescription>
+              <DialogTitle>{t('cd_add_review')}</DialogTitle>
+              <DialogDescription>{t('cd_share_opinion')} {company.company_name}</DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4 py-4">
               <div>
-                <Label>Рейтинг</Label>
+                <Label>{t('cd_rating')}</Label>
                 <div className="flex gap-2 mt-2">
                   {[1, 2, 3, 4, 5].map(i => (
                     <button
