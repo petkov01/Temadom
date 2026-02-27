@@ -502,8 +502,8 @@ const LandingPage = () => {
                     <CheckCircle className="h-5 w-5 text-orange-400" />
                   </div>
                   <div>
-                    <p className="font-semibold">28 услуги</p>
-                    <p className="text-xs text-slate-400">Пълен обхват</p>
+                    <p className="font-semibold">{t('hero_stat1')}</p>
+                    <p className="text-xs text-slate-400">{t('hero_stat1_sub')}</p>
                   </div>
                 </div>
                 
@@ -512,8 +512,8 @@ const LandingPage = () => {
                     <MapPin className="h-5 w-5 text-orange-400" />
                   </div>
                   <div>
-                    <p className="font-semibold">28 области</p>
-                    <p className="text-xs text-slate-400">Цяла България</p>
+                    <p className="font-semibold">{t('hero_stat2')}</p>
+                    <p className="text-xs text-slate-400">{t('hero_stat2_sub')}</p>
                   </div>
                 </div>
                 
@@ -522,8 +522,8 @@ const LandingPage = () => {
                     <Award className="h-5 w-5 text-orange-400" />
                   </div>
                   <div>
-                    <p className="font-semibold">3 нива качество</p>
-                    <p className="text-xs text-slate-400">Спрямо бюджет</p>
+                    <p className="font-semibold">{t('hero_stat3')}</p>
+                    <p className="text-xs text-slate-400">{t('hero_stat3_sub')}</p>
                   </div>
                 </div>
                 
@@ -532,8 +532,8 @@ const LandingPage = () => {
                     <Euro className="h-5 w-5 text-orange-400" />
                   </div>
                   <div>
-                    <p className="font-semibold">Труд ± материали</p>
-                    <p className="text-xs text-slate-400">Гъвкави опции</p>
+                    <p className="font-semibold">{t('hero_stat4')}</p>
+                    <p className="text-xs text-slate-400">{t('hero_stat4_sub')}</p>
                   </div>
                 </div>
               </div>
