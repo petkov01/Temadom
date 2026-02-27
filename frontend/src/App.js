@@ -2508,15 +2508,15 @@ const ClientDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Моите проекти</h1>
-            <p className="text-slate-600">Управлявайте вашите строителни проекти</p>
+            <h1 className="text-3xl font-bold text-slate-900">{t('cl_my_projects')}</h1>
+            <p className="text-slate-600">{t('cl_manage')}</p>
           </div>
           <Button 
             className="bg-orange-600 hover:bg-orange-700"
             onClick={() => setCreateDialogOpen(true)}
             data-testid="create-project-btn"
           >
-            + Нов проект
+            + {t('cl_new_project')}
           </Button>
         </div>
 
