@@ -1864,6 +1864,7 @@ const categories = [];
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
@@ -1872,10 +1873,10 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const data = await login(formData.email, formData.password);
-      toast.success('Успешен вход!');
+      toast.success(t('login_success'));
       navigate(data.user.user_type === 'client' ? '/dashboard/client' : '/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Грешка при вход');
+      toast.error(err.response?.data?.detail || t('common_error'));
     }
     setLoading(false);
   };
@@ -1893,13 +1894,13 @@ const LoginPage = () => {
               </svg>
             </div>
           </div>
-          <CardTitle className="text-2xl">Вход в профила</CardTitle>
-          <CardDescription>Въведете вашите данни за вход</CardDescription>
+          <CardTitle className="text-2xl">{t('login_title')}</CardTitle>
+          <CardDescription>{t('login_subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label>Имейл</Label>
+              <Label>{t('login_email')}</Label>
               <Input 
                 type="email"
                 placeholder="email@example.com"
@@ -1910,7 +1911,7 @@ const LoginPage = () => {
               />
             </div>
             <div>
-              <Label>Парола</Label>
+              <Label>{t('login_password')}</Label>
               <Input 
                 type="password"
                 placeholder="••••••••"
@@ -1926,15 +1927,15 @@ const LoginPage = () => {
               disabled={loading}
               data-testid="login-submit"
             >
-              {loading ? 'Влизане...' : 'Вход'}
+              {loading ? t('login_loading') : t('login_submit')}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="justify-center">
           <p className="text-sm text-slate-600">
-            Нямате профил?{' '}
+            {t('login_no_account')}{' '}
             <Link to="/register" className="text-orange-600 hover:underline">
-              Регистрирайте се
+              {t('login_register')}
             </Link>
           </p>
         </CardFooter>
