@@ -2079,12 +2079,7 @@ const RegisterPage = () => {
             )}
 
             <div>
-              <Label>Имейл</Label>
-              <Input 
-                type="email"
-                placeholder="email@example.com"
-                value={formData.email}
-                onChange={(e) => setFormData(d => ({ ...d, email: e.target.value }))}
+              <Label>{t('reg_email')}</Label>
                 required
                 data-testid="register-email"
               />
