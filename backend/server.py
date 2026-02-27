@@ -978,37 +978,13 @@ async def get_free_leads_status(user: dict = Depends(get_current_user)):
 
 @api_router.post("/calculator/log-use")
 async def log_calculator_use(user: dict = Depends(get_current_user)):
-    """Log a calculator use for a company user. Returns remaining free uses."""
-    if user["user_type"] != "company":
-        return {"allowed": True, "remaining": -1}  # Clients have unlimited access
-    
-    if user.get("subscription_active"):
-        return {"allowed": True, "remaining": -1}  # Subscribers have unlimited access
-    
-    uses = user.get("calculator_uses", 0)
-    if uses >= CALCULATOR_FREE_USES:
-        return {"allowed": False, "remaining": 0, "message": "Изчерпахте безплатните калкулации. Моля, платете €10 или се абонирайте."}
-    
-    await db.users.update_one(
-        {"id": user["id"]},
-        {"$inc": {"calculator_uses": 1}}
-    )
-    
-    remaining = CALCULATOR_FREE_USES - uses - 1
-    return {"allowed": True, "remaining": remaining}
+    """Log a calculator use. PLATFORM IS FREE - always allowed."""
+    return {"allowed": True, "remaining": -1}
 
 @api_router.get("/calculator/status")
 async def get_calculator_status(user: dict = Depends(get_current_user)):
-    """Get calculator usage status for current user."""
-    if user["user_type"] != "company":
-        return {"unlimited": True, "uses": 0, "remaining": -1}
-    
-    if user.get("subscription_active"):
-        return {"unlimited": True, "uses": 0, "remaining": -1}
-    
-    uses = user.get("calculator_uses", 0)
-    remaining = max(0, CALCULATOR_FREE_USES - uses)
-    return {"unlimited": False, "uses": uses, "limit": CALCULATOR_FREE_USES, "remaining": remaining}
+    """Get calculator usage status. PLATFORM IS FREE - unlimited."""
+    return {"unlimited": True, "uses": 0, "remaining": -1}
 
 @api_router.post("/calculator/pay")
 async def pay_calculator_use(request: Request, user: dict = Depends(get_current_user)):
