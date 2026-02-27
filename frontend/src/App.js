@@ -2525,8 +2525,8 @@ const ClientDashboard = () => {
             {projects.length === 0 ? (
               <div className="text-center py-12">
                 <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                <h3 className="text-lg font-medium text-slate-700 mb-2">Все още нямате проекти</h3>
-                <p className="text-slate-500 mb-4">Създайте първия си проект и получете оферти</p>
+                <h3 className="text-lg font-medium text-slate-700 mb-2">{t('cl_no_projects')}</h3>
+                <p className="text-slate-500 mb-4">{t('cl_no_projects_sub')}</p>
                 <Button 
                   className="bg-orange-600 hover:bg-orange-700"
                   onClick={() => setCreateDialogOpen(true)}
