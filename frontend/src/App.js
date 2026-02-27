@@ -2712,6 +2712,7 @@ function App() {
               <Route path="/projects/:id" element={<ProjectDetailPage />} />
               <Route path="/companies" element={<CompaniesPage />} />
               <Route path="/companies/:id" element={<CompanyDetailPage />} />
+              <Route path="/find-master" element={<FindMasterPage />} />
               <Route path="/calculator" element={<PriceCalculator />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/messages" element={<ChatPage />} />
