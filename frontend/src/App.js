@@ -145,6 +145,7 @@ const Navbar = () => {
   const [langOpen, setLangOpen] = useState(false);
   const moreRef = useRef(null);
   const langRef = useRef(null);
+  const mobileLangRef = useRef(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
