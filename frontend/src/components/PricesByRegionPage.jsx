@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { MapPin, Calculator, ArrowRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from '@/i18n/LanguageContext';
 import { Badge } from "@/components/ui/badge";
 import { REGIONS, SEO_PROFESSIONS } from '@/data/seoData';
 
