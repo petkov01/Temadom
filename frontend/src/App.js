@@ -252,6 +252,9 @@ const Navbar = () => {
             <Link to="/professions" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
               <HardHat className="h-4 w-4" /> Професии
             </Link>
+            <Link to="/find-master" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-find-master">
+              <Wrench className="h-4 w-4" /> Намери майстор
+            </Link>
             <Link to="/blog" className="block py-2 text-slate-600 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-blog">
               <BookOpen className="h-4 w-4" /> Блог
             </Link>
