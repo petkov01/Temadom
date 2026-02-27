@@ -454,7 +454,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                   ))}
                 </ol>
 
-                <h4 className="font-semibold text-lg mb-3">Необходими материали</h4>
+                <h4 className="font-semibold text-lg mb-3">{isEn ? 'Required materials' : 'Необходими материали'}</h4>
                 <div className="flex flex-wrap gap-2">
                   {service.materials.map((material, idx) => (
                     <Badge key={idx} variant="outline">{material}</Badge>
