@@ -2074,7 +2074,7 @@ const RegisterPage = () => {
                   required
                   data-testid="register-bulstat"
                 />
-                <p className="text-xs text-slate-500 mt-1">Задължително поле - 9 цифри</p>
+                <p className="text-xs text-slate-500 mt-1">{t('reg_bulstat_required')}</p>
               </div>
             )}
 
