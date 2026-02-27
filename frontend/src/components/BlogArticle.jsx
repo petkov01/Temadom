@@ -6,17 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { BLOG_ARTICLES, REGIONS, SEO_PROFESSIONS } from '@/data/seoData';
+import { SEO_BLOG_ARTICLES } from '@/data/blogArticles';
 
 const BlogArticle = () => {
   const { slug } = useParams();
-  const article = BLOG_ARTICLES.find(a => a.slug === slug);
+  
+  // Check new detailed articles first
+  const detailedArticle = SEO_BLOG_ARTICLES.find(a => a.slug === slug);
+  const seoArticle = BLOG_ARTICLES.find(a => a.slug === slug);
+  const article = detailedArticle || seoArticle;
 
   useEffect(() => {
-    if (article) {
-      document.title = `${article.title} | TemaDom`;
+    if (detailedArticle) {
+      document.title = `${detailedArticle.metaTitle} | TemaDom`;
       const meta = document.querySelector('meta[name="description"]');
-      if (meta) meta.setAttribute('content', article.description);
+      if (meta) meta.setAttribute('content', detailedArticle.metaDescription);
+    } else if (seoArticle) {
+      document.title = `${seoArticle.title} | TemaDom`;
+      const meta = document.querySelector('meta[name="description"]');
+      if (meta) meta.setAttribute('content', seoArticle.description);
     }
+    window.scrollTo(0, 0);
   }, [article]);
 
   if (!article) return (
@@ -27,6 +37,113 @@ const BlogArticle = () => {
       </div>
     </div>
   );
+
+  // Render detailed article with markdown-like content
+  if (detailedArticle) {
+    return (
+      <div className="min-h-screen bg-white" data-testid="blog-article">
+        <article className="max-w-4xl mx-auto px-4 py-8">
+          <Link to="/blog" className="text-orange-600 hover:text-orange-700 text-sm flex items-center gap-1 mb-6">
+            <ArrowLeft className="h-4 w-4" /> Към блога
+          </Link>
+
+          <header className="mb-8">
+            <Badge className="bg-amber-100 text-amber-800 mb-3">{detailedArticle.category}</Badge>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">{detailedArticle.title}</h1>
+            <p className="text-lg text-slate-600">{detailedArticle.metaDescription}</p>
+            <div className="flex items-center gap-4 mt-4 text-sm text-slate-500">
+              <span className="flex items-center gap-1"><Clock className="h-4 w-4" /> {detailedArticle.readTime}</span>
+              <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> България</span>
+            </div>
+          </header>
+
+          <Separator className="mb-8" />
+
+          {/* Render content as formatted HTML */}
+          <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-p:text-slate-700 prose-p:leading-relaxed prose-strong:text-slate-900 prose-table:border-collapse prose-td:border prose-td:border-slate-200 prose-td:p-3 prose-th:border prose-th:border-slate-300 prose-th:bg-slate-900 prose-th:text-white prose-th:p-3 prose-li:text-slate-700 prose-a:text-orange-600">
+            {detailedArticle.content.split('\n').map((line, i) => {
+              const trimmed = line.trim();
+              if (!trimmed) return null;
+              
+              if (trimmed.startsWith('## ')) return <h2 key={i} className="text-2xl font-bold text-slate-900 mt-8 mb-4">{trimmed.slice(3)}</h2>;
+              if (trimmed.startsWith('### ')) return <h3 key={i} className="text-xl font-semibold text-slate-900 mt-6 mb-3">{trimmed.slice(4)}</h3>;
+              
+              if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+                // Table row
+                const cells = trimmed.split('|').filter(c => c.trim());
+                if (cells.every(c => c.trim().match(/^-+$/))) return null; // separator row
+                const isHeader = i > 0 && detailedArticle.content.split('\n')[i+1]?.trim().startsWith('|---');
+                if (isHeader) {
+                  return (
+                    <div key={i} className="overflow-x-auto my-4">
+                      <table className="w-full border-collapse text-sm">
+                        <thead>
+                          <tr className="bg-slate-900 text-white">
+                            {cells.map((cell, j) => <th key={j} className="p-3 text-left font-medium">{cell.trim()}</th>)}
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
+                  );
+                }
+                return null; // Table rows handled in a batch below
+              }
+              
+              if (trimmed.startsWith('- **') || trimmed.startsWith('1. **') || trimmed.match(/^\d+\.\s/)) {
+                const text = trimmed.replace(/^\d+\.\s/, '').replace(/^-\s/, '');
+                return (
+                  <div key={i} className="flex items-start gap-2 my-1.5">
+                    <span className="text-orange-500 mt-1 flex-shrink-0">&#8226;</span>
+                    <p className="text-slate-700" dangerouslySetInnerHTML={{ __html: text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                  </div>
+                );
+              }
+              
+              return <p key={i} className="text-slate-700 leading-relaxed my-2" dangerouslySetInnerHTML={{ __html: trimmed.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-900">$1</strong>').replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-orange-600 hover:underline">$1</a>') }} />;
+            })}
+          </div>
+
+          {/* CTA */}
+          <Card className="bg-orange-50 border-orange-200 mt-10">
+            <CardContent className="p-6 text-center">
+              <Calculator className="h-8 w-8 text-orange-600 mx-auto mb-3" />
+              <h3 className="text-xl font-bold mb-2">Изчислете вашата оферта безплатно</h3>
+              <p className="text-slate-600 mb-4">28 професии, 28 области, актуални цени 2026</p>
+              <Link to="/calculator">
+                <Button className="bg-orange-600 hover:bg-orange-700" data-testid="article-calc-btn">
+                  <Calculator className="mr-2 h-4 w-4" /> Към калкулатора
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Related articles */}
+          <section className="mt-10">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Свързани статии</h2>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {SEO_BLOG_ARTICLES.filter(a => a.slug !== slug).slice(0, 6).map(a => (
+                <Link key={a.slug} to={`/blog/${a.slug}`} className="text-sm text-orange-600 hover:underline flex items-center gap-1">
+                  <ArrowLeft className="h-3 w-3 rotate-180" /> {a.title.substring(0, 60)}...
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": detailedArticle.title,
+            "description": detailedArticle.metaDescription,
+            "datePublished": detailedArticle.date,
+            "dateModified": "2026-02-27",
+            "author": { "@type": "Organization", "name": "TemaDom" },
+            "publisher": { "@type": "Organization", "name": "TemaDom", "url": "https://temadom.bg" },
+            "keywords": detailedArticle.keywords
+          })}} />
+        </article>
+      </div>
+    );
+  }
 
   const regions = Object.entries(REGIONS);
   const profession = article.professionId ? SEO_PROFESSIONS.find(p => p.id === article.professionId) : null;
