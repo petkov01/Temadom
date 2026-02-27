@@ -1,0 +1,124 @@
+{
+  "summary": "Completed testing of iteration 8 features: Free platform, Telegram integration, city field, mobile menu. All features implemented correctly and working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "✅ Mobile menu displays all 8 required links: Проекти, Фирми, Калкулатор, Услуги, Професии, Блог, Цени по области, За нас",
+    "✅ Logo with 'Ремонт и строителство' subtitle visible and centered on desktop",
+    "✅ Registration form includes 'Град / Населено място' field for both client and company",
+    "✅ Registration form for companies shows Telegram info box with blue background",
+    "✅ Registration form for companies has telegram_username field with placeholder",
+    "✅ Registration form shows 'Платформата е БЕЗПЛАТНА за ограничен период!' green banner",
+    "✅ Project detail page shows green 'Платформата е безплатна!' notice",
+    "✅ Project detail page shows 'Контактите са отключени' with client info visible",
+    "✅ Project detail page has NO Stripe payment buttons (free platform)",
+    "✅ Calculator page has NO paywall dialog",
+    "✅ Calculator page has NO usage limit counter",
+    "✅ Calculator PDF download button available without payment",
+    "✅ Company dashboard shows 'Платформата е безплатна!' green banner",
+    "✅ Company dashboard shows Telegram link section with t.me/TemaDomBot button",
+    "✅ API /api/projects returns contact_locked=false for all projects",
+    "✅ API /api/projects/<id> returns contact_locked=false and shows client_name, client_email, client_phone",
+    "✅ API /api/auth/register accepts city and telegram_username fields",
+    "✅ API /api/auth/me returns city and telegram_username",
+    "✅ API /api/messages allows sending messages with contact info (no filtering)",
+    "✅ API /api/telegram/webhook endpoint available",
+    "✅ API /api/telegram/link endpoint functional",
+    "✅ API /api/calculator/log-use returns allowed=true (unlimited)",
+    "✅ API /api/calculator/status returns unlimited=true"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration8_free_platform.py",
+    "/app/test_reports/pytest/pytest_results_iter8.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_iteration8_free_platform.py"
+  ],
+  "success_rate": {
+    "backend": "100% (12/12 tests passed)",
+    "frontend": "100% (all 13 UI features verified)"
+  },
+  "seed_data_creation": "Created test users with city and telegram_username fields during testing",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 8 fully tested. Platform is now FREE - all payment gates disabled. Mobile menu fixed with all 8 links. Registration has city and telegram_username fields. Chat messages are not filtered. Telegram bot integration working (bot token: 8799080474:AAHcnu93WuzSdDzEYQd5N_7MCfminVDlRUI). Test credentials: company testfirma@test.bg / test12345, client ivan_client@test.bg / test12345.",
+  "features_tested": {
+    "mobile_menu": {
+      "status": "PASS",
+      "details": "All 8 links visible: Проекти, Фирми, Калкулатор, Услуги, Професии, Блог, Цени по області, За нас"
+    },
+    "logo_subtitle": {
+      "status": "PASS",
+      "details": "Orange 'Ремонт и строителство' subtitle displayed under logo on desktop"
+    },
+    "registration_city_field": {
+      "status": "PASS",
+      "details": "Field 'Град / Населено място' present with placeholder 'Напр. София, Пловдив, Варна...'"
+    },
+    "registration_telegram": {
+      "status": "PASS",
+      "details": "Telegram info box and username field shown for company registration"
+    },
+    "registration_free_banner": {
+      "status": "PASS",
+      "details": "Green banner 'Платформата е БЕЗПЛАТНА за ограничен период!'"
+    },
+    "project_contacts_unlocked": {
+      "status": "PASS",
+      "details": "contact_locked=false, client info (name, phone, email) visible without payment"
+    },
+    "project_free_notice": {
+      "status": "PASS",
+      "details": "Green 'Платформата е безплатна!' notice on project detail page"
+    },
+    "no_stripe_buttons": {
+      "status": "PASS",
+      "details": "No payment/Stripe buttons on project detail page"
+    },
+    "calculator_no_paywall": {
+      "status": "PASS",
+      "details": "Calculator fully usable with no paywall dialog or usage limits"
+    },
+    "dashboard_free_banner": {
+      "status": "PASS",
+      "details": "Company dashboard shows free platform banner with full explanation"
+    },
+    "dashboard_telegram_link": {
+      "status": "PASS",
+      "details": "Telegram section with 'Свържи Telegram' button linking to t.me/TemaDomBot"
+    },
+    "chat_no_filtering": {
+      "status": "PASS",
+      "details": "API allows sending messages with contact info (was_filtered=false)"
+    },
+    "api_city_telegram_fields": {
+      "status": "PASS",
+      "details": "/auth/register and /auth/me properly handle city and telegram_username"
+    }
+  },
+  "test_credentials": {
+    "test_company": {
+      "email": "testfirma@test.bg",
+      "password": "test12345"
+    },
+    "test_client": {
+      "email": "ivan_client@test.bg",
+      "password": "test12345"
+    },
+    "analytics_password": "temadom2026"
+  },
+  "telegram_bot": {
+    "token": "8799080474:AAHcnu93WuzSdDzEYQd5N_7MCfminVDlRUI",
+    "username": "@TemaDomBot",
+    "link_url": "https://t.me/TemaDomBot?start={user_id}"
+  }
+}
