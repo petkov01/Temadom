@@ -916,6 +916,180 @@ const PriceCalculator = () => {
         </div>
       )}
 
+      {/* AI Blueprint Analysis Dialog */}
+      <Dialog open={showBlueprintDialog} onOpenChange={setShowBlueprintDialog}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <FileImage className="h-6 w-6 text-violet-600" />
+              AI Анализ на строителен чертеж
+            </DialogTitle>
+            <DialogDescription>
+              Качете архитектурен или конструктивен чертеж. AI ще разпознае размери, коти, площи и ще попълни автоматично калкулатора.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-4">
+            {/* Upload area */}
+            {!blueprintPreview ? (
+              <div 
+                onClick={() => blueprintInputRef.current?.click()}
+                className="border-2 border-dashed border-slate-300 rounded-xl p-10 text-center cursor-pointer hover:border-violet-400 hover:bg-violet-50/50 transition-all"
+                data-testid="blueprint-upload-area"
+              >
+                <Upload className="h-12 w-12 text-slate-400 mx-auto mb-3" />
+                <p className="text-lg font-medium text-slate-700">Качете чертеж</p>
+                <p className="text-sm text-slate-500 mt-1">JPG, PNG или PDF • Макс. 10MB</p>
+                <p className="text-xs text-slate-400 mt-3">Поддържа: архитектурни планове, конструктивни чертежи, разпределения</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="relative border rounded-lg overflow-hidden bg-slate-100">
+                  <img src={blueprintPreview} alt="Чертеж" className="w-full max-h-[300px] object-contain" />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="absolute top-2 right-2 bg-white"
+                    onClick={() => { setBlueprintImage(null); setBlueprintPreview(null); setAnalysisResult(null); }}
+                  >
+                    Смени
+                  </Button>
+                </div>
+                
+                {!analysisResult && !analyzing && (
+                  <Button 
+                    onClick={handleAnalyzeBlueprint}
+                    className="w-full bg-violet-600 hover:bg-violet-700 h-12 text-base"
+                    disabled={analyzing}
+                    data-testid="analyze-blueprint-btn"
+                  >
+                    <Zap className="mr-2 h-5 w-5" />
+                    Анализирай с AI
+                  </Button>
+                )}
+              </div>
+            )}
+
+            <input
+              ref={blueprintInputRef}
+              type="file"
+              accept="image/*,.pdf"
+              className="hidden"
+              onChange={handleBlueprintSelect}
+            />
+
+            {/* Loading state */}
+            {analyzing && (
+              <div className="bg-violet-50 border border-violet-200 rounded-lg p-6 text-center" data-testid="blueprint-analyzing">
+                <Loader2 className="h-10 w-10 text-violet-600 mx-auto mb-3 animate-spin" />
+                <p className="font-semibold text-violet-800 text-lg">AI анализира чертежа...</p>
+                <p className="text-sm text-violet-600 mt-1">Разпознаване на коти, размери, елементи и площи</p>
+                <p className="text-xs text-violet-500 mt-2">Това може да отнеме 10-30 секунди</p>
+              </div>
+            )}
+
+            {/* Error state */}
+            {analysisError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                  <span className="font-semibold text-red-800">Грешка при анализ</span>
+                </div>
+                <p className="text-sm text-red-700">{analysisError}</p>
+                <Button variant="outline" className="mt-3" onClick={handleAnalyzeBlueprint}>
+                  Опитай отново
+                </Button>
+              </div>
+            )}
+
+            {/* Results */}
+            {analysisResult && (
+              <div className="space-y-4" data-testid="blueprint-results">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="font-semibold text-green-800">Анализът е завършен!</span>
+                  </div>
+                  {analysisResult.description && (
+                    <p className="text-sm text-green-700">{analysisResult.description}</p>
+                  )}
+                  {analysisResult.total_area_sqm && (
+                    <p className="text-sm text-green-800 font-medium mt-1">
+                      Обща площ: {analysisResult.total_area_sqm} кв.м
+                    </p>
+                  )}
+                </div>
+
+                {/* Floor levels */}
+                {analysisResult.floor_levels?.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm text-slate-700 mb-2">Коти:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {analysisResult.floor_levels.map((fl, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">
+                          Кота {fl.level} - {fl.description}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Rooms */}
+                {analysisResult.rooms?.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm text-slate-700 mb-2">Помещения:</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {analysisResult.rooms.map((room, i) => (
+                        <div key={i} className="bg-slate-50 rounded p-2 text-xs">
+                          <span className="font-medium">{room.name}</span>
+                          <span className="text-slate-500 ml-1">
+                            {room.length_m && room.width_m ? `${room.length_m}x${room.width_m}м` : ''} = {room.area_sqm} кв.м
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Calculator suggestions */}
+                {analysisResult.calculator_suggestions?.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm text-slate-700 mb-2">
+                      Извлечени количества ({analysisResult.calculator_suggestions.length} дейности):
+                    </h4>
+                    <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+                      {analysisResult.calculator_suggestions.map((s, i) => (
+                        <div key={i} className="flex items-center justify-between bg-slate-50 rounded px-3 py-2 text-sm">
+                          <span className="text-slate-700">{s.description}</span>
+                          <span className="font-semibold text-slate-900">{s.quantity} {s.unit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Notes */}
+                {analysisResult.notes?.length > 0 && (
+                  <div className="text-xs text-slate-500">
+                    {analysisResult.notes.map((note, i) => <p key={i}>* {note}</p>)}
+                  </div>
+                )}
+
+                {/* Apply button */}
+                <Button 
+                  onClick={applyBlueprintToCalculator}
+                  className="w-full bg-green-600 hover:bg-green-700 h-12 text-base"
+                  data-testid="apply-blueprint-btn"
+                >
+                  <CheckCircle className="mr-2 h-5 w-5" />
+                  Попълни калкулатора с тези количества
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 };
