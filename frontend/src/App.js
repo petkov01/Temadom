@@ -1709,7 +1709,7 @@ const CompanyDetailPage = () => {
                 <div className="flex items-center gap-2 mt-2">
                   <StarRating rating={company.rating} size="md" />
                   <span className="text-slate-600">
-                    {company.rating.toFixed(1)} ({company.review_count} отзива)
+                    {company.rating.toFixed(1)} ({company.review_count} {t('comp_reviews')})
                   </span>
                 </div>
               </div>
