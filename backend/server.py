@@ -38,6 +38,9 @@ STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
 # Telegram Config
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
+# AI Config
+EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
+
 # PLATFORM IS FREE - all payment gates disabled
 PLATFORM_FREE = True
 
