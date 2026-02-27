@@ -402,6 +402,33 @@ const translations = {
     pay_check_email: "Check your email for confirmation",
     pay_cancelled: "Payment cancelled", pay_can_retry: "You can try again anytime",
 
+    // Dashboard extra
+    dash_contacts: "Contacts", dash_portfolio: "Portfolio",
+    dash_access_all: "You have access to all projects",
+    dash_no_contacts_sub: "Browse projects and purchase contacts",
+    dash_telegram_link: "Link Telegram",
+    dash_portfolio_deleted: "Project deleted",
+
+    // Client dashboard
+    cl_my_projects: "My Projects", cl_manage: "Manage your construction projects",
+    cl_new_project: "New project", cl_no_projects: "No projects yet",
+    cl_no_projects_sub: "Create your first project and get offers",
+    cl_active: "Active", cl_closed: "Closed", cl_purchases: "purchases",
+    cl_create_project: "Create project",
+    cl_create_desc: "Describe your project to receive offers from companies",
+    cl_title: "Title", cl_title_placeholder: "E.g. Apartment renovation 80 sq.m.",
+    cl_category: "Category", cl_select_cat: "Select category",
+    cl_city_label: "City", cl_city_placeholder: "E.g. Sofia",
+    cl_description: "Description", cl_desc_placeholder: "Describe in detail what you are looking for...",
+    cl_min_budget: "Min. budget (\u20AC)", cl_max_budget: "Max. budget (\u20AC)",
+    cl_photos: "Project photos (up to 10)",
+    cl_photos_desc: "Add photos of the rooms, blueprints or sketches so that contractors can better understand what you need",
+    cl_add_photo: "Add", cl_of_10: "of 10 photos",
+    cl_creating: "Creating...",
+    cd_fill_required: "Please fill in all required fields",
+    cd_project_created: "Project created successfully!",
+    reg_confirm_password: "Confirm password",
+
     calc_auth_title: "Calculator requires registration",
     calc_auth_desc: "To use the renovation calculator, please register or log in. Registration is completely free!",
     calc_auth_register: "Register", calc_auth_login: "Login",
