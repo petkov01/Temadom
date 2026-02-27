@@ -164,63 +164,66 @@ const Navbar = () => {
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
+          {/* Left: Logo only */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
               <TemaDomLogo className="h-10 w-auto" showSubtitle={true} />
             </Link>
-            
-            <div className="hidden md:flex items-center ml-6 gap-3 lg:gap-4">
-              <Link to="/projects" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-projects">
-                <FolderSearch className="h-3.5 w-3.5" />
-                {t('nav_projects')}
-              </Link>
-              <Link to="/find-master" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-find-master">
-                <Wrench className="h-3.5 w-3.5" />
-                {t('nav_masters')}
-              </Link>
-              <Link to="/companies" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-companies">
-                <Building2 className="h-3.5 w-3.5" />
-                {t('nav_companies')}
-              </Link>
-              <Link to="/calculator" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-calculator">
-                <Calculator className="h-3.5 w-3.5" />
-                {t('nav_calculator')}
-              </Link>
-
-              {/* More dropdown */}
-              <div className="relative" ref={moreRef}>
-                <button
-                  onClick={() => setMoreOpen(!moreOpen)}
-                  className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1"
-                  data-testid="nav-more-btn"
-                >
-                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
-                  {t('nav_more')}
-                </button>
-                {moreOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-52 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50" data-testid="nav-more-dropdown">
-                    <Link to="/services" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-services">
-                      <Hammer className="h-4 w-4" /> {t('nav_services')}
-                    </Link>
-                    <Link to="/professions" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-professions">
-                      <HardHat className="h-4 w-4" /> {t('nav_professions')}
-                    </Link>
-                    <Link to="/blog" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-blog">
-                      <BookOpen className="h-4 w-4" /> {t('nav_blog')}
-                    </Link>
-                    <Link to="/prices" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-prices">
-                      <MapPin className="h-4 w-4" /> {t('nav_prices')}
-                    </Link>
-                    <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-about">
-                      <Info className="h-4 w-4" /> {t('nav_about')}
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+          {/* Right: Nav links + Language + Auth */}
+          <div className="hidden md:flex items-center gap-3 lg:gap-4">
+            <Link to="/projects" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-projects">
+              <FolderSearch className="h-3.5 w-3.5" />
+              {t('nav_projects')}
+            </Link>
+            <Link to="/find-master" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-find-master">
+              <Wrench className="h-3.5 w-3.5" />
+              {t('nav_masters')}
+            </Link>
+            <Link to="/companies" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-companies">
+              <Building2 className="h-3.5 w-3.5" />
+              {t('nav_companies')}
+            </Link>
+            <Link to="/calculator" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-calculator">
+              <Calculator className="h-3.5 w-3.5" />
+              {t('nav_calculator')}
+            </Link>
+
+            {/* More dropdown */}
+            <div className="relative" ref={moreRef}>
+              <button
+                onClick={() => setMoreOpen(!moreOpen)}
+                className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1"
+                data-testid="nav-more-btn"
+              >
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
+                {t('nav_more')}
+              </button>
+              {moreOpen && (
+                <div className="absolute top-full right-0 mt-2 w-52 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50" data-testid="nav-more-dropdown">
+                  <Link to="/services" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-services">
+                    <Hammer className="h-4 w-4" /> {t('nav_services')}
+                  </Link>
+                  <Link to="/professions" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-professions">
+                    <HardHat className="h-4 w-4" /> {t('nav_professions')}
+                  </Link>
+                  <Link to="/blog" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-blog">
+                    <BookOpen className="h-4 w-4" /> {t('nav_blog')}
+                  </Link>
+                  <Link to="/prices" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-prices">
+                    <MapPin className="h-4 w-4" /> {t('nav_prices')}
+                  </Link>
+                  <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-about">
+                    <Info className="h-4 w-4" /> {t('nav_about')}
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Separator */}
+            <div className="h-5 w-px bg-slate-200 mx-1"></div>
+
             {/* Language switcher */}
             <div className="relative" ref={langRef}>
               <button
