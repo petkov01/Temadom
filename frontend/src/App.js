@@ -1841,13 +1841,13 @@ const CompanyDetailPage = () => {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>Отказ</Button>
+              <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>{t('cd_cancel')}</Button>
               <Button 
                 className="bg-orange-600 hover:bg-orange-700"
                 onClick={handleSubmitReview}
                 disabled={!reviewData.comment || submitting}
               >
-                {submitting ? 'Изпращане...' : 'Изпрати отзив'}
+                {submitting ? t('cd_submitting') : t('cd_submit_review')}
               </Button>
             </DialogFooter>
           </DialogContent>
