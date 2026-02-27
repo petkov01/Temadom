@@ -2685,7 +2685,7 @@ const ClientDashboard = () => {
                   />
                 </div>
                 {newProject.images.length > 0 && (
-                  <p className="text-xs text-slate-500 mt-2">{newProject.images.length} от 10 снимки</p>
+                  <p className="text-xs text-slate-500 mt-2">{newProject.images.length} {t('cl_of_10')}</p>
                 )}
               </div>
 
