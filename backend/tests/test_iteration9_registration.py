@@ -29,7 +29,8 @@ TEST_COMPANY_EMAIL = f"test_company_{TEST_ID}@test.bg"
 TEST_MASTER_EMAIL = f"test_master_{TEST_ID}@test.bg"
 TEST_CLIENT_EMAIL = f"test_client_{TEST_ID}@test.bg"
 TEST_PASSWORD = "test12345"
-VALID_BULSTAT = "123456789"  # 9 digits exactly
+# Use unique bulstat based on test ID to avoid duplicates
+VALID_BULSTAT = f"9{TEST_ID[:8]}".replace('-', '')[:9].ljust(9, '0')  # 9 digits, unique per test run
 
 
 class TestCompanyRegistrationBulstat:
@@ -48,7 +49,8 @@ class TestCompanyRegistrationBulstat:
         assert response.status_code == 400, f"Expected 400, got {response.status_code}"
         data = response.json()
         assert "detail" in data
-        assert "Булстат" in data["detail"].lower() or "булстат" in data["detail"]
+        # Check that message mentions "булстат" (case-insensitive)
+        assert "булстат" in data["detail"].lower(), f"Expected 'булстат' in error message, got: {data['detail']}"
         print(f"✅ Company registration without Булстат correctly rejected: {data['detail']}")
     
     def test_reject_company_with_empty_bulstat(self):
