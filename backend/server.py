@@ -616,8 +616,8 @@ async def add_portfolio_project(
 @api_router.delete("/portfolio/{project_id}")
 async def delete_portfolio_project(project_id: str, user: dict = Depends(get_current_user)):
     """Delete a portfolio project (owner only)"""
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Само фирми могат да изтриват проекти")
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Само фирми и майстори могат да изтриват проекти")
     
     # Get company profile
     profile = await db.company_profiles.find_one({"user_id": user["id"]})
@@ -638,9 +638,9 @@ async def delete_portfolio_project(project_id: str, user: dict = Depends(get_cur
 
 @api_router.get("/my-portfolio")
 async def get_my_portfolio(user: dict = Depends(get_current_user)):
-    """Get portfolio for current company user"""
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Тази функция е само за фирми")
+    """Get portfolio for current company/master user"""
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Тази функция е само за фирми и майстори")
     
     profile = await db.company_profiles.find_one({"user_id": user["id"]})
     if not profile:
@@ -708,8 +708,8 @@ async def create_checkout(
     project_id: Optional[str] = None,
     user: dict = Depends(get_current_user)
 ):
-    if user["user_type"] != "company":
-        raise HTTPException(status_code=403, detail="Само фирми могат да закупуват контакти")
+    if user["user_type"] not in ("company", "master"):
+        raise HTTPException(status_code=403, detail="Само фирми и майстори могат да закупуват контакти")
     
     if package_type not in PAYMENT_PACKAGES:
         raise HTTPException(status_code=400, detail="Невалиден пакет")
