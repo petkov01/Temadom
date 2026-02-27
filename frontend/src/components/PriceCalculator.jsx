@@ -126,8 +126,8 @@ const PRICE_DATABASE = {
     unit: "м²",
     unitLabel: "Квадратни метри",
     prices: {
-      labor: { economy: 15, standard: 22, premium: 35 },
-      laborAndMaterial: { economy: 40, standard: 65, premium: 120 }
+      labor: { economy: 18, standard: 28, premium: 42 },
+      laborAndMaterial: { economy: 45, standard: 75, premium: 130 }
     },
     description: "Лепене на плочки за стени и под"
   },
@@ -243,8 +243,8 @@ const PRICE_DATABASE = {
     unit: "м²",
     unitLabel: "Квадратни метри",
     prices: {
-      labor: { economy: 8, standard: 12, premium: 18 },
-      laborAndMaterial: { economy: 18, standard: 28, premium: 45 }
+      labor: { economy: 10, standard: 15, premium: 22 },
+      laborAndMaterial: { economy: 22, standard: 35, premium: 55 }
     },
     description: "Стени, тавани, преградни стени"
   },
@@ -256,8 +256,8 @@ const PRICE_DATABASE = {
     unit: "м²",
     unitLabel: "Квадратни метри фасада",
     prices: {
-      labor: { economy: 8, standard: 12, premium: 18 },
-      laborAndMaterial: { economy: 20, standard: 32, premium: 50 }
+      labor: { economy: 10, standard: 16, premium: 24 },
+      laborAndMaterial: { economy: 25, standard: 40, premium: 60 }
     },
     description: "Циментова или варова мазилка"
   },
