@@ -61,8 +61,8 @@ const PRICE_DATABASE = {
     unit: "точки",
     unitLabel: "Брой точки (контакти, ключове, осветление)",
     prices: {
-      labor: { economy: 15, standard: 25, premium: 40 },
-      laborAndMaterial: { economy: 30, standard: 50, premium: 80 }
+      labor: { economy: 25, standard: 40, premium: 65 },
+      laborAndMaterial: { economy: 50, standard: 80, premium: 130 }
     },
     description: "Контакти, ключове, осветителни тела"
   },
@@ -87,8 +87,8 @@ const PRICE_DATABASE = {
     unit: "м³",
     unitLabel: "Кубични метри",
     prices: {
-      labor: { economy: 25, standard: 40, premium: 60 },
-      laborAndMaterial: { economy: 70, standard: 100, premium: 150 }
+      labor: { economy: 45, standard: 70, premium: 100 },
+      laborAndMaterial: { economy: 110, standard: 160, premium: 230 }
     },
     description: "Изливане на бетон C20/25 - C25/30"
   },
@@ -100,8 +100,8 @@ const PRICE_DATABASE = {
     unit: "кг",
     unitLabel: "Килограми",
     prices: {
-      labor: { economy: 0.3, standard: 0.5, premium: 0.8 },
-      laborAndMaterial: { economy: 1.2, standard: 1.8, premium: 2.5 }
+      labor: { economy: 0.5, standard: 0.8, premium: 1.2 },
+      laborAndMaterial: { economy: 1.5, standard: 2.2, premium: 3.2 }
     },
     description: "Арматурно желязо и мрежи"
   },
@@ -113,8 +113,8 @@ const PRICE_DATABASE = {
     unit: "м²",
     unitLabel: "Квадратни метри",
     prices: {
-      labor: { economy: 12, standard: 18, premium: 28 },
-      laborAndMaterial: { economy: 25, standard: 40, premium: 60 }
+      labor: { economy: 20, standard: 32, premium: 48 },
+      laborAndMaterial: { economy: 40, standard: 65, premium: 95 }
     },
     description: "Кофражни работи за бетон"
   },
