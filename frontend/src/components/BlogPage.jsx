@@ -47,10 +47,14 @@ const BlogPage = () => {
         <div className="max-w-5xl mx-auto px-4 text-center">
           <BookOpen className="h-10 w-10 text-orange-400 mx-auto mb-4" />
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-            Блог за строителство и <span className="text-orange-400">ремонти</span>
+            {isEn 
+              ? <>{`Blog about construction & `}<span className="text-orange-400">renovations</span></>
+              : <>Блог за строителство и <span className="text-orange-400">ремонти</span></>}
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto">
-            Актуални цени, съвети и ръководства за строителство и ремонти в България 2026.
+            {isEn 
+              ? 'Current prices, tips and guides for construction and renovations in Bulgaria 2026.'
+              : 'Актуални цени, съвети и ръководства за строителство и ремонти в България 2026.'}
           </p>
         </div>
       </section>
