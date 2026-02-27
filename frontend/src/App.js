@@ -1183,12 +1183,12 @@ const ProjectDetailPage = () => {
                 {project.images?.length > 0 && (
                   <span className="flex items-center gap-1">
                     <Image className="h-4 w-4" />
-                    {project.images.length} снимки
+                    {project.images.length} {t('pd_photos')}
                   </span>
                 )}
                 <span className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
-                  {project.views} преглеждания
+                  {project.views} {t('pd_views')}
                 </span>
               </div>
             </div>
