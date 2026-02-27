@@ -563,51 +563,51 @@ const LandingPage = () => {
             <div className="hidden lg:block">
               <Card className="bg-white/10 backdrop-blur-xl border-white/20 p-6 rounded-2xl shadow-2xl">
                 <div className="text-white mb-6">
-                  <h3 className="text-xl font-semibold mb-2">Примерна калкулация</h3>
-                  <p className="text-slate-400 text-sm">Ремонт на апартамент 80 м² в София</p>
+                  <h3 className="text-xl font-semibold mb-2">{t('hero_preview_title')}</h3>
+                  <p className="text-slate-400 text-sm">{t('hero_preview_sub')}</p>
                 </div>
                 
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between items-center py-2 border-b border-white/10">
                     <span className="text-slate-300 flex items-center gap-2">
-                      <Paintbrush className="h-4 w-4" /> Боядисване (160 м²)
+                      <Paintbrush className="h-4 w-4" /> {t('hero_preview_paint')}
                     </span>
                     <span className="text-white font-medium">1,152 €</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-white/10">
                     <span className="text-slate-300 flex items-center gap-2">
-                      <Layers className="h-4 w-4" /> Шпакловка (160 м²)
+                      <Layers className="h-4 w-4" /> {t('hero_preview_plaster')}
                     </span>
                     <span className="text-white font-medium">1,344 €</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-white/10">
                     <span className="text-slate-300 flex items-center gap-2">
-                      <Square className="h-4 w-4" /> Подови настилки (80 м²)
+                      <Square className="h-4 w-4" /> {t('hero_preview_floor')}
                     </span>
                     <span className="text-white font-medium">3,840 €</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-white/10">
                     <span className="text-slate-300 flex items-center gap-2">
-                      <Zap className="h-4 w-4" /> Ел. инсталация (30 точки)
+                      <Zap className="h-4 w-4" /> {t('hero_preview_elec')}
                     </span>
                     <span className="text-white font-medium">1,800 €</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-white/10">
                     <span className="text-slate-300 flex items-center gap-2">
-                      <Droplets className="h-4 w-4" /> ВиК (6 точки)
+                      <Droplets className="h-4 w-4" /> {t('hero_preview_plumb')}
                     </span>
                     <span className="text-white font-medium">792 €</span>
                   </div>
                 </div>
                 
                 <div className="bg-orange-600 rounded-xl p-5 text-center">
-                  <p className="text-orange-100 text-sm mb-1">Приблизителна цена</p>
+                  <p className="text-orange-100 text-sm mb-1">{t('hero_preview_approx')}</p>
                   <p className="text-4xl font-bold text-white">8,928 €</p>
                   <p className="text-orange-200 text-sm mt-1">≈ 17,411 лв.</p>
                 </div>
                 
                 <p className="text-slate-500 text-xs text-center mt-4">
-                  * Стандартно качество, труд + материали, София (+20%)
+                  {t('hero_preview_note')}
                 </p>
               </Card>
             </div>
