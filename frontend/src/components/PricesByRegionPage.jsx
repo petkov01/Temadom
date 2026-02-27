@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { REGIONS, SEO_PROFESSIONS } from '@/data/seoData';
 
 const PricesByRegionPage = () => {
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const regions = Object.entries(REGIONS).sort((a, b) => b[1].multiplier - a[1].multiplier);
 
   const getTrend = (m) => {
