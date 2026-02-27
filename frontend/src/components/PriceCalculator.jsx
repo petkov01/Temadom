@@ -441,6 +441,77 @@ const PriceCalculator = () => {
   const [region, setRegion] = useState('sofia_city');
   const [pricingType, setPricingType] = useState('laborAndMaterial');
   const [qualityLevel, setQualityLevel] = useState('standard');
+  
+  // AI Blueprint Analysis state
+  const [showBlueprintDialog, setShowBlueprintDialog] = useState(false);
+  const [blueprintImage, setBlueprintImage] = useState(null);
+  const [blueprintPreview, setBlueprintPreview] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [analysisError, setAnalysisError] = useState(null);
+  const blueprintInputRef = useRef(null);
+
+  const handleBlueprintSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Файлът е прекалено голям (макс. 10MB)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setBlueprintImage(reader.result);
+      setBlueprintPreview(reader.result);
+      setAnalysisResult(null);
+      setAnalysisError(null);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAnalyzeBlueprint = async () => {
+    if (!blueprintImage) return;
+    setAnalyzing(true);
+    setAnalysisError(null);
+    setAnalysisResult(null);
+
+    try {
+      const res = await axios.post(`${CALC_API}/blueprint/analyze`, {
+        image: blueprintImage
+      });
+      setAnalysisResult(res.data);
+      toast.success('Чертежът е анализиран успешно!');
+    } catch (err) {
+      setAnalysisError(err.response?.data?.detail || 'Грешка при анализ на чертежа');
+      toast.error('Грешка при анализ');
+    }
+    setAnalyzing(false);
+  };
+
+  const applyBlueprintToCalculator = () => {
+    if (!analysisResult?.calculator_suggestions) return;
+    
+    const newItems = [...selectedItems];
+    
+    for (const suggestion of analysisResult.calculator_suggestions) {
+      const category = suggestion.category;
+      if (!PRICE_DATABASE[category]) continue;
+      
+      const existingIdx = newItems.findIndex(i => i.category === category);
+      if (existingIdx >= 0) {
+        newItems[existingIdx] = { ...newItems[existingIdx], quantity: suggestion.quantity };
+      } else {
+        newItems.push({
+          id: category,
+          category: category,
+          quantity: suggestion.quantity
+        });
+      }
+    }
+    
+    setSelectedItems(newItems);
+    setShowBlueprintDialog(false);
+    toast.success(`${analysisResult.calculator_suggestions.length} дейности са попълнени от чертежа!`);
+  };
 
   const addItem = (categoryKey) => {
     const category = PRICE_DATABASE[categoryKey];
