@@ -1775,7 +1775,7 @@ const CompanyDetailPage = () => {
           </CardHeader>
           <CardContent>
             {company.reviews?.length === 0 ? (
-              <p className="text-slate-500 text-center py-8">Все още няма отзиви</p>
+              <p className="text-slate-500 text-center py-8">{t('cd_no_reviews')}</p>
             ) : (
               <div className="space-y-6">
                 {company.reviews?.map(review => (
