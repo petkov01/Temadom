@@ -1227,7 +1227,7 @@ const ProjectDetailPage = () => {
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-8">
                 <div className="flex items-center gap-3 mb-2">
                   <Calculator className="h-5 w-5 text-orange-600" />
-                  <h4 className="font-semibold text-orange-800">Оценка от калкулатора</h4>
+                  <h4 className="font-semibold text-orange-800">{t('pd_calc_estimate')}</h4>
                 </div>
                 <p className="text-3xl font-bold text-orange-600">
                   ~{project.estimated_budget} €
