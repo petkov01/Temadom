@@ -2621,7 +2621,7 @@ const ClientDashboard = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Мин. бюджет (€)</Label>
+                  <Label>{t('cl_min_budget')}</Label>
                   <Input 
                     type="number"
                     placeholder="1000"
