@@ -1534,14 +1534,14 @@ const FindMasterPage = () => {
             </Select>
             
             <Input 
-              placeholder="Град или населено място" 
+              placeholder={t('fm_city')} 
               value={city}
               onChange={(e) => setCity(e.target.value)}
               data-testid="filter-city"
             />
             
             <Button className="bg-orange-600 hover:bg-orange-700" data-testid="filter-search-btn">
-              <Search className="mr-2 h-4 w-4" /> Търси
+              <Search className="mr-2 h-4 w-4" /> {t('fm_search')}
             </Button>
           </div>
         </Card>
