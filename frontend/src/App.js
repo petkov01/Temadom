@@ -2467,7 +2467,7 @@ const ClientDashboard = () => {
 
   const handleCreateProject = async () => {
     if (!newProject.title || !newProject.description || !newProject.category || !newProject.city) {
-      toast.error('Моля, попълнете всички задължителни полета');
+      toast.error(t('cd_fill_required'));
       return;
     }
 
@@ -2480,7 +2480,7 @@ const ClientDashboard = () => {
         estimated_budget: newProject.estimated_budget
       };
       await axios.post(`${API}/projects`, data, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('Проектът е създаден успешно!');
+      toast.success(t('cd_project_created'));
       setCreateDialogOpen(false);
       setNewProject({ title: '', description: '', category: '', city: '', budget_min: '', budget_max: '', images: [], estimated_budget: null });
       
