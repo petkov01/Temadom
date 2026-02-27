@@ -439,6 +439,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
               {/* Left column */}
               <div>
                 <h4 className="font-semibold text-lg mb-3">{isEn ? 'Description' : 'Описание'}</h4>
+                <p className="text-slate-600 mb-6">{service.fullDescription}</p>
 
                 <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-600" /> {isEn ? 'Execution steps' : 'Стъпки на изпълнение'}
