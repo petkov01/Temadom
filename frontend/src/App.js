@@ -1553,8 +1553,8 @@ const FindMasterPage = () => {
         ) : professionals.length === 0 ? (
           <Card className="p-12 text-center">
             <Wrench className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-            <h3 className="text-xl font-semibold text-slate-700 mb-2">Няма намерени специалисти</h3>
-            <p className="text-slate-500">Опитайте с други филтри или друг град</p>
+            <h3 className="text-xl font-semibold text-slate-700 mb-2">{t('fm_empty')}</h3>
+            <p className="text-slate-500">{t('fm_empty_sub')}</p>
           </Card>
         ) : (
           <>
