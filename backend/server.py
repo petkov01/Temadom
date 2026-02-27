@@ -38,6 +38,9 @@ TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 # PLATFORM IS FREE - all payment gates disabled
 PLATFORM_FREE = True
 
+# Analytics password
+ANALYTICS_ADMIN_PASSWORD = os.environ.get("ANALYTICS_PASSWORD", "temadom2026")
+
 # Payment packages (server-side only - security) - DISABLED while PLATFORM_FREE
 PAYMENT_PACKAGES = {
     "subscription": {"amount": 100.00, "currency": "eur", "type": "subscription", "name": "Месечен абонамент"},
