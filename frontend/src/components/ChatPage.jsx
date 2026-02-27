@@ -16,6 +16,8 @@ const API = `${BACKEND_URL}/api`;
 
 const ChatPage = () => {
   const { user, token } = useAuth();
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [conversations, setConversations] = useState([]);
