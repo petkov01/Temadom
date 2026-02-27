@@ -5,7 +5,7 @@ export const REGIONS = {
   plovdiv: { name: "Пловдив", slug: "plovdiv", multiplier: 1.05, population: "340,000", description: "Вторият по големина град в България" },
   varna: { name: "Варна", slug: "varna", multiplier: 1.08, population: "335,000", description: "Морската столица на България" },
   burgas: { name: "Бургас", slug: "burgas", multiplier: 1.05, population: "200,000", description: "Голям черноморски град с развит строителен сектор" },
-  stara_zagora: { name: "Стара Загора", slug: "stara-zagora", multiplier: 0.98, population: "135,000", description: "Важен индустриален и търговски център" },
+  stara_zagora: { name: "Стара Загора", slug: "stara-zagora", multiplier: 1.00, population: "135,000", description: "Важен индустриален и търговски център" },
   ruse: { name: "Русе", slug: "ruse", multiplier: 0.95, population: "144,000", description: "Дунавска перла с достъпни строителни цени" },
   pleven: { name: "Плевен", slug: "pleven", multiplier: 0.92, population: "100,000", description: "Голям град в Северна България" },
   blagoevgrad: { name: "Благоевград", slug: "blagoevgrad", multiplier: 0.95, population: "70,000", description: "Университетски град в Югозападна България" },
