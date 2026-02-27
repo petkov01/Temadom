@@ -1431,6 +1431,149 @@ async def analytics_dashboard(request: Request):
         "top_regions": [{"region": r["_id"] or "N/A", "count": r["count"]} for r in top_regions]
     }
 
+# ============== TELEGRAM BOT ROUTES ==============
+
+async def send_telegram_message(chat_id: int, text: str):
+    """Send a message via Telegram Bot API"""
+    if not TELEGRAM_BOT_TOKEN:
+        return False
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    try:
+        async with httpx.AsyncClient() as client_http:
+            resp = await client_http.post(url, json={
+                "chat_id": chat_id,
+                "text": text,
+                "parse_mode": "HTML"
+            }, timeout=10)
+            return resp.status_code == 200
+    except Exception as e:
+        logging.error(f"Telegram send error: {e}")
+        return False
+
+async def notify_companies_new_project(project_dict: dict):
+    """Notify companies via Telegram about a new project in their area"""
+    if not TELEGRAM_BOT_TOKEN:
+        return
+    
+    project_city = project_dict.get("city", "").lower().strip()
+    cat = next((c for c in CATEGORIES if c["id"] == project_dict.get("category")), None)
+    cat_name = cat["name"] if cat else project_dict.get("category", "")
+    
+    # Find companies with matching city and telegram_chat_id
+    query = {"user_type": "company", "telegram_chat_id": {"$exists": True, "$ne": None}}
+    if project_city:
+        query["city"] = {"$regex": project_city, "$options": "i"}
+    
+    companies = await db.users.find(query, {"_id": 0}).to_list(500)
+    
+    message = (
+        f"<b>Нов проект в TemaDom!</b>\n\n"
+        f"<b>{project_dict.get('title', '')}</b>\n"
+        f"Категория: {cat_name}\n"
+        f"Град: {project_dict.get('city', '')}\n"
+        f"Описание: {project_dict.get('description', '')[:200]}...\n\n"
+        f"Влезте в платформата, за да видите детайлите и да се свържете с клиента."
+    )
+    
+    for company in companies:
+        chat_id = company.get("telegram_chat_id")
+        if chat_id:
+            await send_telegram_message(int(chat_id), message)
+
+@api_router.post("/telegram/link")
+async def link_telegram(data: dict, user: dict = Depends(get_current_user)):
+    """Link a Telegram chat ID to user account"""
+    chat_id = data.get("chat_id")
+    if not chat_id:
+        raise HTTPException(status_code=400, detail="Chat ID е задължителен")
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"telegram_chat_id": str(chat_id)}}
+    )
+    return {"message": "Telegram акаунтът е свързан успешно"}
+
+@api_router.post("/telegram/broadcast")
+async def broadcast_telegram(data: dict, request: Request):
+    """Send mass Telegram message to all companies/craftsmen. Admin only."""
+    pw = request.headers.get("X-Admin-Password", "")
+    if pw != ANALYTICS_ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Грешна парола")
+    
+    message_text = data.get("message", "")
+    if not message_text:
+        raise HTTPException(status_code=400, detail="Съобщението е задължително")
+    
+    # Get all users with telegram_chat_id
+    target = data.get("target", "companies")  # "companies", "all"
+    query = {"telegram_chat_id": {"$exists": True, "$ne": None}}
+    if target == "companies":
+        query["user_type"] = "company"
+    
+    users = await db.users.find(query, {"_id": 0}).to_list(5000)
+    
+    sent = 0
+    failed = 0
+    for u in users:
+        chat_id = u.get("telegram_chat_id")
+        if chat_id:
+            success = await send_telegram_message(int(chat_id), message_text)
+            if success:
+                sent += 1
+            else:
+                failed += 1
+    
+    return {"sent": sent, "failed": failed, "total": len(users)}
+
+@api_router.post("/telegram/webhook")
+async def telegram_webhook(request: Request):
+    """Handle incoming Telegram messages (for /start command)"""
+    try:
+        data = await request.json()
+        message = data.get("message", {})
+        chat = message.get("chat", {})
+        text = message.get("text", "")
+        chat_id = chat.get("id")
+        
+        if not chat_id:
+            return {"ok": True}
+        
+        if text.startswith("/start"):
+            # Extract user token from /start command if present
+            parts = text.split()
+            if len(parts) > 1:
+                user_id = parts[1]
+                # Link this chat_id to the user
+                result = await db.users.update_one(
+                    {"id": user_id},
+                    {"$set": {"telegram_chat_id": str(chat_id)}}
+                )
+                if result.modified_count > 0:
+                    await send_telegram_message(chat_id, 
+                        "Акаунтът ви е свързан с TemaDom! "
+                        "Ще получавате известия за нови проекти във вашата област."
+                    )
+                else:
+                    await send_telegram_message(chat_id,
+                        "Добре дошли в TemaDom бот!\n"
+                        "За да свържете акаунта си, моля влезте в профила си на temadom.bg "
+                        "и натиснете бутона 'Свържи Telegram'."
+                    )
+            else:
+                await send_telegram_message(chat_id,
+                    "Добре дошли в TemaDom бот!\n\n"
+                    "За да получавате известия за нови проекти:\n"
+                    "1. Регистрирайте се на temadom.bg\n"
+                    "2. Влезте в профила си\n"
+                    "3. Натиснете 'Свържи Telegram'\n\n"
+                    "Платформата е БЕЗПЛАТНА за ограничен период!"
+                )
+        
+        return {"ok": True}
+    except Exception as e:
+        logging.error(f"Telegram webhook error: {e}")
+        return {"ok": True}
+
 # ============== SITEMAP ==============
 
 @api_router.get("/sitemap")
