@@ -980,17 +980,17 @@ const ProjectsPage = () => {
                   disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
                 >
-                  Предишна
+                  {t('projects_prev')}
                 </Button>
                 <span className="flex items-center px-4 text-slate-600">
-                  Страница {page} от {totalPages}
+                  {t('projects_page')} {page} {t('projects_of')} {totalPages}
                 </span>
                 <Button 
                   variant="outline" 
                   disabled={page === totalPages}
                   onClick={() => setPage(p => p + 1)}
                 >
-                  Следваща
+                  {t('projects_next')}
                 </Button>
               </div>
             )}
