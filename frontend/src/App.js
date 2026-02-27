@@ -1351,6 +1351,160 @@ const CompaniesPage = () => {
   );
 };
 
+// ============== FIND MASTER PAGE ==============
+const FindMasterPage = () => {
+  const [professionals, setProfessionals] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState('');
+  const [city, setCity] = useState('');
+  const [proType, setProType] = useState('all'); // all, company, master
+
+  useEffect(() => {
+    axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
+  }, []);
+
+  useEffect(() => {
+    const fetchPros = async () => {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (category && category !== 'all') params.set('category', category);
+      if (city) params.set('city', city);
+      if (proType && proType !== 'all') params.set('user_type', proType);
+      
+      const res = await axios.get(`${API}/companies?${params}`);
+      setProfessionals(res.data.companies);
+      setLoading(false);
+    };
+    fetchPros();
+  }, [category, city, proType]);
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8" data-testid="find-master-page">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Намери майстор</h1>
+          <p className="text-slate-600">Търсете по град, професия или тип изпълнител</p>
+        </div>
+
+        {/* Free platform notice */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6" data-testid="find-master-free-notice">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+            <p className="text-sm text-green-800">
+              <strong>Безплатен достъп!</strong> Свържете се директно с всеки майстор или фирма - без такси, без ограничения.
+            </p>
+          </div>
+        </div>
+
+        <Card className="p-4 mb-8">
+          <div className="grid md:grid-cols-4 gap-4">
+            <Select value={proType} onValueChange={setProType}>
+              <SelectTrigger data-testid="filter-pro-type">
+                <SelectValue placeholder="Тип изпълнител" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Всички</SelectItem>
+                <SelectItem value="company">Фирми</SelectItem>
+                <SelectItem value="master">Майстори</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger data-testid="filter-category">
+                <SelectValue placeholder="Всички професии" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Всички професии</SelectItem>
+                {categories.map(cat => (
+                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Input 
+              placeholder="Град или населено място" 
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              data-testid="filter-city"
+            />
+            
+            <Button className="bg-orange-600 hover:bg-orange-700" data-testid="filter-search-btn">
+              <Search className="mr-2 h-4 w-4" /> Търси
+            </Button>
+          </div>
+        </Card>
+
+        {loading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1,2,3].map(i => <Card key={i} className="h-48 animate-pulse bg-slate-100" />)}
+          </div>
+        ) : professionals.length === 0 ? (
+          <Card className="p-12 text-center">
+            <Wrench className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+            <h3 className="text-xl font-semibold text-slate-700 mb-2">Няма намерени специалисти</h3>
+            <p className="text-slate-500">Опитайте с други филтри или друг град</p>
+          </Card>
+        ) : (
+          <>
+            <p className="text-sm text-slate-500 mb-4">Намерени: {professionals.length} специалиста</p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {professionals.map(pro => (
+                <Link key={pro.id} to={`/companies/${pro.id}`}>
+                  <Card className="p-6 hover:shadow-lg transition-all duration-300 h-full border-l-4 border-l-orange-400" data-testid={`pro-card-${pro.id}`}>
+                    <div className="flex items-center gap-4 mb-4">
+                      <Avatar className="h-14 w-14">
+                        <AvatarFallback className={`text-lg ${pro.user_type === 'master' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+                          {pro.company_name?.charAt(0) || 'M'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg truncate">{pro.company_name}</h3>
+                        <div className="flex items-center gap-2">
+                          {pro.city && (
+                            <span className="text-sm text-slate-500 flex items-center gap-1">
+                              <MapPin className="h-3 w-3" /> {pro.city}
+                            </span>
+                          )}
+                          <Badge variant="outline" className={`text-[10px] ${pro.user_type === 'master' ? 'border-blue-300 text-blue-700' : 'border-orange-300 text-orange-700'}`}>
+                            {pro.user_type === 'master' ? 'Майстор' : 'Фирма'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mb-3">
+                      <StarRating rating={pro.rating} />
+                      <span className="text-sm text-slate-600">
+                        ({pro.review_count} отзива)
+                      </span>
+                    </div>
+                    
+                    {pro.description && (
+                      <p className="text-sm text-slate-600 line-clamp-2 mb-3">{pro.description}</p>
+                    )}
+
+                    {pro.categories && pro.categories.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {pro.categories.slice(0, 3).map((catId, i) => (
+                          <Badge key={i} variant="secondary" className="text-[10px]">{catId}</Badge>
+                        ))}
+                        {pro.categories.length > 3 && (
+                          <Badge variant="secondary" className="text-[10px]">+{pro.categories.length - 3}</Badge>
+                        )}
+                      </div>
+                    )}
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // ============== COMPANY DETAIL PAGE ==============
 const CompanyDetailPage = () => {
   const { id } = useParams();
