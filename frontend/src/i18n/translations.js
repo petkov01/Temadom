@@ -246,7 +246,7 @@ const translations = {
     chatbot_sending: "Изпращане...", chatbot_error: "Грешка при изпращане. Опитайте отново.",
 
     // Common
-    common_error: "Грешка", common_loading: "Зареждане...",
+    common_loading: "Зареждане...",
     common_please_login: "Моля, влезте в профила си",
     common_only_companies: "Само фирми и майстори могат да закупуват контакти",
   },
