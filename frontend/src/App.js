@@ -2759,18 +2759,18 @@ const PaymentSuccessPage = () => {
         {status === 'checking' && (
           <>
             <Clock className="h-16 w-16 mx-auto mb-4 text-orange-500 animate-pulse" />
-            <h2 className="text-2xl font-bold mb-2">Проверяване на плащането...</h2>
-            <p className="text-slate-600">Моля, изчакайте</p>
+            <h2 className="text-2xl font-bold mb-2">{t('pay_checking')}</h2>
+            <p className="text-slate-600">{t('pay_wait')}</p>
           </>
         )}
         
         {status === 'success' && (
           <>
             <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
-            <h2 className="text-2xl font-bold mb-2">Плащането е успешно!</h2>
-            <p className="text-slate-600 mb-6">Благодарим ви! Вече имате достъп.</p>
+            <h2 className="text-2xl font-bold mb-2">{t('pay_success')}</h2>
+            <p className="text-slate-600 mb-6">{t('pay_thanks')}</p>
             <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => navigate('/dashboard')}>
-              Към таблото
+              {t('pay_to_dash')}
             </Button>
           </>
         )}
@@ -2778,10 +2778,10 @@ const PaymentSuccessPage = () => {
         {status === 'failed' && (
           <>
             <AlertCircle className="h-16 w-16 mx-auto mb-4 text-red-500" />
-            <h2 className="text-2xl font-bold mb-2">Плащането не бе успешно</h2>
-            <p className="text-slate-600 mb-6">Моля, опитайте отново</p>
+            <h2 className="text-2xl font-bold mb-2">{t('pay_failed')}</h2>
+            <p className="text-slate-600 mb-6">{t('pay_retry')}</p>
             <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => navigate('/projects')}>
-              Обратно към проекти
+              {t('pay_back')}
             </Button>
           </>
         )}
@@ -2789,10 +2789,10 @@ const PaymentSuccessPage = () => {
         {status === 'timeout' && (
           <>
             <AlertCircle className="h-16 w-16 mx-auto mb-4 text-yellow-500" />
-            <h2 className="text-2xl font-bold mb-2">Времето за проверка изтече</h2>
-            <p className="text-slate-600 mb-6">Проверете имейла си за потвърждение</p>
+            <h2 className="text-2xl font-bold mb-2">{t('pay_timeout')}</h2>
+            <p className="text-slate-600 mb-6">{t('pay_check_email')}</p>
             <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => navigate('/dashboard')}>
-              Към таблото
+              {t('pay_to_dash')}
             </Button>
           </>
         )}
