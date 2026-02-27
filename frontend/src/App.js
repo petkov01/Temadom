@@ -1744,8 +1744,8 @@ const CompanyDetailPage = () => {
         {portfolio.length > 0 && (
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>Портфолио</CardTitle>
-              <CardDescription>Снимки преди и след извършени проекти</CardDescription>
+              <CardTitle>{t('cd_portfolio')}</CardTitle>
+              <CardDescription>{t('cd_portfolio_desc')}</CardDescription>
             </CardHeader>
             <CardContent>
               <PortfolioGallery 
