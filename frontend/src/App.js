@@ -1965,18 +1965,18 @@ const RegisterPage = () => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Паролите не съвпадат');
+      toast.error(t('reg_pass_mismatch'));
       return;
     }
 
     if (userType === 'company') {
       const bulstat = formData.bulstat.trim();
       if (!bulstat) {
-        toast.error('Булстатът е задължителен за фирми');
+        toast.error(t('reg_bulstat_required_err'));
         return;
       }
       if (!/^\d{9}$/.test(bulstat)) {
-        toast.error('Булстатът трябва да е точно 9 цифри');
+        toast.error(t('reg_bulstat_format'));
         return;
       }
     }
@@ -1986,7 +1986,7 @@ const RegisterPage = () => {
       const { confirmPassword, ...data } = formData;
       if (userType !== 'company') delete data.bulstat;
       await register({ ...data, user_type: userType });
-      toast.success('Успешна регистрация!');
+      toast.success(t('reg_success'));
       navigate(userType === 'client' ? '/dashboard/client' : '/dashboard');
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка при регистрация');
