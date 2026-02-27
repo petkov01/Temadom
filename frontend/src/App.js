@@ -1116,7 +1116,7 @@ const ProjectDetailPage = () => {
           className="mb-4"
           onClick={() => navigate('/projects')}
         >
-          ← Обратно към проекти
+          {t('pd_back')}
         </Button>
 
         <Card className="overflow-hidden" data-testid="project-detail">
