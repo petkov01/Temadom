@@ -2,6 +2,7 @@ import React from 'react';
 import { Shield, FileText, CreditCard, MessageSquare, Star, Calculator, AlertTriangle, Users, Lock, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const TermsPage = () => {
   return (
