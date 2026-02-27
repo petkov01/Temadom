@@ -530,11 +530,12 @@ const ServicesPage = () => {
       <section className="bg-slate-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Справочник за строителство и ремонт
+            {isEn ? 'Construction & Renovation Guide' : 'Справочник за строителство и ремонт'}
           </h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            Подробна информация за всички строителни дейности - технология на изпълнение, 
-            времетраене, материали и полезни съвети от професионалисти.
+            {isEn 
+              ? 'Detailed information about all construction activities - execution technology, duration, materials and useful tips from professionals.'
+              : 'Подробна информация за всички строителни дейности - технология на изпълнение, времетраене, материали и полезни съвети от професионалисти.'}
           </p>
         </div>
       </section>
