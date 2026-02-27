@@ -624,28 +624,28 @@ const LandingPage = () => {
                 <Users className="h-7 w-7 text-orange-600" />
               </div>
               <p className="text-2xl font-bold text-slate-900">{stats.total_companies}+</p>
-              <p className="text-slate-600 text-sm">Регистрирани фирми</p>
+              <p className="text-slate-600 text-sm">{t('stats_companies')}</p>
             </div>
             <div className="p-4">
               <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Boxes className="h-7 w-7 text-orange-600" />
               </div>
               <p className="text-2xl font-bold text-slate-900">{stats.total_projects}+</p>
-              <p className="text-slate-600 text-sm">Активни проекти</p>
+              <p className="text-slate-600 text-sm">{t('stats_projects')}</p>
             </div>
             <div className="p-4">
               <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Star className="h-7 w-7 text-orange-600" />
               </div>
               <p className="text-2xl font-bold text-slate-900">{stats.total_reviews}+</p>
-              <p className="text-slate-600 text-sm">Отзиви</p>
+              <p className="text-slate-600 text-sm">{t('stats_reviews')}</p>
             </div>
             <div className="p-4">
               <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Shield className="h-7 w-7 text-orange-600" />
               </div>
               <p className="text-2xl font-bold text-slate-900">28</p>
-              <p className="text-slate-600 text-sm">Области в България</p>
+              <p className="text-slate-600 text-sm">{t('stats_regions')}</p>
             </div>
           </div>
         </div>
