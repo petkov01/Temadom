@@ -849,6 +849,8 @@ const ProfessionsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Всички');
   const [expandedId, setExpandedId] = useState(null);
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
 
   const filtered = professions.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -864,11 +866,14 @@ const ProfessionsPage = () => {
         <div className="max-w-5xl mx-auto px-4 text-center">
           <HardHat className="h-12 w-12 text-orange-400 mx-auto mb-4" />
           <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-            Наръчник за <span className="text-orange-400">28 строителни професии</span>
+            {isEn 
+              ? <>{`Guide to `}<span className="text-orange-400">28 construction professions</span></>
+              : <>Наръчник за <span className="text-orange-400">28 строителни професии</span></>}
           </h1>
           <p className="text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Научете как трябва да се извършва всяка строителна дейност, какви са технологичните времена 
-            и как да разпознаете качествен майстор от такъв, който е дошъл само да ви вземе парите.
+            {isEn 
+              ? 'Learn how each construction activity should be performed, what the technological times are, and how to distinguish a quality craftsman from one who only came to take your money.'
+              : 'Научете как трябва да се извършва всяка строителна дейност, какви са технологичните времена и как да разпознаете качествен майстор от такъв, който е дошъл само да ви вземе парите.'}
           </p>
         </div>
       </section>
@@ -879,10 +884,11 @@ const ProfessionsPage = () => {
           <CardContent className="p-5 flex items-start gap-4">
             <AlertTriangle className="h-6 w-6 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-bold text-amber-900 mb-1">Защо е важно да знаете това?</h3>
+              <h3 className="font-bold text-amber-900 mb-1">{isEn ? 'Why is it important to know this?' : 'Защо е важно да знаете това?'}</h3>
               <p className="text-amber-800 text-sm leading-relaxed">
-                В България огромна част от клиентите стават жертви на некачествена работа, защото 
-                не знаят как трябва да изглежда правилното изпълнение. Некоректните майстори разчитат 
+                {isEn 
+                  ? 'In Bulgaria, a huge number of clients become victims of poor quality work because they don\'t know what proper execution should look like. Dishonest craftsmen rely on your ignorance.'
+                  : 'В България огромна част от клиентите стават жертви на некачествена работа, защото не знаят как трябва да изглежда правилното изпълнение. Некоректните майстори разчитат на вашето незнание.'} 
                 точно на това незнание. Този наръчник ви дава знанията, от които се нуждаете, за да 
                 контролирате качеството и да защитите инвестицията си.
               </p>
