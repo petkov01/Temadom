@@ -2550,10 +2550,10 @@ const ClientDashboard = () => {
                       </div>
                       <div className="text-right">
                         <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
-                          {project.status === 'active' ? 'Активен' : 'Затворен'}
+                          {project.status === 'active' ? t('cl_active') : t('cl_closed')}
                         </Badge>
                         <p className="text-sm text-slate-500 mt-2">
-                          {project.views} преглеждания • {project.purchases} закупувания
+                          {project.views} {t('projects_views')} • {project.purchases} {t('cl_purchases')}
                         </p>
                       </div>
                     </div>
