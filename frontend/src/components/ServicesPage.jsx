@@ -398,8 +398,9 @@ const SERVICES_INFO = {
   }
 };
 
-const ServiceCard = ({ serviceKey, service, isExpanded, onToggle }) => {
+const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
   const Icon = service.icon;
+  const isEn = lang === 'en';
   
   return (
     <Card className="overflow-hidden" data-testid={`service-${serviceKey}`}>
