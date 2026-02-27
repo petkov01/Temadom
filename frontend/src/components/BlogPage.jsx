@@ -1,21 +1,39 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Search, ArrowRight, Calendar, MapPin, Tag } from 'lucide-react';
+import { BookOpen, Search, ArrowRight, Calendar, Clock, Tag } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BLOG_ARTICLES } from '@/data/seoData';
+import { SEO_BLOG_ARTICLES } from '@/data/blogArticles';
 
-const typeLabels = { overview: 'Обзор', category: 'Категория', profession: 'Професия', region: 'Регион' };
-const typeColors = { overview: 'bg-blue-100 text-blue-800', category: 'bg-green-100 text-green-800', profession: 'bg-orange-100 text-orange-800', region: 'bg-purple-100 text-purple-800' };
+const typeLabels = { overview: 'Обзор', category: 'Категория', profession: 'Професия', region: 'Регион', article: 'Статия' };
+const typeColors = { overview: 'bg-blue-100 text-blue-800', category: 'bg-green-100 text-green-800', profession: 'bg-orange-100 text-orange-800', region: 'bg-purple-100 text-purple-800', article: 'bg-amber-100 text-amber-800' };
+
+const catLabels = { 'ремонт': 'Ремонт', 'покриви': 'Покриви', 'изолация': 'Изолация', 'инсталации': 'Инсталации', 'груб строеж': 'Груб строеж', 'строителство': 'Строителство', 'съвети': 'Съвети', 'довършителни': 'Довършителни', 'подове': 'Подове' };
+
+// Merge old SEO articles with new detailed articles
+const allArticles = [
+  ...SEO_BLOG_ARTICLES.map(a => ({
+    slug: a.slug,
+    title: a.title,
+    description: a.metaDescription,
+    type: 'article',
+    category: a.category,
+    date: a.date,
+    readTime: a.readTime
+  })),
+  ...BLOG_ARTICLES
+];
 
 const BlogPage = () => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
 
-  const filtered = BLOG_ARTICLES.filter(a => {
-    const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase());
+  const filtered = allArticles.filter(a => {
+    const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) || 
+      (a.description || '').toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === 'all' || a.type === filter;
     return matchesSearch && matchesFilter;
   });
@@ -26,10 +44,10 @@ const BlogPage = () => {
         <div className="max-w-5xl mx-auto px-4 text-center">
           <BookOpen className="h-10 w-10 text-orange-400 mx-auto mb-4" />
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-            Блог за строителство и <span className="text-orange-400">цени 2026</span>
+            Блог за строителство и <span className="text-orange-400">ремонти</span>
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto">
-            Актуални цени за строителство и ремонти в България. Калкулатори, оферти и сравнения по области.
+            Актуални цени, съвети и ръководства за строителство и ремонти в България 2026.
           </p>
         </div>
       </section>
@@ -41,7 +59,7 @@ const BlogPage = () => {
             <Input placeholder="Търси статия..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" data-testid="blog-search" />
           </div>
           <div className="flex gap-2 flex-wrap">
-            {[['all','Всички'],['overview','Обзор'],['profession','Професии'],['region','Региони'],['category','Категории']].map(([v,l]) => (
+            {[['all','Всички'],['article','Статии'],['profession','Професии'],['region','Региони'],['overview','Обзори']].map(([v,l]) => (
               <Button key={v} variant={filter===v?'default':'outline'} size="sm" className={filter===v?'bg-orange-600 hover:bg-orange-700':''} onClick={() => setFilter(v)}>{l}</Button>
             ))}
           </div>
@@ -55,7 +73,12 @@ const BlogPage = () => {
               <Card className="h-full hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer" data-testid={`blog-card-${article.slug}`}>
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Badge className={typeColors[article.type]}>{typeLabels[article.type]}</Badge>
+                    <Badge className={typeColors[article.type] || typeColors.article}>
+                      {article.category ? catLabels[article.category] || article.category : typeLabels[article.type]}
+                    </Badge>
+                    {article.readTime && (
+                      <span className="text-xs text-slate-400 flex items-center gap-1"><Clock className="h-3 w-3" /> {article.readTime}</span>
+                    )}
                     <span className="text-xs text-slate-400 flex items-center gap-1"><Calendar className="h-3 w-3" /> 2026</span>
                   </div>
                   <h2 className="font-bold text-slate-900 mb-2 line-clamp-2">{article.title}</h2>
