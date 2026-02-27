@@ -2100,9 +2100,9 @@ const RegisterPage = () => {
               />
             </div>
             <div>
-              <Label>Град / Населено място</Label>
+              <Label>{t('reg_city')}</Label>
               <Input 
-                placeholder="Напр. София, Пловдив, Варна..."
+                placeholder={t('reg_city_placeholder')}
                 value={formData.city}
                 onChange={(e) => setFormData(d => ({ ...d, city: e.target.value }))}
                 data-testid="register-city"
