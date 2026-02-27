@@ -1133,122 +1133,60 @@ const ProjectDetailPage = () => {
             <div className="border-t border-slate-200 pt-8">
               <h3 className="text-lg font-semibold mb-4">Информация за контакт</h3>
               
-              {project.contact_locked ? (
-                <div className="relative">
-                  <div className="blur-overlay absolute inset-0 rounded-lg flex items-center justify-center z-10">
-                    <div className="text-center p-6">
-                      <Lock className="h-12 w-12 mx-auto mb-4 text-slate-400" />
-                      <h4 className="text-xl font-semibold mb-2">Контактите са заключени</h4>
-                      <p className="text-slate-600 mb-6">Закупете достъп, за да видите информацията за контакт</p>
-                      
-                      <div className="flex flex-col gap-4 justify-center">
-                        {/* Free lead button for companies with remaining free leads */}
-                        {user?.user_type === 'company' && freeLeadsRemaining > 0 && (
-                          <Button 
-                            className="bg-green-600 hover:bg-green-700 w-full"
-                            onClick={handleClaimFreeLead}
-                            disabled={paymentLoading}
-                            data-testid="claim-free-lead"
-                          >
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Безплатен контакт ({freeLeadsRemaining} от 3 остават)
-                          </Button>
-                        )}
-                        
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                          <Button 
-                            className="bg-orange-600 hover:bg-orange-700"
-                            onClick={() => handlePurchase('single_lead')}
-                            disabled={paymentLoading}
-                            data-testid="buy-single-lead"
-                          >
-                            <Lock className="mr-2 h-4 w-4" />
-                            Единичен контакт - 25€
-                          </Button>
-                          <Button 
-                            variant="outline"
-                            onClick={() => handlePurchase('subscription')}
-                            disabled={paymentLoading}
-                            data-testid="buy-subscription"
-                          >
-                            Месечен абонамент - 100€
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Send message button */}
-                      {user && project.client_id && user.id !== project.client_id && (
-                        <div className="mt-4 pt-4 border-t border-slate-200">
-                          <Button 
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => navigate(`/messages?to=${project.client_id}&project=${id}`)}
-                            data-testid="send-message-btn"
-                          >
-                            <MessageSquare className="mr-2 h-4 w-4" />
-                            Изпрати съобщение на клиента
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="bg-slate-100 rounded-lg p-6 opacity-30">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <User className="h-5 w-5 text-slate-400" />
-                        <span className="blur-sm">Име на клиента</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Phone className="h-5 w-5 text-slate-400" />
-                        <span className="blur-sm">+359 88 888 8888</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Mail className="h-5 w-5 text-slate-400" />
-                        <span className="blur-sm">email@example.com</span>
-                      </div>
-                    </div>
-                  </div>
+              {/* Free platform notice */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6" data-testid="free-platform-notice">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="font-semibold text-green-800">Платформата е безплатна!</span>
                 </div>
-              ) : (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6" data-testid="contact-unlocked">
-                  <div className="flex items-center gap-2 mb-4">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                    <span className="font-semibold text-green-800">Контактите са отключени</span>
-                  </div>
-                  <div className="space-y-4">
+                <p className="text-sm text-green-700">
+                  TemaDom е временно безплатна за всички потребители. Възползвайте се сега, докато е безплатно!
+                </p>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6" data-testid="contact-unlocked">
+                <div className="flex items-center gap-2 mb-4">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="font-semibold text-green-800">Контактите са отключени</span>
+                </div>
+                <div className="space-y-4">
+                  {project.client_name && (
                     <div className="flex items-center gap-3">
                       <User className="h-5 w-5 text-slate-600" />
                       <span className="font-medium">{project.client_name}</span>
                     </div>
+                  )}
+                  {project.client_phone && (
                     <div className="flex items-center gap-3">
                       <Phone className="h-5 w-5 text-slate-600" />
                       <a href={`tel:${project.client_phone}`} className="text-orange-600 hover:underline">
                         {project.client_phone}
                       </a>
                     </div>
+                  )}
+                  {project.client_email && (
                     <div className="flex items-center gap-3">
                       <Mail className="h-5 w-5 text-slate-600" />
                       <a href={`mailto:${project.client_email}`} className="text-orange-600 hover:underline">
                         {project.client_email}
                       </a>
                     </div>
-                  </div>
-                  {user && user.id !== project.client_id && (
-                    <div className="mt-4 pt-4 border-t border-green-200">
-                      <Button 
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => navigate(`/messages?to=${project.client_id}&project=${id}`)}
-                        data-testid="send-message-unlocked"
-                      >
-                        <MessageSquare className="mr-2 h-4 w-4" />
-                        Изпрати съобщение
-                      </Button>
-                    </div>
                   )}
                 </div>
-              )}
+                {user && user.id !== project.client_id && (
+                  <div className="mt-4 pt-4 border-t border-green-200">
+                    <Button 
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => navigate(`/messages?to=${project.client_id}&project=${id}`)}
+                      data-testid="send-message-unlocked"
+                    >
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Изпрати съобщение
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
