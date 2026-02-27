@@ -947,7 +947,7 @@ const ProjectsPage = () => {
             />
             
             <Button type="submit" className="bg-orange-600 hover:bg-orange-700" data-testid="search-btn">
-              <Filter className="mr-2 h-4 w-4" /> Филтрирай
+              <Filter className="mr-2 h-4 w-4" /> {t('projects_filter')}
             </Button>
           </form>
         </Card>
