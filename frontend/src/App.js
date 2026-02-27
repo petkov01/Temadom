@@ -739,10 +739,10 @@ const LandingPage = () => {
       <section className="py-16 bg-orange-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Готови ли сте да започнете?
+            {t('cta_title')}
           </h2>
           <p className="text-xl text-orange-100 mb-8">
-            Регистрирайте се безплатно и започнете да получавате клиенти днес
+            {t('cta_subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
@@ -751,7 +751,7 @@ const LandingPage = () => {
               onClick={() => navigate('/register')}
               data-testid="cta-register"
             >
-              Регистрирай фирма
+              {t('cta_register')}
             </Button>
             <Button 
               size="lg" 
@@ -759,7 +759,7 @@ const LandingPage = () => {
               className="border-white text-white hover:bg-white/10 text-lg px-8"
               onClick={() => navigate('/register')}
             >
-              Публикувай проект
+              {t('hero_cta2')}
             </Button>
           </div>
         </div>
