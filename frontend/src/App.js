@@ -1399,7 +1399,7 @@ const FindMasterPage = () => {
           <div className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
             <p className="text-sm text-green-800">
-              <strong>Безплатен достъп!</strong> Свържете се директно с всеки майстор или фирма - без такси, без ограничения.
+              <strong>Безплатен достъп!</strong> Свържете се директно с всеки майстор или фирма.
             </p>
           </div>
         </div>
