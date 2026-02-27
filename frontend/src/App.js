@@ -919,7 +919,7 @@ const ProjectDetailPage = () => {
     };
     fetchProject();
     // Fetch free leads status for companies
-    if (token && user?.user_type === 'company') {
+    if (token && (user?.user_type === 'company' || user?.user_type === 'master')) {
       axios.get(`${API}/leads/free-status`, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setFreeLeadsRemaining(res.data.free_leads_remaining))
         .catch(() => {});
@@ -950,8 +950,8 @@ const ProjectDetailPage = () => {
       return;
     }
     
-    if (user.user_type !== 'company') {
-      toast.error('Само фирми могат да закупуват контакти');
+    if (user.user_type !== 'company' && user.user_type !== 'master') {
+      toast.error('Само фирми и майстори могат да закупуват контакти');
       return;
     }
 
