@@ -2488,7 +2488,7 @@ const ClientDashboard = () => {
       const res = await axios.get(`${API}/my-projects`, { headers: { Authorization: `Bearer ${token}` } });
       setProjects(res.data.projects);
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Грешка при създаване');
+      toast.error(err.response?.data?.detail || t('common_error'));
     }
     setSubmitting(false);
   };
