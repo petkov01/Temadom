@@ -1356,6 +1356,7 @@ const CompaniesPage = () => {
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('');
   const [city, setCity] = useState('');
+  const { t } = useLanguage();
 
   useEffect(() => {
     axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
