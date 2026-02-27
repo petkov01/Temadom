@@ -817,6 +817,19 @@ const PriceCalculator = () => {
         </Card>
       </div>
 
+      {/* Mobile sticky total bar */}
+      {calculation.total > 0 && (
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-900 text-white px-4 py-3 shadow-2xl z-50 border-t border-slate-700" data-testid="mobile-total-bar">
+          <div className="flex items-center justify-between max-w-lg mx-auto">
+            <div>
+              <p className="text-xs text-slate-400">ОБЩА ЦЕНА</p>
+              <p className="text-2xl font-bold">{calculation.total.toFixed(0)} € <span className="text-sm text-orange-400 font-normal">≈ {(calculation.total * 1.95).toFixed(0)} лв.</span></p>
+            </div>
+            <span className="text-xs text-slate-400">{calculation.items.filter(i => i.quantity > 0).length} дейности</span>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
