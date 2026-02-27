@@ -1144,10 +1144,10 @@ const ProjectDetailPage = () => {
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6" data-testid="free-platform-notice">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span className="font-semibold text-green-800">Платформата е безплатна!</span>
+                  <span className="font-semibold text-green-800">Безплатен достъп до контактите!</span>
                 </div>
                 <p className="text-sm text-green-700">
-                  TemaDom е временно безплатна за всички потребители. Възползвайте се сега, докато е безплатно!
+                  Виждате пълната информация за контакт на клиента. Свържете се директно!
                 </p>
               </div>
 
@@ -1909,7 +1909,7 @@ const RegisterPage = () => {
           {/* Free platform banner */}
           <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4" data-testid="register-free-banner">
             <p className="text-sm text-green-800 font-medium text-center">
-              Платформата е БЕЗПЛАТНА за ограничен период! Регистрирайте се сега.
+              Платформата е БЕЗПЛАТНА! Регистрирайте се сега.
             </p>
           </div>
 
@@ -2142,13 +2142,12 @@ const CompanyDashboard = () => {
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="h-6 w-6 text-green-600" />
                   <h2 className="text-xl font-semibold text-green-800">
-                    Платформата е безплатна!
+                    Добре дошли в TemaDom!
                   </h2>
                 </div>
                 <p className="text-green-700">
-                  Възползвайте се от пълен безплатен достъп, докато платформата е в тестов режим. 
-                  Всички контакти, калкулации и функции са напълно безплатни. Бъдете сред първите, 
-                  които ще изградят репутацията си тук, преди услугата да стане платена!
+                  Всички контакти, калкулации и функции са безплатни. 
+                  Бъдете сред първите, които ще изградят репутацията си тук!
                 </p>
               </div>
               <Button 
