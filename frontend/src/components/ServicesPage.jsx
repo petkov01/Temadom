@@ -438,11 +438,10 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
             <div className="grid md:grid-cols-2 gap-8 pt-6">
               {/* Left column */}
               <div>
-                <h4 className="font-semibold text-lg mb-3">Описание</h4>
-                <p className="text-slate-600 mb-6">{service.fullDescription}</p>
+                <h4 className="font-semibold text-lg mb-3">{isEn ? 'Description' : 'Описание'}</h4>
 
                 <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" /> Стъпки на изпълнение
+                  <CheckCircle className="h-5 w-5 text-green-600" /> {isEn ? 'Execution steps' : 'Стъпки на изпълнение'}
                 </h4>
                 <ol className="space-y-2 mb-6">
                   {service.steps.map((step, idx) => (
