@@ -1,0 +1,98 @@
+{
+  "summary": "Completed iteration 12 testing: Domain change from temadom.bg to temadom.com, Open Graph meta tags, Twitter Card tags, promotional registration banner. All backend tests passed (8/8 + 1 skipped). All frontend tests passed (16/16).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/calculator/pdf",
+        "issue": "PDF generation fails with Unicode encoding error - fpdf falls back to Helvetica which doesn't support Cyrillic",
+        "priority": "LOW",
+        "note": "PRE-EXISTING ISSUE - not related to iteration 12 changes"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "✅ API health check - working",
+    "✅ /api/sitemap returns 75 temadom.com URLs",
+    "✅ /api/sitemap contains no temadom.bg references",
+    "✅ /api/sitemap valid XML format",
+    "✅ /api/categories endpoint working (15 categories)",
+    "✅ /api/stats endpoint working",
+    "✅ /api/projects endpoint working",
+    "✅ /api/companies endpoint working",
+    "✅ Backend server.py code contains temadom.com, no .bg references",
+    "✅ index.html og:url = https://temadom.com",
+    "✅ index.html og:image = https://temadom.com/logo-generated.png",
+    "✅ index.html twitter:card = summary_large_image",
+    "✅ index.html canonical URL = https://temadom.com",
+    "✅ Footer shows info@temadom.com",
+    "✅ No temadom.bg references in homepage HTML source",
+    "✅ Registration Клиент tab does NOT show orange promo banner",
+    "✅ Registration Фирма tab shows orange promo banner 'Бъдете крачка пред конкуренцията!'",
+    "✅ Registration Фирма promo banner mentions TemaDom.com",
+    "✅ Registration Майстор tab shows orange promo banner",
+    "✅ Registration free platform banner shows 'БЕЗПЛАТНА'",
+    "✅ Blog article schema.org has @type: Article",
+    "✅ Blog article publisher URL is temadom.com",
+    "✅ Blog article has no temadom.bg references",
+    "✅ Blog article calculator CTA button works"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration12.py",
+    "/app/test_reports/pytest/pytest_results_iter12.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PDF generation has pre-existing Cyrillic font encoding issue (fpdf library fallback to Helvetica). Not blocking but should be addressed in future iteration."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration12.py"
+  ],
+  "success_rate": {
+    "backend": "100% (8/8 tests passed, 1 skipped - pre-existing issue)",
+    "frontend": "100% (16/16 UI tests passed)"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 12 fully tested. Domain changed from temadom.bg to temadom.com everywhere - backend, frontend, sitemap, schema.org, PDF code. Open Graph and Twitter Card meta tags added. Promotional registration banner added for Фирма and Майстор tabs (not shown for Клиент). Frontend needed restart after file changes to pick up index.html updates.",
+  "features_tested": {
+    "domain_change_bg_to_com": {
+      "status": "PASS",
+      "details": "All temadom.bg references changed to temadom.com in sitemap, schema.org, backend code, frontend index.html"
+    },
+    "open_graph_tags": {
+      "status": "PASS",
+      "details": "og:url, og:image, og:title, og:description, og:type, og:locale, og:site_name all present with temadom.com"
+    },
+    "twitter_card_tags": {
+      "status": "PASS",
+      "details": "twitter:card=summary_large_image, twitter:title, twitter:description, twitter:image all present"
+    },
+    "canonical_url": {
+      "status": "PASS",
+      "details": "canonical href = https://temadom.com"
+    },
+    "registration_promo_banner": {
+      "status": "PASS",
+      "details": "Orange banner shows for Фирма/Майстор tabs with 'Бъдете крачка пред конкуренцията!' and temadom.com mention. Does NOT show for Клиент tab."
+    },
+    "footer_email": {
+      "status": "PASS",
+      "details": "Footer shows info@temadom.com"
+    },
+    "sitemap_urls": {
+      "status": "PASS",
+      "details": "Sitemap contains 75 temadom.com URLs including all regional and blog pages"
+    },
+    "blog_schema_org": {
+      "status": "PASS",
+      "details": "Blog articles have Article schema.org with publisher URL = temadom.com"
+    }
+  }
+}
