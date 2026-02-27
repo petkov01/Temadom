@@ -1380,8 +1380,8 @@ const CompaniesPage = () => {
     <div className="min-h-screen bg-slate-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Фирми и майстори</h1>
-          <p className="text-slate-600">Намерете надеждни строителни фирми с проверени отзиви</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('comp_title')}</h1>
+          <p className="text-slate-600">{t('comp_subtitle')}</p>
         </div>
 
         <Card className="p-4 mb-8">
