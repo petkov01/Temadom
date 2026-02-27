@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Calculator, Paintbrush, Zap, Droplets, Boxes, LayoutGrid, Square, Layers, ChevronDown, Info, Euro, Hammer, Lock, AlertTriangle, FileDown } from 'lucide-react';
+import { Calculator, Paintbrush, Zap, Droplets, Boxes, LayoutGrid, Square, Layers, ChevronDown, Info, Euro, Hammer, FileDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useAuth } from '@/App';
 import { toast } from 'sonner';
 import axios from 'axios';
