@@ -165,8 +165,8 @@ const PRICE_DATABASE = {
     unit: "м²",
     unitLabel: "Квадратни метри",
     prices: {
-      labor: { economy: 10, standard: 15, premium: 25 },
-      laborAndMaterial: { economy: 30, standard: 50, premium: 80 }
+      labor: { economy: 14, standard: 22, premium: 35 },
+      laborAndMaterial: { economy: 40, standard: 65, premium: 100 }
     },
     description: "Тухлена или газобетонна зидария"
   },
@@ -204,8 +204,8 @@ const PRICE_DATABASE = {
     unit: "м³",
     unitLabel: "Кубични метри бетон за основи",
     prices: {
-      labor: { economy: 35, standard: 50, premium: 75 },
-      laborAndMaterial: { economy: 90, standard: 130, premium: 180 }
+      labor: { economy: 50, standard: 75, premium: 110 },
+      laborAndMaterial: { economy: 120, standard: 180, premium: 260 }
     },
     description: "Фундаменти, ивични основи"
   },
@@ -390,7 +390,7 @@ const REGIONAL_MULTIPLIERS = {
   burgas: { name: "Бургас", multiplier: 1.05 },
   
   // Средни по големина градове
-  stara_zagora: { name: "Стара Загора", multiplier: 0.98 },
+  stara_zagora: { name: "Стара Загора", multiplier: 1.00 },
   ruse: { name: "Русе", multiplier: 0.95 },
   pleven: { name: "Плевен", multiplier: 0.92 },
   blagoevgrad: { name: "Благоевград", multiplier: 0.95 },
