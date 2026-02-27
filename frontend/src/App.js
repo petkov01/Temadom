@@ -2609,9 +2609,9 @@ const ClientDashboard = () => {
               </div>
 
               <div>
-                <Label>Описание *</Label>
+                <Label>{t('cl_description')} *</Label>
                 <Textarea 
-                  placeholder="Опишете подробно какво търсите..."
+                  placeholder={t('cl_desc_placeholder')}
                   value={newProject.description}
                   onChange={(e) => setNewProject(d => ({ ...d, description: e.target.value }))}
                   rows={4}
