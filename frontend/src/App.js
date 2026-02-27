@@ -18,6 +18,11 @@ import ChatPage from '@/components/ChatPage';
 import AboutPage from '@/components/AboutPage';
 import TermsPage from '@/components/TermsPage';
 import ProfessionsPage from '@/components/ProfessionsPage';
+import BlogPage from '@/components/BlogPage';
+import BlogArticle from '@/components/BlogArticle';
+import PricesByRegionPage from '@/components/PricesByRegionPage';
+import RegionalPage from '@/components/RegionalPage';
+import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 
 // TemaDom Logo Component - SVG text logo with house icon
 const TemaDomLogo = ({ className = "h-10", showSubtitle = false }) => (
