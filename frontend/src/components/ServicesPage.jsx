@@ -515,6 +515,8 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
 const ServicesPage = () => {
   const [expandedService, setExpandedService] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
 
   const categories = ['all', ...new Set(Object.values(SERVICES_INFO).map(s => s.category))];
   
