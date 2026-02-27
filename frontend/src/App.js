@@ -2803,15 +2803,16 @@ const PaymentSuccessPage = () => {
 
 const PaymentCancelPage = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
       <Card className="w-full max-w-md text-center p-8" data-testid="payment-cancel">
         <AlertCircle className="h-16 w-16 mx-auto mb-4 text-slate-400" />
-        <h2 className="text-2xl font-bold mb-2">Плащането е отменено</h2>
-        <p className="text-slate-600 mb-6">Можете да опитате отново по всяко време</p>
+        <h2 className="text-2xl font-bold mb-2">{t('pay_cancelled')}</h2>
+        <p className="text-slate-600 mb-6">{t('pay_can_retry')}</p>
         <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => navigate('/projects')}>
-          Обратно към проекти
+          {t('pay_back')}
         </Button>
       </Card>
     </div>
