@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Calculator, Paintbrush, Zap, Droplets, Boxes, LayoutGrid, Square, Layers, ChevronDown, Info, Euro, Hammer, FileDown, Upload, Loader2, FileImage, CheckCircle, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Calculator, Paintbrush, Zap, Droplets, Boxes, LayoutGrid, Square, Layers, ChevronDown, Info, Euro, Hammer, FileDown, Upload, Loader2, FileImage, CheckCircle, AlertCircle, Lock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
