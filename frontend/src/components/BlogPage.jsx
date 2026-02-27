@@ -31,6 +31,8 @@ const allArticles = [
 const BlogPage = () => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
+  const { lang } = useLanguage();
+  const isEn = lang === 'en';
 
   const filtered = allArticles.filter(a => {
     const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) || 
