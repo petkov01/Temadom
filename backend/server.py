@@ -443,28 +443,8 @@ async def get_project(project_id: str, user: Optional[dict] = Depends(get_option
     await db.projects.update_one({"id": project_id}, {"$inc": {"views": 1}})
     project["views"] = project.get("views", 0) + 1
     
-    # Check access
-    has_access = False
-    if user:
-        if user.get("user_type") == "client" and user.get("id") == project.get("client_id"):
-            has_access = True
-        elif user.get("user_type") == "company":
-            purchased_leads = user.get("purchased_leads", [])
-            has_subscription = user.get("subscription_active", False)
-            if has_subscription and user.get("subscription_expires"):
-                exp = user.get("subscription_expires")
-                if isinstance(exp, str):
-                    exp = datetime.fromisoformat(exp.replace('Z', '+00:00'))
-                if exp < datetime.now(timezone.utc):
-                    has_subscription = False
-            has_access = has_subscription or project_id in purchased_leads
-    
-    if not has_access:
-        project["client_email"] = None
-        project["client_phone"] = None
-        project["contact_locked"] = True
-    else:
-        project["contact_locked"] = False
+    # PLATFORM IS FREE - all contacts are unlocked
+    project["contact_locked"] = False
     
     # Get category name
     cat = next((c for c in CATEGORIES if c["id"] == project.get("category")), None)
