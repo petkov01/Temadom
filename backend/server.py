@@ -1781,6 +1781,189 @@ async def sitemap():
     
     return Response(content=xml, media_type="application/xml")
 
+# ============== CHATBOT ROUTES ==============
+
+CHATBOT_SYSTEM_PROMPT = """Ти си виртуален асистент на TemaDom - платформа за строителни услуги в България.
+
+Основна информация за платформата:
+- TemaDom свързва клиенти с майстори и строителни фирми
+- Платформата е НАПЪЛНО БЕЗПЛАТНА за всички потребители
+- Има 3 типа потребители: Клиент, Фирма, Майстор
+- Функции: публикуване на проекти, калкулатор за цени, директен чат, портфолио
+- Калкулаторът покрива 28 строителни услуги в 28 области на България
+- Има AI анализ на чертежи за автоматично попълване на калкулатора
+
+Ти трябва да:
+1. Отговаряш учтиво на въпроси за платформата
+2. Помагаш с навигация и използване на функциите
+3. Когато получиш ОПЛАКВАНЕ от потребител, ЗАДЪЛЖИТЕЛНО:
+   - Изслушай внимателно
+   - Поискай конкретни детайли (име на фирма/майстор, какъв е проблемът)
+   - Увери потребителя, че оплакването е регистрирано
+   - Ако оплакването е за конкретна фирма/майстор, кажи че ще бъде прегледано от администратор
+   - Включи в отговора маркер [COMPLAINT] в началото ако е оплакване
+
+4. Ако потребител е агресивен или нарушава правилата, включи маркер [WARNING] в отговора
+
+Отговаряй КРАТКО и ПОЛЕЗНО. Максимум 2-3 изречения за прости въпроси.
+Ако въпросът е на друг език, отговаряй на СЪЩИЯ ЕЗИК.
+"""
+
+@api_router.post("/chatbot/message")
+async def chatbot_message(data: dict):
+    """Handle chatbot messages with AI"""
+    message = data.get("message", "").strip()
+    session_id = data.get("session_id", str(uuid.uuid4()))
+    user_id = data.get("user_id")
+    user_name = data.get("user_name", "Гост")
+    user_type = data.get("user_type", "guest")
+    lang = data.get("lang", "bg")
+    
+    if not message:
+        raise HTTPException(status_code=400, detail="Съобщението е задължително")
+    
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+    
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"chatbot-{session_id}",
+            system_message=CHATBOT_SYSTEM_PROMPT
+        ).with_model("openai", "gpt-4o")
+        
+        lang_hint = f" (Потребителят пише на език с код: {lang}. Отговори на същия език.)" if lang != 'bg' else ""
+        full_message = f"[Потребител: {user_name}, Тип: {user_type}]{lang_hint}\n{message}"
+        
+        user_msg = UserMessage(text=full_message)
+        response = await chat.send_message(user_msg)
+        reply = response.strip()
+        
+        # Check for complaint markers and log
+        is_complaint = "[COMPLAINT]" in reply
+        is_warning = "[WARNING]" in reply
+        
+        # Clean markers from the reply shown to user
+        clean_reply = reply.replace("[COMPLAINT]", "").replace("[WARNING]", "").strip()
+        
+        # Store conversation in DB
+        await db.chatbot_conversations.insert_one({
+            "session_id": session_id,
+            "user_id": user_id,
+            "user_name": user_name,
+            "user_type": user_type,
+            "message": message,
+            "reply": clean_reply,
+            "is_complaint": is_complaint,
+            "is_warning": is_warning,
+            "lang": lang,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        # If complaint detected, create a complaint record
+        if is_complaint and user_id:
+            await db.complaints.insert_one({
+                "id": str(uuid.uuid4()),
+                "reporter_id": user_id,
+                "reporter_name": user_name,
+                "reporter_type": user_type,
+                "message": message,
+                "bot_reply": clean_reply,
+                "status": "new",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            })
+            
+            # Check warnings count for the reporter (if they are being warned themselves)
+            if is_warning:
+                warnings_count = await db.user_warnings.count_documents({"user_id": user_id})
+                if warnings_count >= 2:
+                    # Auto-block after 3rd warning
+                    await db.users.update_one(
+                        {"id": user_id},
+                        {"$set": {"blocked": True, "blocked_reason": "Множество нарушения, автоматично блокиране след 3 предупреждения"}}
+                    )
+                else:
+                    await db.user_warnings.insert_one({
+                        "id": str(uuid.uuid4()),
+                        "user_id": user_id,
+                        "user_name": user_name,
+                        "reason": message,
+                        "created_at": datetime.now(timezone.utc).isoformat()
+                    })
+        
+        return {"reply": clean_reply, "session_id": session_id}
+        
+    except Exception as e:
+        logging.error(f"Chatbot error: {e}")
+        raise HTTPException(status_code=500, detail=f"Грешка: {str(e)}")
+
+@api_router.get("/chatbot/complaints")
+async def get_complaints(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Admin endpoint to view complaints"""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+    if not user or user.get("user_type") != "admin":
+        raise HTTPException(status_code=403, detail="Само администратори имат достъп")
+    
+    complaints = await db.complaints.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return {"complaints": complaints}
+
+@api_router.post("/chatbot/warn-user/{user_id}")
+async def warn_user(user_id: str, data: dict, credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Admin: warn a user"""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    admin = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+    if not admin or admin.get("user_type") != "admin":
+        raise HTTPException(status_code=403, detail="Само администратори")
+    
+    reason = data.get("reason", "Предупреждение от администратор")
+    
+    warnings_count = await db.user_warnings.count_documents({"user_id": user_id})
+    
+    await db.user_warnings.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "admin_id": payload["user_id"],
+        "reason": reason,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    if warnings_count >= 2:
+        # 3rd warning = auto block
+        await db.users.update_one(
+            {"id": user_id},
+            {"$set": {"blocked": True, "blocked_reason": f"Блокиран след 3 предупреждения. Последно: {reason}"}}
+        )
+        return {"message": "Потребителят е блокиран автоматично след 3 предупреждения", "blocked": True}
+    
+    return {"message": f"Предупреждение #{warnings_count + 1} е изпратено", "warnings": warnings_count + 1, "blocked": False}
+
+@api_router.post("/chatbot/block-user/{user_id}")
+async def block_user(user_id: str, data: dict, credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Admin: block a user immediately"""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    admin = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+    if not admin or admin.get("user_type") != "admin":
+        raise HTTPException(status_code=403, detail="Само администратори")
+    
+    reason = data.get("reason", "Блокиран от администратор")
+    
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"blocked": True, "blocked_reason": reason}}
+    )
+    
+    return {"message": "Потребителят е блокиран", "blocked": True}
+
 # Include router - MUST be after all route definitions
 app.include_router(api_router)
 
