@@ -1688,7 +1688,7 @@ const CompanyDetailPage = () => {
     <div className="min-h-screen bg-slate-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button variant="ghost" className="mb-4" onClick={() => navigate('/companies')}>
-          ← Обратно към фирми
+          {t('cd_back')}
         </Button>
 
         <Card className="overflow-hidden mb-8" data-testid="company-detail">
