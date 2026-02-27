@@ -844,9 +844,9 @@ const ProjectCard = ({ project }) => {
         </div>
         
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-          <span className="text-xs text-slate-400">{project.views} преглеждания</span>
+          <span className="text-xs text-slate-400">{project.views} {t('projects_views')}</span>
           <span className="text-orange-600 text-sm font-medium group-hover:underline">
-            Виж детайли →
+            {t('projects_details')}
           </span>
         </div>
       </CardContent>
