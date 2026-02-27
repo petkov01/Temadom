@@ -13,7 +13,7 @@ const TermsPage = () => {
       <section className="bg-slate-900 text-white py-14">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <FileText className="h-10 w-10 text-orange-400 mx-auto mb-4" />
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3">Правила и условия</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">{isEn ? 'Terms and Conditions' : 'Правила и условия'}</h1>
           <p className="text-slate-400">Последна актуализация: февруари 2026</p>
         </div>
       </section>
