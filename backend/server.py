@@ -77,9 +77,10 @@ class UserBase(BaseModel):
     email: EmailStr
     name: str
     phone: Optional[str] = None
-    user_type: str  # "client", "company", "admin"
+    user_type: str  # "client", "company", "master", "admin"
     city: Optional[str] = None
     telegram_username: Optional[str] = None
+    bulstat: Optional[str] = None  # Required for companies (9 digits)
 
 class UserCreate(UserBase):
     password: str
@@ -278,6 +279,22 @@ async def register(user_data: UserCreate):
     if existing:
         raise HTTPException(status_code=400, detail="Този имейл вече е регистриран")
     
+    # Validate user_type
+    if user_data.user_type not in ("client", "company", "master"):
+        raise HTTPException(status_code=400, detail="Невалиден тип потребител")
+    
+    # Validate bulstat for companies
+    if user_data.user_type == "company":
+        if not user_data.bulstat or not user_data.bulstat.strip():
+            raise HTTPException(status_code=400, detail="Булстатът е задължителен за фирми")
+        bulstat = user_data.bulstat.strip()
+        if not bulstat.isdigit() or len(bulstat) != 9:
+            raise HTTPException(status_code=400, detail="Булстатът трябва да е точно 9 цифри")
+        # Check if bulstat already registered
+        existing_bulstat = await db.users.find_one({"bulstat": bulstat})
+        if existing_bulstat:
+            raise HTTPException(status_code=400, detail="Този Булстат вече е регистриран")
+    
     # Create user
     user_dict = user_data.model_dump()
     password = user_dict.pop("password")
@@ -291,8 +308,8 @@ async def register(user_data: UserCreate):
     
     await db.users.insert_one(user_dict)
     
-    # Create company profile if company
-    if user_data.user_type == "company":
+    # Create company/master profile
+    if user_data.user_type in ("company", "master"):
         profile = {
             "id": str(uuid.uuid4()),
             "user_id": user_dict["id"],
@@ -306,6 +323,8 @@ async def register(user_data: UserCreate):
             "portfolio_images": [],
             "rating": 0.0,
             "review_count": 0,
+            "bulstat": user_data.bulstat if user_data.user_type == "company" else None,
+            "user_type": user_data.user_type,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.company_profiles.insert_one(profile)
