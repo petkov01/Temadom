@@ -822,7 +822,7 @@ const ProjectCard = ({ project }) => {
           {project.estimated_budget && (
             <div className="flex items-center gap-2 text-orange-600 font-medium">
               <Calculator className="h-4 w-4" />
-              <span>~{project.estimated_budget} € оценка</span>
+              <span>~{project.estimated_budget} € {t('projects_estimate')}</span>
             </div>
           )}
           
