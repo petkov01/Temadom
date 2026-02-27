@@ -503,6 +503,7 @@ async def get_companies(
     category: Optional[str] = None,
     city: Optional[str] = None,
     min_rating: Optional[float] = None,
+    user_type: Optional[str] = None,
     page: int = 1,
     limit: int = 12
 ):
@@ -514,6 +515,8 @@ async def get_companies(
         query["city"] = {"$regex": city, "$options": "i"}
     if min_rating:
         query["rating"] = {"$gte": min_rating}
+    if user_type and user_type in ("company", "master"):
+        query["user_type"] = user_type
     
     skip = (page - 1) * limit
     total = await db.company_profiles.count_documents(query)
