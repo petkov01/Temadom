@@ -1,0 +1,92 @@
+{
+  "summary": "Completed iteration 14 testing: Dropdown navigation menu, Language switcher (8 languages), and AI Chatbot. All features work correctly. Backend 11/11 tests passed, Frontend UI fully functional.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "✅ Backend: /api/ root endpoint working",
+    "✅ Backend: /api/categories returns 15 categories",
+    "✅ Backend: /api/stats returns project and company counts",
+    "✅ Backend: /api/chatbot/message responds to valid messages",
+    "✅ Backend: /api/chatbot/message returns 400 for empty message",
+    "✅ Backend: /api/chatbot/message returns 400 for missing message field",
+    "✅ Backend: /api/chatbot/message handles language hints (German test)",
+    "✅ Backend: /api/chatbot/message handles Bulgarian messages",
+    "✅ Backend: /api/projects listing works",
+    "✅ Backend: /api/projects filter by category works",
+    "✅ Backend: /api/companies listing works",
+    "✅ Frontend: Desktop nav shows 4 main items (Проекти, Майстори, Фирми, Калкулатор)",
+    "✅ Frontend: 'Още' dropdown button visible with ChevronDown icon",
+    "✅ Frontend: 'Още' dropdown contains 5 items (Услуги, Професии, Блог, Цени по области, За нас)",
+    "✅ Frontend: Language switcher button shows globe icon + current language code (BG)",
+    "✅ Frontend: Language dropdown shows 8 languages with flags (BG, EN, DE, FR, ES, IT, RU, TR)",
+    "✅ Frontend: Switching to English changes nav text (Projects, Masters, Companies, Calculator, More)",
+    "✅ Frontend: Switching to German changes nav text (Projekte, Meister, Firmen, Rechner, Mehr)",
+    "✅ Frontend: Language choice persists in localStorage under 'temadom_lang' key",
+    "✅ Frontend: Chatbot floating button visible at bottom-right (position x=1840, y=944 on desktop)",
+    "✅ Frontend: Clicking chatbot button opens chat window with welcome message",
+    "✅ Frontend: Chatbot window has title 'TemaDom Асистент', subtitle, close button, message area, input field, send button",
+    "✅ Frontend: Chatbot close button works (closes window, floating button reappears)",
+    "✅ Frontend: Mobile hamburger menu shows all navigation items",
+    "✅ Frontend: Mobile language switcher (globe icon) available next to hamburger menu",
+    "✅ Frontend: Mobile chatbot button visible at bottom-right"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration14.py",
+    "/app/test_reports/pytest/pytest_results_iter14.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Language context implementation is clean with localStorage persistence",
+    "Chatbot uses GPT-4o via emergentintegrations - may encounter budget errors in production",
+    "All interactive elements have proper data-testid attributes",
+    "Separate refs for desktop (langRef) and mobile (mobileLangRef) language dropdowns correctly handle outside click detection"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration14.py"
+  ],
+  "success_rate": {
+    "backend": "100% (11/11 tests passed)",
+    "frontend": "100% (17/17 UI tests passed)"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 14 fully tested. Dropdown navigation working - 4 main items visible (Проекти, Майстори, Фирми, Калкулатор), 5 items in 'Още' dropdown (Услуги, Професии, Блог, Цени по области, За нас). Language switcher has 8 languages with flags, persists to localStorage('temadom_lang'). Chatbot uses GPT-4o and works correctly. Mobile responsive navigation tested.",
+  "features_tested": {
+    "dropdown_navigation": {
+      "status": "PASS",
+      "details": "Desktop shows 4 main nav items + 'Още' dropdown with 5 more items. Mobile hamburger menu shows all items."
+    },
+    "language_switcher": {
+      "status": "PASS",
+      "details": "Globe icon + language code in navbar, 8 languages with flags (BG, EN, DE, FR, ES, IT, RU, TR), persists to localStorage"
+    },
+    "language_switching": {
+      "status": "PASS",
+      "details": "Nav text changes correctly when switching languages (tested BG->EN->DE). Login/Register buttons also translate."
+    },
+    "chatbot_button": {
+      "status": "PASS",
+      "details": "Orange floating button at bottom-right with z-index 100, opens chat window on click"
+    },
+    "chatbot_window": {
+      "status": "PASS",
+      "details": "Window has title, subtitle, messages area with welcome message, input field, send button, close button. Close works correctly."
+    },
+    "chatbot_endpoint": {
+      "status": "PASS",
+      "details": "/api/chatbot/message endpoint works, returns 400 for empty/missing message, uses GPT-4o for responses"
+    },
+    "mobile_responsive": {
+      "status": "PASS",
+      "details": "Hamburger menu shows all nav items, globe icon for language switcher next to hamburger, chatbot button visible"
+    }
+  }
+}
