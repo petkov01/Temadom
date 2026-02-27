@@ -1726,7 +1726,7 @@ const CompanyDetailPage = () => {
 
             {company.categories?.length > 0 && (
               <div className="mb-6">
-                <h3 className="font-semibold mb-2">Услуги</h3>
+                <h3 className="font-semibold mb-2">{t('cd_services')}</h3>
                 <div className="flex flex-wrap gap-2">
                   {company.categories.map(catId => {
                     const cat = categories.find(c => c.id === catId);
