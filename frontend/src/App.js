@@ -2630,7 +2630,7 @@ const ClientDashboard = () => {
                   />
                 </div>
                 <div>
-                  <Label>Макс. бюджет (€)</Label>
+                  <Label>{t('cl_max_budget')}</Label>
                   <Input 
                     type="number"
                     placeholder="5000"
