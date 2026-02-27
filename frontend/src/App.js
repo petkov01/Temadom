@@ -299,9 +299,9 @@ const Footer = () => (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <div className="mb-4">
+          <div className="mb-4 flex flex-col items-start">
             <TemaDomLogo className="h-10 w-auto" />
-            <p className="text-orange-400 text-xs font-bold tracking-widest uppercase mt-1">Ремонт и строителство</p>
+            <p className="text-orange-400 text-[10px] font-bold tracking-[0.12em] uppercase mt-1">Ремонт и строителство</p>
           </div>
           <p className="text-slate-400 text-sm">
             Свържете се с най-добрите майстори и фирми за вашите строителни проекти.
