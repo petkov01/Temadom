@@ -75,7 +75,7 @@ const BlogPage = () => {
           </div>
         </div>
 
-        <p className="text-sm text-slate-500 mb-4">{filtered.length} статии</p>
+        <p className="text-sm text-slate-500 mb-4">{filtered.length} {isEn ? 'articles' : 'статии'}</p>
 
         <div className="grid md:grid-cols-2 gap-4">
           {filtered.map(article => (
