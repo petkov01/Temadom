@@ -1291,7 +1291,7 @@ const ProjectDetailPage = () => {
                       data-testid="send-message-unlocked"
                     >
                       <MessageSquare className="mr-2 h-4 w-4" />
-                      Изпрати съобщение
+                      {t('pd_send_message')}
                     </Button>
                   </div>
                 )}
