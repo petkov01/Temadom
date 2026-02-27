@@ -387,6 +387,12 @@ async def create_project(project_data: ProjectCreate, user: dict = Depends(get_c
     
     await db.projects.insert_one(project_dict)
     
+    # Notify companies via Telegram about new project
+    try:
+        await notify_companies_new_project(project_dict)
+    except Exception as e:
+        logging.error(f"Telegram notification error: {e}")
+    
     return {"message": "Проектът е създаден успешно", "project_id": project_dict["id"]}
 
 @api_router.get("/projects")
