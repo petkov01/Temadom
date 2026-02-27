@@ -2672,7 +2672,7 @@ const ClientDashboard = () => {
                       className="w-20 h-20 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
                     >
                       <Camera className="h-5 w-5 mb-1" />
-                      <span className="text-xs">Добави</span>
+                      <span className="text-xs">{t('cl_add_photo')}</span>
                     </button>
                   )}
                   <input
