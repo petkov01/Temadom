@@ -718,10 +718,10 @@ const LandingPage = () => {
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-slate-900">Последни проекти</h2>
+              <h2 className="text-3xl font-bold text-slate-900">{t('recent_projects')}</h2>
               <Link to="/projects">
                 <Button variant="ghost" className="text-orange-600 hover:text-orange-700">
-                  Виж всички <ChevronRight className="ml-1 h-4 w-4" />
+                  {t('view_all')} <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
             </div>
