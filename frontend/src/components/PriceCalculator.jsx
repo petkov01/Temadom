@@ -826,6 +826,14 @@ const PriceCalculator = () => {
                             link.click();
                             window.URL.revokeObjectURL(url);
                             toast.success('PDF офертата е изтеглена');
+                            // GA4: Track PDF download
+                            if (typeof window.gtag === 'function') {
+                              window.gtag('event', 'pdf_download', {
+                                event_category: 'premium',
+                                event_label: 'offer_pdf',
+                                value: 10
+                              });
+                            }
                           } catch {
                             toast.error('Грешка при генериране на PDF');
                           }
