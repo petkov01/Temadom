@@ -479,7 +479,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
 
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <h4 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5" /> Внимание
+                    <AlertTriangle className="h-5 w-5" /> {isEn ? 'Warning' : 'Внимание'}
                   </h4>
                   <ul className="space-y-2">
                     {service.warnings.map((warning, idx) => (
