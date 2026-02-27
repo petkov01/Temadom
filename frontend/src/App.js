@@ -389,41 +389,43 @@ const Navbar = () => {
 };
 
 // ============== FOOTER ==============
-const Footer = () => (
+const Footer = () => {
+  const { t } = useLanguage();
+  return (
   <footer className="bg-slate-900 text-white py-12 mt-auto">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <div className="mb-4 flex flex-col items-start">
             <TemaDomLogo className="h-10 w-auto" />
-            <p className="text-orange-400 text-[10px] font-bold tracking-[0.12em] uppercase mt-1">Ремонт и строителство</p>
+            <p className="text-orange-400 text-[10px] font-bold tracking-[0.12em] uppercase mt-1">{t('footer_tagline')}</p>
           </div>
           <p className="text-slate-400 text-sm">
-            Свържете се с най-добрите майстори и фирми за вашите строителни проекти.
+            {t('footer_desc')}
           </p>
         </div>
         <div>
-          <h4 className="font-semibold mb-4">За клиенти</h4>
+          <h4 className="font-semibold mb-4">{t('footer_clients')}</h4>
           <ul className="space-y-2 text-slate-400 text-sm">
-            <li><Link to="/register" className="hover:text-white transition-colors">Публикувай проект</Link></li>
-            <li><Link to="/companies" className="hover:text-white transition-colors">Намери фирма</Link></li>
-            <li><Link to="/services" className="hover:text-white transition-colors">Услуги</Link></li>
-            <li><Link to="/calculator" className="hover:text-white transition-colors">Калкулатор</Link></li>
-            <li><Link to="/professions" className="hover:text-white transition-colors">Наръчник за професии</Link></li>
+            <li><Link to="/register" className="hover:text-white transition-colors">{t('footer_publish')}</Link></li>
+            <li><Link to="/companies" className="hover:text-white transition-colors">{t('footer_find_company')}</Link></li>
+            <li><Link to="/services" className="hover:text-white transition-colors">{t('footer_services')}</Link></li>
+            <li><Link to="/calculator" className="hover:text-white transition-colors">{t('footer_calculator')}</Link></li>
+            <li><Link to="/professions" className="hover:text-white transition-colors">{t('footer_professions_guide')}</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-4">За фирми</h4>
+          <h4 className="font-semibold mb-4">{t('footer_for_companies')}</h4>
           <ul className="space-y-2 text-slate-400 text-sm">
-            <li><Link to="/register" className="hover:text-white transition-colors">Регистрирай се</Link></li>
-            <li><Link to="/projects" className="hover:text-white transition-colors">Виж проекти</Link></li>
+            <li><Link to="/register" className="hover:text-white transition-colors">{t('footer_register_link')}</Link></li>
+            <li><Link to="/projects" className="hover:text-white transition-colors">{t('footer_view_projects')}</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-4">Информация</h4>
+          <h4 className="font-semibold mb-4">{t('footer_info')}</h4>
           <ul className="space-y-2 text-slate-400 text-sm">
-            <li><Link to="/about" className="hover:text-white transition-colors">За нас</Link></li>
-            <li><Link to="/terms" className="hover:text-white transition-colors">Правила и условия</Link></li>
+            <li><Link to="/about" className="hover:text-white transition-colors">{t('footer_about')}</Link></li>
+            <li><Link to="/terms" className="hover:text-white transition-colors">{t('footer_terms')}</Link></li>
             <li>info@temadom.com</li>
             <li>+359 88 888 8888</li>
           </ul>
@@ -431,11 +433,12 @@ const Footer = () => (
       </div>
       <Separator className="my-8 bg-slate-700" />
       <p className="text-center text-slate-500 text-sm">
-        © 2025-2026 TemaDom. Всички права запазени.
+        © 2025-2026 TemaDom. {t('footer_rights')}
       </p>
     </div>
   </footer>
-);
+  );
+};
 
 // ============== STAR RATING ==============
 const StarRating = ({ rating, size = 'sm' }) => {
