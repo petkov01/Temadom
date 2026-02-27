@@ -2258,8 +2258,8 @@ const CompanyDashboard = () => {
     <div className="min-h-screen bg-slate-50 py-8" data-testid="company-dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Табло на фирмата</h1>
-          <p className="text-slate-600">Управлявайте вашите контакти и абонамент</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t('dash_title')}</h1>
+          <p className="text-slate-600">{t('dash_subtitle')}</p>
         </div>
 
         {/* Free Platform Banner */}
@@ -2270,19 +2270,18 @@ const CompanyDashboard = () => {
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="h-6 w-6 text-green-600" />
                   <h2 className="text-xl font-semibold text-green-800">
-                    Добре дошли в TemaDom!
+                    {t('dash_welcome')}
                   </h2>
                 </div>
                 <p className="text-green-700">
-                  Всички контакти, калкулации и функции са безплатни. 
-                  Бъдете сред първите, които ще изградят репутацията си тук!
+                  {t('dash_welcome_desc')}
                 </p>
               </div>
               <Button 
                 className="bg-green-600 hover:bg-green-700 flex-shrink-0"
                 onClick={() => navigate('/projects')}
               >
-                Виж проекти
+                {t('dash_view_projects')}
               </Button>
             </div>
           </div>
@@ -2295,10 +2294,10 @@ const CompanyDashboard = () => {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <svg className="h-6 w-6 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.13l-1.97 9.28c-.15.66-.54.82-1.09.51l-3.01-2.22-1.45 1.4c-.16.16-.3.3-.61.3l.22-3.06 5.55-5.01c.24-.22-.05-.33-.37-.13l-6.86 4.32-2.95-.92c-.64-.2-.66-.64.14-.95l11.54-4.45c.53-.2 1-.05.86.93z"/></svg>
-                  <h2 className="text-lg font-semibold text-blue-800">Telegram известия</h2>
+                  <h2 className="text-lg font-semibold text-blue-800">{t('dash_telegram')}</h2>
                 </div>
                 <p className="text-sm text-blue-700">
-                  Свържете Telegram акаунта си и получавайте моментални известия за нови проекти във вашата област!
+                  {t('dash_telegram_desc')}
                 </p>
               </div>
               <a 
@@ -2308,7 +2307,7 @@ const CompanyDashboard = () => {
                 className="inline-flex"
               >
                 <Button className="bg-blue-500 hover:bg-blue-600 flex-shrink-0" data-testid="link-telegram-btn">
-                  Свържи Telegram
+                  {t('dash_telegram_link')}
                 </Button>
               </a>
             </div>
@@ -2318,29 +2317,29 @@ const CompanyDashboard = () => {
         {/* Tabs for Leads and Portfolio */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="leads">Контакти</TabsTrigger>
-            <TabsTrigger value="portfolio">Портфолио</TabsTrigger>
+            <TabsTrigger value="leads">{t('dash_contacts')}</TabsTrigger>
+            <TabsTrigger value="portfolio">{t('dash_portfolio')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="leads" className="mt-6">
             {/* Leads */}
             <Card>
               <CardHeader>
-                <CardTitle>Вашите контакти</CardTitle>
+                <CardTitle>{t('dash_your_contacts')}</CardTitle>
                 <CardDescription>
                   {user.subscription_active 
-                    ? 'Имате достъп до всички проекти' 
-                    : `${leads.length} закупени контакта`}
+                    ? t('dash_access_all') 
+                    : `${leads.length} ${t('dash_purchased')}`}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {leads.length === 0 ? (
                   <div className="text-center py-12">
                     <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                    <h3 className="text-lg font-medium text-slate-700 mb-2">Все още нямате контакти</h3>
-                    <p className="text-slate-500 mb-4">Разгледайте проектите и закупете контакти</p>
+                    <h3 className="text-lg font-medium text-slate-700 mb-2">{t('dash_no_contacts')}</h3>
+                    <p className="text-slate-500 mb-4">{t('dash_no_contacts_sub')}</p>
                     <Button onClick={() => navigate('/projects')} className="bg-orange-600 hover:bg-orange-700">
-                      Виж проекти
+                      {t('dash_view_projects')}
                     </Button>
                   </div>
                 ) : (
