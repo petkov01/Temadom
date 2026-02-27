@@ -1213,7 +1213,7 @@ const ProjectDetailPage = () => {
 
             {(project.budget_min || project.budget_max) && (
               <div className="bg-slate-50 rounded-lg p-4 mb-8">
-                <h4 className="font-semibold text-slate-700 mb-2">Бюджет</h4>
+                <h4 className="font-semibold text-slate-700 mb-2">{t('pd_budget')}</h4>
                 <p className="text-2xl font-bold text-slate-900">
                   {project.budget_min && `${project.budget_min}€`}
                   {project.budget_min && project.budget_max && ' - '}
