@@ -63,10 +63,13 @@ const BlogPage = () => {
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input placeholder="Търси статия..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" data-testid="blog-search" />
+            <Input placeholder={isEn ? 'Search article...' : 'Търси статия...'} value={search} onChange={e => setSearch(e.target.value)} className="pl-10" data-testid="blog-search" />
           </div>
           <div className="flex gap-2 flex-wrap">
-            {[['all','Всички'],['article','Статии'],['profession','Професии'],['region','Региони'],['overview','Обзори']].map(([v,l]) => (
+            {(isEn 
+              ? [['all','All'],['article','Articles'],['profession','Professions'],['region','Regions'],['overview','Overviews']]
+              : [['all','Всички'],['article','Статии'],['profession','Професии'],['region','Региони'],['overview','Обзори']]
+            ).map(([v,l]) => (
               <Button key={v} variant={filter===v?'default':'outline'} size="sm" className={filter===v?'bg-orange-600 hover:bg-orange-700':''} onClick={() => setFilter(v)}>{l}</Button>
             ))}
           </div>
