@@ -413,33 +413,12 @@ async def get_projects(
     
     projects = await db.projects.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     
-    # Determine which projects user has access to
-    purchased_leads = []
-    has_subscription = False
-    if user and user.get("user_type") == "company":
-        purchased_leads = user.get("purchased_leads", [])
-        has_subscription = user.get("subscription_active", False)
-        # Check subscription expiry
-        if has_subscription and user.get("subscription_expires"):
-            exp = user.get("subscription_expires")
-            if isinstance(exp, str):
-                exp = datetime.fromisoformat(exp.replace('Z', '+00:00'))
-            if exp < datetime.now(timezone.utc):
-                has_subscription = False
-    
-    # Process projects - hide contact info if not purchased/subscribed
+    # Process projects - PLATFORM IS FREE, show all contacts
     processed_projects = []
     for p in projects:
         project = dict(p)
-        has_access = has_subscription or project["id"] in purchased_leads
-        
-        if not has_access:
-            # Hide sensitive info
-            project["client_email"] = None
-            project["client_phone"] = None
-            project["contact_locked"] = True
-        else:
-            project["contact_locked"] = False
+        # Free platform: all contacts are unlocked
+        project["contact_locked"] = False
         
         # Get category name
         cat = next((c for c in CATEGORIES if c["id"] == project.get("category")), None)
