@@ -569,6 +569,7 @@ const ServicesPage = () => {
               service={service}
               isExpanded={expandedService === key}
               onToggle={() => setExpandedService(expandedService === key ? null : key)}
+              lang={lang}
             />
           ))}
         </div>
