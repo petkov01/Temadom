@@ -2398,6 +2398,7 @@ const CompanyDashboard = () => {
 const ClientDashboard = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
