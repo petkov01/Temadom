@@ -2050,9 +2050,9 @@ const RegisterPage = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label>{userType === 'company' ? 'Име на фирма' : userType === 'master' ? 'Име на майстор' : 'Име'}</Label>
+              <Label>{userType === 'company' ? t('reg_company_name') : userType === 'master' ? t('reg_master_name') : t('reg_name')}</Label>
               <Input 
-                placeholder={userType === 'company' ? 'Фирма ЕООД' : userType === 'master' ? 'Иван Иванов - Електротехник' : 'Иван Иванов'}
+                placeholder={userType === 'company' ? t('reg_company_placeholder') : userType === 'master' ? t('reg_master_placeholder') : t('reg_name_placeholder')}
                 value={formData.name}
                 onChange={(e) => setFormData(d => ({ ...d, name: e.target.value }))}
                 required
