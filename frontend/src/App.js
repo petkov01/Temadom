@@ -2080,12 +2080,17 @@ const RegisterPage = () => {
 
             <div>
               <Label>{t('reg_email')}</Label>
+              <Input 
+                type="email"
+                placeholder="email@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData(d => ({ ...d, email: e.target.value }))}
                 required
                 data-testid="register-email"
               />
             </div>
             <div>
-              <Label>Телефон</Label>
+              <Label>{t('reg_phone')}</Label>
               <Input 
                 type="tel"
                 placeholder="+359 88 888 8888"
