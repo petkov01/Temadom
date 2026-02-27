@@ -2599,9 +2599,9 @@ const ClientDashboard = () => {
               </div>
 
               <div>
-                <Label>Град *</Label>
+                <Label>{t('cl_city_label')} *</Label>
                 <Input 
-                  placeholder="Напр. София"
+                  placeholder={t('cl_city_placeholder')}
                   value={newProject.city}
                   onChange={(e) => setNewProject(d => ({ ...d, city: e.target.value }))}
                   data-testid="project-city-input"
