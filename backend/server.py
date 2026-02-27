@@ -1467,6 +1467,116 @@ async def analytics_dashboard(request: Request):
         "top_regions": [{"region": r["_id"] or "N/A", "count": r["count"]} for r in top_regions]
     }
 
+# ============== AI BLUEPRINT ANALYSIS ==============
+
+BLUEPRINT_SYSTEM_PROMPT = """Ти си експерт по анализ на строителни чертежи и архитектурни планове. Анализирай внимателно качения чертеж и извлечи ВСИЧКИ измерения и количества.
+
+ЗАДАЧА: Извлечи от чертежа следната информация:
+
+1. РАЗМЕРИ: Всички коти (дължини, ширини, височини) в метри
+2. ПЛОЩИ: Изчисли площта на всяко помещение/зона в кв.м
+3. ОБЕМИ: Ако има височини, изчисли обемите в куб.м
+4. СТРОИТЕЛНИ ЕЛЕМЕНТИ: Идентифицирай колони, шайби, стени, плочи, греди
+5. КОТИ: Разпознай всички коти (кота 0.00, кота +2.70, кота +3.50 и т.н.)
+6. МАТЕРИАЛИ: Ако са посочени, опиши материалите
+
+ОТГОВОРИ ЗАДЪЛЖИТЕЛНО в JSON формат:
+{
+  "description": "Кратко описание на чертежа",
+  "floor_levels": [{"level": "+0.00", "description": "Кота нула - приземен етаж"}],
+  "rooms": [{"name": "Хол", "length_m": 5.2, "width_m": 4.0, "area_sqm": 20.8, "height_m": 2.7}],
+  "total_area_sqm": 85.5,
+  "structural_elements": {
+    "columns": [{"id": "К1", "dimensions": "40x40 см", "count": 4}],
+    "walls": [{"type": "Носеща стена", "thickness_cm": 25, "length_m": 12, "area_sqm": 32.4}],
+    "beams": [{"id": "Г1", "dimensions": "25x50 см", "length_m": 5.2}],
+    "slabs": [{"type": "Плоча", "area_sqm": 85.5, "thickness_cm": 16}]
+  },
+  "calculator_suggestions": [
+    {"category": "concrete", "description": "Бетон за плоча", "quantity": 13.7, "unit": "м³"},
+    {"category": "reinforcement", "description": "Арматура за плоча", "quantity": 1370, "unit": "кг"},
+    {"category": "formwork", "description": "Кофраж за плоча", "quantity": 85.5, "unit": "м²"},
+    {"category": "masonry", "description": "Зидария стени", "quantity": 120, "unit": "м²"},
+    {"category": "foundations", "description": "Основи", "quantity": 8.5, "unit": "м³"},
+    {"category": "roofing", "description": "Покрив", "quantity": 95, "unit": "м²"},
+    {"category": "electrical", "description": "Ел. точки", "quantity": 45, "unit": "точки"},
+    {"category": "insulation", "description": "Топлоизолация", "quantity": 120, "unit": "м²"},
+    {"category": "waterproofing", "description": "Хидроизолация", "quantity": 15, "unit": "м²"},
+    {"category": "tiling", "description": "Плочки баня/кухня", "quantity": 25, "unit": "м²"},
+    {"category": "render", "description": "Вътрешна мазилка", "quantity": 200, "unit": "м²"},
+    {"category": "painting", "description": "Боядисване", "quantity": 200, "unit": "м²"},
+    {"category": "drywall", "description": "Гипсокартон", "quantity": 30, "unit": "м²"},
+    {"category": "flooring", "description": "Подова настилка", "quantity": 65, "unit": "м²"},
+    {"category": "plumbing", "description": "ВиК точки", "quantity": 15, "unit": "точки"},
+    {"category": "windows", "description": "Прозорци", "quantity": 12, "unit": "м²"}
+  ],
+  "notes": ["Допълнителни забележки за чертежа"]
+}
+
+ВАЖНО:
+- Бъди максимално ТОЧЕН с размерите - чети котите внимателно
+- Ако не можеш да разчетеш нещо, кажи го в notes
+- calculator_suggestions трябва да включва САМО категории от тези: concrete, reinforcement, formwork, masonry, foundations, roofing, electrical, insulation, waterproofing, tiling, render, painting, drywall, flooring, plumbing, windows, demolition, excavation, screed
+- Изчислявай количествата реалистично на база размерите
+- За арматура: 100 кг/м³ бетон за плочи, 120 кг/м³ за колони
+- За кофраж: площта на повърхността на бетонните елементи
+- ВИНАГИ отговаряй на БЪЛГАРСКИ"""
+
+@api_router.post("/blueprint/analyze")
+async def analyze_blueprint(data: dict):
+    """Analyze a construction blueprint using AI vision"""
+    image_base64 = data.get("image")
+    if not image_base64:
+        raise HTTPException(status_code=400, detail="Изображението е задължително")
+    
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+    
+    # Clean base64 - remove data:image prefix if present
+    if "," in image_base64:
+        image_base64 = image_base64.split(",")[1]
+    
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"blueprint-{uuid.uuid4()}",
+            system_message=BLUEPRINT_SYSTEM_PROMPT
+        ).with_model("openai", "gpt-4o")
+        
+        image_content = ImageContent(image_base64=image_base64)
+        
+        user_message = UserMessage(
+            text="Анализирай този строителен чертеж. Извлечи ВСИЧКИ размери, площи, коти, конструктивни елементи. Отговори в JSON формат с calculator_suggestions за автоматично попълване на калкулатора.",
+            file_contents=[image_content]
+        )
+        
+        response = await chat.send_message(user_message)
+        
+        # Try to parse JSON from response
+        response_text = response.strip()
+        
+        # Extract JSON from markdown code block if present
+        json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', response_text)
+        if json_match:
+            response_text = json_match.group(1).strip()
+        
+        try:
+            result = json_module.loads(response_text)
+        except json_module.JSONDecodeError:
+            # If parsing fails, return raw text
+            result = {
+                "description": "Анализът завърши, но не може да бъде структуриран автоматично.",
+                "raw_analysis": response_text,
+                "calculator_suggestions": [],
+                "notes": ["AI анализът не върна структуриран отговор. Моля, прегледайте ръчно."]
+            }
+        
+        return result
+        
+    except Exception as e:
+        logging.error(f"Blueprint analysis error: {e}")
+        raise HTTPException(status_code=500, detail=f"Грешка при анализ: {str(e)}")
+
 # ============== TELEGRAM BOT ROUTES ==============
 
 async def send_telegram_message(chat_id: int, text: str):
