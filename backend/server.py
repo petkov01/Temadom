@@ -75,6 +75,8 @@ class UserBase(BaseModel):
     name: str
     phone: Optional[str] = None
     user_type: str  # "client", "company", "admin"
+    city: Optional[str] = None
+    telegram_username: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str
