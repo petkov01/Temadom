@@ -1687,6 +1687,7 @@ const RegisterPage = () => {
     phone: '',
     city: '',
     telegram_username: '',
+    bulstat: '',
     password: '',
     confirmPassword: ''
   });
@@ -1700,9 +1701,22 @@ const RegisterPage = () => {
       return;
     }
 
+    if (userType === 'company') {
+      const bulstat = formData.bulstat.trim();
+      if (!bulstat) {
+        toast.error('Булстатът е задължителен за фирми');
+        return;
+      }
+      if (!/^\d{9}$/.test(bulstat)) {
+        toast.error('Булстатът трябва да е точно 9 цифри');
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const { confirmPassword, ...data } = formData;
+      if (userType !== 'company') delete data.bulstat;
       await register({ ...data, user_type: userType });
       toast.success('Успешна регистрация!');
       navigate(userType === 'client' ? '/dashboard/client' : '/dashboard');
@@ -1711,6 +1725,8 @@ const RegisterPage = () => {
     }
     setLoading(false);
   };
+
+  const isProUser = userType === 'company' || userType === 'master';
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
@@ -1737,23 +1753,43 @@ const RegisterPage = () => {
           </div>
 
           <Tabs value={userType} onValueChange={setUserType} className="mb-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="client" data-testid="register-client-tab">Клиент</TabsTrigger>
               <TabsTrigger value="company" data-testid="register-company-tab">Фирма</TabsTrigger>
+              <TabsTrigger value="master" data-testid="register-master-tab">Майстор</TabsTrigger>
             </TabsList>
           </Tabs>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label>{userType === 'company' ? 'Име на фирма' : 'Име'}</Label>
+              <Label>{userType === 'company' ? 'Име на фирма' : userType === 'master' ? 'Име на майстор' : 'Име'}</Label>
               <Input 
-                placeholder={userType === 'company' ? 'Фирма ЕООД' : 'Иван Иванов'}
+                placeholder={userType === 'company' ? 'Фирма ЕООД' : userType === 'master' ? 'Иван Иванов - Електротехник' : 'Иван Иванов'}
                 value={formData.name}
                 onChange={(e) => setFormData(d => ({ ...d, name: e.target.value }))}
                 required
                 data-testid="register-name"
               />
             </div>
+
+            {userType === 'company' && (
+              <div>
+                <Label>Булстат (ЕИК) <span className="text-red-500">*</span></Label>
+                <Input 
+                  placeholder="123456789"
+                  value={formData.bulstat}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 9);
+                    setFormData(d => ({ ...d, bulstat: val }));
+                  }}
+                  maxLength={9}
+                  required
+                  data-testid="register-bulstat"
+                />
+                <p className="text-xs text-slate-500 mt-1">Задължително поле - 9 цифри</p>
+              </div>
+            )}
+
             <div>
               <Label>Имейл</Label>
               <Input 
@@ -1785,7 +1821,7 @@ const RegisterPage = () => {
               />
             </div>
 
-            {userType === 'company' && (
+            {isProUser && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3" data-testid="telegram-info-box">
                 <div className="flex items-center gap-2 mb-2">
                   <svg className="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.13l-1.97 9.28c-.15.66-.54.82-1.09.51l-3.01-2.22-1.45 1.4c-.16.16-.3.3-.61.3l.22-3.06 5.55-5.01c.24-.22-.05-.33-.37-.13l-6.86 4.32-2.95-.92c-.64-.2-.66-.64.14-.95l11.54-4.45c.53-.2 1-.05.86.93z"/></svg>
