@@ -2155,7 +2155,7 @@ const RegisterPage = () => {
               disabled={loading}
               data-testid="register-submit"
             >
-              {loading ? 'Регистриране...' : 'Регистрация'}
+              {loading ? t('reg_loading') : t('reg_submit')}
             </Button>
           </form>
         </CardContent>
