@@ -1,8 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Camera, Upload, Sparkles, Download, RefreshCw, ChevronDown, ExternalLink, Star, Play, Image, Loader2, X, CheckCircle } from 'lucide-react';
+import { Camera, Upload, Sparkles, Download, RefreshCw, ExternalLink, Star, Play, Image, Loader2, X, CheckCircle, FileText, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { PageInstructions } from './PageInstructions';
 import axios from 'axios';
@@ -24,15 +23,73 @@ const MATERIAL_CLASSES = [
 ];
 
 const VARIANTS = [
-  { count: 1, label: 'Вариант 1', desc: '1 проект' },
-  { count: 3, label: 'Вариант 3', desc: '3 проекта' },
-  { count: 5, label: 'Вариант 5', desc: '5 проекта' },
+  { count: 1, label: '1', desc: '1 проект' },
+  { count: 3, label: '3', desc: '3 проекта' },
+  { count: 5, label: '5', desc: '5 проекта' },
+];
+
+const ROOM_TYPES = [
+  { id: 'bathroom', name: 'Баня' },
+  { id: 'kitchen', name: 'Кухня' },
+  { id: 'living_room', name: 'Хол' },
+  { id: 'bedroom', name: 'Спалня' },
+  { id: 'kids_room', name: 'Детска стая' },
+  { id: 'office', name: 'Офис / Кабинет' },
+  { id: 'corridor', name: 'Коридор / Антре' },
+  { id: 'balcony', name: 'Балкон / Тераса' },
+  { id: 'other', name: 'Друго' },
+];
+
+const ANGLE_LABELS = ['Ъгъл 1 (Фронтален)', 'Ъгъл 2 (Ляв/Десен)', 'Ъгъл 3 (Обратен)'];
+
+// Video instruction data for each step
+const VIDEO_STEPS = [
+  {
+    title: 'Как да снимате помещението',
+    duration: '0:45',
+    points: [
+      'Снимайте от 3 различни ъгъла за пълно покритие',
+      'Използвайте добро осветление — включете всички лампи',
+      'Снимайте хоризонтално за по-добър резултат',
+      'Уловете подовата настилка, стените и тавана',
+    ]
+  },
+  {
+    title: 'Как да въведете параметри',
+    duration: '0:30',
+    points: [
+      'Измерете стаята с ролетка — ширина, дължина, височина',
+      'Изберете тип помещение от списъка',
+      'Добавете бележки за специални изисквания',
+    ]
+  },
+  {
+    title: 'Избор на стил и материали',
+    duration: '0:40',
+    points: [
+      'Изберете стил — всеки има различен характер',
+      'Класът материали определя бюджета',
+      'Повече варианти = повече избор за сравнение',
+    ]
+  },
+  {
+    title: 'Генериране и преглед',
+    duration: '0:50',
+    points: [
+      'Натиснете "Генерирай" и изчакайте 30-90 секунди',
+      'Сравнете "Преди" и "След" за всеки вариант',
+      'Разгледайте таблицата с материали и цени',
+      'Кликнете върху магазин за повече информация',
+    ]
+  },
 ];
 
 export const AIDesignerPage = () => {
   const [step, setStep] = useState(1);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  // 3 images from 3 angles
+  const [images, setImages] = useState([null, null, null]);
+  const [previews, setPreviews] = useState([null, null, null]);
+  const [roomType, setRoomType] = useState('bathroom');
   const [style, setStyle] = useState('modern');
   const [materialClass, setMaterialClass] = useState('standard');
   const [variants, setVariants] = useState(1);
@@ -41,10 +98,10 @@ export const AIDesignerPage = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
-  const [showVideo, setShowVideo] = useState(false);
-  const fileInputRef = useRef(null);
+  const [activeVideo, setActiveVideo] = useState(null);
+  const fileRefs = [useRef(null), useRef(null), useRef(null)];
 
-  const handleImageUpload = useCallback((e) => {
+  const handleImageUpload = useCallback((index, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
@@ -53,44 +110,54 @@ export const AIDesignerPage = () => {
     }
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setUploadedImage(ev.target.result);
-      setImagePreview(ev.target.result);
-      setStep(2);
+      setImages(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
+      setPreviews(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
     };
     reader.readAsDataURL(file);
   }, []);
 
+  const removeImage = (index) => {
+    setImages(prev => { const n = [...prev]; n[index] = null; return n; });
+    setPreviews(prev => { const n = [...prev]; n[index] = null; return n; });
+  };
+
+  const uploadedCount = images.filter(Boolean).length;
+  const canProceed = uploadedCount >= 1; // At least 1 image required, 3 recommended
+
   const handleGenerate = async () => {
-    if (!uploadedImage) {
-      toast.error('Моля, качете снимка');
+    if (uploadedCount === 0) {
+      toast.error('Качете поне 1 снимка');
       return;
     }
     setLoading(true);
-    setStep(4);
+    setStep(5);
     try {
+      const validImages = images.filter(Boolean);
       const res = await axios.post(`${API}/ai-designer/generate`, {
-        image: uploadedImage,
+        images: validImages,
+        image: validImages[0], // primary image for backward compat
         style,
         material_class: materialClass,
+        room_type: roomType,
         width: dimensions.width,
         length: dimensions.length,
         height: dimensions.height,
         variants,
         notes
-      }, { timeout: 180000 });
+      }, { timeout: 300000 });
       setResults(res.data);
       toast.success(`Генерирани ${res.data.generated_images?.length || 0} варианта!`);
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Грешка при генерация');
-      setStep(3);
+      toast.error(err.response?.data?.detail || 'Грешка при генерация. Опитайте отново.');
+      setStep(4);
     }
     setLoading(false);
   };
 
   const resetDesigner = () => {
     setStep(1);
-    setUploadedImage(null);
-    setImagePreview(null);
+    setImages([null, null, null]);
+    setPreviews([null, null, null]);
     setResults(null);
     setActiveImage(0);
   };
@@ -106,32 +173,32 @@ export const AIDesignerPage = () => {
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">AI Интериорен дизайнер</h1>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Качете снимка на вашето помещение и AI ще генерира нов дизайн в избрания от вас стил
+            Снимайте помещението от 3 ъгъла — AI генерира проект с максимална точност
           </p>
         </div>
 
         <PageInstructions
           title="Как да използвате AI Дизайнера"
-          description="Пълно ръководство стъпка по стъпка"
+          description="Пълно ръководство стъпка по стъпка — от снимка до готов проект"
           steps={[
-            'Качете снимка на помещението (JPG/PNG, до 10MB)',
-            'Въведете размери: дължина, ширина, височина в метри',
+            'Снимайте помещението от 3 различни ъгъла (JPG/PNG, до 10MB)',
+            'Изберете тип помещение и въведете размери (ширина, дължина, височина)',
             'Изберете стил: Модерен, Скандинавски, Лофт, Класически или Минималистичен',
             'Изберете клас материали: Икономичен, Стандартен или Премиум',
             'Изберете колко варианта искате: 1, 3 или 5',
-            'Натиснете "Генерирай" и изчакайте AI да създаде дизайна',
-            'Разгледайте резултатите: сравнение Преди/След, материали, цени'
+            'Натиснете "Генерирай" — AI анализира всичките снимки и създава дизайн',
+            'Разгледайте "Преди/След", таблица с материали, цени и линкове към магазини'
           ]}
           benefits={[
-            'AI анализира ВАШАТА снимка и генерира дизайн на СЪЩОТО помещение',
-            'Списък с материали и реални цени от български магазини',
-            'Линкове към Praktiker, Bauhaus, IKEA, Mr. Bricolage и други',
+            '3 снимки от различни ъгли = по-точен анализ на помещението',
+            'AI генерира дизайн на ВАШЕТО помещение, не на случайна стая',
+            'Списък с материали и реални цени от 18 български магазина',
             'Безплатно в тестов режим — без ограничения'
           ]}
           tips={[
-            'Използвайте снимка с добро осветление за по-точен анализ',
-            'Опитайте различни стилове за да сравните варианти',
-            'Добавете бележки за специални изисквания'
+            'Снимайте с добро осветление за по-точен резултат',
+            'Включете подовата настилка, стените и тавана в снимките',
+            'Добавете бележки ако искате нещо специално (вана, душ-кабина и т.н.)'
           ]}
           videoUrl="https://temadom.com/videos/ai-designer"
         />
@@ -139,122 +206,224 @@ export const AIDesignerPage = () => {
         {/* Test mode banner */}
         <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-xl p-4 mb-8 text-center">
           <p className="text-[#FF8C42] font-bold text-sm">
-            ТЕСТОВ РЕЖИМ — AI Дизайнер е безплатен и без ограничения
+            ТЕСТОВ РЕЖИМ — AI Дизайнер безплатен и без ограничения
           </p>
           <p className="text-slate-400 text-xs mt-1">
-            AI Designer е отделен платен модул. В тестовия период е достъпен за всички потребители.
+            AI Designer е отделен платен модул. В тестовия период е достъпен за всички.
           </p>
         </div>
 
         {/* Step indicator */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          {[1, 2, 3, 4].map(s => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                step >= s ? 'bg-[#FF8C42] text-white' : 'bg-[#253545] text-slate-500'
-              }`} data-testid={`step-${s}`}>
-                {step > s ? <CheckCircle className="h-4 w-4" /> : s}
-              </div>
-              {s < 4 && <div className={`w-12 h-0.5 ${step > s ? 'bg-[#FF8C42]' : 'bg-[#3A4A5C]'}`} />}
+        <div className="flex items-center justify-center gap-1 mb-8 flex-wrap">
+          {['Снимки', 'Параметри', 'Стил', 'Варианти', 'Резултат'].map((label, s) => (
+            <div key={s} className="flex items-center gap-1">
+              <button
+                onClick={() => { if (s + 1 < step || (s + 1 <= 4 && uploadedCount > 0)) setStep(s + 1); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  step === s + 1 ? 'bg-[#FF8C42] text-white' : step > s + 1 ? 'bg-[#28A745]/20 text-[#28A745]' : 'bg-[#253545] text-slate-500'
+                }`}
+                data-testid={`step-${s + 1}`}
+              >
+                {step > s + 1 ? <CheckCircle className="h-3 w-3" /> : <span>{s + 1}</span>}
+                <span className="hidden sm:inline">{label}</span>
+              </button>
+              {s < 4 && <ChevronRight className="h-3 w-3 text-[#3A4A5C]" />}
             </div>
           ))}
         </div>
 
-        {/* ===== STEP 1: Upload Photo ===== */}
+        {/* ===== VIDEO INSTRUCTIONS PANEL ===== */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <Play className="h-4 w-4 text-[#FF8C42]" />
+            <h3 className="text-white font-semibold text-sm">Видео инструкции</h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {VIDEO_STEPS.map((vid, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveVideo(activeVideo === i ? null : i)}
+                className={`p-3 rounded-xl border text-left transition-all ${
+                  activeVideo === i ? 'border-[#FF8C42] bg-[#FF8C42]/10' : 'border-[#3A4A5C] bg-[#253545] hover:border-[#4DA6FF]/50'
+                }`}
+                data-testid={`video-step-${i}`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-7 h-7 rounded-full bg-[#FF8C42]/15 flex items-center justify-center">
+                    <Play className="h-3 w-3 text-[#FF8C42]" />
+                  </div>
+                  <span className="text-slate-500 text-[10px]">{vid.duration}</span>
+                </div>
+                <p className="text-white text-xs font-medium leading-tight">{vid.title}</p>
+              </button>
+            ))}
+          </div>
+          {activeVideo !== null && (
+            <div className="mt-3 bg-[#253545] border border-[#3A4A5C] rounded-xl p-4 animate-slideDown" data-testid="video-content">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-[#FF8C42]/15 flex items-center justify-center">
+                  <Play className="h-5 w-5 text-[#FF8C42]" />
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold text-sm">{VIDEO_STEPS[activeVideo].title}</h4>
+                  <p className="text-slate-500 text-xs">{VIDEO_STEPS[activeVideo].duration}</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {VIDEO_STEPS[activeVideo].points.map((p, j) => (
+                  <div key={j} className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#FF8C42]/15 text-[#FF8C42] text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                      {j + 1}
+                    </span>
+                    <p className="text-slate-300 text-sm">{p}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ===== STEP 1: Upload 3 Photos ===== */}
         {step === 1 && (
-          <Card className="bg-[#253545] border-[#3A4A5C] max-w-2xl mx-auto" data-testid="upload-section">
+          <Card className="bg-[#253545] border-[#3A4A5C]" data-testid="upload-section">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <Camera className="h-5 w-5 text-[#FF8C42]" />
-                Стъпка 1: Качете снимка на помещението
+                Стъпка 1: Снимайте от 3 ъгъла
               </CardTitle>
+              <p className="text-slate-400 text-sm mt-1">
+                Качете снимки от 3 различни ъгъла за максимална точност. Минимум 1 снимка.
+              </p>
             </CardHeader>
             <CardContent>
-              <div
-                className="border-2 border-dashed border-[#3A4A5C] rounded-xl p-12 text-center cursor-pointer hover:border-[#FF8C42]/50 transition-colors"
-                onClick={() => fileInputRef.current?.click()}
-                data-testid="upload-area"
-              >
-                <Upload className="h-12 w-12 text-[#4DA6FF] mx-auto mb-4" />
-                <p className="text-white font-medium mb-2">Кликнете или плъзнете снимка тук</p>
-                <p className="text-slate-400 text-sm">JPG, PNG — до 10 MB</p>
+              <div className="grid md:grid-cols-3 gap-4">
+                {[0, 1, 2].map(idx => (
+                  <div key={idx}>
+                    <p className="text-slate-400 text-xs mb-2 font-medium">{ANGLE_LABELS[idx]}</p>
+                    {previews[idx] ? (
+                      <div className="relative rounded-xl overflow-hidden border border-[#3A4A5C]">
+                        <img src={previews[idx]} alt={`Angle ${idx + 1}`} className="w-full h-48 object-cover" data-testid={`preview-${idx}`} />
+                        <button
+                          onClick={() => removeImage(idx)}
+                          className="absolute top-2 right-2 bg-black/60 text-white p-1.5 rounded-full hover:bg-[#DC3545]"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        <div className="absolute bottom-2 left-2 bg-[#28A745] text-white text-[10px] px-2 py-0.5 rounded-full font-medium">
+                          <CheckCircle className="h-3 w-3 inline mr-1" />Качена
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className="border-2 border-dashed border-[#3A4A5C] rounded-xl h-48 flex flex-col items-center justify-center cursor-pointer hover:border-[#FF8C42]/50 transition-colors"
+                        onClick={() => fileRefs[idx].current?.click()}
+                        data-testid={`upload-area-${idx}`}
+                      >
+                        <Upload className="h-8 w-8 text-[#4DA6FF] mb-2" />
+                        <p className="text-slate-400 text-xs">{idx === 0 ? 'Задължителна' : 'Препоръчителна'}</p>
+                      </div>
+                    )}
+                    <input
+                      ref={fileRefs[idx]}
+                      type="file"
+                      accept="image/jpeg,image/png"
+                      className="hidden"
+                      onChange={(e) => handleImageUpload(idx, e)}
+                      data-testid={`file-input-${idx}`}
+                    />
+                  </div>
+                ))}
               </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png"
-                className="hidden"
-                onChange={handleImageUpload}
-                data-testid="file-input"
-              />
+
+              <div className="flex items-center justify-between mt-6">
+                <p className="text-sm text-slate-400">
+                  Качени: <span className="text-[#FF8C42] font-bold">{uploadedCount}/3</span>
+                  {uploadedCount < 3 && uploadedCount > 0 && <span className="text-slate-500 ml-2">(може да продължите)</span>}
+                </p>
+                <Button
+                  className="bg-[#FF8C42] hover:bg-[#e67a30] text-white"
+                  onClick={() => setStep(2)}
+                  disabled={!canProceed}
+                  data-testid="next-to-params"
+                >
+                  Напред: Параметри <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
 
         {/* ===== STEP 2: Parameters ===== */}
         {step === 2 && (
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Uploaded image preview */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Thumbnails of uploaded images */}
             <Card className="bg-[#253545] border-[#3A4A5C]">
               <CardHeader>
                 <CardTitle className="text-white text-sm flex items-center gap-2">
                   <Image className="h-4 w-4 text-[#4DA6FF]" />
-                  Качена снимка
+                  Качени снимки ({uploadedCount})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {imagePreview && (
-                  <div className="relative">
-                    <img src={imagePreview} alt="Uploaded room" className="w-full rounded-lg" data-testid="preview-image" />
-                    <button
-                      onClick={resetDesigner}
-                      className="absolute top-2 right-2 bg-black/60 text-white p-1.5 rounded-full hover:bg-black/80"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
+                <div className="grid grid-cols-3 gap-2">
+                  {previews.map((p, i) => (
+                    <div key={i} className={`rounded-lg overflow-hidden border ${p ? 'border-[#28A745]/50' : 'border-[#3A4A5C]'} h-24`}>
+                      {p ? (
+                        <img src={p} alt={`Angle ${i+1}`} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-[#1E2A38] flex items-center justify-center">
+                          <Camera className="h-5 w-5 text-[#3A4A5C]" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
-            {/* Parameters */}
+            {/* Parameters form */}
             <Card className="bg-[#253545] border-[#3A4A5C]">
               <CardHeader>
                 <CardTitle className="text-white text-sm">Параметри на помещението</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="text-slate-400 text-xs block mb-1">Ширина (м)</label>
-                    <input
-                      type="number" step="0.1" value={dimensions.width}
-                      onChange={(e) => setDimensions(d => ({ ...d, width: e.target.value }))}
-                      className="w-full bg-[#1E2A38] border border-[#3A4A5C] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FF8C42] focus:outline-none"
-                      data-testid="input-width"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-slate-400 text-xs block mb-1">Дължина (м)</label>
-                    <input
-                      type="number" step="0.1" value={dimensions.length}
-                      onChange={(e) => setDimensions(d => ({ ...d, length: e.target.value }))}
-                      className="w-full bg-[#1E2A38] border border-[#3A4A5C] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FF8C42] focus:outline-none"
-                      data-testid="input-length"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-slate-400 text-xs block mb-1">Височина (м)</label>
-                    <input
-                      type="number" step="0.1" value={dimensions.height}
-                      onChange={(e) => setDimensions(d => ({ ...d, height: e.target.value }))}
-                      className="w-full bg-[#1E2A38] border border-[#3A4A5C] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FF8C42] focus:outline-none"
-                      data-testid="input-height"
-                    />
-                  </div>
+                {/* Room type */}
+                <div>
+                  <label className="text-slate-400 text-xs block mb-1">Тип помещение</label>
+                  <select
+                    value={roomType}
+                    onChange={(e) => setRoomType(e.target.value)}
+                    className="w-full bg-[#1E2A38] border border-[#3A4A5C] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FF8C42] focus:outline-none"
+                    data-testid="room-type-select"
+                  >
+                    {ROOM_TYPES.map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
                 </div>
 
+                {/* Dimensions */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { key: 'width', label: 'Ширина (м)' },
+                    { key: 'length', label: 'Дължина (м)' },
+                    { key: 'height', label: 'Височина (м)' },
+                  ].map(d => (
+                    <div key={d.key}>
+                      <label className="text-slate-400 text-xs block mb-1">{d.label}</label>
+                      <input
+                        type="number" step="0.1" value={dimensions[d.key]}
+                        onChange={(e) => setDimensions(prev => ({ ...prev, [d.key]: e.target.value }))}
+                        className="w-full bg-[#1E2A38] border border-[#3A4A5C] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FF8C42] focus:outline-none"
+                        data-testid={`input-${d.key}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Notes */}
                 <div>
-                  <label className="text-slate-400 text-xs block mb-2">Допълнителни бележки</label>
+                  <label className="text-slate-400 text-xs block mb-1">Допълнителни бележки</label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
@@ -265,22 +434,22 @@ export const AIDesignerPage = () => {
                   />
                 </div>
 
-                <Button
-                  className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white"
-                  onClick={() => setStep(3)}
-                  data-testid="next-to-style"
-                >
-                  Напред: Избор на стил
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="border-[#3A4A5C] text-slate-300 hover:bg-[#1E2A38]" onClick={() => setStep(1)}>
+                    Назад
+                  </Button>
+                  <Button className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={() => setStep(3)} data-testid="next-to-style">
+                    Напред: Стил <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* ===== STEP 3: Style + Material + Variants ===== */}
+        {/* ===== STEP 3: Style ===== */}
         {step === 3 && (
-          <div className="max-w-4xl mx-auto space-y-6">
-            {/* Style selection */}
+          <div className="space-y-6 max-w-4xl mx-auto">
             <Card className="bg-[#253545] border-[#3A4A5C]">
               <CardHeader>
                 <CardTitle className="text-white text-sm">Изберете стил</CardTitle>
@@ -291,26 +460,23 @@ export const AIDesignerPage = () => {
                     <button
                       key={s.id}
                       onClick={() => setStyle(s.id)}
-                      className={`p-3 rounded-xl border-2 text-center transition-all ${
-                        style === s.id
-                          ? 'border-[#FF8C42] bg-[#FF8C42]/10'
-                          : 'border-[#3A4A5C] hover:border-[#4DA6FF]/50'
+                      className={`p-4 rounded-xl border-2 text-center transition-all ${
+                        style === s.id ? 'border-[#FF8C42] bg-[#FF8C42]/10' : 'border-[#3A4A5C] hover:border-[#4DA6FF]/50'
                       }`}
                       data-testid={`style-${s.id}`}
                     >
-                      <div className="w-8 h-8 rounded-full mx-auto mb-2" style={{ backgroundColor: s.color + '30', border: `2px solid ${s.color}` }} />
+                      <div className="w-10 h-10 rounded-full mx-auto mb-2" style={{ backgroundColor: s.color + '25', border: `2px solid ${s.color}` }} />
                       <p className="text-white text-xs font-medium">{s.name}</p>
-                      <p className="text-slate-500 text-[10px]">{s.desc}</p>
+                      <p className="text-slate-500 text-[10px] mt-0.5">{s.desc}</p>
                     </button>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Material class */}
             <Card className="bg-[#253545] border-[#3A4A5C]">
               <CardHeader>
-                <CardTitle className="text-white text-sm">Клас материали</CardTitle>
+                <CardTitle className="text-white text-sm">Клас материали / оборудване</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-3">
@@ -319,13 +485,11 @@ export const AIDesignerPage = () => {
                       key={m.id}
                       onClick={() => setMaterialClass(m.id)}
                       className={`p-4 rounded-xl border-2 text-center transition-all ${
-                        materialClass === m.id
-                          ? 'border-[#FF8C42] bg-[#FF8C42]/10'
-                          : 'border-[#3A4A5C] hover:border-[#4DA6FF]/50'
+                        materialClass === m.id ? 'border-[#FF8C42] bg-[#FF8C42]/10' : 'border-[#3A4A5C] hover:border-[#4DA6FF]/50'
                       }`}
                       data-testid={`material-${m.id}`}
                     >
-                      <div className="w-10 h-10 rounded-full bg-[#FF8C42]/15 text-[#FF8C42] flex items-center justify-center mx-auto mb-2 font-bold">
+                      <div className="w-10 h-10 rounded-full bg-[#FF8C42]/15 text-[#FF8C42] flex items-center justify-center mx-auto mb-2 font-bold text-lg">
                         {m.icon}
                       </div>
                       <p className="text-white text-sm font-medium">{m.name}</p>
@@ -336,10 +500,23 @@ export const AIDesignerPage = () => {
               </CardContent>
             </Card>
 
-            {/* Variants */}
+            <div className="flex gap-2">
+              <Button variant="outline" className="border-[#3A4A5C] text-slate-300 hover:bg-[#253545]" onClick={() => setStep(2)}>
+                Назад
+              </Button>
+              <Button className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={() => setStep(4)} data-testid="next-to-variants">
+                Напред: Варианти <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ===== STEP 4: Variants + Generate ===== */}
+        {step === 4 && (
+          <div className="max-w-3xl mx-auto space-y-6">
             <Card className="bg-[#253545] border-[#3A4A5C]">
               <CardHeader>
-                <CardTitle className="text-white text-sm">Брой варианти</CardTitle>
+                <CardTitle className="text-white text-sm">Брой варианти за генерация</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-3">
@@ -347,24 +524,37 @@ export const AIDesignerPage = () => {
                     <button
                       key={v.count}
                       onClick={() => setVariants(v.count)}
-                      className={`p-4 rounded-xl border-2 text-center transition-all ${
-                        variants === v.count
-                          ? 'border-[#FF8C42] bg-[#FF8C42]/10'
-                          : 'border-[#3A4A5C] hover:border-[#4DA6FF]/50'
+                      className={`p-5 rounded-xl border-2 text-center transition-all ${
+                        variants === v.count ? 'border-[#FF8C42] bg-[#FF8C42]/10' : 'border-[#3A4A5C] hover:border-[#4DA6FF]/50'
                       }`}
                       data-testid={`variant-${v.count}`}
                     >
-                      <p className="text-2xl font-bold text-white">{v.count}</p>
-                      <p className="text-slate-400 text-xs">{v.desc}</p>
+                      <p className="text-3xl font-bold text-white">{v.count}</p>
+                      <p className="text-slate-400 text-xs mt-1">{v.desc}</p>
                     </button>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Generate button */}
+            {/* Summary before generation */}
+            <Card className="bg-gradient-to-r from-[#8C56FF]/10 to-[#4DA6FF]/10 border-[#8C56FF]/20">
+              <CardContent className="p-5">
+                <h4 className="text-white font-semibold text-sm mb-3">Обобщение на проекта</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-slate-400">Снимки:</span> <span className="text-white font-medium">{uploadedCount} от 3</span></div>
+                  <div><span className="text-slate-400">Помещение:</span> <span className="text-white font-medium">{ROOM_TYPES.find(r => r.id === roomType)?.name}</span></div>
+                  <div><span className="text-slate-400">Размери:</span> <span className="text-white font-medium">{dimensions.width} x {dimensions.length} x {dimensions.height} м</span></div>
+                  <div><span className="text-slate-400">Стил:</span> <span className="text-white font-medium">{STYLES.find(s => s.id === style)?.name}</span></div>
+                  <div><span className="text-slate-400">Материали:</span> <span className="text-white font-medium">{MATERIAL_CLASSES.find(m => m.id === materialClass)?.name}</span></div>
+                  <div><span className="text-slate-400">Варианти:</span> <span className="text-white font-medium">{variants}</span></div>
+                </div>
+                {notes && <div className="mt-2"><span className="text-slate-400 text-sm">Бележки:</span> <span className="text-slate-300 text-sm">{notes}</span></div>}
+              </CardContent>
+            </Card>
+
             <div className="flex gap-3">
-              <Button variant="outline" className="border-[#3A4A5C] text-slate-300 hover:bg-[#253545]" onClick={() => setStep(2)}>
+              <Button variant="outline" className="border-[#3A4A5C] text-slate-300 hover:bg-[#253545]" onClick={() => setStep(3)}>
                 Назад
               </Button>
               <Button
@@ -379,8 +569,8 @@ export const AIDesignerPage = () => {
           </div>
         )}
 
-        {/* ===== STEP 4: Results / Loading ===== */}
-        {step === 4 && (
+        {/* ===== STEP 5: Results / Loading ===== */}
+        {step === 5 && (
           <div className="max-w-5xl mx-auto">
             {loading ? (
               <div className="text-center py-20" data-testid="loading-state">
@@ -388,42 +578,50 @@ export const AIDesignerPage = () => {
                   <Loader2 className="h-10 w-10 text-[#8C56FF] animate-spin" />
                 </div>
                 <h3 className="text-white text-xl font-bold mb-2">AI генерира вашия дизайн...</h3>
-                <p className="text-slate-400">Това може да отнеме 30-90 секунди. Моля, изчакайте.</p>
+                <p className="text-slate-400 mb-1">Анализ на {uploadedCount} снимки от различни ъгли</p>
+                <p className="text-slate-500 text-sm">Това може да отнеме 30-120 секунди</p>
                 <div className="mt-6 max-w-xs mx-auto">
                   <div className="h-2 bg-[#253545] rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-[#8C56FF] to-[#FF8C42] rounded-full animate-pulse" style={{ width: '70%' }} />
+                    <div className="h-full bg-gradient-to-r from-[#8C56FF] to-[#FF8C42] rounded-full animate-pulse" style={{ width: '60%' }} />
                   </div>
                 </div>
               </div>
             ) : results ? (
               <div className="space-y-8">
-                {/* Before/After comparison */}
+                {/* Before/After */}
                 <Card className="bg-[#253545] border-[#3A4A5C] overflow-hidden">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                       <Image className="h-5 w-5 text-[#4DA6FF]" />
-                      Преди и след — {results.room_analysis?.room_type || 'Помещение'}
+                      Преди и след — {results.room_analysis?.room_type || ROOM_TYPES.find(r => r.id === roomType)?.name}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid md:grid-cols-2 gap-4">
-                      {/* Before */}
                       <div>
-                        <p className="text-slate-400 text-xs mb-2 font-medium uppercase tracking-wider">Преди</p>
+                        <p className="text-slate-400 text-xs mb-2 font-medium uppercase tracking-wider">Преди (Оригинал)</p>
                         <div className="rounded-xl overflow-hidden border border-[#3A4A5C]">
-                          {imagePreview && <img src={imagePreview} alt="Before" className="w-full" data-testid="before-image" />}
+                          {previews[0] && <img src={previews[0]} alt="Before" className="w-full" data-testid="before-image" />}
                         </div>
+                        {uploadedCount > 1 && (
+                          <div className="flex gap-2 mt-2">
+                            {previews.filter(Boolean).slice(1).map((p, i) => (
+                              <div key={i} className="w-16 h-12 rounded-lg overflow-hidden border border-[#3A4A5C]">
+                                <img src={p} alt={`Angle ${i+2}`} className="w-full h-full object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      {/* After */}
                       <div>
                         <p className="text-[#FF8C42] text-xs mb-2 font-medium uppercase tracking-wider">
-                          След — Вариант {activeImage + 1}
+                          След — Вариант {activeImage + 1} / {results.generated_images?.length || 0}
                         </p>
                         <div className="rounded-xl overflow-hidden border border-[#FF8C42]/30">
                           {results.generated_images?.[activeImage] && (
                             <img
                               src={`data:image/png;base64,${results.generated_images[activeImage].image_base64}`}
-                              alt={`Design variant ${activeImage + 1}`}
+                              alt={`Design ${activeImage + 1}`}
                               className="w-full"
                               data-testid="after-image"
                             />
@@ -432,7 +630,6 @@ export const AIDesignerPage = () => {
                       </div>
                     </div>
 
-                    {/* Variant selector */}
                     {results.generated_images?.length > 1 && (
                       <div className="flex gap-2 mt-4 justify-center">
                         {results.generated_images.map((img, i) => (
@@ -444,11 +641,7 @@ export const AIDesignerPage = () => {
                             }`}
                             data-testid={`variant-thumb-${i}`}
                           >
-                            <img
-                              src={`data:image/png;base64,${img.image_base64}`}
-                              alt={`Variant ${i + 1}`}
-                              className="w-full h-full object-cover"
-                            />
+                            <img src={`data:image/png;base64,${img.image_base64}`} alt={`V${i+1}`} className="w-full h-full object-cover" />
                           </button>
                         ))}
                       </div>
@@ -461,17 +654,17 @@ export const AIDesignerPage = () => {
                   <Card className="bg-[#253545] border-[#3A4A5C]">
                     <CardHeader>
                       <CardTitle className="text-white text-sm flex items-center gap-2">
-                        <Star className="h-4 w-4 text-[#FF8C42]" />
-                        Списък материали и цени
+                        <FileText className="h-4 w-4 text-[#FF8C42]" />
+                        Материали, оборудване и цени
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
+                        <table className="w-full text-sm" data-testid="materials-table">
                           <thead>
                             <tr className="border-b border-[#3A4A5C]">
                               <th className="text-left py-2 text-slate-400 font-medium">Материал</th>
-                              <th className="text-left py-2 text-slate-400 font-medium">Количество</th>
+                              <th className="text-left py-2 text-slate-400 font-medium">Кол-во</th>
                               <th className="text-right py-2 text-slate-400 font-medium">Ед. цена</th>
                               <th className="text-right py-2 text-slate-400 font-medium">Общо</th>
                               <th className="text-right py-2 text-slate-400 font-medium">Магазин</th>
@@ -479,14 +672,14 @@ export const AIDesignerPage = () => {
                           </thead>
                           <tbody>
                             {results.materials.materials.map((m, i) => (
-                              <tr key={i} className="border-b border-[#3A4A5C]/50">
+                              <tr key={i} className="border-b border-[#3A4A5C]/50 hover:bg-[#1E2A38]/50">
                                 <td className="py-2 text-white">{m.name}</td>
                                 <td className="py-2 text-slate-300">{m.quantity} {m.unit}</td>
                                 <td className="py-2 text-slate-300 text-right">{m.price_per_unit}</td>
                                 <td className="py-2 text-[#FF8C42] font-medium text-right">{m.total_price}</td>
                                 <td className="py-2 text-right">
                                   {m.store_url ? (
-                                    <a href={m.store_url} target="_blank" rel="noopener noreferrer" className="text-[#4DA6FF] hover:underline text-xs flex items-center justify-end gap-1">
+                                    <a href={m.store_url} target="_blank" rel="noopener noreferrer" className="text-[#4DA6FF] hover:underline text-xs inline-flex items-center gap-1">
                                       {m.store} <ExternalLink className="h-3 w-3" />
                                     </a>
                                   ) : (
@@ -498,20 +691,20 @@ export const AIDesignerPage = () => {
                           </tbody>
                           <tfoot>
                             <tr className="border-t-2 border-[#FF8C42]/30">
-                              <td colSpan="3" className="py-3 text-white font-bold">Обща стойност материали:</td>
+                              <td colSpan="3" className="py-3 text-white font-bold">Материали:</td>
                               <td className="py-3 text-[#FF8C42] font-bold text-right text-lg">{results.materials.total_estimate}</td>
                               <td />
                             </tr>
                             {results.materials.labor_estimate && (
                               <tr>
-                                <td colSpan="3" className="py-1 text-slate-300">Труд (приблизително):</td>
+                                <td colSpan="3" className="py-1 text-slate-300">Труд:</td>
                                 <td className="py-1 text-slate-300 text-right">{results.materials.labor_estimate}</td>
                                 <td />
                               </tr>
                             )}
                             {results.materials.grand_total && (
                               <tr className="border-t border-[#3A4A5C]">
-                                <td colSpan="3" className="py-3 text-white font-bold text-lg">ОБЩО:</td>
+                                <td colSpan="3" className="py-3 text-white font-bold text-lg">ОБЩА СТОЙНОСТ:</td>
                                 <td className="py-3 text-[#28A745] font-bold text-right text-xl">{results.materials.grand_total}</td>
                                 <td />
                               </tr>
@@ -529,7 +722,7 @@ export const AIDesignerPage = () => {
                     <CardHeader>
                       <CardTitle className="text-white text-sm flex items-center gap-2">
                         <ExternalLink className="h-4 w-4 text-[#4DA6FF]" />
-                        Магазини за материали и оборудване
+                        Магазини за материали, техника и оборудване
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -540,10 +733,10 @@ export const AIDesignerPage = () => {
                             href={store.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 p-3 rounded-lg bg-[#1E2A38] border border-[#3A4A5C] hover:border-[#FF8C42]/50 transition-colors"
+                            className="flex items-center gap-2 p-3 rounded-lg bg-[#1E2A38] border border-[#3A4A5C] hover:border-[#FF8C42]/50 transition-colors group"
                             data-testid={`store-${i}`}
                           >
-                            <div className="w-8 h-8 rounded-full bg-[#FF8C42]/10 flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-[#FF8C42]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#FF8C42]/20">
                               <ExternalLink className="h-4 w-4 text-[#FF8C42]" />
                             </div>
                             <div className="min-w-0">
@@ -557,7 +750,7 @@ export const AIDesignerPage = () => {
                   </Card>
                 )}
 
-                {/* Action buttons */}
+                {/* CTA buttons */}
                 <div className="flex flex-wrap gap-3 justify-center">
                   <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={resetDesigner} data-testid="new-design-btn">
                     <RefreshCw className="mr-2 h-4 w-4" /> Нов дизайн

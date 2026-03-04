@@ -2292,50 +2292,72 @@ AI_MATERIAL_CLASS = {
 
 @api_router.post("/ai-designer/generate")
 async def generate_ai_design(request: Request):
-    """Generate AI interior design based on uploaded room photo"""
+    """Generate AI interior design based on uploaded room photos (1-3 angles)"""
     data = await request.json()
     
-    image_base64 = data.get("image")
+    # Support both single image and multiple images
+    images_list = data.get("images", [])
+    single_image = data.get("image")
+    if not images_list and single_image:
+        images_list = [single_image]
+    
     style = data.get("style", "modern")
     material_class = data.get("material_class", "standard")
+    room_type_id = data.get("room_type", "bathroom")
     room_width = data.get("width", "4")
     room_length = data.get("length", "5")
     room_height = data.get("height", "2.6")
     variants = data.get("variants", 1)
     notes = data.get("notes", "")
     
-    if not image_base64:
-        raise HTTPException(status_code=400, detail="Снимката е задължителна")
+    if not images_list:
+        raise HTTPException(status_code=400, detail="Качете поне 1 снимка")
     
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
     
-    # Clean base64
-    if "," in image_base64:
-        image_base64 = image_base64.split(",")[1]
+    # Clean base64 for all images
+    cleaned_images = []
+    for img in images_list:
+        if img and "," in img:
+            cleaned_images.append(img.split(",")[1])
+        elif img:
+            cleaned_images.append(img)
+    
+    if not cleaned_images:
+        raise HTTPException(status_code=400, detail="Невалидни снимки")
     
     style_desc = AI_STYLES.get(style, AI_STYLES["modern"])
     material_desc = AI_MATERIAL_CLASS.get(material_class, AI_MATERIAL_CLASS["standard"])
     
+    ROOM_TYPE_NAMES = {
+        "bathroom": "баня", "kitchen": "кухня", "living_room": "хол",
+        "bedroom": "спалня", "kids_room": "детска стая", "office": "офис",
+        "corridor": "коридор", "balcony": "балкон/тераса", "other": "помещение"
+    }
+    room_type_name = ROOM_TYPE_NAMES.get(room_type_id, "помещение")
+    
     try:
-        # Step 1: Analyze the uploaded photo with GPT to understand the room
+        # Step 1: Analyze ALL uploaded photos with GPT for comprehensive understanding
         analysis_chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"ai-designer-{uuid.uuid4()}",
-            system_message="""Ти си експерт интериорен дизайнер. Анализирай снимката на помещението и опиши ТОЧНО какво виждаш:
-- Тип помещение (баня, кухня, хол, спалня, коридор)
-- Текущо състояние и елементи
-- Размери и пропорции
-- Осветление (естествено/изкуствено)
-- Цветове и материали
-- Мебели и оборудване
+            system_message=f"""Ти си експерт интериорен дизайнер. Получаваш {len(cleaned_images)} снимки на {room_type_name} от различни ъгли.
+Анализирай ВСИЧКИ снимки заедно и опиши ТОЧНО какво виждаш:
+- Тип помещение и текущо състояние
+- Конкретни елементи: плочки, стени, мебели, тоалетна, вана/душ, мивка, осветление
+- Цветове, материали, пропорции
+- Какво може да се подобри
+
 Отговори в JSON формат:
-{"room_type": "...", "current_state": "...", "elements": [...], "lighting": "...", "colors": [...], "furniture": [...], "description": "кратко описание на помещението на английски за генерация на снимка"}"""
+{{"room_type": "{room_type_name}", "current_state": "детайлно описание", "elements": ["списък на всички елементи"], "lighting": "тип осветление", "colors": ["цветове"], "furniture": ["мебели/оборудване"], "layout": "описание на разпределението", "description": "detailed description in English of the exact room for image generation - include specific elements, materials, colors, layout, fixtures visible in the photos"}}"""
         ).with_model("openai", "gpt-4o")
         
+        # Build message with all images
+        image_contents = [ImageContent(image_base64=img) for img in cleaned_images]
         analysis_msg = UserMessage(
-            text="Анализирай тази снимка на помещение. Опиши ТОЧНО какво виждаш.",
-            file_contents=[ImageContent(image_base64=image_base64)]
+            text=f"Анализирай тези {len(cleaned_images)} снимки на {room_type_name}. Опиши ТОЧНО какво виждаш от всеки ъгъл.",
+            file_contents=image_contents
         )
         
         analysis_response = await analysis_chat.send_message(analysis_msg)
@@ -2349,10 +2371,10 @@ async def generate_ai_design(request: Request):
             else:
                 room_analysis = json_module.loads(analysis_response)
         except:
-            room_analysis = {"room_type": "помещение", "description": "interior room photo", "current_state": "needs renovation"}
+            room_analysis = {"room_type": room_type_name, "description": f"a {room_type_name} interior", "current_state": "needs renovation"}
         
-        room_desc = room_analysis.get("description", "a room interior")
-        room_type = room_analysis.get("room_type", "помещение")
+        room_desc = room_analysis.get("description", f"a {room_type_name} interior")
+        room_type = room_analysis.get("room_type", room_type_name)
         
         # Step 2: Generate design images using GPT Image 1
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
@@ -2360,13 +2382,23 @@ async def generate_ai_design(request: Request):
         generated_images = []
         variants_count = min(int(variants), 5)
         
+        variant_focuses = [
+            "Focus on warm tones, cozy atmosphere, soft lighting",
+            "Focus on light, airy, spacious feel with bright colors",
+            "Focus on bold design choices, high contrast, statement pieces",
+            "Focus on natural materials, wood, stone, organic textures",
+            "Focus on luxury premium finishes, marble, brass, designer fixtures"
+        ]
+        
         for i in range(variants_count):
-            variant_prompt = f"""Professional interior design photograph of {room_desc}, redesigned in {style_desc} with {material_desc}. 
-Room dimensions: {room_width}m x {room_length}m, height {room_height}m.
-The design should show the SAME room layout but completely renovated with new furniture, materials, and decoration.
-{f'Additional requirements: {notes}' if notes else ''}
-Variant {i+1}: {'Focus on warm tones and cozy atmosphere' if i == 0 else 'Focus on light and spacious feel' if i == 1 else 'Focus on bold design choices and contrast' if i == 2 else 'Focus on natural materials and textures' if i == 3 else 'Focus on luxury and premium finishes'}.
-Ultra-realistic, professional interior photography, 8K quality, perfect lighting."""
+            variant_prompt = f"""Professional interior design photograph of {room_desc}.
+This is a {room_type_name} with dimensions {room_width}m x {room_length}m, height {room_height}m.
+Redesigned in {style_desc} with {material_desc}.
+The design must show the SAME room layout and proportions but completely renovated.
+Keep the same basic structure (walls, windows, doors in same positions).
+{f'Special requirements: {notes}' if notes else ''}
+{variant_focuses[i % len(variant_focuses)]}.
+Ultra-realistic professional interior photography, 8K quality, perfect lighting, photorealistic materials and textures."""
             
             images = await image_gen.generate_images(
                 prompt=variant_prompt,
@@ -2386,8 +2418,11 @@ Ultra-realistic, professional interior photography, 8K quality, perfect lighting
         materials_chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"materials-{uuid.uuid4()}",
-            system_message="""Ти си експерт по строителни материали в България. Генерирай списък с материали и цени за ремонт на помещение.
-Отговори в JSON формат:
+            system_message="""Ти си експерт по строителни материали и интериорен дизайн в България.
+Генерирай ДЕТАЙЛЕН списък с всички материали, оборудване и цени за ремонт.
+Включи ВСИЧКО: подови настилки, стенни покрития, мебели, осветление, санитарно оборудване, аксесоари, електроуреди.
+
+Отговори САМО в JSON формат:
 {
   "materials": [
     {"name": "...", "quantity": "...", "unit": "...", "price_per_unit": "...", "total_price": "...", "store": "...", "store_url": "..."}
@@ -2396,16 +2431,16 @@ Ultra-realistic, professional interior photography, 8K quality, perfect lighting
   "labor_estimate": "...",
   "grand_total": "..."
 }
-Използвай РЕАЛНИ цени от български магазини (Praktiker, Bauhaus, Mr. Bricolage, IKEA, Homemax, Bricoman, Jysk, Emag, Technopolis)."""
+Използвай РЕАЛНИ цени в лева (BGN) от: Praktiker, Bauhaus, Mr. Bricolage, IKEA, Homemax, Bricoman, Jysk, Emag, Technopolis, Technomarket, Videnov, Ceramica, Leroy Merlin, Jumbo."""
         ).with_model("openai", "gpt-4o")
         
         materials_msg = UserMessage(
-            text=f"""Генерирай списък с материали за ремонт на {room_type} с размери {room_width}м x {room_length}м x {room_height}м.
+            text=f"""Генерирай ПЪЛЕН списък с материали и оборудване за ремонт на {room_type} ({room_width}м x {room_length}м x {room_height}м).
 Стил: {style_desc}
 Клас материали: {material_desc}
-{f'Бележки: {notes}' if notes else ''}
-Включи: подови настилки, стенни покрития, мебели, осветление, аксесоари, оборудване.
-Дай реални цени в лева (BGN) от български магазини."""
+{f'Специални изисквания: {notes}' if notes else ''}
+Текущо състояние: {room_analysis.get('current_state', 'нуждае се от ремонт')}
+Включи ВСИЧКО необходимо за цялостен ремонт."""
         )
         
         materials_response = await materials_chat.send_message(materials_msg)
@@ -2425,14 +2460,15 @@ Ultra-realistic, professional interior photography, 8K quality, perfect lighting
         design_record = {
             "id": design_id,
             "room_type": room_type,
+            "room_type_id": room_type_id,
             "room_analysis": room_analysis,
             "style": style,
             "material_class": material_class,
             "dimensions": {"width": room_width, "length": room_length, "height": room_height},
             "variants_count": variants_count,
-            "original_image": image_base64[:100] + "...",
+            "images_count": len(cleaned_images),
             "generated_count": len(generated_images),
-            "materials": materials_data,
+            "materials_count": len(materials_data.get("materials", [])),
             "notes": notes,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
