@@ -9,7 +9,7 @@ import {
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
   ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator, Camera, ChevronLeft, Image, MessageSquare,
   FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench,
-  ChevronDown, Globe
+  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart
 } from 'lucide-react';
 import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
@@ -173,21 +173,24 @@ const Navbar = () => {
 
           {/* Right: Nav links + Language + Auth */}
           <div className="hidden md:flex items-center gap-3 lg:gap-4">
-            <Link to="/projects" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-projects">
-              <FolderSearch className="h-3.5 w-3.5" />
-              {t('nav_projects')}
-            </Link>
-            <Link to="/find-master" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-find-master">
-              <Wrench className="h-3.5 w-3.5" />
-              {t('nav_masters')}
-            </Link>
-            <Link to="/companies" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-companies">
-              <Building2 className="h-3.5 w-3.5" />
-              {t('nav_companies')}
+            <Link to="/" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors" data-testid="nav-home">
+              Главна
             </Link>
             <Link to="/calculator" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-calculator">
               <Calculator className="h-3.5 w-3.5" />
-              {t('nav_calculator')}
+              Калкулатор
+            </Link>
+            <Link to="/companies" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-companies">
+              <Building2 className="h-3.5 w-3.5" />
+              Фирми
+            </Link>
+            <Link to="/find-master" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-find-master">
+              <Wrench className="h-3.5 w-3.5" />
+              Дизайнери
+            </Link>
+            <Link to="/ads" className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-ads">
+              <Megaphone className="h-3.5 w-3.5" />
+              Обяви
             </Link>
 
             {/* More dropdown */}
@@ -198,24 +201,27 @@ const Navbar = () => {
                 data-testid="nav-more-btn"
               >
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
-                {t('nav_more')}
+                Още
               </button>
               {moreOpen && (
                 <div className="absolute top-full right-0 mt-2 w-52 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50" data-testid="nav-more-dropdown">
+                  <Link to="/ai-designer" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-designer">
+                    <Sparkles className="h-4 w-4" /> AI Дизайнер
+                  </Link>
+                  <Link to="/projects" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-projects">
+                    <FolderSearch className="h-4 w-4" /> Проекти
+                  </Link>
                   <Link to="/services" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-services">
-                    <Hammer className="h-4 w-4" /> {t('nav_services')}
+                    <Hammer className="h-4 w-4" /> Услуги
                   </Link>
                   <Link to="/professions" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-professions">
-                    <HardHat className="h-4 w-4" /> {t('nav_professions')}
+                    <HardHat className="h-4 w-4" /> Професии
                   </Link>
                   <Link to="/blog" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-blog">
-                    <BookOpen className="h-4 w-4" /> {t('nav_blog')}
-                  </Link>
-                  <Link to="/prices" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-prices">
-                    <MapPin className="h-4 w-4" /> {t('nav_prices')}
+                    <BookOpen className="h-4 w-4" /> Блог
                   </Link>
                   <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-about">
-                    <Info className="h-4 w-4" /> {t('nav_about')}
+                    <Info className="h-4 w-4" /> За нас
                   </Link>
                 </div>
               )}
@@ -455,311 +461,199 @@ const StarRating = ({ rating, size = 'sm' }) => {
   );
 };
 
-// ============== LANDING PAGE ==============
+// ============== LANDING PAGE v10.8 ==============
 const LandingPage = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, total_reviews: 0 });
-  const [featuredProjects, setFeaturedProjects] = useState([]);
+  const [demoProjects, setDemoProjects] = useState([]);
+  const [topCompanies, setTopCompanies] = useState([]);
+  const [aiDesignStatus, setAiDesignStatus] = useState({ global_free_remaining: 100 });
 
   useEffect(() => {
-    axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
     axios.get(`${API}/stats`).then(res => setStats(res.data));
-    axios.get(`${API}/projects?limit=6`).then(res => setFeaturedProjects(res.data.projects));
+    axios.get(`${API}/demo-projects`).then(res => setDemoProjects(res.data.projects));
+    axios.get(`${API}/top-companies`).then(res => setTopCompanies(res.data.companies));
+    axios.get(`${API}/ai-design/status`).catch(() => {});
   }, []);
 
   return (
-    <div className="min-h-screen">
-      {/* CALCULATOR HERO SECTION - FIRST THING VISITORS SEE */}
+    <div className="min-h-screen" data-testid="landing-page">
+      {/* ===== HERO SECTION ===== */}
       <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-orange-500 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-3xl -translate-y-1/4 translate-x-1/4" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-3xl translate-y-1/4 -translate-x-1/4" />
         </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left side - Calculator Info */}
-            <div className="text-white">
-              <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 rounded-full px-4 py-2 mb-6">
-                <Calculator className="h-5 w-5 text-orange-400" />
-                <span className="text-orange-300 font-medium">{t('hero_badge')}</span>
-              </div>
-              
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-                {t('hero_title_1')}<span className="text-orange-500">{t('hero_highlight')}</span>{t('hero_title_2')}
-              </h1>
-              
-              <p className="text-xl text-slate-300 mb-8">
-                {t('hero_subtitle')}
-              </p>
-              
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="flex items-center gap-3 bg-white/10 rounded-lg p-3">
-                  <div className="flex-shrink-0 w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                    <CheckCircle className="h-5 w-5 text-orange-400" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">{t('hero_stat1')}</p>
-                    <p className="text-xs text-slate-400">{t('hero_stat1_sub')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-white/10 rounded-lg p-3">
-                  <div className="flex-shrink-0 w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                    <MapPin className="h-5 w-5 text-orange-400" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">{t('hero_stat2')}</p>
-                    <p className="text-xs text-slate-400">{t('hero_stat2_sub')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-white/10 rounded-lg p-3">
-                  <div className="flex-shrink-0 w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                    <Award className="h-5 w-5 text-orange-400" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">{t('hero_stat3')}</p>
-                    <p className="text-xs text-slate-400">{t('hero_stat3_sub')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-white/10 rounded-lg p-3">
-                  <div className="flex-shrink-0 w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                    <Euro className="h-5 w-5 text-orange-400" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">{t('hero_stat4')}</p>
-                    <p className="text-xs text-slate-400">{t('hero_stat4_sub')}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  size="lg" 
-                  className="bg-orange-600 hover:bg-orange-700 text-lg px-8 h-14"
-                  onClick={() => navigate('/calculator')}
-                  data-testid="calculator-hero-cta"
-                >
-                  <Calculator className="mr-2 h-6 w-6" />
-                  {t('hero_cta')}
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-white/50 text-white hover:bg-white/10 text-lg px-8 h-14"
-                  onClick={() => navigate('/register')}
-                >
-                  {t('hero_cta2')}
-                </Button>
-              </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24">
+          <div className="text-center text-white">
+            {/* Promo banner */}
+            <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/40 rounded-full px-5 py-2.5 mb-8 animate-pulse" data-testid="hero-promo">
+              <Award className="h-5 w-5 text-orange-400" />
+              <span className="text-orange-300 font-bold text-sm tracking-wide">
+                ПЪРВИ 20 ФИРМИ = 1 МЕСЕЦ ПРО ТЕСТОВ РЕЖИМ
+              </span>
             </div>
             
-            {/* Right side - Live Calculator Preview */}
-            <div className="hidden lg:block">
-              <Card className="bg-white/10 backdrop-blur-xl border-white/20 p-6 rounded-2xl shadow-2xl">
-                <div className="text-white mb-6">
-                  <h3 className="text-xl font-semibold mb-2">{t('hero_preview_title')}</h3>
-                  <p className="text-slate-400 text-sm">{t('hero_preview_sub')}</p>
-                </div>
-                
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between items-center py-2 border-b border-white/10">
-                    <span className="text-slate-300 flex items-center gap-2">
-                      <Paintbrush className="h-4 w-4" /> {t('hero_preview_paint')}
-                    </span>
-                    <span className="text-white font-medium">1,152 €</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-white/10">
-                    <span className="text-slate-300 flex items-center gap-2">
-                      <Layers className="h-4 w-4" /> {t('hero_preview_plaster')}
-                    </span>
-                    <span className="text-white font-medium">1,344 €</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-white/10">
-                    <span className="text-slate-300 flex items-center gap-2">
-                      <Square className="h-4 w-4" /> {t('hero_preview_floor')}
-                    </span>
-                    <span className="text-white font-medium">3,840 €</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-white/10">
-                    <span className="text-slate-300 flex items-center gap-2">
-                      <Zap className="h-4 w-4" /> {t('hero_preview_elec')}
-                    </span>
-                    <span className="text-white font-medium">1,800 €</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-white/10">
-                    <span className="text-slate-300 flex items-center gap-2">
-                      <Droplets className="h-4 w-4" /> {t('hero_preview_plumb')}
-                    </span>
-                    <span className="text-white font-medium">792 €</span>
-                  </div>
-                </div>
-                
-                <div className="bg-orange-600 rounded-xl p-5 text-center">
-                  <p className="text-orange-100 text-sm mb-1">{t('hero_preview_approx')}</p>
-                  <p className="text-4xl font-bold text-white">8,928 €</p>
-                  <p className="text-orange-200 text-sm mt-1">≈ 17,411 лв.</p>
-                </div>
-                
-                <p className="text-slate-500 text-xs text-center mt-4">
-                  {t('hero_preview_note')}
-                </p>
-              </Card>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+              Строителство и ремонти<br/>
+              <span className="text-orange-500">с AI технологии</span>
+            </h1>
+            
+            <p className="text-xl text-slate-300 mb-10 max-w-3xl mx-auto">
+              Калкулатор за цени, AI дизайнер, количествени сметки и свързване с проверени фирми — всичко на едно място.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <Button size="lg" className="bg-orange-600 hover:bg-orange-700 text-lg px-8 h-14" onClick={() => navigate('/calculator')} data-testid="hero-calc-btn">
+                <Calculator className="mr-2 h-6 w-6" /> Калкулатор
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10 text-lg px-8 h-14" onClick={() => navigate('/register')}>
+                Регистрация
+              </Button>
+            </div>
+            
+            {/* Stats row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                <p className="text-3xl font-bold text-orange-400">{stats.total_companies}+</p>
+                <p className="text-sm text-slate-400">Фирми</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                <p className="text-3xl font-bold text-orange-400">{stats.total_projects}+</p>
+                <p className="text-sm text-slate-400">Проекти</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                <p className="text-3xl font-bold text-orange-400">28</p>
+                <p className="text-sm text-slate-400">Области</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                <p className="text-3xl font-bold text-orange-400">{stats.total_reviews}+</p>
+                <p className="text-sm text-slate-400">Отзиви</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Secondary Hero - For Companies */}
-      <section className="py-12 bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-6 text-center">
-            <div className="p-4">
-              <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Users className="h-7 w-7 text-orange-600" />
-              </div>
-              <p className="text-2xl font-bold text-slate-900">{stats.total_companies}+</p>
-              <p className="text-slate-600 text-sm">{t('stats_companies')}</p>
-            </div>
-            <div className="p-4">
-              <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Boxes className="h-7 w-7 text-orange-600" />
-              </div>
-              <p className="text-2xl font-bold text-slate-900">{stats.total_projects}+</p>
-              <p className="text-slate-600 text-sm">{t('stats_projects')}</p>
-            </div>
-            <div className="p-4">
-              <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Star className="h-7 w-7 text-orange-600" />
-              </div>
-              <p className="text-2xl font-bold text-slate-900">{stats.total_reviews}+</p>
-              <p className="text-slate-600 text-sm">{t('stats_reviews')}</p>
-            </div>
-            <div className="p-4">
-              <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Shield className="h-7 w-7 text-orange-600" />
-              </div>
-              <p className="text-2xl font-bold text-slate-900">28</p>
-              <p className="text-slate-600 text-sm">{t('stats_regions')}</p>
-            </div>
+      {/* ===== AI DESIGNER PROMO ===== */}
+      <section className="bg-gradient-to-r from-violet-600 to-purple-700 py-12">
+        <div className="max-w-5xl mx-auto px-4 text-center text-white">
+          <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 mb-4">
+            <Sparkles className="h-5 w-5" />
+            <span className="font-medium text-sm">AI ДИЗАЙНЕР</span>
           </div>
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">
+            Първите 100 AI дизайна — БЕЗПЛАТНИ
+          </h2>
+          <p className="text-purple-200 mb-6 max-w-2xl mx-auto">
+            Генерирайте 2D визуализации и 3D модели за вашия проект. Изберете стил, бюджет и получете PDF + GLB файл.
+          </p>
+          <Button size="lg" className="bg-white text-purple-700 hover:bg-purple-50" onClick={() => navigate('/ai-designer')} data-testid="ai-designer-cta">
+            Опитай AI Дизайнер
+          </Button>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{t('cat_title')}</h2>
-            <p className="text-lg text-slate-600">{t('cat_subtitle')}</p>
-          </div>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {categories.map((cat, idx) => {
-              const IconComponent = ICON_MAP[cat.icon] || Building2;
-              return (
-                <Link 
-                  key={cat.id} 
-                  to={`/projects?category=${cat.id}`}
-                  className="group"
-                  data-testid={`category-${cat.id}`}
-                >
-                  <Card className="p-4 text-center hover:border-orange-300 hover:shadow-md transition-all duration-200 group-hover:-translate-y-1">
-                    <IconComponent className="h-8 w-8 mx-auto mb-3 text-slate-600 group-hover:text-orange-600 transition-colors" />
-                    <span className="text-sm font-medium text-slate-700">{cat.name}</span>
-                  </Card>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
+      {/* ===== 4 DEMO PROJECTS ===== */}
       <section className="py-16 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{t('how_title')}</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-3">Демо проекти</h2>
+            <p className="text-slate-600">Вижте примерни проекти и оценки от калкулатора</p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-orange-600">1</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">{t('how_step1')}</h3>
-              <p className="text-slate-600">{t('how_step1_desc')}</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-orange-600">2</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">{t('how_step2')}</h3>
-              <p className="text-slate-600">{t('how_step2_desc')}</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-orange-600">3</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">{t('how_step3')}</h3>
-              <p className="text-slate-600">{t('how_step3_desc')}</p>
-            </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {demoProjects.map((project, i) => (
+              <Card key={project.id} className="group hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden" data-testid={`demo-project-${i}`}>
+                <div className="h-40 bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
+                  <Building2 className="h-12 w-12 text-slate-400" />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-slate-900 mb-1 text-sm">{project.title}</h3>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <MapPin className="h-3 w-3" /> {project.city}
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-orange-600 font-bold">{project.budget}</span>
+                    <Badge variant="outline" className="text-xs">Демо</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Projects */}
-      {featuredProjects.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ===== HOW IT WORKS ===== */}
+      <section className="py-16">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-3">Как работи TemaDom?</h2>
+          </div>
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { icon: <Calculator className="h-8 w-8" />, title: "Калкулатор", desc: "Изчислете цена с реални данни за 28 области" },
+              { icon: <Sparkles className="h-8 w-8" />, title: "AI Дизайнер", desc: "Визуализирайте проекта си с AI технологии" },
+              { icon: <Users className="h-8 w-8" />, title: "Намери фирма", desc: "Свържете се с проверени фирми и майстори" },
+              { icon: <Star className="h-8 w-8" />, title: "Оценка", desc: "Оценявайте и четете реални отзиви" }
+            ].map((step, i) => (
+              <div key={i} className="text-center">
+                <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-orange-600">
+                  {step.icon}
+                </div>
+                <h3 className="font-semibold mb-2">{step.title}</h3>
+                <p className="text-sm text-slate-600">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== TOP COMPANIES ===== */}
+      {topCompanies.length > 0 && (
+        <section className="py-16 bg-slate-50">
+          <div className="max-w-7xl mx-auto px-4">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-slate-900">{t('recent_projects')}</h2>
-              <Link to="/projects">
-                <Button variant="ghost" className="text-orange-600 hover:text-orange-700">
-                  {t('view_all')} <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
+              <h2 className="text-3xl font-bold text-slate-900">Топ фирми</h2>
+              <Button variant="ghost" className="text-orange-600" onClick={() => navigate('/companies')}>
+                Виж всички <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
             </div>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredProjects.map(project => (
-                <ProjectCard key={project.id} project={project} />
+            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {topCompanies.slice(0, 4).map(comp => (
+                <Card key={comp.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/company/${comp.id}`)}>
+                  <CardContent className="p-5 text-center">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Building2 className="h-8 w-8 text-orange-600" />
+                    </div>
+                    <h4 className="font-semibold">{comp.company_name}</h4>
+                    <div className="flex items-center justify-center gap-1 mt-2">
+                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      <span className="font-medium">{comp.rating?.toFixed(1) || '0.0'}</span>
+                      <span className="text-sm text-slate-500">({comp.review_count || 0})</span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">{comp.city}</p>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* CTA Section */}
-      <section className="py-16 bg-orange-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            {t('cta_title')}
-          </h2>
-          <p className="text-xl text-orange-100 mb-8">
-            {t('cta_subtitle')}
+      {/* ===== SUBSCRIPTION CTA ===== */}
+      <section className="py-16 bg-gradient-to-r from-orange-500 to-amber-500">
+        <div className="max-w-4xl mx-auto px-4 text-center text-white">
+          <h2 className="text-3xl font-bold mb-4">Готови ли сте да започнете?</h2>
+          <p className="text-orange-100 mb-8 text-lg">
+            Регистрирайте се безплатно • Всички функции в тестов режим
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="bg-white text-orange-600 hover:bg-orange-50 text-lg px-8"
-              onClick={() => navigate('/register')}
-              data-testid="cta-register"
-            >
-              {t('cta_register')}
+            <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50 text-lg px-8" onClick={() => navigate('/register')} data-testid="cta-register">
+              Регистрирай се
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-white text-white hover:bg-white/10 text-lg px-8"
-              onClick={() => navigate('/register')}
-            >
-              {t('hero_cta2')}
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8" onClick={() => navigate('/companies')}>
+              Виж фирми
             </Button>
           </div>
         </div>
@@ -2044,15 +1938,16 @@ const RegisterPage = () => {
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="client" data-testid="register-client-tab">{t('reg_tab_client')}</TabsTrigger>
               <TabsTrigger value="company" data-testid="register-company-tab">{t('reg_tab_company')}</TabsTrigger>
+              <TabsTrigger value="designer" data-testid="register-designer-tab">Дизайнер</TabsTrigger>
               <TabsTrigger value="master" data-testid="register-master-tab">{t('reg_tab_master')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label>{userType === 'company' ? t('reg_company_name') : userType === 'master' ? t('reg_master_name') : t('reg_name')}</Label>
+              <Label>{userType === 'company' ? t('reg_company_name') : userType === 'master' ? t('reg_master_name') : userType === 'designer' ? 'Име на дизайнер' : t('reg_name')}</Label>
               <Input 
-                placeholder={userType === 'company' ? t('reg_company_placeholder') : userType === 'master' ? t('reg_master_placeholder') : t('reg_name_placeholder')}
+                placeholder={userType === 'company' ? t('reg_company_placeholder') : userType === 'master' ? t('reg_master_placeholder') : userType === 'designer' ? 'Иван Иванов - Интериорен дизайнер' : t('reg_name_placeholder')}
                 value={formData.name}
                 onChange={(e) => setFormData(d => ({ ...d, name: e.target.value }))}
                 required
@@ -2819,6 +2714,290 @@ const PaymentCancelPage = () => {
   );
 };
 
+// ============== ADS PAGE ==============
+const AdsPage = () => {
+  const { user, token } = useAuth();
+  const [ads, setAds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newAd, setNewAd] = useState({ title: '', description: '', category: 'general', city: '' });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get(`${API}/ads`).then(res => { setAds(res.data.ads); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  const handleCreate = async () => {
+    if (!user) { navigate('/login'); return; }
+    if (!newAd.title || !newAd.description) { toast.error('Попълнете заглавие и описание'); return; }
+    try {
+      const res = await axios.post(`${API}/ads`, newAd, { headers: { Authorization: `Bearer ${token}` } });
+      setAds(prev => [res.data, ...prev]);
+      setShowCreate(false);
+      setNewAd({ title: '', description: '', category: 'general', city: '' });
+      toast.success('Обявата е публикувана!');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8" data-testid="ads-page">
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Обяви</h1>
+            <p className="text-slate-600">Безплатни обяви за строителство и ремонти</p>
+          </div>
+          <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => user ? setShowCreate(true) : navigate('/login')} data-testid="create-ad-btn">
+            + Нова обява
+          </Button>
+        </div>
+
+        {/* Test mode banner */}
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6" data-testid="test-mode-banner">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-amber-600" />
+            <span className="text-sm font-medium text-amber-800">Тестов режим — всички обяви са безплатни</span>
+          </div>
+        </div>
+
+        {/* Create dialog */}
+        <Dialog open={showCreate} onOpenChange={setShowCreate}>
+          <DialogContent className="sm:max-w-md" data-testid="create-ad-dialog">
+            <DialogHeader>
+              <DialogTitle>Нова обява</DialogTitle>
+              <DialogDescription>Публикувайте обява безплатно</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div>
+                <Label>Заглавие *</Label>
+                <Input placeholder="Напр. Търся бояджия за апартамент" value={newAd.title} onChange={e => setNewAd(d => ({ ...d, title: e.target.value }))} data-testid="ad-title" />
+              </div>
+              <div>
+                <Label>Описание *</Label>
+                <Textarea placeholder="Опишете подробно..." value={newAd.description} onChange={e => setNewAd(d => ({ ...d, description: e.target.value }))} data-testid="ad-description" />
+              </div>
+              <div>
+                <Label>Град</Label>
+                <Input placeholder="Напр. София" value={newAd.city} onChange={e => setNewAd(d => ({ ...d, city: e.target.value }))} data-testid="ad-city" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowCreate(false)}>Отказ</Button>
+              <Button className="bg-orange-600 hover:bg-orange-700" onClick={handleCreate} data-testid="submit-ad-btn">Публикувай</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {loading ? (
+          <div className="text-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto" /></div>
+        ) : ads.length === 0 ? (
+          <div className="text-center py-16">
+            <Megaphone className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+            <h3 className="text-lg font-medium text-slate-700 mb-2">Няма обяви все още</h3>
+            <p className="text-slate-500">Бъдете първият, който ще публикува обява!</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {ads.map(ad => (
+              <Card key={ad.id} className="hover:shadow-md transition-shadow" data-testid={`ad-${ad.id}`}>
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1">{ad.title}</h3>
+                      <p className="text-sm text-slate-600 mb-3 line-clamp-2">{ad.description}</p>
+                    </div>
+                    <Badge variant="outline" className="text-xs">{ad.user_type === 'company' ? 'Фирма' : ad.user_type === 'master' ? 'Майстор' : 'Клиент'}</Badge>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs text-slate-500">
+                    {ad.city && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {ad.city}</span>}
+                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {new Date(ad.created_at).toLocaleDateString('bg-BG')}</span>
+                    <span>{ad.user_name}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============== AI DESIGNER PAGE (Placeholder) ==============
+const AIDesignerPage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [designStatus, setDesignStatus] = useState(null);
+
+  useEffect(() => {
+    axios.get(`${API}/ai-design/status`).then(res => setDesignStatus(res.data)).catch(() => {});
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8" data-testid="ai-designer-page">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-purple-100 rounded-full px-4 py-2 mb-4">
+            <Sparkles className="h-5 w-5 text-purple-600" />
+            <span className="text-purple-700 font-medium text-sm">AI ДИЗАЙНЕР</span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">AI Интериорен дизайнер</h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Генерирайте 2D визуализации и 3D модели за вашия проект с помощта на изкуствен интелект.
+          </p>
+        </div>
+
+        {/* Free designs counter */}
+        {designStatus && (
+          <Card className="mb-8 overflow-hidden" data-testid="design-counter">
+            <div className="bg-gradient-to-r from-purple-500 to-violet-600 p-6 text-white text-center">
+              <p className="text-purple-200 text-sm mb-1">Безплатни AI дизайна оставащи</p>
+              <p className="text-5xl font-bold">{designStatus.global_free_remaining} / {designStatus.global_limit}</p>
+              <p className="text-purple-200 text-xs mt-2">1 безплатен дизайн на профил (Вариант 1)</p>
+            </div>
+          </Card>
+        )}
+
+        {/* Design variants */}
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          {[
+            { name: 'Вариант 1', items: '1 PDF + 1 GLB', price: 'Тестов режим', highlight: true, desc: 'Първите 100 безплатни. 1 профил = 1 използване.' },
+            { name: 'Вариант 3', items: '3 PDF + 3 GLB', price: 'Тестов режим', highlight: false, desc: 'С афилиейт линкове към магазини.' },
+            { name: 'Вариант 5', items: '5 PDF + 5 GLB', price: 'Тестов режим', highlight: false, desc: 'С афилиейт линкове + приоритетна генерация.' }
+          ].map((variant, i) => (
+            <Card key={i} className={`relative overflow-hidden ${variant.highlight ? 'border-purple-300 ring-2 ring-purple-100' : ''}`} data-testid={`design-variant-${i}`}>
+              {variant.highlight && (
+                <div className="bg-purple-600 text-white text-center text-xs py-1 font-medium">БЕЗПЛАТНО (лимитирано)</div>
+              )}
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-2">{variant.name}</h3>
+                <p className="text-2xl font-bold text-purple-600 mb-3">{variant.price}</p>
+                <p className="text-sm text-slate-600 mb-4">{variant.desc}</p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> {variant.items}</div>
+                  <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Избор на стил</div>
+                  <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Избор на бюджет</div>
+                  <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Линкове към магазини</div>
+                </div>
+                <Button className={`w-full mt-6 ${variant.highlight ? 'bg-purple-600 hover:bg-purple-700' : 'bg-slate-200 text-slate-500 cursor-not-allowed'}`} 
+                  disabled={!variant.highlight} onClick={() => !user ? navigate('/register') : toast.info('AI Дизайнерът ще бъде активиран скоро!')}>
+                  {variant.highlight ? 'Генерирай дизайн' : 'Очаквайте скоро'}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Features */}
+        <Card className="bg-white">
+          <CardContent className="p-8">
+            <h3 className="text-xl font-bold mb-6 text-center">Какво включва AI дизайна?</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              {[
+                { icon: <FileDown className="h-6 w-6" />, title: 'PDF визуализация', desc: '2D рендер на вашето пространство' },
+                { icon: <Boxes className="h-6 w-6" />, title: '3D GLB модел', desc: 'Интерактивен 3D модел за преглед' },
+                { icon: <Sparkles className="h-6 w-6" />, title: 'Избор на стил', desc: 'Модерен, класически, минималистичен и др.' },
+                { icon: <ShoppingCart className="h-6 w-6" />, title: 'Линкове към магазини', desc: 'Директни линкове за закупуване на мебели' }
+              ].map((f, i) => (
+                <div key={i} className="flex items-start gap-4">
+                  <div className="bg-purple-100 rounded-lg p-3 text-purple-600">{f.icon}</div>
+                  <div>
+                    <h4 className="font-semibold">{f.title}</h4>
+                    <p className="text-sm text-slate-600">{f.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+// ============== SUBSCRIPTIONS PAGE ==============
+const SubscriptionsPage = () => {
+  const { user, token } = useAuth();
+  const navigate = useNavigate();
+  const [plans, setPlans] = useState({});
+
+  useEffect(() => {
+    axios.get(`${API}/subscriptions/plans`).then(res => setPlans(res.data.plans)).catch(() => {});
+  }, []);
+
+  const handleActivate = async (plan) => {
+    if (!user) { navigate('/login'); return; }
+    try {
+      await axios.post(`${API}/subscriptions/activate`, { plan }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Абонаментът е активиран (тестов режим)');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-12" data-testid="subscriptions-page">
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Абонаментни планове</h1>
+          <p className="text-lg text-slate-600">Всички функции в тестов режим — цените ще се активират след старта</p>
+        </div>
+
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8 text-center" data-testid="test-mode-notice">
+          <span className="text-amber-800 font-medium">Тестов режим — цените ще се активират след старта на фирмата</span>
+        </div>
+
+        <h2 className="text-2xl font-bold mb-6">За фирми</h2>
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          {plans.company && Object.entries(plans.company).map(([key, plan]) => (
+            <Card key={key} className={`relative ${key === 'pro' ? 'border-orange-300 ring-2 ring-orange-100' : ''}`} data-testid={`plan-${key}`}>
+              {key === 'pro' && <div className="bg-orange-600 text-white text-center text-xs py-1 font-medium">ПРЕПОРЪЧАН</div>}
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+                <p className="text-2xl font-bold text-orange-600 mb-4">{plan.price}</p>
+                <div className="space-y-2 mb-6">
+                  {plan.features.map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-green-500" /> {f}
+                    </div>
+                  ))}
+                </div>
+                <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
+                  Активирай (тестов)
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <h2 className="text-2xl font-bold mb-6">За дизайнери</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {plans.designer && Object.entries(plans.designer).map(([key, plan]) => (
+            <Card key={key} data-testid={`plan-designer-${key}`}>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+                <p className="text-2xl font-bold text-purple-600 mb-4">{plan.price}</p>
+                <div className="space-y-2 mb-6">
+                  {plan.features.map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-green-500" /> {f}
+                    </div>
+                  ))}
+                </div>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700" onClick={() => handleActivate(key)}>
+                  Активирай (тестов)
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ============== MAIN APP ==============
 // Page view tracker
 const PageTracker = () => {
@@ -2867,6 +3046,9 @@ function App() {
                 <Route path="/dashboard/client" element={<ClientDashboard />} />
                 <Route path="/payment/success" element={<PaymentSuccessPage />} />
                 <Route path="/payment/cancel" element={<PaymentCancelPage />} />
+                <Route path="/ads" element={<AdsPage />} />
+                <Route path="/ai-designer" element={<AIDesignerPage />} />
+                <Route path="/subscriptions" element={<SubscriptionsPage />} />
               </Routes>
             </main>
             <Footer />

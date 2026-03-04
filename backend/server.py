@@ -43,6 +43,23 @@ EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 
 # PLATFORM IS FREE - all payment gates disabled
 PLATFORM_FREE = True
+TEST_MODE = True  # All prices shown as "тестов режим"
+
+# AI Designer limits
+AI_DESIGN_GLOBAL_FREE_LIMIT = 100  # First 100 designs globally free
+AI_DESIGN_PER_PROFILE_LIMIT = 1    # 1 free design per profile (Variant 1)
+
+# Subscription plans (test mode - no real prices)
+SUBSCRIPTION_PLANS = {
+    "company": {
+        "basic": {"name": "Базов", "price": "Тестов режим", "features": ["Публикуване на обяви", "Профил страница", "Основна статистика"]},
+        "pro": {"name": "Про", "price": "Тестов режим", "features": ["Всичко от Базов", "Приоритетно показване", "Разширена статистика", "Неограничени обяви"]},
+        "premium": {"name": "Премиум", "price": "Тестов режим", "features": ["Всичко от Про", "AI дизайн достъп", "Топ позиция", "Персонален мениджър"]}
+    },
+    "designer": {
+        "designer": {"name": "Дизайнер", "price": "Тестов режим", "features": ["AI дизайн достъп", "Портфолио", "Клиентски заявки"]}
+    }
+}
 
 # Analytics password
 ANALYTICS_ADMIN_PASSWORD = os.environ.get("ANALYTICS_PASSWORD", "temadom2026")
@@ -286,7 +303,7 @@ async def register(user_data: UserCreate):
         raise HTTPException(status_code=400, detail="Този имейл вече е регистриран")
     
     # Validate user_type
-    if user_data.user_type not in ("client", "company", "master"):
+    if user_data.user_type not in ("client", "company", "master", "designer"):
         raise HTTPException(status_code=400, detail="Невалиден тип потребител")
     
     # Validate bulstat for companies
@@ -314,8 +331,8 @@ async def register(user_data: UserCreate):
     
     await db.users.insert_one(user_dict)
     
-    # Create company/master profile
-    if user_data.user_type in ("company", "master"):
+    # Create company/master/designer profile
+    if user_data.user_type in ("company", "master", "designer"):
         profile = {
             "id": str(uuid.uuid4()),
             "user_id": user_dict["id"],
@@ -331,6 +348,10 @@ async def register(user_data: UserCreate):
             "review_count": 0,
             "bulstat": user_data.bulstat if user_data.user_type == "company" else None,
             "user_type": user_data.user_type,
+            "subscription_plan": None,
+            "subscription_active": False,
+            "subscription_expires": None,
+            "ai_designs_used": 0,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.company_profiles.insert_one(profile)
@@ -1972,6 +1993,160 @@ async def block_user(user_id: str, data: dict, credentials: HTTPAuthorizationCre
     )
     
     return {"message": "Потребителят е блокиран", "blocked": True}
+
+# ============== SUBSCRIPTION PLANS ==============
+
+@api_router.get("/subscriptions/plans")
+async def get_subscription_plans():
+    """Get available subscription plans (test mode)"""
+    return {"plans": SUBSCRIPTION_PLANS, "test_mode": TEST_MODE}
+
+@api_router.post("/subscriptions/activate")
+async def activate_subscription(data: dict, user: dict = Depends(get_current_user)):
+    """Activate subscription (test mode - always succeeds)"""
+    plan = data.get("plan", "basic")
+    if user["user_type"] not in ("company", "master", "designer"):
+        raise HTTPException(status_code=400, detail="Само фирми, майстори и дизайнери могат да имат абонамент")
+    
+    expires = datetime.now(timezone.utc) + timedelta(days=30)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "subscription_active": True,
+            "subscription_plan": plan,
+            "subscription_expires": expires.isoformat()
+        }}
+    )
+    await db.company_profiles.update_one(
+        {"user_id": user["id"]},
+        {"$set": {
+            "subscription_active": True,
+            "subscription_plan": plan,
+            "subscription_expires": expires.isoformat()
+        }}
+    )
+    return {"message": "Абонаментът е активиран (тестов режим)", "plan": plan, "expires": expires.isoformat()}
+
+# ============== ADS / LISTINGS ==============
+
+@api_router.get("/ads")
+async def get_ads(category: str = None, city: str = None, page: int = 1, limit: int = 20):
+    """Get active ads/listings"""
+    query = {"status": "active"}
+    if category:
+        query["category"] = category
+    if city:
+        query["city"] = {"$regex": city, "$options": "i"}
+    
+    skip = (page - 1) * limit
+    ads = await db.ads.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.ads.count_documents(query)
+    return {"ads": ads, "total": total, "page": page, "pages": (total + limit - 1) // limit}
+
+@api_router.post("/ads")
+async def create_ad(data: dict, user: dict = Depends(get_current_user)):
+    """Create a new ad/listing"""
+    ad = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_name": user["name"],
+        "user_type": user["user_type"],
+        "title": data.get("title", ""),
+        "description": data.get("description", ""),
+        "category": data.get("category", "general"),
+        "city": data.get("city", ""),
+        "images": data.get("images", [])[:5],
+        "status": "active",
+        "views": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.ads.insert_one(ad)
+    ad.pop("_id", None)
+    return ad
+
+@api_router.delete("/ads/{ad_id}")
+async def delete_ad(ad_id: str, user: dict = Depends(get_current_user)):
+    """Delete own ad"""
+    result = await db.ads.delete_one({"id": ad_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Обявата не е намерена")
+    return {"message": "Обявата е изтрита"}
+
+# ============== AI DESIGN COUNTER ==============
+
+@api_router.get("/ai-design/status")
+async def get_ai_design_status(user: dict = Depends(get_optional_user)):
+    """Get AI design availability status"""
+    global_count = await db.ai_designs.count_documents({})
+    free_remaining = max(0, AI_DESIGN_GLOBAL_FREE_LIMIT - global_count)
+    
+    user_used = 0
+    if user:
+        user_used = await db.ai_designs.count_documents({"user_id": user["id"]})
+    
+    return {
+        "global_free_remaining": free_remaining,
+        "global_total_used": global_count,
+        "global_limit": AI_DESIGN_GLOBAL_FREE_LIMIT,
+        "user_designs_used": user_used,
+        "user_free_limit": AI_DESIGN_PER_PROFILE_LIMIT,
+        "can_use_free": free_remaining > 0 and user_used < AI_DESIGN_PER_PROFILE_LIMIT,
+        "test_mode": TEST_MODE
+    }
+
+# ============== REFERRAL SYSTEM (DEMO) ==============
+
+@api_router.get("/referrals/status")
+async def get_referral_status(user: dict = Depends(get_current_user)):
+    """Get referral status (demo mode)"""
+    referral_count = await db.referrals.count_documents({"referrer_id": user["id"]})
+    return {
+        "referral_count": referral_count,
+        "referral_code": user["id"][:8],
+        "test_mode": True,
+        "rewards": {
+            "client": {"required": 5, "bonus": "€3 кредит (демо)"},
+            "company": {"tier1": {"required": 1, "bonus": "Бонус (демо)"}, "tier2": {"required": 10, "bonus": "Голям бонус (демо)"}}
+        }
+    }
+
+@api_router.get("/top-companies")
+async def get_top_companies(limit: int = 10):
+    """Get top-rated companies for homepage"""
+    companies = await db.company_profiles.find(
+        {"rating": {"$gt": 0}}, {"_id": 0}
+    ).sort("rating", -1).limit(limit).to_list(limit)
+    return {"companies": companies}
+
+@api_router.get("/demo-projects")
+async def get_demo_projects():
+    """Get demo projects for homepage"""
+    demos = [
+        {"id": "demo1", "title": "Ремонт на апартамент 80 м²", "category": "general", "city": "София", "image": "/demo/apartment.jpg", "budget": "8,928 €"},
+        {"id": "demo2", "title": "Вътрешен дизайн на дневна", "category": "design", "city": "Пловдив", "image": "/demo/living.jpg", "budget": "3,500 €"},
+        {"id": "demo3", "title": "Баня от А до Я", "category": "plumbing", "city": "Варна", "image": "/demo/bathroom.jpg", "budget": "5,200 €"},
+        {"id": "demo4", "title": "Кухня по поръчка", "category": "carpentry", "city": "Бургас", "image": "/demo/kitchen.jpg", "budget": "7,100 €"}
+    ]
+    return {"projects": demos}
+
+# ============== REVIEW AI MODERATION ==============
+
+@api_router.post("/reviews/check")
+async def check_review_content(data: dict):
+    """AI-moderate review content before posting"""
+    comment = data.get("comment", "")
+    if not comment:
+        return {"approved": True, "reason": ""}
+    
+    # Simple profanity/abuse check
+    abuse_patterns = [
+        re.compile(r'\b(идиот|глупак|мамка|дебил|простак|измамник|крадец)\b', re.IGNORECASE),
+    ]
+    for pattern in abuse_patterns:
+        if pattern.search(comment):
+            return {"approved": False, "reason": "Коментарът съдържа обидни думи. Моля, преформулирайте."}
+    
+    return {"approved": True, "reason": ""}
 
 # Include router - MUST be after all route definitions
 app.include_router(api_router)
