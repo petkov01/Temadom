@@ -39,7 +39,7 @@ const TemaDomLogo = ({ className = "h-12", showSubtitle = false }) => (
       src="/logo-temadom.png" 
       alt="TemaDom" 
       className={className}
-      style={{ objectFit: 'contain', maxHeight: '100%' }}
+      style={{ objectFit: 'contain', maxHeight: '100%', padding: '4px 0' }}
     />
   </div>
 );
@@ -156,11 +156,11 @@ const Navbar = () => {
   return (
     <nav className="bg-[#0F1923] border-b border-[#2A3A4C] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-[100px]">
+        <div className="flex justify-between h-[90px]">
           {/* Left: Big Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
-              <TemaDomLogo className="h-[140px] w-auto" />
+              <TemaDomLogo className="h-[70px] w-auto" />
             </Link>
           </div>
 
