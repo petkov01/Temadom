@@ -677,7 +677,7 @@ export const AIDesignerPage = () => {
                               <th className="text-left py-2 text-slate-400 font-medium">Материал</th>
                               <th className="text-left py-2 text-slate-400 font-medium">Кол-во</th>
                               <th className="text-right py-2 text-slate-400 font-medium">Ед. цена</th>
-                              <th className="text-right py-2 text-slate-400 font-medium">Общо</th>
+                              <th className="text-right py-2 text-slate-400 font-medium">Общо (лв / €)</th>
                               <th className="text-right py-2 text-slate-400 font-medium">Магазин</th>
                             </tr>
                           </thead>
@@ -686,8 +686,14 @@ export const AIDesignerPage = () => {
                               <tr key={i} className="border-b border-[#3A4A5C]/50 hover:bg-[#1E2A38]/50">
                                 <td className="py-2 text-white">{m.name}</td>
                                 <td className="py-2 text-slate-300">{m.quantity} {m.unit}</td>
-                                <td className="py-2 text-slate-300 text-right">{m.price_per_unit}</td>
-                                <td className="py-2 text-[#FF8C42] font-medium text-right">{m.total_price}</td>
+                                <td className="py-2 text-slate-300 text-right">
+                                  {m.price_per_unit_bgn || m.price_per_unit || '-'}
+                                  {m.price_per_unit_eur && <span className="text-slate-500 text-xs ml-1">/ {m.price_per_unit_eur}</span>}
+                                </td>
+                                <td className="py-2 text-right">
+                                  <span className="text-[#FF8C42] font-medium">{m.total_price_bgn || m.total_price || '-'}</span>
+                                  {m.total_price_eur && <span className="text-slate-400 text-xs block">{m.total_price_eur}</span>}
+                                </td>
                                 <td className="py-2 text-right">
                                   {m.store_url ? (
                                     <a href={m.store_url} target="_blank" rel="noopener noreferrer" className="text-[#4DA6FF] hover:underline text-xs inline-flex items-center gap-1">
@@ -703,20 +709,29 @@ export const AIDesignerPage = () => {
                           <tfoot>
                             <tr className="border-t-2 border-[#FF8C42]/30">
                               <td colSpan="3" className="py-3 text-white font-bold">Материали:</td>
-                              <td className="py-3 text-[#FF8C42] font-bold text-right text-lg">{results.materials.total_estimate}</td>
+                              <td className="py-3 text-right">
+                                <span className="text-[#FF8C42] font-bold text-lg">{results.materials.total_estimate_bgn || results.materials.total_estimate}</span>
+                                {results.materials.total_estimate_eur && <span className="text-slate-400 text-sm block">{results.materials.total_estimate_eur}</span>}
+                              </td>
                               <td />
                             </tr>
-                            {results.materials.labor_estimate && (
+                            {(results.materials.labor_estimate_bgn || results.materials.labor_estimate) && (
                               <tr>
                                 <td colSpan="3" className="py-1 text-slate-300">Труд:</td>
-                                <td className="py-1 text-slate-300 text-right">{results.materials.labor_estimate}</td>
+                                <td className="py-1 text-right">
+                                  <span className="text-slate-300">{results.materials.labor_estimate_bgn || results.materials.labor_estimate}</span>
+                                  {results.materials.labor_estimate_eur && <span className="text-slate-500 text-sm block">{results.materials.labor_estimate_eur}</span>}
+                                </td>
                                 <td />
                               </tr>
                             )}
-                            {results.materials.grand_total && (
+                            {(results.materials.grand_total_bgn || results.materials.grand_total) && (
                               <tr className="border-t border-[#3A4A5C]">
                                 <td colSpan="3" className="py-3 text-white font-bold text-lg">ОБЩА СТОЙНОСТ:</td>
-                                <td className="py-3 text-[#28A745] font-bold text-right text-xl">{results.materials.grand_total}</td>
+                                <td className="py-3 text-right">
+                                  <span className="text-[#28A745] font-bold text-xl">{results.materials.grand_total_bgn || results.materials.grand_total}</span>
+                                  {results.materials.grand_total_eur && <span className="text-[#28A745]/70 text-sm block">{results.materials.grand_total_eur}</span>}
+                                </td>
                                 <td />
                               </tr>
                             )}
