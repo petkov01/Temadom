@@ -1,107 +1,101 @@
-# TemaDom v10.8 - PRD (Product Requirements Document)
+# TemaDom - PRD (Product Requirements Document)
 
 ## Original Problem Statement
-Build a marketplace platform "TemaDom" for construction and renovation services in Bulgaria with AI-powered features.
+Build a marketplace application named "TemaDom" for selling construction project leads. The platform connects clients seeking construction/renovation services with verified companies and masters.
 
-## Platform Architecture
-Modular design with independent blocks communicating through Central AI Core:
-- **Central AI Core**: Manages AI Designer, calculations, PDF generation, limits tracking
-- **Block 1**: User System (Client, Company, Designer, Master)
-- **Block 2**: Subscription Engine (test mode)
-- **Block 3**: AI Designer Engine (2D + 3D)
-- **Block 4**: Calculator & Charter Engine
-- **Block 5**: Ads System
-- **Block 6**: Referral System (demo)
-- **Block 7**: Rating System
-- **Block 8**: Homepage Structure
+## Current Phase: Phase 3 - Soft Launch
+All features are active and FREE for testing. The UI presents the structure of future paid plans.
 
-## Current Mode
-**TEST MODE** — All prices replaced with "Тестов режим". Limits and functionalities active.
+## Core Requirements
+
+### User Types
+- **Client** - Posts projects, uses calculator, contacts companies
+- **Company** - Business entity with Bulstat (EIK), receives project leads
+- **Master** - Individual craftsman/professional
+- **Designer** - Interior designer with AI design capabilities
+
+### Visual Identity (Phase 3) - COMPLETED
+- Dark theme: Main (#1E2A38), Dark Gray (#2B2B2B), White (#FFFFFF)
+- Accents: Orange (#FF8C42), Green (#28A745), Red (#DC3545)
+- Secondary: Light Blue (#4DA6FF), Purple (#8C56FF)
+- New TemaDom logo (large in navbar, footer)
+- Gradient text effects, glass morphism, noise overlays
+
+### Key Features
+1. **Price Calculator** - Construction cost calculator for 28 regions
+2. **AI Designer** - Interior design visualization with AI (1/3/5 variants)
+3. **PDF Generator** - Contracts, Quantity Surveys, Charters
+4. **Ads System** - Up to 5 images, search by category/city
+5. **Subscription Plans** - Base, Pro, Premium (companies), Designer
+6. **Feedback System** - Star rating (1-5) + text feedback
+7. **AI Chatbot** - Assistant for construction questions
+8. **Company Profiles** - Ratings, reviews, portfolio
+9. **Notifications** - Telegram + Email for subscriptions
 
 ## Tech Stack
-- **Frontend**: React.js, TailwindCSS, Shadcn/UI, lucide-react
-- **Backend**: FastAPI, Python, MongoDB
-- **AI**: OpenAI GPT-5.2 via emergentintegrations (blueprint analysis, chatbot)
-- **Notifications**: Telegram
+- **Frontend:** React.js, TailwindCSS, Shadcn/UI, Lucide React
+- **Backend:** FastAPI, Python, MongoDB
+- **AI:** OpenAI GPT-5.2 via Emergent LLM Key
+- **i18n:** Custom LanguageContext (BG/EN)
 
-## User Types
-1. **Клиент** (Client) - posts projects, free ads
-2. **Фирма** (Company) - requires bulstat, subscription plans
-3. **Дизайнер** (Designer) - AI design access, portfolio
-4. **Майстор** (Master) - individual craftsman
+## Architecture
+```
+/app/
+├── backend/
+│   ├── server.py      # Monolithic FastAPI server
+│   ├── requirements.txt
+│   └── .env
+└── frontend/
+    ├── src/
+    │   ├── App.js     # Main app with routes and inline components
+    │   ├── components/ # Reusable components
+    │   ├── i18n/       # Language context and translations
+    │   └── data/       # Translation strings
+    └── public/
+        └── logo-temadom.png  # New Phase 3 logo
+```
 
 ## What's Been Implemented
 
-### Phase 1 - Foundation (COMPLETED - March 2026)
-- [x] User system with 4 types (Client, Company, Designer, Master)
-- [x] New Homepage v10.8 with Hero ("ПЪРВИ 20 ФИРМИ = 1 МЕСЕЦ ПРО ТЕСТОВ РЕЖИМ")
-- [x] AI Designer promo section ("Първите 100 AI дизайна безплатни")
-- [x] 4 Demo projects on homepage
-- [x] How it works section (Калкулатор, AI Дизайнер, Намери фирма, Оценка)
-- [x] Top companies section
-- [x] Subscription plans page (Базов/Про/Премиум for companies, Designer plan)
-- [x] Ads/Listings system (create, view, delete)
-- [x] AI Designer showcase page with 3 variants and free counter (100/100)
-- [x] Referral system endpoints (demo mode)
-- [x] AI review moderation endpoint
-- [x] Updated Navbar: Главна | Калкулатор | Фирми | Дизайнери | Обяви | Още
-- [x] Registration with 4 user type tabs
-- [x] Subscription activation (test mode)
+### Phase 1 - Foundation (Completed)
+- User registration/login with JWT auth
+- Price calculator with 28 regions
+- Company profiles with ratings
+- AI chatbot integration
+- Basic project CRUD
 
-### Previously Completed (carried over)
-- [x] Price Calculator with 28 regions, 3 quality levels
-- [x] AI Blueprint Analysis (GPT-5.2)
-- [x] AI Chatbot Assistant ("TemaDom Асистент")
-- [x] Full-site BG/EN translation system
-- [x] PDF generation from calculator (fixed format)
-- [x] Real-time chat between users
-- [x] Telegram notifications
-- [x] Rating & review system
-- [x] Contact info protection (censoring in chat)
-- [x] Google Analytics 4 integration
+### Phase 2 - Translation & v10.8 (Completed)
+- Full BG/EN translation system
+- Designer user type
+- Homepage v10.8 design
+- Subscription stubs
+- Ads system stubs
 
-## API Endpoints
-### New in v10.8
-- `GET /api/subscriptions/plans` - Subscription plans (test mode)
-- `POST /api/subscriptions/activate` - Activate subscription
-- `GET /api/ads` - List ads
-- `POST /api/ads` - Create ad (auth required)
-- `DELETE /api/ads/{ad_id}` - Delete ad
-- `GET /api/ai-design/status` - AI design counter
-- `GET /api/demo-projects` - 4 demo projects for homepage
-- `GET /api/top-companies` - Top-rated companies
-- `GET /api/referrals/status` - Referral status (demo)
-- `POST /api/reviews/check` - AI moderation for reviews
+### Phase 3 - Soft Launch (IN PROGRESS - March 4, 2026)
+- ✅ Dark theme applied site-wide
+- ✅ New logo (large in navbar + footer)
+- ✅ PageInstructions component on all major pages
+- ✅ Feedback button with star rating modal
+- ✅ Registration form: 3 tabs + Company/Master dropdown + Bulstat
+- ✅ Subscriptions page with 4 plans
+- ✅ AI Designer page styling
+- ✅ Ads page dark theme
+- ✅ Chatbot dark theme
+- ✅ All backend endpoints working
 
-## Backlog (Prioritized)
+## P0 Remaining (Phase 3)
+- Gallery of previous AI designs
+- Video instruction popups (real video content)
+- PDF Generator improvements (Contracts, Quantity Surveys)
+- Notification system (Telegram/Email for subscriptions)
 
-### P0 - Phase 2: Subscriptions + Ads Enhancement
-- Subscription auto-deactivation on expiry (7-day reminder)
-- Ads with image upload
-- Ads filtering by category and city
-- Auto-delete ads on subscription expiry
+## P1 Backlog
+- Mobile app (React Native/Expo or PWA)
+- Real payment integration (EasyPay Bulgaria)
+- Admin dashboard for feedback review
+- Server.py refactoring into routers
 
-### P1 - Phase 3: AI Designer Engine
-- OpenAI GPT Image 1 integration for 2D visualizations
-- 3D GLB model generation (Kaedim/Point-E/Spline)
-- Style and budget selection flow
-- PDF + GLB file generation and download
-- Store links integration
-- Video instructions
-- 100 global free limit enforcement
-- 1 per profile limit enforcement
-
-### P2 - Phase 4: Calculator & Charter Engine
-- PDF dimension analysis
-- 3D formwork recognition (columns, beams, slabs, stairs, elevator shafts)
-- Quantity survey generation
-- Contract generation
-- Share version (no prices)
-- Manual price editing by companies
-
-### P3 - Future
-- EasyPay Bulgaria integration
-- Mobile app (React Native/Expo)
-- Forum system
-- Full English translation for all content pages
-- server.py refactoring into modular FastAPI structure
+## P2 Future
+- Advanced analytics dashboard
+- SEO optimization
+- Performance optimization
