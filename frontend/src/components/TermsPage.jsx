@@ -8,7 +8,7 @@ const TermsPage = () => {
   const { lang } = useLanguage();
   const isEn = lang === 'en';
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="terms-page">
+    <div className="min-h-screen bg-[#1E2A38]" data-testid="terms-page">
       {/* Header */}
       <section className="bg-slate-900 text-white py-14">
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -28,7 +28,7 @@ const TermsPage = () => {
               1. Общи условия
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <p>TemaDom е онлайн платформа, която свързва клиенти, търсещи строителни и ремонтни услуги, с фирми и майстори, предлагащи тези услуги.</p>
             <p>С регистрацията си в платформата, всеки потребител приема настоящите правила и условия.</p>
             <p>TemaDom не е пряк изпълнител на строителни работи. Платформата е посредник, който улеснява връзката между клиенти и фирми.</p>
@@ -48,7 +48,7 @@ const TermsPage = () => {
               2. Регистрация и акаунти
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <p>За регистрация е необходимо: имейл адрес, парола, име и телефонен номер.</p>
             <p>Всеки потребител е отговорен за точността на предоставената информация.</p>
             <p>Един имейл адрес може да бъде свързан само с един акаунт.</p>
@@ -70,7 +70,7 @@ const TermsPage = () => {
               3. Публикуване на проекти
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <p>Клиентите могат да публикуват проекти безплатно.</p>
             <p>Всеки проект може да съдържа: заглавие, описание, категория, местоположение и до 10 снимки/чертежи.</p>
             <p>Контактната информация на клиента (телефон, имейл) е видима САМО за фирми, които са заплатили за достъп или имат активен абонамент.</p>
@@ -87,15 +87,15 @@ const TermsPage = () => {
               4. Плащания и абонаменти
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <p className="font-semibold">Ценова политика за фирми:</p>
-            <div className="bg-slate-50 rounded-lg p-4 space-y-3">
+            <div className="bg-[#1E2A38] rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-green-500" />
                 <p><strong>Безплатен старт:</strong> Първите 3 контакта на клиенти са безплатни за всяка нова фирма.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-orange-500" />
+                <span className="w-2 h-2 rounded-full bg-[#FF8C42]/50" />
                 <p><strong>Единичен контакт:</strong> 25 EUR за достъп до контактната информация на конкретен клиент.</p>
               </div>
               <div className="flex items-center gap-3">
@@ -105,13 +105,13 @@ const TermsPage = () => {
             </div>
             <Separator />
             <p className="font-semibold">Калкулатор за фирми:</p>
-            <div className="bg-slate-50 rounded-lg p-4 space-y-3">
+            <div className="bg-[#1E2A38] rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-green-500" />
                 <p><strong>5 безплатни калкулации</strong> за всяка нова фирма.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-orange-500" />
+                <span className="w-2 h-2 rounded-full bg-[#FF8C42]/50" />
                 <p><strong>10 EUR</strong> за 5 допълнителни калкулации след изчерпване на безплатните.</p>
               </div>
               <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ const TermsPage = () => {
               5. Правила за комуникация (Чат)
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -165,7 +165,7 @@ const TermsPage = () => {
               6. Отзиви и оценки
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <p>Клиентите имат право да оставят отзив и оценка (от 1 до 5 звезди) за всяка фирма, с която са работили.</p>
             <p className="font-semibold text-red-700">Фирмите НЕ могат да изтриват, редактират или оспорват отзиви.</p>
             <p>Това гарантира обективност и изгражда доверие в платформата.</p>
@@ -186,7 +186,7 @@ const TermsPage = () => {
               7. Ценови калкулатор
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <p>Калкулаторът предоставя ориентировъчни цени, базирани на средни пазарни стойности за 2025-2026 г. за всички 28 области в България.</p>
             <p>Цените са индикативни и НЕ представляват оферта или гаранция за крайна цена.</p>
             <p>Реалните цени могат да варират в зависимост от: състоянието на обекта, достъпност, сезонност, конкретния изпълнител и сложността на работата.</p>
@@ -202,7 +202,7 @@ const TermsPage = () => {
               8. Ограничение на отговорността
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <p>TemaDom е посредник и не носи отговорност за:</p>
             <ul className="list-disc ml-6 space-y-1">
               <li>Качеството на извършените строителни или ремонтни работи</li>
@@ -223,7 +223,7 @@ const TermsPage = () => {
               9. Защита на личните данни
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <p>TemaDom обработва лични данни в съответствие с GDPR и Закона за защита на личните данни.</p>
             <p>Събирани данни: имейл, име, телефон. Тези данни се използват единствено за функционирането на платформата.</p>
             <p>Контактната информация на клиентите се предоставя САМО на фирми, които са заплатили за достъп.</p>
@@ -239,7 +239,7 @@ const TermsPage = () => {
               10. Промени в условията
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-slate-700 leading-relaxed">
+          <CardContent className="space-y-4 text-slate-300 leading-relaxed">
             <p>TemaDom си запазва правото да променя настоящите правила и условия по всяко време.</p>
             <p>При съществени промени, потребителите ще бъдат уведомени по имейл.</p>
             <p>Продължаването на използването на платформата след промяна в условията означава приемане на новите условия.</p>

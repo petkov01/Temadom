@@ -119,10 +119,10 @@ const AboutPage = () => {
   const c = content[lang] || content.bg;
 
   return (
-    <div className="min-h-screen bg-white" data-testid="about-page">
+    <div className="min-h-screen bg-[#253545]" data-testid="about-page">
       <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-orange-500 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute top-0 left-0 w-96 h-96 bg-[#FF8C42]/50 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-600 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
         </div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
@@ -135,18 +135,18 @@ const AboutPage = () => {
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">{c.problemTitle}</h2>
-            <p className="text-lg text-slate-600">{c.problemSub}</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">{c.problemTitle}</h2>
+            <p className="text-lg text-slate-400">{c.problemSub}</p>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
             {c.problems.map((p, i) => (
-              <Card key={i} className="bg-white border-red-200 hover:shadow-md transition-shadow">
+              <Card key={i} className="bg-[#253545] border-red-200 hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-bold text-slate-900 mb-2">{p.title}</h3>
-                      <p className="text-slate-600 text-sm leading-relaxed">{p.desc}</p>
+                      <h3 className="font-bold text-white mb-2">{p.title}</h3>
+                      <p className="text-slate-400 text-sm leading-relaxed">{p.desc}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -160,8 +160,8 @@ const AboutPage = () => {
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <Shield className="h-12 w-12 text-orange-500 mx-auto mb-4" />
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">{c.solutionTitle}</h2>
-            <p className="text-lg text-slate-600">{c.solutionSub}</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">{c.solutionTitle}</h2>
+            <p className="text-lg text-slate-400">{c.solutionSub}</p>
           </div>
           <div className="space-y-8">
             {c.solutions.map((s, i) => (
@@ -169,8 +169,8 @@ const AboutPage = () => {
                 <CardContent className="p-6 flex items-start gap-5">
                   <div className="flex-shrink-0">{solutionIcons[i]}</div>
                   <div>
-                    <h3 className="font-bold text-lg text-slate-900 mb-2">{s.title}</h3>
-                    <p className="text-slate-700 leading-relaxed">{s.desc}</p>
+                    <h3 className="font-bold text-lg text-white mb-2">{s.title}</h3>
+                    <p className="text-slate-300 leading-relaxed">{s.desc}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -179,19 +179,19 @@ const AboutPage = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-[#1E2A38]">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <Users className="h-8 w-8 text-orange-500" />
-                <h2 className="text-2xl font-bold text-slate-900">{c.forClients}</h2>
+                <h2 className="text-2xl font-bold text-white">{c.forClients}</h2>
               </div>
               <div className="space-y-4">
                 {c.clientBenefits.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-slate-700">{item}</p>
+                    <p className="text-slate-300">{item}</p>
                   </div>
                 ))}
               </div>
@@ -199,13 +199,13 @@ const AboutPage = () => {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <Building2 className="h-8 w-8 text-orange-500" />
-                <h2 className="text-2xl font-bold text-slate-900">{c.forCompanies}</h2>
+                <h2 className="text-2xl font-bold text-white">{c.forCompanies}</h2>
               </div>
               <div className="space-y-4">
                 {c.companyBenefits.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-slate-700">{item}</p>
+                    <p className="text-slate-300">{item}</p>
                   </div>
                 ))}
               </div>
@@ -220,17 +220,17 @@ const AboutPage = () => {
           <h2 className="text-2xl sm:text-3xl font-bold mb-6">{c.missionTitle}</h2>
           <p className="text-lg leading-relaxed mb-4 text-white/90">{c.missionP1}</p>
           <p className="text-lg leading-relaxed mb-8 text-white/90">{c.missionP2}</p>
-          <Separator className="bg-white/20 mb-8" />
+          <Separator className="bg-[#253545]/20 mb-8" />
           <p className="text-sm text-white/70 italic">{c.missionFooter}</p>
         </div>
       </section>
 
       <section className="py-16 text-center">
         <div className="max-w-xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">{c.ctaTitle}</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">{c.ctaTitle}</h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/register">
-              <Button className="bg-orange-600 hover:bg-orange-700 text-lg px-8 py-3" data-testid="about-register-btn">
+              <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-lg px-8 py-3" data-testid="about-register-btn">
                 <ArrowRight className="mr-2 h-5 w-5" /> {c.ctaStart}
               </Button>
             </Link>

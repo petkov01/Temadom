@@ -10,7 +10,7 @@ import { BLOG_ARTICLES } from '@/data/seoData';
 import { SEO_BLOG_ARTICLES } from '@/data/blogArticles';
 
 const typeLabels = { overview: 'Обзор', category: 'Категория', profession: 'Професия', region: 'Регион', article: 'Статия' };
-const typeColors = { overview: 'bg-blue-100 text-blue-800', category: 'bg-green-100 text-green-800', profession: 'bg-orange-100 text-orange-800', region: 'bg-purple-100 text-purple-800', article: 'bg-amber-100 text-amber-800' };
+const typeColors = { overview: 'bg-blue-100 text-blue-800', category: 'bg-green-100 text-green-800', profession: 'bg-[#FF8C42]/10 text-[#FF8C42]', region: 'bg-[#8C56FF]/10 text-purple-800', article: 'bg-amber-100 text-amber-800' };
 
 const catLabels = { 'ремонт': 'Ремонт', 'покриви': 'Покриви', 'изолация': 'Изолация', 'инсталации': 'Инсталации', 'груб строеж': 'Груб строеж', 'строителство': 'Строителство', 'съвети': 'Съвети', 'довършителни': 'Довършителни', 'подове': 'Подове' };
 
@@ -42,7 +42,7 @@ const BlogPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="blog-page">
+    <div className="min-h-screen bg-[#1E2A38]" data-testid="blog-page">
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-14">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <BookOpen className="h-10 w-10 text-orange-400 mx-auto mb-4" />
@@ -70,7 +70,7 @@ const BlogPage = () => {
               ? [['all','All'],['article','Articles'],['profession','Professions'],['region','Regions'],['overview','Overviews']]
               : [['all','Всички'],['article','Статии'],['profession','Професии'],['region','Региони'],['overview','Обзори']]
             ).map(([v,l]) => (
-              <Button key={v} variant={filter===v?'default':'outline'} size="sm" className={filter===v?'bg-orange-600 hover:bg-orange-700':''} onClick={() => setFilter(v)}>{l}</Button>
+              <Button key={v} variant={filter===v?'default':'outline'} size="sm" className={filter===v?'bg-[#FF8C42] hover:bg-[#e67a30]':''} onClick={() => setFilter(v)}>{l}</Button>
             ))}
           </div>
         </div>
@@ -91,9 +91,9 @@ const BlogPage = () => {
                     )}
                     <span className="text-xs text-slate-400 flex items-center gap-1"><Calendar className="h-3 w-3" /> 2026</span>
                   </div>
-                  <h2 className="font-bold text-slate-900 mb-2 line-clamp-2">{article.title}</h2>
-                  <p className="text-sm text-slate-600 line-clamp-2">{article.description}</p>
-                  <div className="mt-3 flex items-center text-orange-600 text-sm font-medium">
+                  <h2 className="font-bold text-white mb-2 line-clamp-2">{article.title}</h2>
+                  <p className="text-sm text-slate-400 line-clamp-2">{article.description}</p>
+                  <div className="mt-3 flex items-center text-[#FF8C42] text-sm font-medium">
                     Прочети повече <ArrowRight className="h-3 w-3 ml-1" />
                   </div>
                 </CardContent>

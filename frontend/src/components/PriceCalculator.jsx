@@ -580,29 +580,29 @@ const PriceCalculator = () => {
   // Auth guard - if not logged in, show registration prompt
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center py-16 px-4" data-testid="calculator-auth-guard">
+      <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-16 px-4" data-testid="calculator-auth-guard">
         <div className="max-w-md w-full text-center">
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-            <div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Lock className="h-8 w-8 text-orange-600" />
+          <div className="bg-[#253545] rounded-2xl shadow-lg border border-[#3A4A5C] p-8">
+            <div className="bg-[#FF8C42]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Lock className="h-8 w-8 text-[#FF8C42]" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
+            <h2 className="text-2xl font-bold text-white mb-3">
               {t('calc_auth_title')}
             </h2>
-            <p className="text-slate-600 mb-8">
+            <p className="text-slate-400 mb-8">
               {t('calc_auth_desc')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => navigate('/register')}
-                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white font-medium py-3 px-6 rounded-lg transition-colors"
                 data-testid="calculator-register-btn"
               >
                 {t('calc_auth_register')}
               </button>
               <button
                 onClick={() => navigate('/login')}
-                className="flex-1 bg-white hover:bg-slate-50 text-slate-700 font-medium py-3 px-6 rounded-lg border border-slate-300 transition-colors"
+                className="flex-1 bg-[#253545] hover:bg-[#1E2A38] text-slate-300 font-medium py-3 px-6 rounded-lg border border-[#3A4A5C] transition-colors"
                 data-testid="calculator-login-btn"
               >
                 {t('calc_auth_login')}
@@ -615,19 +615,19 @@ const PriceCalculator = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8" data-testid="price-calculator">
+    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="price-calculator">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="bg-orange-100 p-3 rounded-full">
-              <Calculator className="h-8 w-8 text-orange-600" />
+            <div className="bg-[#FF8C42]/10 p-3 rounded-full">
+              <Calculator className="h-8 w-8 text-[#FF8C42]" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
+            <h1 className="text-3xl md:text-4xl font-bold text-white">
               {t('calc_title')}
             </h1>
           </div>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
             {t('calc_subtitle')}
           </p>
           
@@ -640,7 +640,7 @@ const PriceCalculator = () => {
             >
               <FileImage className="mr-2 h-5 w-5" />
               AI Анализ на чертеж
-              <Badge className="ml-2 bg-white/20 text-white text-[10px]">NEW</Badge>
+              <Badge className="ml-2 bg-[#253545]/20 text-white text-[10px]">NEW</Badge>
             </Button>
             <p className="text-xs text-slate-500 mt-2">Качете строителен чертеж и AI ще извлече автоматично количествата</p>
           </div>
@@ -671,12 +671,12 @@ const PriceCalculator = () => {
                         onClick={() => addItem(key)}
                         className={`p-4 rounded-lg border-2 transition-all duration-200 text-left hover:shadow-md ${
                           isSelected 
-                            ? 'border-orange-400 bg-orange-50' 
-                            : 'border-slate-200 hover:border-orange-300'
+                            ? 'border-orange-400 bg-[#FF8C42]/5' 
+                            : 'border-[#3A4A5C] hover:border-orange-300'
                         }`}
                         data-testid={`add-${key}`}
                       >
-                        <Icon className={`h-6 w-6 mb-2 ${isSelected ? 'text-orange-600' : 'text-slate-500'}`} />
+                        <Icon className={`h-6 w-6 mb-2 ${isSelected ? 'text-[#FF8C42]' : 'text-slate-500'}`} />
                         <p className="font-medium text-sm">{category.name}</p>
                         <p className="text-xs text-slate-500 mt-1">{category.unit}</p>
                       </button>
@@ -699,7 +699,7 @@ const PriceCalculator = () => {
                   {selectedItems.map(item => {
                     const category = PRICE_DATABASE[item.category];
                     return (
-                      <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
+                      <div key={item.id} className="flex items-center gap-4 p-4 bg-[#1E2A38] rounded-lg">
                         <div className="flex-1">
                           <Label className="font-medium">{item.name}</Label>
                           <p className="text-xs text-slate-500">{category.unitLabel}</p>
@@ -751,8 +751,8 @@ const PriceCalculator = () => {
                         onClick={() => setPricingType(key)}
                         className={`p-4 rounded-lg border-2 text-left transition-all ${
                           pricingType === key 
-                            ? 'border-orange-500 bg-orange-50' 
-                            : 'border-slate-200 hover:border-slate-300'
+                            ? 'border-orange-500 bg-[#FF8C42]/5' 
+                            : 'border-[#3A4A5C] hover:border-[#3A4A5C]'
                         }`}
                         data-testid={`pricing-${key}`}
                       >
@@ -773,8 +773,8 @@ const PriceCalculator = () => {
                         onClick={() => setQualityLevel(key)}
                         className={`p-4 rounded-lg border-2 text-center transition-all ${
                           qualityLevel === key 
-                            ? 'border-orange-500 bg-orange-50' 
-                            : 'border-slate-200 hover:border-slate-300'
+                            ? 'border-orange-500 bg-[#FF8C42]/5' 
+                            : 'border-[#3A4A5C] hover:border-[#3A4A5C]'
                         }`}
                         data-testid={`quality-${key}`}
                       >
@@ -810,10 +810,10 @@ const PriceCalculator = () => {
 
           {/* Right: Price Summary */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24 border-2 border-orange-200">
-              <CardHeader className="bg-orange-50">
+            <Card className="sticky top-24 border-2 border-[#FF8C42]/20">
+              <CardHeader className="bg-[#FF8C42]/5">
                 <CardTitle className="flex items-center gap-2">
-                  <Euro className="h-5 w-5 text-orange-600" />
+                  <Euro className="h-5 w-5 text-[#FF8C42]" />
                   Обща цена
                 </CardTitle>
                 <CardDescription>
@@ -832,10 +832,10 @@ const PriceCalculator = () => {
                       {calculation.items.map(item => (
                         <div key={item.id} className="flex justify-between text-sm py-2 border-b border-slate-100 last:border-0">
                           <div className="flex-1">
-                            <span className="text-slate-700 font-medium">{item.name}</span>
+                            <span className="text-slate-300 font-medium">{item.name}</span>
                             <span className="text-slate-400 ml-1">({item.quantity} {PRICE_DATABASE[item.category].unit})</span>
                           </div>
-                          <span className="font-semibold text-slate-900 ml-3">
+                          <span className="font-semibold text-white ml-3">
                             {item.total.toFixed(0)} €
                           </span>
                         </div>
@@ -857,7 +857,7 @@ const PriceCalculator = () => {
                         <span>Регион:</span>
                         <span>{calculation.regionName}</span>
                       </div>
-                      <div className="flex justify-between font-medium text-slate-700">
+                      <div className="flex justify-between font-medium text-slate-300">
                         <span>Брой дейности:</span>
                         <span>{calculation.items.filter(i => i.quantity > 0).length}</span>
                       </div>
@@ -878,7 +878,7 @@ const PriceCalculator = () => {
                     {/* Download PDF button */}
                     {calculation.total > 0 && (
                       <Button 
-                        className="w-full mt-4 bg-orange-600 hover:bg-orange-700"
+                        className="w-full mt-4 bg-[#FF8C42] hover:bg-[#e67a30]"
                         onClick={async () => {
                           try {
                             const res = await axios.post(`${CALC_API}/calculator/pdf`, {
@@ -974,11 +974,11 @@ const PriceCalculator = () => {
             {!blueprintPreview ? (
               <div 
                 onClick={() => blueprintInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-300 rounded-xl p-10 text-center cursor-pointer hover:border-violet-400 hover:bg-violet-50/50 transition-all"
+                className="border-2 border-dashed border-[#3A4A5C] rounded-xl p-10 text-center cursor-pointer hover:border-violet-400 hover:bg-violet-50/50 transition-all"
                 data-testid="blueprint-upload-area"
               >
                 <Upload className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-                <p className="text-lg font-medium text-slate-700">Качете чертеж</p>
+                <p className="text-lg font-medium text-slate-300">Качете чертеж</p>
                 <p className="text-sm text-slate-500 mt-1">JPG, PNG или PDF • Макс. 10MB</p>
                 <p className="text-xs text-slate-400 mt-3">Поддържа: архитектурни планове, конструктивни чертежи, разпределения</p>
               </div>
@@ -989,7 +989,7 @@ const PriceCalculator = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="absolute top-2 right-2 bg-white"
+                    className="absolute top-2 right-2 bg-[#253545]"
                     onClick={() => { setBlueprintImage(null); setBlueprintPreview(null); setAnalysisResult(null); }}
                   >
                     Смени
@@ -1063,7 +1063,7 @@ const PriceCalculator = () => {
                 {/* Floor levels */}
                 {analysisResult.floor_levels?.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-sm text-slate-700 mb-2">Коти:</h4>
+                    <h4 className="font-semibold text-sm text-slate-300 mb-2">Коти:</h4>
                     <div className="flex flex-wrap gap-2">
                       {analysisResult.floor_levels.map((fl, i) => (
                         <Badge key={i} variant="outline" className="text-xs">
@@ -1077,10 +1077,10 @@ const PriceCalculator = () => {
                 {/* Rooms */}
                 {analysisResult.rooms?.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-sm text-slate-700 mb-2">Помещения:</h4>
+                    <h4 className="font-semibold text-sm text-slate-300 mb-2">Помещения:</h4>
                     <div className="grid grid-cols-2 gap-2">
                       {analysisResult.rooms.map((room, i) => (
-                        <div key={i} className="bg-slate-50 rounded p-2 text-xs">
+                        <div key={i} className="bg-[#1E2A38] rounded p-2 text-xs">
                           <span className="font-medium">{room.name}</span>
                           <span className="text-slate-500 ml-1">
                             {room.length_m && room.width_m ? `${room.length_m}x${room.width_m}м` : ''} = {room.area_sqm} кв.м
@@ -1094,14 +1094,14 @@ const PriceCalculator = () => {
                 {/* Calculator suggestions */}
                 {analysisResult.calculator_suggestions?.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-sm text-slate-700 mb-2">
+                    <h4 className="font-semibold text-sm text-slate-300 mb-2">
                       Извлечени количества ({analysisResult.calculator_suggestions.length} дейности):
                     </h4>
                     <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
                       {analysisResult.calculator_suggestions.map((s, i) => (
-                        <div key={i} className="flex items-center justify-between bg-slate-50 rounded px-3 py-2 text-sm">
-                          <span className="text-slate-700">{s.description}</span>
-                          <span className="font-semibold text-slate-900">{s.quantity} {s.unit}</span>
+                        <div key={i} className="flex items-center justify-between bg-[#1E2A38] rounded px-3 py-2 text-sm">
+                          <span className="text-slate-300">{s.description}</span>
+                          <span className="font-semibold text-white">{s.quantity} {s.unit}</span>
                         </div>
                       ))}
                     </div>

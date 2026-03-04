@@ -19,7 +19,7 @@ const PricesByRegionPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="prices-by-region">
+    <div className="min-h-screen bg-[#1E2A38]" data-testid="prices-by-region">
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-14">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <MapPin className="h-10 w-10 text-orange-400 mx-auto mb-4" />
@@ -73,11 +73,11 @@ const PricesByRegionPage = () => {
               </thead>
               <tbody>
                 {regions.map(([key, r], i) => (
-                  <tr key={key} className={`${i % 2 === 0 ? 'bg-slate-50' : 'bg-white'} hover:bg-orange-50 transition-colors`}>
+                  <tr key={key} className={`${i % 2 === 0 ? 'bg-[#1E2A38]' : 'bg-[#253545]'} hover:bg-[#FF8C42]/5 transition-colors`}>
                     <td className="p-3 font-medium sticky left-0 bg-inherit z-10">
                       <div className="flex items-center gap-2">
                         {getTrend(r.multiplier)}
-                        <Link to={`/region/${r.slug}`} className="text-orange-600 hover:underline">{r.name}</Link>
+                        <Link to={`/region/${r.slug}`} className="text-[#FF8C42] hover:underline">{r.name}</Link>
                       </div>
                     </td>
                     <td className="p-3 text-center"><Badge variant="outline" className="text-xs">x{r.multiplier.toFixed(2)}</Badge></td>
@@ -89,7 +89,7 @@ const PricesByRegionPage = () => {
                     <td className="p-3 text-center">{(30 * r.multiplier).toFixed(1)}</td>
                     <td className="p-3 text-center">
                       <Link to={`/region/${r.slug}`}>
-                        <Button size="sm" variant="ghost" className="text-orange-600 hover:text-orange-700 text-xs">
+                        <Button size="sm" variant="ghost" className="text-[#FF8C42] hover:text-[#FF8C42] text-xs">
                           Детайли <ArrowRight className="h-3 w-3 ml-1" />
                         </Button>
                       </Link>
@@ -104,7 +104,7 @@ const PricesByRegionPage = () => {
         {/* CTA */}
         <div className="text-center mt-8">
           <Link to="/calculator">
-            <Button className="bg-orange-600 hover:bg-orange-700 text-lg px-8 py-3" data-testid="prices-calc-btn">
+            <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-lg px-8 py-3" data-testid="prices-calc-btn">
               <Calculator className="mr-2 h-5 w-5" /> Изчисли точна оферта за твоята област
             </Button>
           </Link>

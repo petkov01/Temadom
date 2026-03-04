@@ -105,7 +105,7 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
       <CardContent className="p-4">
         <h4 className="font-semibold mb-1">{project.title}</h4>
         {project.description && (
-          <p className="text-sm text-slate-600 line-clamp-2">{project.description}</p>
+          <p className="text-sm text-slate-400 line-clamp-2">{project.description}</p>
         )}
         <div className="flex items-center gap-2 mt-3">
           {project.category && (
@@ -149,7 +149,7 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:bg-[#253545]/20"
                   onClick={() => navigateImage('prev')}
                 >
                   <ChevronLeft className="h-8 w-8" />
@@ -157,7 +157,7 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:bg-[#253545]/20"
                   onClick={() => navigateImage('next')}
                 >
                   <ChevronRight className="h-8 w-8" />
@@ -174,7 +174,7 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-2 right-2 text-white hover:bg-white/20"
+              className="absolute top-2 right-2 text-white hover:bg-[#253545]/20"
               onClick={() => setLightboxOpen(false)}
             >
               <X className="h-6 w-6" />
@@ -314,7 +314,7 @@ const AddPortfolioForm = ({ onSubmit, onCancel, loading }) => {
           {beforeImages.length < 5 && (
             <button
               onClick={() => beforeInputRef.current?.click()}
-              className="w-24 h-24 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
+              className="w-24 h-24 border-2 border-dashed border-[#3A4A5C] rounded-lg flex flex-col items-center justify-center text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
             >
               <Camera className="h-6 w-6 mb-1" />
               <span className="text-xs">Добави</span>
@@ -352,7 +352,7 @@ const AddPortfolioForm = ({ onSubmit, onCancel, loading }) => {
           {afterImages.length < 5 && (
             <button
               onClick={() => afterInputRef.current?.click()}
-              className="w-24 h-24 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
+              className="w-24 h-24 border-2 border-dashed border-[#3A4A5C] rounded-lg flex flex-col items-center justify-center text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
             >
               <Camera className="h-6 w-6 mb-1" />
               <span className="text-xs">Добави</span>
@@ -372,7 +372,7 @@ const AddPortfolioForm = ({ onSubmit, onCancel, loading }) => {
       <div className="flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={onCancel}>Отказ</Button>
         <Button 
-          className="bg-orange-600 hover:bg-orange-700"
+          className="bg-[#FF8C42] hover:bg-[#e67a30]"
           onClick={handleSubmit}
           disabled={loading}
           data-testid="submit-portfolio"
@@ -410,7 +410,7 @@ const PortfolioGallery = ({ projects, isOwner, onAddProject, onDeleteProject }) 
         </div>
         {isOwner && (
           <Button 
-            className="bg-orange-600 hover:bg-orange-700"
+            className="bg-[#FF8C42] hover:bg-[#e67a30]"
             onClick={() => setAddDialogOpen(true)}
             data-testid="add-portfolio-btn"
           >
@@ -422,7 +422,7 @@ const PortfolioGallery = ({ projects, isOwner, onAddProject, onDeleteProject }) 
       {projects.length === 0 ? (
         <Card className="p-12 text-center">
           <Camera className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-          <h4 className="text-lg font-medium text-slate-700 mb-2">Няма проекти в портфолиото</h4>
+          <h4 className="text-lg font-medium text-slate-300 mb-2">Няма проекти в портфолиото</h4>
           <p className="text-slate-500">
             {isOwner 
               ? 'Добавете снимки от вашите проекти за да покажете работата си'

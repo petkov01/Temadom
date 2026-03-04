@@ -60,14 +60,14 @@ const AnalyticsDashboard = () => {
     <div className="min-h-screen bg-slate-900 flex items-center justify-center" data-testid="analytics-login">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <Lock className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+          <Lock className="h-8 w-8 text-[#FF8C42] mx-auto mb-2" />
           <CardTitle>Аналитикс</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <Input type="password" placeholder="Парола за достъп" value={password} onChange={e => setPassword(e.target.value)} data-testid="analytics-password" />
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button className="w-full bg-orange-600 hover:bg-orange-700" type="submit" disabled={loading} data-testid="analytics-login-btn">
+            <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30]" type="submit" disabled={loading} data-testid="analytics-login-btn">
               {loading ? 'Зареждане...' : 'Вход'}
             </Button>
           </form>
@@ -96,14 +96,14 @@ const AnalyticsDashboard = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { icon: <Eye className="h-5 w-5" />, label: 'Посещения (днес)', value: data.pageviews_today, color: 'text-blue-600' },
-            { icon: <Calculator className="h-5 w-5" />, label: 'Калкулации', value: data.calculator_uses, color: 'text-orange-600' },
+            { icon: <Calculator className="h-5 w-5" />, label: 'Калкулации', value: data.calculator_uses, color: 'text-[#FF8C42]' },
             { icon: <FileDown className="h-5 w-5" />, label: 'PDF изтегляния', value: data.pdf_downloads, color: 'text-green-600' },
-            { icon: <CreditCard className="h-5 w-5" />, label: 'Плащания', value: data.payments, color: 'text-purple-600' }
+            { icon: <CreditCard className="h-5 w-5" />, label: 'Плащания', value: data.payments, color: 'text-[#8C56FF]' }
           ].map((m, i) => (
             <Card key={i}>
               <CardContent className="p-4">
                 <div className={`${m.color} mb-2`}>{m.icon}</div>
-                <p className="text-2xl font-bold text-slate-900">{m.value}</p>
+                <p className="text-2xl font-bold text-white">{m.value}</p>
                 <p className="text-xs text-slate-500">{m.label}</p>
               </CardContent>
             </Card>
@@ -121,7 +121,7 @@ const AnalyticsDashboard = () => {
           </Card>
           <Card>
             <CardContent className="p-4">
-              <Users className="h-5 w-5 text-orange-600 mb-2" />
+              <Users className="h-5 w-5 text-[#FF8C42] mb-2" />
               <p className="text-2xl font-bold">{data.total_companies}</p>
               <p className="text-xs text-slate-500">Фирми</p>
             </CardContent>
@@ -143,7 +143,7 @@ const AnalyticsDashboard = () => {
               <div className="space-y-2">
                 {data.top_pages?.map((p, i) => (
                   <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
-                    <span className="text-sm text-slate-700 truncate flex-1">{p.path}</span>
+                    <span className="text-sm text-slate-300 truncate flex-1">{p.path}</span>
                     <Badge variant="outline" className="text-xs ml-2">{p.views} посещения</Badge>
                   </div>
                 ))}
@@ -160,7 +160,7 @@ const AnalyticsDashboard = () => {
                 {data.recent_events?.map((e, i) => (
                   <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
                     <div>
-                      <span className="text-sm font-medium text-slate-900">{e.event_name}</span>
+                      <span className="text-sm font-medium text-white">{e.event_name}</span>
                       {e.metadata && <span className="text-xs text-slate-500 ml-2">{JSON.stringify(e.metadata).substring(0, 40)}</span>}
                     </div>
                     <span className="text-xs text-slate-400">{new Date(e.created_at).toLocaleTimeString('bg-BG')}</span>
@@ -178,9 +178,9 @@ const AnalyticsDashboard = () => {
           <CardContent>
             <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
               {data.top_regions?.map((r, i) => (
-                <div key={i} className="flex items-center justify-between bg-slate-50 rounded-lg p-3">
-                  <span className="text-sm font-medium text-slate-700">{r.region}</span>
-                  <Badge className="bg-orange-100 text-orange-800 text-xs">{r.count}</Badge>
+                <div key={i} className="flex items-center justify-between bg-[#1E2A38] rounded-lg p-3">
+                  <span className="text-sm font-medium text-slate-300">{r.region}</span>
+                  <Badge className="bg-[#FF8C42]/10 text-[#FF8C42] text-xs">{r.count}</Badge>
                 </div>
               ))}
               {(!data.top_regions || data.top_regions.length === 0) && <p className="text-sm text-slate-400">Няма данни</p>}
@@ -189,7 +189,7 @@ const AnalyticsDashboard = () => {
         </Card>
 
         {/* GA4 + Hotjar placeholder */}
-        <Card className="bg-slate-50 border-dashed">
+        <Card className="bg-[#1E2A38] border-dashed">
           <CardContent className="p-6 text-center text-slate-500">
             <p className="font-semibold mb-2">Google Analytics 4 & Hotjar</p>
             <p className="text-sm">За да активирате GA4 и Hotjar, добавете вашите ID-та в <code className="bg-slate-200 px-1 rounded">/app/frontend/public/index.html</code></p>

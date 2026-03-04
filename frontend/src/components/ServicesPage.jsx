@@ -407,10 +407,10 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
       <Collapsible open={isExpanded} onOpenChange={onToggle}>
         <CollapsibleTrigger asChild>
           <button className="w-full text-left">
-            <CardHeader className="hover:bg-slate-50 transition-colors cursor-pointer">
+            <CardHeader className="hover:bg-[#1E2A38] transition-colors cursor-pointer">
               <div className="flex items-start gap-4">
-                <div className="bg-orange-100 p-3 rounded-xl">
-                  <Icon className="h-6 w-6 text-orange-600" />
+                <div className="bg-[#FF8C42]/10 p-3 rounded-xl">
+                  <Icon className="h-6 w-6 text-[#FF8C42]" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
@@ -422,10 +422,10 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                   </div>
                   <CardDescription className="mt-2">{service.shortDescription}</CardDescription>
                   <div className="flex items-center gap-4 mt-3 text-sm">
-                    <span className="flex items-center gap-1 text-slate-600">
+                    <span className="flex items-center gap-1 text-slate-400">
                       <Clock className="h-4 w-4" /> {service.timeEstimate}
                     </span>
-                    <span className="text-orange-600 font-medium">{service.priceRange}</span>
+                    <span className="text-[#FF8C42] font-medium">{service.priceRange}</span>
                   </div>
                 </div>
               </div>
@@ -439,7 +439,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
               {/* Left column */}
               <div>
                 <h4 className="font-semibold text-lg mb-3">{isEn ? 'Description' : 'Описание'}</h4>
-                <p className="text-slate-600 mb-6">{service.fullDescription}</p>
+                <p className="text-slate-400 mb-6">{service.fullDescription}</p>
 
                 <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-600" /> {isEn ? 'Execution steps' : 'Стъпки на изпълнение'}
@@ -447,10 +447,10 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                 <ol className="space-y-2 mb-6">
                   {service.steps.map((step, idx) => (
                     <li key={idx} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-sm font-medium">
+                      <span className="flex-shrink-0 w-6 h-6 bg-[#FF8C42]/10 text-[#FF8C42] rounded-full flex items-center justify-center text-sm font-medium">
                         {idx + 1}
                       </span>
-                      <span className="text-slate-600">{step}</span>
+                      <span className="text-slate-400">{step}</span>
                     </li>
                   ))}
                 </ol>
@@ -495,10 +495,10 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-semibold">{isEn ? 'Need a craftsman?' : 'Нужда от майстор?'}</p>
-                      <p className="text-sm text-slate-600">{isEn ? 'Find a verified specialist' : 'Намерете проверен специалист'}</p>
+                      <p className="text-sm text-slate-400">{isEn ? 'Find a verified specialist' : 'Намерете проверен специалист'}</p>
                     </div>
                     <Link to="/companies">
-                      <Button className="bg-orange-600 hover:bg-orange-700">
+                      <Button className="bg-[#FF8C42] hover:bg-[#e67a30]">
                         {isEn ? 'Find company' : 'Намери фирма'} <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
@@ -526,7 +526,7 @@ const ServicesPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#1E2A38]">
       {/* Hero */}
       <section className="bg-slate-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -542,7 +542,7 @@ const ServicesPage = () => {
       </section>
 
       {/* Category Filter */}
-      <div className="bg-white border-b sticky top-16 z-40">
+      <div className="bg-[#253545] border-b sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap gap-2">
             {categories.map(cat => (
@@ -551,7 +551,7 @@ const ServicesPage = () => {
                 variant={categoryFilter === cat ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCategoryFilter(cat)}
-                className={categoryFilter === cat ? "bg-orange-600 hover:bg-orange-700" : ""}
+                className={categoryFilter === cat ? "bg-[#FF8C42] hover:bg-[#e67a30]" : ""}
               >
                 {cat === 'all' ? (isEn ? 'All' : 'Всички') : cat}
               </Button>
@@ -586,12 +586,12 @@ const ServicesPage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/calculator">
-                <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50">
+                <Button size="lg" className="bg-[#253545] text-[#FF8C42] hover:bg-[#FF8C42]/5">
                   {isEn ? 'Price Calculator' : 'Калкулатор за цени'}
                 </Button>
               </Link>
               <Link to="/register">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-[#253545]/10">
                   {isEn ? 'Publish project' : 'Публикувай проект'}
                 </Button>
               </Link>

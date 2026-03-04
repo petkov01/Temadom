@@ -67,7 +67,7 @@ export const Chatbot = ({ user }) => {
         <button
           onClick={() => setOpen(true)}
           data-testid="chatbot-open-btn"
-          className="fixed bottom-20 right-6 z-[100] w-14 h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg flex items-center justify-center transition-transform hover:scale-110"
+          className="fixed bottom-20 right-6 z-[100] w-14 h-14 rounded-full bg-[#FF8C42] hover:bg-[#e67a30] text-white shadow-lg shadow-[#FF8C42]/20 flex items-center justify-center transition-transform hover:scale-110"
         >
           <MessageSquare className="h-6 w-6" />
         </button>
@@ -76,11 +76,11 @@ export const Chatbot = ({ user }) => {
       {/* Chat window */}
       {open && (
         <div 
-          className="fixed bottom-20 right-6 z-[100] w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
+          className="fixed bottom-20 right-6 z-[100] w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-[#1E2A38] rounded-2xl shadow-2xl border border-[#3A4A5C] flex flex-col overflow-hidden"
           data-testid="chatbot-window"
         >
           {/* Header */}
-          <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
+          <div className="bg-[#0F1923] text-white px-4 py-3 flex items-center justify-between flex-shrink-0 border-b border-[#2A3A4C]">
             <div>
               <p className="font-semibold text-sm" data-testid="chatbot-title">{t('chatbot_title')}</p>
               <p className="text-xs text-slate-400">{t('chatbot_subtitle')}</p>
@@ -101,8 +101,8 @@ export const Chatbot = ({ user }) => {
                 <div
                   className={`max-w-[80%] px-3 py-2 rounded-xl text-sm leading-relaxed ${
                     msg.role === 'user'
-                      ? 'bg-orange-600 text-white rounded-br-sm'
-                      : 'bg-slate-100 text-slate-800 rounded-bl-sm'
+                      ? 'bg-[#FF8C42] text-white rounded-br-sm'
+                      : 'bg-[#253545] text-slate-200 rounded-bl-sm'
                   }`}
                   data-testid={`chatbot-msg-${msg.role}-${i}`}
                 >
@@ -112,7 +112,7 @@ export const Chatbot = ({ user }) => {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-slate-100 text-slate-500 px-3 py-2 rounded-xl rounded-bl-sm text-sm flex items-center gap-2">
+                <div className="bg-[#253545] text-slate-400 px-3 py-2 rounded-xl rounded-bl-sm text-sm flex items-center gap-2">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   {t('chatbot_sending')}
                 </div>
@@ -122,7 +122,7 @@ export const Chatbot = ({ user }) => {
           </div>
 
           {/* Input */}
-          <div className="border-t border-slate-200 px-3 py-2 flex-shrink-0">
+          <div className="border-t border-[#3A4A5C] px-3 py-2 flex-shrink-0">
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -132,13 +132,13 @@ export const Chatbot = ({ user }) => {
                 placeholder={t('chatbot_placeholder')}
                 disabled={loading}
                 data-testid="chatbot-input"
-                className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-orange-400 transition-colors"
+                className="flex-1 text-sm bg-[#253545] border border-[#3A4A5C] rounded-lg px-3 py-2 outline-none text-white placeholder-slate-500 focus:border-[#FF8C42] transition-colors"
               />
               <button
                 onClick={sendMessage}
                 disabled={loading || !input.trim()}
                 data-testid="chatbot-send-btn"
-                className="p-2 bg-orange-600 hover:bg-orange-700 disabled:bg-slate-300 text-white rounded-lg transition-colors"
+                className="p-2 bg-[#FF8C42] hover:bg-[#e67a30] disabled:bg-[#2B3A4A] text-white rounded-lg transition-colors"
               >
                 <Send className="h-4 w-4" />
               </button>

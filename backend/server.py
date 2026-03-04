@@ -2027,6 +2027,116 @@ async def activate_subscription(data: dict, user: dict = Depends(get_current_use
     )
     return {"message": "Абонаментът е активиран (тестов режим)", "plan": plan, "expires": expires.isoformat()}
 
+@api_router.get("/subscriptions/my")
+async def get_my_subscription(user: dict = Depends(get_current_user)):
+    """Get current user's subscription status"""
+    u = await db.users.find_one({"id": user["id"]}, {"_id": 0})
+    if not u:
+        raise HTTPException(status_code=404)
+    
+    expires_str = u.get("subscription_expires")
+    days_remaining = 0
+    if expires_str:
+        try:
+            expires_dt = datetime.fromisoformat(expires_str)
+            days_remaining = max(0, (expires_dt - datetime.now(timezone.utc)).days)
+        except Exception:
+            pass
+    
+    # Count user's active ads
+    active_ads = await db.ads.count_documents({"user_id": user["id"], "status": "active"})
+    
+    return {
+        "subscription_active": u.get("subscription_active", False),
+        "subscription_plan": u.get("subscription_plan"),
+        "subscription_expires": expires_str,
+        "days_remaining": days_remaining,
+        "active_ads": active_ads,
+        "test_mode": TEST_MODE
+    }
+
+@api_router.post("/subscriptions/simulate-expiry")
+async def simulate_subscription_expiry(user: dict = Depends(get_current_user)):
+    """TEST ONLY: Simulate subscription expiry for testing auto-deactivation"""
+    if not TEST_MODE:
+        raise HTTPException(status_code=403, detail="Достъпно само в тестов режим")
+    
+    expired_time = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"subscription_expires": expired_time, "subscription_reminded": False}}
+    )
+    await db.company_profiles.update_one(
+        {"user_id": user["id"]},
+        {"$set": {"subscription_expires": expired_time}}
+    )
+    return {"message": "Абонаментът е симулиран като изтекъл. Изчакайте до 1 час за автоматично деактивиране, или извикайте /api/subscriptions/run-check."}
+
+@api_router.post("/subscriptions/run-check")
+async def run_subscription_check():
+    """TEST ONLY: Manually trigger subscription expiry check"""
+    if not TEST_MODE:
+        raise HTTPException(status_code=403, detail="Достъпно само в тестов режим")
+    
+    now = datetime.now(timezone.utc)
+    reminder_threshold = now + timedelta(days=7)
+    
+    # Reminders
+    reminded = 0
+    expiring_soon = await db.users.find({
+        "subscription_active": True,
+        "subscription_expires": {"$lte": reminder_threshold.isoformat(), "$gt": now.isoformat()},
+        "subscription_reminded": {"$ne": True}
+    }, {"_id": 0}).to_list(100)
+    for u in expiring_soon:
+        await db.notifications.insert_one({
+            "id": str(uuid.uuid4()), "user_id": u["id"], "type": "subscription_reminder",
+            "title": "Абонаментът ви изтича скоро",
+            "message": f"Вашият абонамент ({u.get('subscription_plan', 'basic')}) изтича на {u.get('subscription_expires', '')[:10]}.",
+            "read": False, "created_at": now.isoformat()
+        })
+        await db.users.update_one({"id": u["id"]}, {"$set": {"subscription_reminded": True}})
+        reminded += 1
+    
+    # Deactivations
+    deactivated = 0
+    ads_removed = 0
+    expired = await db.users.find({
+        "subscription_active": True,
+        "subscription_expires": {"$lte": now.isoformat()}
+    }, {"_id": 0}).to_list(100)
+    for u in expired:
+        await db.users.update_one({"id": u["id"]}, {"$set": {"subscription_active": False, "subscription_reminded": False}})
+        await db.company_profiles.update_one({"user_id": u["id"]}, {"$set": {"subscription_active": False}})
+        res = await db.ads.update_many({"user_id": u["id"], "status": "active"}, {"$set": {"status": "expired"}})
+        ads_removed += res.modified_count
+        await db.notifications.insert_one({
+            "id": str(uuid.uuid4()), "user_id": u["id"], "type": "subscription_expired",
+            "title": "Абонаментът ви е изтекъл",
+            "message": f"Вашият абонамент е деактивиран. {res.modified_count} обяви са спрени.",
+            "read": False, "created_at": now.isoformat()
+        })
+        deactivated += 1
+    
+    return {"reminded": reminded, "deactivated": deactivated, "ads_removed": ads_removed}
+
+# ============== NOTIFICATIONS ==============
+
+@api_router.get("/notifications")
+async def get_notifications(user: dict = Depends(get_current_user)):
+    """Get user's notifications"""
+    notifs = await db.notifications.find(
+        {"user_id": user["id"]}, {"_id": 0}
+    ).sort("created_at", -1).limit(50).to_list(50)
+    unread = await db.notifications.count_documents({"user_id": user["id"], "read": False})
+    return {"notifications": notifs, "unread_count": unread}
+
+@api_router.post("/notifications/read-all")
+async def mark_all_read(user: dict = Depends(get_current_user)):
+    """Mark all notifications as read"""
+    await db.notifications.update_many({"user_id": user["id"], "read": False}, {"$set": {"read": True}})
+    return {"message": "Всички известия са маркирани като прочетени"}
+
 # ============== ADS / LISTINGS ==============
 
 @api_router.get("/ads")
@@ -2148,8 +2258,112 @@ async def check_review_content(data: dict):
     
     return {"approved": True, "reason": ""}
 
+# ============== FEEDBACK SYSTEM ==============
+@api_router.post("/feedback")
+async def submit_feedback(data: dict):
+    """Submit user feedback with rating"""
+    rating = data.get("rating", 0)
+    text = data.get("text", "")
+    name = data.get("name", "Анонимен")
+    
+    if not rating or rating < 1 or rating > 5:
+        raise HTTPException(status_code=400, detail="Оценката трябва да е между 1 и 5")
+    
+    feedback = {
+        "id": str(uuid.uuid4()),
+        "rating": rating,
+        "text": text,
+        "name": name,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.feedback.insert_one(feedback)
+    return {"status": "ok", "message": "Благодарим за обратната връзка!"}
+
+@api_router.get("/feedback")
+async def get_feedback():
+    """Get all feedback (admin view)"""
+    feedback_list = await db.feedback.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    avg_rating = 0
+    if feedback_list:
+        avg_rating = sum(f["rating"] for f in feedback_list) / len(feedback_list)
+    return {"feedback": feedback_list, "avg_rating": round(avg_rating, 1), "total": len(feedback_list)}
+
 # Include router - MUST be after all route definitions
 app.include_router(api_router)
+
+# ============== BACKGROUND TASKS: SUBSCRIPTION MANAGEMENT ==============
+import asyncio
+
+async def check_subscriptions_background():
+    """Background task: check expired subscriptions, send reminders, auto-deactivate"""
+    while True:
+        try:
+            now = datetime.now(timezone.utc)
+            reminder_threshold = now + timedelta(days=7)
+            
+            # 1. Send reminders for subscriptions expiring in 7 days
+            expiring_soon = await db.users.find({
+                "subscription_active": True,
+                "subscription_expires": {"$lte": reminder_threshold.isoformat(), "$gt": now.isoformat()},
+                "subscription_reminded": {"$ne": True}
+            }, {"_id": 0}).to_list(100)
+            
+            for user in expiring_soon:
+                # Create in-platform notification
+                await db.notifications.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "user_id": user["id"],
+                    "type": "subscription_reminder",
+                    "title": "Абонаментът ви изтича скоро",
+                    "message": f"Вашият абонамент ({user.get('subscription_plan', 'basic')}) изтича на {user.get('subscription_expires', '')[:10]}. Подновете го, за да запазите достъпа си.",
+                    "read": False,
+                    "created_at": now.isoformat()
+                })
+                await db.users.update_one({"id": user["id"]}, {"$set": {"subscription_reminded": True}})
+                logger.info(f"Subscription reminder sent to user {user['id']}")
+            
+            # 2. Auto-deactivate expired subscriptions
+            expired_users = await db.users.find({
+                "subscription_active": True,
+                "subscription_expires": {"$lte": now.isoformat()}
+            }, {"_id": 0}).to_list(100)
+            
+            for user in expired_users:
+                # Deactivate user subscription
+                await db.users.update_one(
+                    {"id": user["id"]},
+                    {"$set": {"subscription_active": False, "subscription_reminded": False}}
+                )
+                # Deactivate company profile subscription
+                await db.company_profiles.update_one(
+                    {"user_id": user["id"]},
+                    {"$set": {"subscription_active": False}}
+                )
+                # Deactivate all ads from this user
+                deactivated = await db.ads.update_many(
+                    {"user_id": user["id"], "status": "active"},
+                    {"$set": {"status": "expired"}}
+                )
+                # Create notification
+                await db.notifications.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "user_id": user["id"],
+                    "type": "subscription_expired",
+                    "title": "Абонаментът ви е изтекъл",
+                    "message": f"Вашият абонамент е деактивиран. {deactivated.modified_count} обяви са спрени. Подновете абонамента си за да ги възстановите.",
+                    "read": False,
+                    "created_at": now.isoformat()
+                })
+                logger.info(f"Subscription expired for user {user['id']}, {deactivated.modified_count} ads deactivated")
+            
+        except Exception as e:
+            logger.error(f"Subscription check error: {e}")
+        
+        await asyncio.sleep(3600)  # Check every hour
+
+@app.on_event("startup")
+async def start_background_tasks():
+    asyncio.create_task(check_subscriptions_background())
 
 logging.basicConfig(
     level=logging.INFO,

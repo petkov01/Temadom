@@ -161,17 +161,17 @@ const ChatPage = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="chat-page">
+    <div className="min-h-screen bg-[#1E2A38]" data-testid="chat-page">
       <div className="max-w-6xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-          <MessageSquare className="h-6 w-6 text-orange-600" />
+        <h1 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+          <MessageSquare className="h-6 w-6 text-[#FF8C42]" />
           Съобщения
         </h1>
 
         <div className="grid md:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
           {/* Conversations sidebar */}
           <Card className="md:col-span-1 overflow-hidden flex flex-col">
-            <CardHeader className="py-3 px-4 border-b bg-white">
+            <CardHeader className="py-3 px-4 border-b bg-[#253545]">
               <CardTitle className="text-base">Разговори</CardTitle>
             </CardHeader>
             <div className="flex-1 overflow-y-auto">
@@ -187,14 +187,14 @@ const ChatPage = () => {
                   <button
                     key={conv.conversation_id}
                     onClick={() => openConversation(conv)}
-                    className={`w-full text-left p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors ${
-                      activeConversation === conv.conversation_id ? 'bg-orange-50 border-l-4 border-l-orange-500' : ''
+                    className={`w-full text-left p-4 border-b border-slate-100 hover:bg-[#1E2A38] transition-colors ${
+                      activeConversation === conv.conversation_id ? 'bg-[#FF8C42]/5 border-l-4 border-l-orange-500' : ''
                     }`}
                     data-testid={`conversation-${conv.conversation_id}`}
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
-                        <AvatarFallback className="bg-orange-100 text-orange-700">
+                        <AvatarFallback className="bg-[#FF8C42]/10 text-[#FF8C42]">
                           {conv.other_user.name?.charAt(0) || '?'}
                         </AvatarFallback>
                       </Avatar>
@@ -222,7 +222,7 @@ const ChatPage = () => {
             {activeConversation || toUserId ? (
               <>
                 {/* Chat header */}
-                <div className="p-4 border-b bg-white flex items-center gap-3">
+                <div className="p-4 border-b bg-[#253545] flex items-center gap-3">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -232,7 +232,7 @@ const ChatPage = () => {
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
                   <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-orange-100 text-orange-700">
+                    <AvatarFallback className="bg-[#FF8C42]/10 text-[#FF8C42]">
                       {otherUser?.name?.charAt(0) || '?'}
                     </AvatarFallback>
                   </Avatar>
@@ -245,7 +245,7 @@ const ChatPage = () => {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
+                <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#1E2A38]">
                   {messages.length === 0 && (
                     <div className="text-center py-12 text-slate-500">
                       <MessageSquare className="h-8 w-8 mx-auto mb-2 text-slate-300" />
@@ -260,7 +260,7 @@ const ChatPage = () => {
                         <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                           isMine 
                             ? 'bg-orange-600 text-white rounded-br-md' 
-                            : 'bg-white border border-slate-200 text-slate-800 rounded-bl-md'
+                            : 'bg-[#253545] border border-[#3A4A5C] text-slate-200 rounded-bl-md'
                         }`}>
                           {msg.image && (
                             <img 
@@ -285,7 +285,7 @@ const ChatPage = () => {
 
                 {/* Image preview */}
                 {imagePreview && (
-                  <div className="px-3 pt-2 bg-white border-t">
+                  <div className="px-3 pt-2 bg-[#253545] border-t">
                     <div className="relative inline-block">
                       <img src={imagePreview} alt="Преглед" className="h-20 rounded-lg object-cover" />
                       <button
@@ -299,12 +299,12 @@ const ChatPage = () => {
                 )}
 
                 {/* Message input */}
-                <div className="p-3 border-t bg-white">
+                <div className="p-3 border-t bg-[#253545]">
                   <form onSubmit={handleSend} className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => imageInputRef.current?.click()}
-                      className="p-2 text-slate-400 hover:text-orange-600 transition-colors"
+                      className="p-2 text-slate-400 hover:text-[#FF8C42] transition-colors"
                       data-testid="chat-image-btn"
                     >
                       <Image className="h-5 w-5" />
@@ -326,7 +326,7 @@ const ChatPage = () => {
                     />
                     <Button 
                       type="submit" 
-                      className="bg-orange-600 hover:bg-orange-700"
+                      className="bg-[#FF8C42] hover:bg-[#e67a30]"
                       disabled={(!newMessage.trim() && !imagePreview) || sending}
                       data-testid="send-message-submit"
                     >

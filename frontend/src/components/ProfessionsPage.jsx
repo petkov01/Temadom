@@ -860,7 +860,7 @@ const ProfessionsPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="professions-page">
+    <div className="min-h-screen bg-[#1E2A38]" data-testid="professions-page">
       {/* Hero */}
       <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
@@ -914,7 +914,7 @@ const ProfessionsPage = () => {
                 key={cat}
                 variant={selectedCategory === cat ? 'default' : 'outline'}
                 size="sm"
-                className={selectedCategory === cat ? 'bg-orange-600 hover:bg-orange-700' : ''}
+                className={selectedCategory === cat ? 'bg-[#FF8C42] hover:bg-[#e67a30]' : ''}
                 onClick={() => setSelectedCategory(cat)}
                 data-testid={`filter-${cat}`}
               >
@@ -941,16 +941,16 @@ const ProfessionsPage = () => {
                 className="w-full text-left p-5 flex items-center gap-4"
                 onClick={() => setExpandedId(isExpanded ? null : prof.id)}
               >
-                <div className="bg-orange-100 text-orange-600 p-3 rounded-xl">
+                <div className="bg-[#FF8C42]/10 text-[#FF8C42] p-3 rounded-xl">
                   {prof.icon}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <h3 className="font-bold text-lg text-slate-900">{prof.name}</h3>
+                    <h3 className="font-bold text-lg text-white">{prof.name}</h3>
                     <Badge variant="outline" className="text-xs">{prof.category}</Badge>
-                    <Badge className="bg-slate-100 text-slate-700 text-xs">{prof.priceRange}</Badge>
+                    <Badge className="bg-slate-100 text-slate-300 text-xs">{prof.priceRange}</Badge>
                   </div>
-                  <p className="text-slate-600 text-sm mt-1">{prof.description}</p>
+                  <p className="text-slate-400 text-sm mt-1">{prof.description}</p>
                 </div>
                 {isExpanded ? <ChevronUp className="h-5 w-5 text-slate-400 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 text-slate-400 flex-shrink-0" />}
               </button>
@@ -972,7 +972,7 @@ const ProfessionsPage = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <CheckCircle className="h-5 w-5 text-green-600" />
-                      <h4 className="font-semibold text-slate-900">Как ТРЯБВА да се направи</h4>
+                      <h4 className="font-semibold text-white">Как ТРЯБВА да се направи</h4>
                     </div>
                     <div className="space-y-2">
                       {prof.howItShouldBeDone.map((step, i) => (
@@ -990,11 +990,11 @@ const ProfessionsPage = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <Star className="h-5 w-5 text-amber-500" />
-                      <h4 className="font-semibold text-slate-900">Признаци за качествена работа</h4>
+                      <h4 className="font-semibold text-white">Признаци за качествена работа</h4>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-2">
                       {prof.qualitySigns.map((sign, i) => (
-                        <div key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                        <div key={i} className="flex items-start gap-2 text-sm text-slate-300">
                           <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
                           <span>{sign}</span>
                         </div>
@@ -1033,7 +1033,7 @@ const ProfessionsPage = () => {
           <p className="text-slate-400 mb-6">Публикувайте проект и получете оферти от проверени фирми с реални отзиви</p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/register">
-              <Button className="bg-orange-600 hover:bg-orange-700 px-6" data-testid="professions-register-btn">
+              <Button className="bg-[#FF8C42] hover:bg-[#e67a30] px-6" data-testid="professions-register-btn">
                 <ArrowRight className="mr-2 h-4 w-4" />
                 Публикувай проект
               </Button>

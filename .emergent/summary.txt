@@ -1,162 +1,155 @@
 <analysis>**original_problem_statement:**
-The user wants to build a marketplace application named TemaDom for selling construction project leads.
+The user wants to build a marketplace application named TemaDom for selling construction project leads. The project has pivoted multiple times and is now in a soft launch phase.
 
-**PRODUCT REQUIREMENTS:**
-- **Business Model (PIVOT):** The platform is now **completely free** to use for both clients and contractors. All payment gates have been removed.
-- **User Roles:**
-    - **Clients:** Post projects.
-    - **Companies:** Contractors with a registered company (requires BULSTAT validation).
-    - **Masters:** Individual craftsmen without a registered company.
-    - Both Companies and Masters can browse projects, get client contacts for free, and create profiles.
-- **Core Features:**
-    - **Interactive Price Calculator:** A detailed calculator for 28+ services and 28 regions. Now includes a prominent total price summary and a sticky total bar on mobile.
-    - **AI Blueprint Analysis:** A new feature in the calculator allowing users to upload a construction drawing (blueprint). An AI (GPT-5.2) analyzes the image and automatically extracts quantities for the calculator.
-    - **Project & Profile Listings:** Clients post projects. Companies/Masters have profiles and can be browsed on a Find Master/Company page with filtering.
-    - **Real-time Chat:** Direct, unrestricted communication between clients and contractors, with image sharing enabled.
-    - **Telegram Notifications:** Companies and Masters receive instant Telegram notifications for new projects posted in their city.
-    - **SEO & Content:** The site includes 40+ blog articles, 28 regional SEO pages, a sitemap, and is optimized with Open Graph and Schema.org tags.
-- **UI/UX:** The user has requested several specific UI fixes, including navigation menu spacing, logo alignment, and removing dummy data.
+The user's latest and most critical request is to implement **Phase 3 - Soft Launch**, which involves a complete visual and functional overhaul of the application. All features are to be active and free for testing, but the UI should present the structure of future paid plans.
+
+**PRODUCT REQUIREMENTS (Phase 3 - Soft Launch):**
+*   **Visual Overhaul:**
+    *   **New Logo:** Replace the old logo site-wide with the new one provided.
+    *   **New Color Scheme:** Implement a specific dark theme:
+        *   Main: Dark Blue (), Dark Gray (), White ()
+        *   Accents: Orange (), Green (), Red ()
+        *   Secondary: Light Blue (), Purple ()
+        *   Gradients for Hero section and cards.
+*   **User Experience:**
+    *   ** Component:** Create and display a detailed instructional component on every major page, explaining the feature's function, steps for use, benefits, and tips.
+    *   **Video Instructions:** Integrate a Watch Video button/popup on each page to show a demo video for that feature.
+    *   **Feedback Section:** Implement a site-wide Give Feedback button allowing users to rate the app (1-5 stars) and provide textual feedback, which should be collected in an admin view.
+    *   **Project Gallery:** Add a gallery to showcase previously generated AI designs to increase user engagement.
+*   **Feature Enhancements (Test Mode - All Free):**
+    *   **Subscription Plans Page:** Create a new  page detailing , ,  (for Companies) and  plans. All features are unlocked, but the page explains what each plan will offer in the future.
+    *   **AI Designer Engine:** All variants (1/3/5) are active without limits. It should work from an uploaded room photo and allow users to select material quality (economy, standard, premium).
+    *   **PDF Generator:** Generate Contracts, Quantity Surveys, and Charters. Contracts should *not* include promotional store links, only legal terms, quantities, and signature fields.
+    *   **Ads System:** Allow up to 5 images per ad, with search and filtering by category/city.
+    *   **Registration Form:** Update the registration for Master and Company with a dropdown. The Bulstat field should only be visible and required for Company.
+    *   **Notifications (Telegram/Email):** Send notifications for subscription events (reminders, expiry) only for users on future , , and  plans.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-A full-stack marketplace application with a React frontend and a monolithic FastAPI backend using MongoDB. The platform is fully functional according to the latest user requirements. All payment logic has been removed, and the site operates on a free model. It features a multi-role user system (Client, Company, Master) with BULSTAT validation, an advanced price calculator, real-time chat, and Telegram integration for project notifications. The latest major feature is an AI-powered blueprint analyzer that uses GPT-5.2 to extract quantities from construction drawings uploaded to the calculator.
+A functional full-stack marketplace (React, FastAPI, MongoDB). The previous session completed a massive full-site translation (BG/EN) and laid the foundation for a v10.8 update. This included adding a 'designer' user type, a new homepage, and backend stubs for subscriptions, ads, and ratings. This v10.8 foundation was successfully tested but is now set to be completely overhauled by the new Phase 3 - Soft Launch requirements.
 
 **Last working item**:
-- Last item agent was working: Implementing a new feature for AI-powered blueprint analysis in the price calculator, and a minor UI fix for the navigation menu spacing.
-- Status: TESTING PENDING
-- Agent Testing Done: N (The testing agent was invoked in the last step, but the results are not yet available).
-- Which testing method agent to use? The  has already been called. The next agent should analyze its report.
-- User Testing Done: N
+*   Last item agent was working: The agent was acknowledging and planning the implementation of the comprehensive Phase 3 - Soft Launch requirements provided by the user. This includes a complete UI/UX redesign (new logo, color scheme), new instructional components, and significant feature enhancements across the entire application.
+*   Status: NOT STARTED
+*   Agent Testing Done: N
+*   Which testing method agent to use? . This is a massive, site-wide change. The agent should test after all Phase 3 features are implemented together.
+*   User Testing Done: N
 
 **All Pending/In progress Issue list**:
-- No pending issues. All previously reported bugs have been resolved.
+-   **Issue 1:** Fix PDF generation from the price calculator (P1)
+    -   **Status:** RESOLVED. This issue is superseded by the new, more detailed requirements for the PDF generator in the Phase 3 plan, which specifies the generation of different document types (Contracts, Quantity Surveys) with different content rules. The focus should be on implementing the new requirements, not fixing the old format.
 
 **In progress Task List**:
-- Task 1: Finalize AI Blueprint Analysis Feature (P0)
-  - Where to resume: The  was just invoked to test the new feature. The next step is to read the generated test report from , analyze the results, and fix any bugs found by the testing agent.
-  - What will be achieved with this? A cutting-edge feature allowing users to upload construction blueprints, which are then analyzed by an AI to automatically populate the quantity fields in the price calculator, saving significant manual effort.
-  - Status: TESTING PENDING
-  - Should Test frontend/backend/both after fix? Both.
-  - Blocked on something: The results from the  execution.
+*   **Task 1: Implement Phase 3 - Soft Launch (P0)**
+
+**Task Detail:**
+*   **Task 1:**
+    *   **Where to resume:** The agent must start from scratch on this task. The first step should be to implement the new visual identity: replace the logo and apply the new dark-themed color scheme across the entire application's CSS or Tailwind configuration. Then, proceed with the feature list from the .
+    *   **What will be achieved with this?** A fully-featured soft launch version of the TemaDom platform with a new, professional UI/UX, ready for user testing and feedback collection. All features will be active and free.
+    *   **Status:** NOT STARTED
+    *   **Should Test frontend/backend/both after fix?** Both.
+    *   **Blocked on something:** No.
 
 **Upcoming and Future Tasks**
-- **Future Tasks:**
-    - P2: Integrate EasyPay Bulgaria as an alternative payment method (This was deferred from the original plan and will only be relevant if the user decides to re-introduce payments).
+*   **Upcoming Tasks:**
+    *   The entire **Phase 3 - Soft Launch** implementation is the sole upcoming task. It's a very large-scale P0 task.
+*   **Future Tasks:**
+    *   **Mobile App Development:** Build a mobile app for Android and iOS using React Native/Expo, reusing the existing backend. The user needs to confirm if they want to proceed with this or a PWA.
+    *   **Monetization:** Introduce real pricing and payment gateways (like EasyPay Bulgaria) after the soft launch and feedback period.
 
 **Completed work in this session**
-- **AI Feature:**
-  - Implemented an AI-powered blueprint analysis feature in the Price Calculator using GPT-5.2 via . Includes a backend endpoint () and a frontend UI for file upload and interaction.
-- **Business Model & Monetization:**
-  - Made the entire platform free, removing all Stripe payment buttons and backend logic for usage limits on the calculator and project contacts.
-  - Added banners and text across the site to inform users that the platform is currently free.
-- **User Management:**
-  - Re-architected the registration process with three distinct user types: Клиент (Client), Фирма (Company), and Майстор (Master).
-  - Implemented mandatory BULSTAT (9-digit EIK) validation for company registrations.
-  - Updated backend logic to grant Masters the same access rights as Companies.
-- **Telegram Integration:**
-  - Integrated a Telegram bot to send real-time notifications to companies and masters when a new project is posted in their registered city.
-  - Added a  field to the user registration and profile.
-- **UI & UX Improvements:**
-  - Fixed the navigation menu on mobile to correctly display all links (Блог, Цени по области).
-  - Corrected the alignment of the logo's subtitle text on both desktop and footer.
-  - Adjusted spacing in the main navigation bar to bring menu items closer together.
-  - Added a prominent, clearly visible Total Price summary box in the price calculator.
-  - Added a sticky total price bar at the bottom of the screen on mobile for the calculator.
-- **Data & Content:**
-  - Conducted market research and updated the prices for various construction services in  and  to be more accurate.
-  - Performed keyword research and wrote 12 new, comprehensive SEO articles, adding them to the blog.
-  - Deleted all placeholder/dummy projects and companies from the database to start with a clean slate.
-- **New Pages:**
-  - Created a Намери майстор (Find Master) page that allows filtering of contractors by type (company/master), profession, and city.
-- **SEO & Technical:**
-  - Replaced all instances of  with  throughout the codebase.
-  - Added Open Graph meta tags and Schema.org markup to  for better social sharing and SEO.
-  - Added a Google Search Console verification file and meta tag to facilitate site ownership verification.
+-   **Full-Site Translation:** Refactored the entire frontend to use  for seamless Bulgarian/English language switching.
+-   **v10.8 Foundation:**
+    -   Implemented a new v10.8 homepage design and updated the main navigation.
+    -   Added 'designer' user type to the backend and registration form.
+    -   Created placeholder pages (, , ) and backend endpoints for upcoming features.
+-   **Testing:** Successfully ran , which passed all frontend and backend tests for the v10.8 foundation.
+-   **Deployment Guidance:** Provided the user with a Health Check summary and instructions on how to deploy the application.
+
+**Earlier issues found/mentioned but not fixed**
+-   None.
 
 **Known issue recurrence from previous fork**
-- **Issue:** User dissatisfaction with the logo.
-  - **Recurrence count:** 5+
-  - **Status:** RESOLVED. The agent has fixed multiple alignment issues and the user has not reported further problems.
-- **Issue:** Mobile menu bugs.
-  - **Recurrence count:** 2
-  - **Status:** RESOLVED. The mobile menu is now functional and displays all required links.
+-   None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend:** FastAPI, Python, MongoDB. Now uses  and  for LLM access.
-- **Frontend:** React.js, TailwindCSS, .
-- **Database:** MongoDB. The  model was updated to include , , , and .
-- **AI:** OpenAI GPT-5.2 is used for image-to-text analysis (construction blueprints). Access is managed via the Emergent LLM Key.
+-   **Backend:** FastAPI, Python, MongoDB. The  file is a large monolith.
+-   **Frontend:** React.js, TailwindCSS, .
+-   **State Management:** React Context API for Auth () and Language ().
+-   **Internationalization (i18n):** A custom React Context and a central  file drive the full-site translation.
+-   **Soft Launch Mode:** A core concept where all features are enabled for free to gather user feedback, while the UI communicates the structure of future paid plans.
 
 **key DB schema**
-- **users:** 
-- **projects:** 
-- **conversations:** 
-- **messages:** 
-- **events:** 
+-   : Collection updated to support  type 'designer'. New fields for subscription status are needed.
+-   : New collection needed for the feedback system.
+-   : Schema needs to support up to 5 images.
 
 **All files of reference**
-- : Massively updated. Contains all logic for user roles, BULSTAT validation, Telegram notifications, the new AI blueprint analysis endpoint, and unrestricted data access.
-- : Major overhaul. Implemented the UI for the AI blueprint analysis feature, including the dialog, file upload, and state management. Also added the improved total price display.
-- : Completely redesigned with a tabbed interface for Client, Company, and Master registration types, with conditional fields like BULSTAT.
-- : Updated with the Намери майстор link and adjusted item spacing.
-- : New file that displays a filterable list of companies and masters.
-- : Updated with Open Graph tags, Schema.org markup, and Google verification meta tag.
-- : New file created for Google Search Console verification.
+*   : Modified to include new routes and inline page components for the v10.8 update. Will need significant changes for Phase 3.
+*   : Heavily modified with new endpoints for subscriptions, ads, and ratings. Will need more changes for Phase 3 logic.
+*   : Completely rewritten with the v10.8 design, but will be changed again for Phase 3's new color scheme and content.
+*   : Updated with the 'Designer' user type. Will need further changes for the dynamic Bulstat field.
+*   : A new, large file containing all text for BG/EN translations.
+*   **Almost all files in ** were modified to implement the translation system.
 
 **Areas that need refactoring**:
-- ** is critically oversized and monolithic.** It handles authentication, all CRUD operations, chat, analytics, PDF generation, sitemap, Telegram integration, and AI analysis. It urgently needs to be broken down into a standard FastAPI structure (e.g., using routers, models, and services folders) to improve maintainability. This should be proposed to the user as a high-priority technical debt task.
+-   **:** This is a critical monolith that grows with every feature. It should be broken down into a standard FastAPI structure (routers, services, models) to improve maintainability.
+-   **Inline Page Components:** The new pages added in  (, , ) should be extracted into their own files within .
 
 **key api endpoints**
-- : **(NEW)** POST endpoint that accepts an image file (blueprint) and uses GPT-5.2 to extract and return construction quantities.
-- : **(NEW)** POST endpoint to send a mass message to all companies/masters via Telegram.
-- : GET endpoint updated to allow filtering by  ('company' or 'master').
-- : POST endpoint updated to handle different s and validate  for companies.
+-   : (NEW) GET endpoint to fetch subscription plans.
+-   : (NEW) GET endpoint to check a user's subscription status.
+-   : (NEW) GET endpoint for the global AI design counter.
+-   : (NEW) POST endpoint for submitting reviews/feedback.
+-   : (NEW) POST endpoint for creating ads.
 
 **Critical Info for New Agent**
-- Your immediate task is to review the results of the  that was just run on the new **AI Blueprint Analysis** feature. Find the report in  and address any issues.
-- The user is technically savvy and has successfully pushed the code to a public GitHub repository. They are now asking about deployment. Be prepared to guide them on deploying from GitHub or using the platform's deploy feature.
-- All communication with the user **MUST** be in Bulgarian.
-- Proposing the refactoring of  is highly recommended for the long-term health of the project.
+-   You MUST discard previous plans and focus exclusively on the user's **Phase 3 - Soft Launch** request. This is your single source of truth.
+-   The implementation order should be:
+    1.  **Visuals First:** Implement the new logo and the site-wide dark color scheme.
+    2.  **Core Components:** Create the generic , video instruction popups, and the Give Feedback components.
+    3.  **Feature by Feature:** Implement the detailed functional requirements for Subscriptions, AI Designer, PDF Generator, Ads, Registration, and Notifications as specified in the problem statement.
+-   Everything is in **test mode**: all features are free and fully unlocked. The goal is to present the functionality and gather user feedback.
+-   All communication must be in **Bulgarian**.
 
 **documents and test reports created in this job**
--  (Continuously updated)
-- 
-- 
-- Test reports from  to . The next report to check will be  or higher.
+-    (Updated)
+-    (Successful test report for the v10.8 foundation)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1. **User (latest):** Requested two final features: move Find Project and Find Master links closer together in the navigation, and add an AI feature to the calculator to analyze construction drawings and extract quantities automatically.
-2. **User:** Clarified the AI requirement: it should be the most powerful AI available to accurately recognize all elements (levels, columns, dimensions, etc.) from architectural/structural drawings to save contractors time.
-3. **User:** Requested that the calculator display a clear grand total for all selected activities, as it was previously unclear.
-4. **User:** Asked for instructions on how to deploy the site to his domain .
-5. **User:** Mentioned they failed Google Search Console verification using the DNS method.
-6. **User:** Stated that adding the property with a capital H in  failed.
-7. **User:** Reported that the HTML file verification method also failed due to incorrect content.
-8. **User:** Provided the HTML filename given by Google for verification.
-9. **User:** Asked where to find the meta tag for verification.
-10. **User:** Asked for instructions on how to get the code to provide it to the agent.
+1.  **User (latest):** Copy (Providing a massive, detailed prompt for the Phase 3 soft launch, including the new color scheme,  component, video tutorials, and redefined functionality for all major features. Also provided a new logo image).
+2.  **User:** Yes, I'd like to add a gallery of previous projects.
+3.  **User:** Can you start phase 2?
+4.  **User:** Deploy.
+5.  **User:** Call Deployer Agent and Run Health Check to Check for Readiness for Deployment.
+6.  **User:** (Confirms all Phase 1 tests passed and is ready to finalize).
+7.  **User:** (Provides a long, detailed list of requirements for a v10.8 test mode, which was the precursor to the final Phase 3 prompt).
+8.  **User:** (Agrees to the development plan for v10.8).
+9.  **User:** I want the language to change for the entire site, not just the menu. Also, the PDF from the calculator is formatted incorrectly.
+10. **User (oldest):** I want the PDF to show activity type on the left, then prices, and a grand total at the bottom.
 
 **Project Health Check:**
-- **Broken:** No features are known to be broken. The last implemented feature (AI analysis) is pending test results.
-- **Mocked:** None.
+-   **Broken:** None. The app is in a stable, tested state (v10.8 foundation).
+-   **Mocked:** The subscription, ads, and ratings features have backend stubs but lack full implementation, which is the goal of the upcoming Phase 3 task.
 
 **3rd Party Integrations**
-- **OpenAI GPT-5.2:** Used for blueprint analysis. Requires Emergent LLM Key.
-- **Telegram:** Used for sending new project notifications. Requires User API Key (already provided and in ).
-- **Stripe (Payments):** Integrated but currently disabled as the platform is free. Requires User API Key.
-- **Google Analytics 4:** Integrated for site analytics (). Does not require a user key.
+-   **OpenAI GPT-5.2:** Used for blueprint analysis and the AI chatbot. Uses **Emergent LLM Key**.
+-   **Telegram:** Used for new project notifications. Requires a user-provided API key.
+-   **Stripe (Payments):** Integrated but currently disabled.
+-   **Google Analytics 4:** Integrated for site analytics.
 
 **Testing status**
-- Testing agent used after significant changes: YES
-- Troubleshoot agent used after agent stuck in loop: NO
-- Test files created: []
-- Known regressions: None currently. All previously identified regressions have been fixed.
+-   Testing agent used after significant changes: YES (for the v10.8 foundation)
+-   Troubleshoot agent used after agent stuck in loop: NO
+-   Test files created: []
+-   Known regressions: None.
 
 **Credentials to test flow:**
-- **Analytics Dashboard:** The password is .
-- **Telegram Bot Token:** Available in  as .
-- **User Accounts:** Can be registered freely on the site for all three roles (Client, Company, Master).</analysis>
+-   **User Accounts:** Register a new user on the site to access features.
+
+**What agent forgot to execute**
+-   The agent has not forgotten any tasks. The user provided a new, all-encompassing set of requirements (Phase 3) that supersedes all previous in-progress work and redefines the project's immediate goals. The next step is to begin implementing this new, large-scale plan.</analysis>

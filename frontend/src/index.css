@@ -6,26 +6,36 @@
 @tailwind utilities;
 
 :root {
-  --background: 210 40% 98%;
-  --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --primary: 222 47% 11%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 24 95% 47%;
+  /* Dark Theme - TemaDom Phase 3 */
+  --background: 211 30% 17%;
+  --foreground: 0 0% 100%;
+  --card: 211 25% 22%;
+  --card-foreground: 0 0% 95%;
+  --popover: 211 25% 20%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 25 100% 63%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 211 30% 28%;
+  --secondary-foreground: 0 0% 90%;
+  --muted: 211 20% 25%;
+  --muted-foreground: 210 15% 65%;
+  --accent: 25 100% 63%;
   --accent-foreground: 0 0% 100%;
-  --destructive: 0 84% 60%;
+  --destructive: 354 70% 54%;
   --destructive-foreground: 0 0% 98%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 24 95% 47%;
+  --border: 211 20% 30%;
+  --input: 211 20% 30%;
+  --ring: 25 100% 63%;
   --radius: 0.5rem;
+
+  /* Custom colors */
+  --td-dark-blue: #1E2A38;
+  --td-dark-gray: #2B2B2B;
+  --td-orange: #FF8C42;
+  --td-green: #28A745;
+  --td-red: #DC3545;
+  --td-light-blue: #4DA6FF;
+  --td-purple: #8C56FF;
 }
 
 * {
@@ -37,8 +47,8 @@ body {
   font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #F8FAFC;
-  color: #0F172A;
+  background-color: #1E2A38;
+  color: #FFFFFF;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -56,23 +66,23 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - dark theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #1E2A38;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #3A4A5C;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #4DA6FF;
 }
 
 /* Animation classes */
@@ -103,6 +113,11 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 140, 66, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(255, 140, 66, 0.6); }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
 }
@@ -115,6 +130,10 @@ h1, h2, h3, h4, h5, h6 {
   animation: slideDown 0.3s ease-out;
 }
 
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
 /* Stagger animations */
 .stagger-1 { animation-delay: 0.1s; }
 .stagger-2 { animation-delay: 0.2s; }
@@ -125,39 +144,39 @@ h1, h2, h3, h4, h5, h6 {
 .blur-overlay {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(30, 42, 56, 0.6);
 }
 
 /* Button hover effects */
 .btn-primary {
-  @apply bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 rounded-md shadow-sm transition-all duration-200;
+  @apply bg-[#FF8C42] hover:bg-[#e67a30] text-white font-semibold px-6 py-3 rounded-md shadow-sm transition-all duration-200;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
 }
 
 .btn-secondary {
-  @apply bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium px-6 py-3 rounded-md transition-all duration-200;
+  @apply bg-[#253545] border border-[#3A4A5C] text-white hover:bg-[#2E4050] font-medium px-6 py-3 rounded-md transition-all duration-200;
 }
 
 .btn-ghost {
-  @apply text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-4 py-2 rounded-md transition-all duration-200;
+  @apply text-slate-300 hover:text-white hover:bg-white/10 px-4 py-2 rounded-md transition-all duration-200;
 }
 
-/* Card styles */
+/* Card styles - dark */
 .card {
-  @apply bg-white border border-slate-200 rounded-lg shadow-sm transition-shadow duration-200;
+  @apply bg-[#253545] border border-[#3A4A5C] rounded-lg shadow-sm transition-shadow duration-200;
 }
 
 .card:hover {
-  @apply shadow-md;
+  @apply shadow-lg;
 }
 
-/* Input styles */
+/* Input styles - dark */
 .input-base {
-  @apply h-11 border-slate-300 focus:border-orange-500 focus:ring-orange-500 rounded-md bg-white;
+  @apply h-11 border-[#3A4A5C] focus:border-[#FF8C42] focus:ring-[#FF8C42] rounded-md bg-[#1E2A38];
 }
 
 /* Badge styles */
@@ -166,33 +185,49 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .badge-neutral {
-  @apply bg-slate-100 text-slate-800;
+  @apply bg-[#2B3A4A] text-slate-300;
 }
 
 .badge-success {
-  @apply bg-green-100 text-green-800;
+  @apply bg-green-900/40 text-green-400;
 }
 
 .badge-warning {
-  @apply bg-yellow-100 text-yellow-800;
+  @apply bg-yellow-900/40 text-yellow-400;
 }
 
 .badge-accent {
-  @apply bg-orange-100 text-orange-800;
+  @apply bg-orange-900/40 text-orange-400;
 }
 
 /* Rating stars */
 .star-filled {
-  color: #F59E0B;
+  color: #FF8C42;
 }
 
 .star-empty {
-  color: #E2E8F0;
+  color: #3A4A5C;
 }
 
 /* Hero section */
 .hero-gradient {
-  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  background: linear-gradient(135deg, #1E2A38 0%, #0F1923 50%, #1E2A38 100%);
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(37, 53, 69, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(77, 166, 255, 0.15);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #FF8C42, #4DA6FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Noise texture overlay */
@@ -207,7 +242,17 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   right: 0;
   bottom: 0;
-  opacity: 0.03;
+  opacity: 0.02;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Custom gradient cards */
+.gradient-card {
+  background: linear-gradient(135deg, #253545 0%, #1E2A38 100%);
+  border: 1px solid rgba(77, 166, 255, 0.1);
+}
+
+.gradient-card:hover {
+  border-color: rgba(255, 140, 66, 0.3);
 }
