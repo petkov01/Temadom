@@ -1,62 +1,107 @@
-# TemaDom - PRD (Product Requirements Document)
+# TemaDom v10.8 - PRD (Product Requirements Document)
 
 ## Original Problem Statement
-Build a marketplace application named "TemaDom" for construction project leads in Bulgaria. Connect clients with contractors (companies and individual masters).
+Build a marketplace platform "TemaDom" for construction and renovation services in Bulgaria with AI-powered features.
 
-## Business Model
-- **COMPLETELY FREE** platform for all users (clients, companies, masters)
-- All payment gates removed (Stripe integrated but disabled)
+## Platform Architecture
+Modular design with independent blocks communicating through Central AI Core:
+- **Central AI Core**: Manages AI Designer, calculations, PDF generation, limits tracking
+- **Block 1**: User System (Client, Company, Designer, Master)
+- **Block 2**: Subscription Engine (test mode)
+- **Block 3**: AI Designer Engine (2D + 3D)
+- **Block 4**: Calculator & Charter Engine
+- **Block 5**: Ads System
+- **Block 6**: Referral System (demo)
+- **Block 7**: Rating System
+- **Block 8**: Homepage Structure
 
-## User Personas
-- **Clients:** Post construction/renovation projects
-- **Companies:** Contractors with registered company (BULSTAT validation required)
-- **Masters:** Individual craftsmen without a registered company
-- **Admin:** Platform moderator with access to analytics, complaints management
+## Current Mode
+**TEST MODE** — All prices replaced with "Тестов режим". Limits and functionalities active.
 
-## Core Requirements
+## Tech Stack
+- **Frontend**: React.js, TailwindCSS, Shadcn/UI, lucide-react
+- **Backend**: FastAPI, Python, MongoDB
+- **AI**: OpenAI GPT-5.2 via emergentintegrations (blueprint analysis, chatbot)
+- **Notifications**: Telegram
 
-### Implemented Features (Complete)
-1. **Multi-role Authentication** - Client/Company/Master registration with BULSTAT validation
-2. **Project Listings** - CRUD for construction projects with image upload
-3. **Company/Master Profiles** - With portfolio gallery, ratings, reviews
-4. **Price Calculator** - 28 services x 28 regions, 3 quality levels, labor +/- materials
-5. **AI Blueprint Analysis** - GPT-4o powered image analysis of construction drawings
-6. **Real-time Chat** - Direct messaging with image sharing
-7. **Telegram Notifications** - Bot notifications for new projects in contractor's city
-8. **Blog & SEO** - 40+ articles, 28 regional pages, Schema.org, Open Graph
-9. **Analytics Dashboard** - Password-protected admin analytics
-10. **Find Master Page** - Filterable listing of contractors
-11. **Dropdown Navigation Menu** - 4 main items visible + "Още" dropdown with 5 more
-12. **Language Switcher** - 8 languages (BG, EN, DE, FR, ES, IT, RU, TR) with flag icons
-13. **AI Chatbot** - GPT-4o powered assistant for platform questions and complaint handling
+## User Types
+1. **Клиент** (Client) - posts projects, free ads
+2. **Фирма** (Company) - requires bulstat, subscription plans
+3. **Дизайнер** (Designer) - AI design access, portfolio
+4. **Майстор** (Master) - individual craftsman
 
-### Date Log
-- 2026-02-27: Added dropdown navigation, language switcher (8 languages), AI chatbot with complaint handling
+## What's Been Implemented
 
-## Technical Architecture
-- **Frontend:** React.js, TailwindCSS, Shadcn/UI, lucide-react
-- **Backend:** FastAPI (Python), monolithic server.py
-- **Database:** MongoDB (users, projects, conversations, messages, events, chatbot_conversations, complaints, user_warnings)
-- **AI:** OpenAI GPT-4o via emergentintegrations + Emergent LLM Key
-- **Integrations:** Telegram Bot, Stripe (disabled), Google Analytics
+### Phase 1 - Foundation (COMPLETED - March 2026)
+- [x] User system with 4 types (Client, Company, Designer, Master)
+- [x] New Homepage v10.8 with Hero ("ПЪРВИ 20 ФИРМИ = 1 МЕСЕЦ ПРО ТЕСТОВ РЕЖИМ")
+- [x] AI Designer promo section ("Първите 100 AI дизайна безплатни")
+- [x] 4 Demo projects on homepage
+- [x] How it works section (Калкулатор, AI Дизайнер, Намери фирма, Оценка)
+- [x] Top companies section
+- [x] Subscription plans page (Базов/Про/Премиум for companies, Designer plan)
+- [x] Ads/Listings system (create, view, delete)
+- [x] AI Designer showcase page with 3 variants and free counter (100/100)
+- [x] Referral system endpoints (demo mode)
+- [x] AI review moderation endpoint
+- [x] Updated Navbar: Главна | Калкулатор | Фирми | Дизайнери | Обяви | Още
+- [x] Registration with 4 user type tabs
+- [x] Subscription activation (test mode)
 
-## P0 (Critical) - DONE
-- All core marketplace features
-- Calculator with AI analysis
-- Chat system
-- Navigation improvements
+### Previously Completed (carried over)
+- [x] Price Calculator with 28 regions, 3 quality levels
+- [x] AI Blueprint Analysis (GPT-5.2)
+- [x] AI Chatbot Assistant ("TemaDom Асистент")
+- [x] Full-site BG/EN translation system
+- [x] PDF generation from calculator (fixed format)
+- [x] Real-time chat between users
+- [x] Telegram notifications
+- [x] Rating & review system
+- [x] Contact info protection (censoring in chat)
+- [x] Google Analytics 4 integration
 
-## P1 (Important) - BACKLOG
-- Refactor server.py into modular FastAPI structure (routes, models, services)
-- Add more content translations for landing page and subpages
+## API Endpoints
+### New in v10.8
+- `GET /api/subscriptions/plans` - Subscription plans (test mode)
+- `POST /api/subscriptions/activate` - Activate subscription
+- `GET /api/ads` - List ads
+- `POST /api/ads` - Create ad (auth required)
+- `DELETE /api/ads/{ad_id}` - Delete ad
+- `GET /api/ai-design/status` - AI design counter
+- `GET /api/demo-projects` - 4 demo projects for homepage
+- `GET /api/top-companies` - Top-rated companies
+- `GET /api/referrals/status` - Referral status (demo)
+- `POST /api/reviews/check` - AI moderation for reviews
 
-## P2 (Nice to have) - BACKLOG
-- EasyPay Bulgaria payment integration (if payments re-introduced)
-- Admin dashboard for complaint management UI
-- Push notifications for mobile web
-- User reputation/review system improvements
+## Backlog (Prioritized)
 
-## Known Limitations
-- Emergent LLM Key budget may be low - users should add balance via Profile -> Universal Key -> Add Balance
-- Landing page hero content stays in Bulgarian regardless of language setting (intentional - Bulgarian market focus)
-- PDF generation has Cyrillic encoding issue (pre-existing, low priority)
+### P0 - Phase 2: Subscriptions + Ads Enhancement
+- Subscription auto-deactivation on expiry (7-day reminder)
+- Ads with image upload
+- Ads filtering by category and city
+- Auto-delete ads on subscription expiry
+
+### P1 - Phase 3: AI Designer Engine
+- OpenAI GPT Image 1 integration for 2D visualizations
+- 3D GLB model generation (Kaedim/Point-E/Spline)
+- Style and budget selection flow
+- PDF + GLB file generation and download
+- Store links integration
+- Video instructions
+- 100 global free limit enforcement
+- 1 per profile limit enforcement
+
+### P2 - Phase 4: Calculator & Charter Engine
+- PDF dimension analysis
+- 3D formwork recognition (columns, beams, slabs, stairs, elevator shafts)
+- Quantity survey generation
+- Contract generation
+- Share version (no prices)
+- Manual price editing by companies
+
+### P3 - Future
+- EasyPay Bulgaria integration
+- Mobile app (React Native/Expo)
+- Forum system
+- Full English translation for all content pages
+- server.py refactoring into modular FastAPI structure
