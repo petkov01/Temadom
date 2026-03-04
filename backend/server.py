@@ -2390,8 +2390,16 @@ async def generate_ai_design(request: Request):
             "Focus on luxury premium finishes, marble, brass, designer fixtures"
         ]
         
+        # 2 camera angles per variant
+        angles = [
+            "photographed from the entrance/door looking inward, showing the full room layout",
+            "photographed from the opposite corner at a diagonal angle, showing depth and side walls"
+        ]
+        
         for i in range(variants_count):
-            variant_prompt = f"""Professional interior design photograph of {room_desc}.
+            variant_angles = []
+            for angle_idx, angle_desc in enumerate(angles):
+                variant_prompt = f"""Professional interior design photograph of {room_desc}, {angle_desc}.
 This is a {room_type_name} with dimensions {room_width}m x {room_length}m, height {room_height}m.
 Redesigned in {style_desc} with {material_desc}.
 The design must show the SAME room layout and proportions but completely renovated.
@@ -2399,20 +2407,27 @@ Keep the same basic structure (walls, windows, doors in same positions).
 {f'Special requirements: {notes}' if notes else ''}
 {variant_focuses[i % len(variant_focuses)]}.
 Ultra-realistic professional interior photography, 8K quality, perfect lighting, photorealistic materials and textures."""
+                
+                img_result = await image_gen.generate_images(
+                    prompt=variant_prompt,
+                    model="gpt-image-1",
+                    number_of_images=1
+                )
+                
+                if img_result and len(img_result) > 0:
+                    img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
+                    variant_angles.append({
+                        "angle": angle_idx + 1,
+                        "angle_label": "Фронтален" if angle_idx == 0 else "Страничен",
+                        "image_base64": img_b64
+                    })
             
-            images = await image_gen.generate_images(
-                prompt=variant_prompt,
-                model="gpt-image-1",
-                number_of_images=1
-            )
-            
-            if images and len(images) > 0:
-                img_b64 = base64.b64encode(images[0]).decode('utf-8')
-                generated_images.append({
-                    "variant": i + 1,
-                    "image_base64": img_b64,
-                    "prompt_used": variant_prompt[:200]
-                })
+            generated_images.append({
+                "variant": i + 1,
+                "angles": variant_angles,
+                "image_base64": variant_angles[0]["image_base64"] if variant_angles else "",
+                "prompt_used": variant_prompt[:200] if variant_angles else ""
+            })
         
         # Step 3: Generate materials list with prices using GPT
         materials_chat = LlmChat(

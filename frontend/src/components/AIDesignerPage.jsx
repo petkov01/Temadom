@@ -628,16 +628,37 @@ export const AIDesignerPage = () => {
                         <p className="text-[#FF8C42] text-xs mb-2 font-medium uppercase tracking-wider">
                           След — Вариант {activeImage + 1} / {results.generated_images?.length || 0}
                         </p>
-                        <div className="rounded-xl overflow-hidden border border-[#FF8C42]/30">
-                          {results.generated_images?.[activeImage] && (
-                            <img
-                              src={`data:image/png;base64,${results.generated_images[activeImage].image_base64}`}
-                              alt={`Design ${activeImage + 1}`}
-                              className="w-full"
-                              data-testid="after-image"
-                            />
-                          )}
-                        </div>
+                        {/* 2 angles for the active variant */}
+                        {results.generated_images?.[activeImage]?.angles?.length > 1 ? (
+                          <div className="space-y-3">
+                            {results.generated_images[activeImage].angles.map((ang, ai) => (
+                              <div key={ai}>
+                                <p className="text-slate-500 text-[10px] mb-1 uppercase tracking-wider">
+                                  {ang.angle_label || (ai === 0 ? 'Фронтален ъгъл' : 'Страничен ъгъл')}
+                                </p>
+                                <div className="rounded-xl overflow-hidden border border-[#FF8C42]/30">
+                                  <img
+                                    src={`data:image/png;base64,${ang.image_base64}`}
+                                    alt={`V${activeImage+1} angle ${ai+1}`}
+                                    className="w-full"
+                                    data-testid={`after-image-angle-${ai}`}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="rounded-xl overflow-hidden border border-[#FF8C42]/30">
+                            {results.generated_images?.[activeImage] && (
+                              <img
+                                src={`data:image/png;base64,${results.generated_images[activeImage].image_base64}`}
+                                alt={`Design ${activeImage + 1}`}
+                                className="w-full"
+                                data-testid="after-image"
+                              />
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 
