@@ -11,6 +11,8 @@ import {
   FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench,
   ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart
 } from 'lucide-react';
+import { AIDesignerPage } from '@/components/AIDesignerPage';
+import { FeedbackPage } from '@/components/FeedbackPage';
 import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 import ProjectEstimator from '@/components/ProjectEstimator';
@@ -154,11 +156,11 @@ const Navbar = () => {
   return (
     <nav className="bg-[#0F1923] border-b border-[#2A3A4C] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-[100px]">
+        <div className="flex justify-between h-[130px]">
           {/* Left: Big Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
-              <TemaDomLogo className="h-[88px] w-auto" />
+              <TemaDomLogo className="h-[120px] w-auto" />
             </Link>
           </div>
 
@@ -216,6 +218,9 @@ const Navbar = () => {
                   </Link>
                   <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-about">
                     <Info className="h-4 w-4" /> За нас
+                  </Link>
+                  <Link to="/feedback" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-feedback">
+                    <Star className="h-4 w-4" /> Обратна връзка
                   </Link>
                 </div>
               )}
@@ -2851,105 +2856,6 @@ const AdsPage = () => {
 };
 
 // ============== AI DESIGNER PAGE (Placeholder) ==============
-const AIDesignerPage = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [designStatus, setDesignStatus] = useState(null);
-
-  useEffect(() => {
-    axios.get(`${API}/ai-design/status`).then(res => setDesignStatus(res.data)).catch(() => {});
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="ai-designer-page">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-[#8C56FF]/15 border border-[#8C56FF]/30 rounded-full px-4 py-2 mb-4">
-            <Sparkles className="h-5 w-5 text-[#8C56FF]" />
-            <span className="text-[#8C56FF] font-medium text-sm">AI ДИЗАЙНЕР</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">AI Интериорен дизайнер</h1>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Генерирайте 2D визуализации и 3D модели за вашия проект с помощта на изкуствен интелект.
-          </p>
-        </div>
-
-        <PageInstructions
-          title="AI Интериорен дизайнер"
-          description="Генерирайте AI визуализации на вашия проект"
-          steps={['Качете снимка на стаята или пространството', 'Изберете стил и качество на материалите', 'AI генерира 2D визуализация и 3D модел', 'Получете PDF с линкове към магазини']}
-          benefits={['Безплатни дизайни в тестов режим', 'Избор между Economy, Standard и Premium материали', 'PDF + GLB файл за всеки дизайн']}
-          tips={['Качете снимка с добро осветление', 'Изберете стил, който ви допада']}
-          videoUrl="https://temadom.com/videos/ai-designer"
-        />
-
-        {/* Free designs counter */}
-        {designStatus && (
-          <Card className="mb-8 overflow-hidden" data-testid="design-counter">
-            <div className="bg-gradient-to-r from-[#8C56FF]/30 to-[#4DA6FF]/30 border border-[#8C56FF]/20 p-6 text-white text-center">
-              <p className="text-[#8C56FF]/60 text-sm mb-1">Безплатни AI дизайна оставащи</p>
-              <p className="text-5xl font-bold">{designStatus.global_free_remaining} / {designStatus.global_limit}</p>
-              <p className="text-[#8C56FF]/60 text-xs mt-2">1 безплатен дизайн на профил (Вариант 1)</p>
-            </div>
-          </Card>
-        )}
-
-        {/* Design variants */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {[
-            { name: 'Вариант 1', items: '1 PDF + 1 GLB', price: 'Тестов режим', highlight: true, desc: 'Първите 100 безплатни. 1 профил = 1 използване.' },
-            { name: 'Вариант 3', items: '3 PDF + 3 GLB', price: 'Тестов режим', highlight: false, desc: 'С афилиейт линкове към магазини.' },
-            { name: 'Вариант 5', items: '5 PDF + 5 GLB', price: 'Тестов режим', highlight: false, desc: 'С афилиейт линкове + приоритетна генерация.' }
-          ].map((variant, i) => (
-            <Card key={i} className={`relative overflow-hidden ${variant.highlight ? 'border-[#8C56FF] ring-2 ring-[#8C56FF]/20' : ''}`} data-testid={`design-variant-${i}`}>
-              {variant.highlight && (
-                <div className="bg-[#8C56FF] text-white text-center text-xs py-1 font-medium">БЕЗПЛАТНО (лимитирано)</div>
-              )}
-              <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-2">{variant.name}</h3>
-                <p className="text-2xl font-bold text-[#8C56FF] mb-3">{variant.price}</p>
-                <p className="text-sm text-slate-400 mb-4">{variant.desc}</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> {variant.items}</div>
-                  <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Избор на стил</div>
-                  <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Избор на бюджет</div>
-                  <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Линкове към магазини</div>
-                </div>
-                <Button className={`w-full mt-6 ${variant.highlight ? 'bg-[#8C56FF] hover:bg-[#7a44ee]' : 'bg-[#2B3A4A] text-slate-500 cursor-not-allowed'}`} 
-                  disabled={!variant.highlight} onClick={() => !user ? navigate('/register') : toast.info('AI Дизайнерът ще бъде активиран скоро!')}>
-                  {variant.highlight ? 'Генерирай дизайн' : 'Очаквайте скоро'}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Features */}
-        <Card className="bg-[#253545] border-[#3A4A5C]">
-          <CardContent className="p-8">
-            <h3 className="text-xl font-bold mb-6 text-center">Какво включва AI дизайна?</h3>
-            <div className="grid md:grid-cols-2 gap-6">
-              {[
-                { icon: <FileDown className="h-6 w-6" />, title: 'PDF визуализация', desc: '2D рендер на вашето пространство' },
-                { icon: <Boxes className="h-6 w-6" />, title: '3D GLB модел', desc: 'Интерактивен 3D модел за преглед' },
-                { icon: <Sparkles className="h-6 w-6" />, title: 'Избор на стил', desc: 'Модерен, класически, минималистичен и др.' },
-                { icon: <ShoppingCart className="h-6 w-6" />, title: 'Линкове към магазини', desc: 'Директни линкове за закупуване на мебели' }
-              ].map((f, i) => (
-                <div key={i} className="flex items-start gap-4">
-                  <div className="bg-[#8C56FF]/10 rounded-lg p-3 text-[#8C56FF]">{f.icon}</div>
-                  <div>
-                    <h4 className="font-semibold">{f.title}</h4>
-                    <p className="text-sm text-slate-400">{f.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-};
 
 // ============== SUBSCRIPTIONS PAGE ==============
 const SubscriptionsPage = () => {
@@ -2976,60 +2882,72 @@ const SubscriptionsPage = () => {
       <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Абонаментни планове</h1>
-          <p className="text-lg text-slate-400">Всички функции в тестов режим — цените ще се активират след старта</p>
+          <p className="text-lg text-slate-400">Всички функции в тестов режим — без показани цени</p>
         </div>
 
         <PageInstructions
           title="Абонаментни планове"
           description="Изберете план според вашите нужди"
-          steps={['Разгледайте наличните планове', 'Изберете подходящия план за вашия бизнес', 'Активирайте безплатно в тестов режим', 'Използвайте всички функции без ограничения']}
-          benefits={['Всички функции безплатни в тестов режим', 'Планове за фирми и дизайнери', 'Telegram/Email нотификации за Pro и Premium']}
+          steps={['Разгледайте наличните планове за фирми', 'AI Designer е отделен платен модул', 'В тестов режим всичко е безплатно', 'Регистрирайте се и активирайте']}
+          benefits={['Всички функции безплатни в тестов режим', 'Без показани цени', 'Email / Telegram известия за Pro и Premium']}
           videoUrl="https://temadom.com/videos/subscriptions"
         />
 
-        <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-lg p-4 mb-8 text-center" data-testid="test-mode-notice">
-          <span className="text-[#FF8C42] font-medium">Тестов режим — цените ще се активират след старта на фирмата</span>
+        <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-xl p-4 mb-8 text-center" data-testid="test-mode-notice">
+          <span className="text-[#FF8C42] font-bold">ТЕСТОВ РЕЖИМ — Всички функции активни, без ограничения</span>
+          <p className="text-slate-400 text-xs mt-1">Цените ще бъдат обявени след приключване на тестовия период</p>
         </div>
 
-        <h2 className="text-2xl font-bold mb-6">За фирми</h2>
+        {/* Plans for companies */}
+        <h2 className="text-2xl font-bold text-white mb-6">За фирми</h2>
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {plans.company && Object.entries(plans.company).map(([key, plan]) => (
             <Card key={key} className={`relative bg-[#253545] border-[#3A4A5C] ${key === 'pro' ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20' : ''}`} data-testid={`plan-${key}`}>
               {key === 'pro' && <div className="bg-[#FF8C42] text-white text-center text-xs py-1 font-medium">ПРЕПОРЪЧАН</div>}
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
-                <p className="text-2xl font-bold text-[#FF8C42] mb-4">{plan.price}</p>
+                <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
+                <p className="text-lg font-bold text-[#FF8C42] mb-4">{plan.price}</p>
                 <div className="space-y-2 mb-6">
                   {plan.features.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-green-500" /> {f}
+                    <div key={i} className="flex items-center gap-2 text-sm text-slate-300">
+                      <CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> {f}
                     </div>
                   ))}
                 </div>
-                <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30]" onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
-                  Активирай (тестов)
+                <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
+                  Регистрирай се
                 </Button>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <h2 className="text-2xl font-bold mb-6">За дизайнери</h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* AI Designer - separate module */}
+        <h2 className="text-2xl font-bold text-white mb-2">AI Дизайнер</h2>
+        <p className="text-slate-400 text-sm mb-6">Отделен платен модул — безплатен в тестовия период</p>
+        <div className="grid md:grid-cols-1 gap-6 max-w-md">
           {plans.designer && Object.entries(plans.designer).map(([key, plan]) => (
-            <Card key={key} data-testid={`plan-designer-${key}`}>
+            <Card key={key} className="bg-gradient-to-r from-[#8C56FF]/20 to-[#4DA6FF]/20 border-[#8C56FF]/30" data-testid={`plan-designer-${key}`}>
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
-                <p className="text-2xl font-bold text-[#8C56FF] mb-4">{plan.price}</p>
+                <div className="flex items-center gap-3 mb-3">
+                  <Sparkles className="h-6 w-6 text-[#8C56FF]" />
+                  <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                </div>
+                <p className="text-sm font-medium text-[#8C56FF] mb-4">{plan.price}</p>
+                {plan.note && (
+                  <div className="bg-[#8C56FF]/10 border border-[#8C56FF]/20 rounded-lg p-3 mb-4">
+                    <p className="text-xs text-[#8C56FF]">{plan.note}</p>
+                  </div>
+                )}
                 <div className="space-y-2 mb-6">
                   {plan.features.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-green-500" /> {f}
+                    <div key={i} className="flex items-center gap-2 text-sm text-slate-300">
+                      <CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> {f}
                     </div>
                   ))}
                 </div>
-                <Button className="w-full bg-[#8C56FF] hover:bg-[#7a44ee]" onClick={() => handleActivate(key)}>
-                  Активирай (тестов)
+                <Button className="w-full bg-[#8C56FF] hover:bg-[#7a44ee] text-white" onClick={() => navigate('/ai-designer')}>
+                  Опитай безплатно
                 </Button>
               </CardContent>
             </Card>
@@ -3091,6 +3009,7 @@ function App() {
                 <Route path="/ads" element={<AdsPage />} />
                 <Route path="/ai-designer" element={<AIDesignerPage />} />
                 <Route path="/subscriptions" element={<SubscriptionsPage />} />
+                <Route path="/feedback" element={<FeedbackPage />} />
               </Routes>
             </main>
             <Footer />

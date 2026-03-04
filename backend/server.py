@@ -16,8 +16,10 @@ import jwt
 import httpx
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 import json as json_module
 import re as re_module
+import base64
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -45,19 +47,87 @@ EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 PLATFORM_FREE = True
 TEST_MODE = True  # All prices shown as "тестов режим"
 
-# AI Designer limits
-AI_DESIGN_GLOBAL_FREE_LIMIT = 100  # First 100 designs globally free
-AI_DESIGN_PER_PROFILE_LIMIT = 1    # 1 free design per profile (Variant 1)
+# AI Designer limits - TEST MODE: all free
+AI_DESIGN_GLOBAL_FREE_LIMIT = 10000
+AI_DESIGN_PER_PROFILE_LIMIT = 100
 
-# Subscription plans (test mode - no real prices)
+# Bulgarian stores for materials
+BG_STORES = [
+    {"name": "Praktiker", "url": "https://www.praktiker.bg", "category": "Строителство и ремонт"},
+    {"name": "Bauhaus", "url": "https://www.bauhaus.bg", "category": "Строителство и материали"},
+    {"name": "Mr. Bricolage", "url": "https://www.mr-bricolage.bg", "category": "Дом и градина"},
+    {"name": "Homemax", "url": "https://www.homemax.bg", "category": "Обзавеждане и интериор"},
+    {"name": "IKEA", "url": "https://www.ikea.bg", "category": "Мебели и аксесоари"},
+    {"name": "Bricoman", "url": "https://www.bricoman.bg", "category": "Строителни материали"},
+    {"name": "Technopolis", "url": "https://www.technopolis.bg", "category": "Електроуреди и техника"},
+    {"name": "Technomarket", "url": "https://www.technomarket.bg", "category": "Електроуреди"},
+    {"name": "Emag", "url": "https://www.emag.bg", "category": "Електроника и дом"},
+    {"name": "Jysk", "url": "https://www.jysk.bg", "category": "Мебели и текстил"},
+    {"name": "Jumbo", "url": "https://www.jumbo.bg", "category": "Дом и декорация"},
+    {"name": "Videnov", "url": "https://www.videnov.bg", "category": "Мебели"},
+    {"name": "Masko", "url": "https://www.masko.bg", "category": "Мебели и обзавеждане"},
+    {"name": "Forma Ideale", "url": "https://www.formaideale.bg", "category": "Мебели"},
+    {"name": "Mebeli 1", "url": "https://www.mebeli1.bg", "category": "Мебели онлайн"},
+    {"name": "Selion", "url": "https://www.selilon.bg", "category": "Осветление"},
+    {"name": "Ceramica", "url": "https://www.ceramica.bg", "category": "Плочки и керамика"},
+    {"name": "Leroy Merlin", "url": "https://www.leroymerlin.bg", "category": "Строителство и дом"},
+]
+
+# Subscription plans - updated for soft launch
 SUBSCRIPTION_PLANS = {
     "company": {
-        "basic": {"name": "Базов", "price": "Тестов режим", "features": ["Публикуване на обяви", "Профил страница", "Основна статистика"]},
-        "pro": {"name": "Про", "price": "Тестов режим", "features": ["Всичко от Базов", "Приоритетно показване", "Разширена статистика", "Неограничени обяви"]},
-        "premium": {"name": "Премиум", "price": "Тестов режим", "features": ["Всичко от Про", "AI дизайн достъп", "Топ позиция", "Персонален мениджър"]}
+        "basic": {
+            "name": "Базов",
+            "price": "Тестов режим",
+            "features": [
+                "До 2 проекта едновременно",
+                "PDF генератор: чертежи и количествени сметки",
+                "Обяви: до 3 снимки",
+                "Видео инструкции",
+                "Профил страница"
+            ]
+        },
+        "pro": {
+            "name": "Про",
+            "price": "Тестов режим",
+            "features": [
+                "Всичко от Базов",
+                "Неограничени проекти",
+                "PDF генератор: пълна функционалност",
+                "Обяви: до 5 снимки",
+                "Email / Telegram известия",
+                "Приоритетно показване",
+                "Разширена статистика"
+            ]
+        },
+        "premium": {
+            "name": "Премиум",
+            "price": "Тестов режим",
+            "features": [
+                "Всичко от Про",
+                "PDF генератор: пълна функционалност",
+                "Обяви: до 10 снимки",
+                "Персонализирани видео и маркетинг",
+                "Топ позиция в търсачката",
+                "Персонален мениджър"
+            ]
+        }
     },
     "designer": {
-        "designer": {"name": "Дизайнер", "price": "Тестов режим", "features": ["AI дизайн достъп", "Портфолио", "Клиентски заявки"]}
+        "designer": {
+            "name": "AI Дизайнер",
+            "price": "Отделен модул (тестов)",
+            "features": [
+                "AI интериорен дизайн",
+                "1/3/5 варианта генерация",
+                "Преди и след сравнение",
+                "Списък материали с цени",
+                "Линкове към магазини",
+                "PDF експорт",
+                "Портфолио"
+            ],
+            "note": "AI Designer е отделен платен модул. Безплатен в тестов режим."
+        }
     }
 }
 
@@ -2200,9 +2270,197 @@ async def get_ai_design_status(user: dict = Depends(get_optional_user)):
         "global_limit": AI_DESIGN_GLOBAL_FREE_LIMIT,
         "user_designs_used": user_used,
         "user_free_limit": AI_DESIGN_PER_PROFILE_LIMIT,
-        "can_use_free": free_remaining > 0 and user_used < AI_DESIGN_PER_PROFILE_LIMIT,
+        "can_use_free": True,
         "test_mode": TEST_MODE
     }
+
+# ============== AI DESIGNER - GENERATE ==============
+
+AI_STYLES = {
+    "modern": "съвременен модерен стил с чисти линии, неутрални цветове и минимализъм",
+    "scandinavian": "скандинавски стил с бели стени, дърво, минимализъм и естествена светлина",
+    "loft": "индустриален лофт стил с тухлени стени, метал, открити тръби и бетон",
+    "classic": "класически стил с елегантни мебели, богати тъкани и декоративни елементи",
+    "minimalist": "минималистичен стил с прости форми, бяло пространство и функционалност"
+}
+
+AI_MATERIAL_CLASS = {
+    "economy": "икономичен клас материали - достъпни цени, основно качество",
+    "standard": "стандартен клас материали - добро качество, средна ценова гама",
+    "premium": "премиум клас материали - висококачествени, луксозни"
+}
+
+@api_router.post("/ai-designer/generate")
+async def generate_ai_design(request: Request):
+    """Generate AI interior design based on uploaded room photo"""
+    data = await request.json()
+    
+    image_base64 = data.get("image")
+    style = data.get("style", "modern")
+    material_class = data.get("material_class", "standard")
+    room_width = data.get("width", "4")
+    room_length = data.get("length", "5")
+    room_height = data.get("height", "2.6")
+    variants = data.get("variants", 1)
+    notes = data.get("notes", "")
+    
+    if not image_base64:
+        raise HTTPException(status_code=400, detail="Снимката е задължителна")
+    
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+    
+    # Clean base64
+    if "," in image_base64:
+        image_base64 = image_base64.split(",")[1]
+    
+    style_desc = AI_STYLES.get(style, AI_STYLES["modern"])
+    material_desc = AI_MATERIAL_CLASS.get(material_class, AI_MATERIAL_CLASS["standard"])
+    
+    try:
+        # Step 1: Analyze the uploaded photo with GPT to understand the room
+        analysis_chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"ai-designer-{uuid.uuid4()}",
+            system_message="""Ти си експерт интериорен дизайнер. Анализирай снимката на помещението и опиши ТОЧНО какво виждаш:
+- Тип помещение (баня, кухня, хол, спалня, коридор)
+- Текущо състояние и елементи
+- Размери и пропорции
+- Осветление (естествено/изкуствено)
+- Цветове и материали
+- Мебели и оборудване
+Отговори в JSON формат:
+{"room_type": "...", "current_state": "...", "elements": [...], "lighting": "...", "colors": [...], "furniture": [...], "description": "кратко описание на помещението на английски за генерация на снимка"}"""
+        ).with_model("openai", "gpt-4o")
+        
+        analysis_msg = UserMessage(
+            text="Анализирай тази снимка на помещение. Опиши ТОЧНО какво виждаш.",
+            file_contents=[ImageContent(image_base64=image_base64)]
+        )
+        
+        analysis_response = await analysis_chat.send_message(analysis_msg)
+        
+        # Parse analysis
+        room_analysis = {}
+        try:
+            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', analysis_response)
+            if json_match:
+                room_analysis = json_module.loads(json_match.group(1))
+            else:
+                room_analysis = json_module.loads(analysis_response)
+        except:
+            room_analysis = {"room_type": "помещение", "description": "interior room photo", "current_state": "needs renovation"}
+        
+        room_desc = room_analysis.get("description", "a room interior")
+        room_type = room_analysis.get("room_type", "помещение")
+        
+        # Step 2: Generate design images using GPT Image 1
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        
+        generated_images = []
+        variants_count = min(int(variants), 5)
+        
+        for i in range(variants_count):
+            variant_prompt = f"""Professional interior design photograph of {room_desc}, redesigned in {style_desc} with {material_desc}. 
+Room dimensions: {room_width}m x {room_length}m, height {room_height}m.
+The design should show the SAME room layout but completely renovated with new furniture, materials, and decoration.
+{f'Additional requirements: {notes}' if notes else ''}
+Variant {i+1}: {'Focus on warm tones and cozy atmosphere' if i == 0 else 'Focus on light and spacious feel' if i == 1 else 'Focus on bold design choices and contrast' if i == 2 else 'Focus on natural materials and textures' if i == 3 else 'Focus on luxury and premium finishes'}.
+Ultra-realistic, professional interior photography, 8K quality, perfect lighting."""
+            
+            images = await image_gen.generate_images(
+                prompt=variant_prompt,
+                model="gpt-image-1",
+                number_of_images=1
+            )
+            
+            if images and len(images) > 0:
+                img_b64 = base64.b64encode(images[0]).decode('utf-8')
+                generated_images.append({
+                    "variant": i + 1,
+                    "image_base64": img_b64,
+                    "prompt_used": variant_prompt[:200]
+                })
+        
+        # Step 3: Generate materials list with prices using GPT
+        materials_chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"materials-{uuid.uuid4()}",
+            system_message="""Ти си експерт по строителни материали в България. Генерирай списък с материали и цени за ремонт на помещение.
+Отговори в JSON формат:
+{
+  "materials": [
+    {"name": "...", "quantity": "...", "unit": "...", "price_per_unit": "...", "total_price": "...", "store": "...", "store_url": "..."}
+  ],
+  "total_estimate": "...",
+  "labor_estimate": "...",
+  "grand_total": "..."
+}
+Използвай РЕАЛНИ цени от български магазини (Praktiker, Bauhaus, Mr. Bricolage, IKEA, Homemax, Bricoman, Jysk, Emag, Technopolis)."""
+        ).with_model("openai", "gpt-4o")
+        
+        materials_msg = UserMessage(
+            text=f"""Генерирай списък с материали за ремонт на {room_type} с размери {room_width}м x {room_length}м x {room_height}м.
+Стил: {style_desc}
+Клас материали: {material_desc}
+{f'Бележки: {notes}' if notes else ''}
+Включи: подови настилки, стенни покрития, мебели, осветление, аксесоари, оборудване.
+Дай реални цени в лева (BGN) от български магазини."""
+        )
+        
+        materials_response = await materials_chat.send_message(materials_msg)
+        
+        materials_data = {}
+        try:
+            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', materials_response)
+            if json_match:
+                materials_data = json_module.loads(json_match.group(1))
+            else:
+                materials_data = json_module.loads(materials_response)
+        except:
+            materials_data = {"materials": [], "total_estimate": "Не може да се изчисли", "grand_total": "N/A"}
+        
+        # Save design to DB
+        design_id = str(uuid.uuid4())
+        design_record = {
+            "id": design_id,
+            "room_type": room_type,
+            "room_analysis": room_analysis,
+            "style": style,
+            "material_class": material_class,
+            "dimensions": {"width": room_width, "length": room_length, "height": room_height},
+            "variants_count": variants_count,
+            "original_image": image_base64[:100] + "...",
+            "generated_count": len(generated_images),
+            "materials": materials_data,
+            "notes": notes,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.ai_designs.insert_one(design_record)
+        
+        return {
+            "id": design_id,
+            "room_analysis": room_analysis,
+            "generated_images": generated_images,
+            "materials": materials_data,
+            "stores": BG_STORES,
+            "style": style,
+            "material_class": material_class,
+            "dimensions": {"width": room_width, "length": room_length, "height": room_height},
+            "test_mode": True
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Грешка при генерация: {str(e)}")
+
+@api_router.get("/ai-designer/gallery")
+async def get_ai_design_gallery():
+    """Get gallery of previous AI designs"""
+    designs = await db.ai_designs.find(
+        {},
+        {"_id": 0, "id": 1, "room_type": 1, "style": 1, "material_class": 1, "dimensions": 1, "generated_count": 1, "created_at": 1}
+    ).sort("created_at", -1).to_list(20)
+    return {"designs": designs}
 
 # ============== REFERRAL SYSTEM (DEMO) ==============
 
