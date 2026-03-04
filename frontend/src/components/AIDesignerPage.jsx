@@ -99,7 +99,10 @@ export const AIDesignerPage = () => {
   const [results, setResults] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [activeVideo, setActiveVideo] = useState(null);
-  const fileRefs = [useRef(null), useRef(null), useRef(null)];
+  const fileRef0 = useRef(null);
+  const fileRef1 = useRef(null);
+  const fileRef2 = useRef(null);
+  const fileRefs = [fileRef0, fileRef1, fileRef2];
 
   const handleImageUpload = useCallback((index, e) => {
     const file = e.target.files?.[0];
@@ -108,10 +111,18 @@ export const AIDesignerPage = () => {
       toast.error('Файлът е твърде голям (макс. 10MB)');
       return;
     }
+    if (!file.type.startsWith('image/')) {
+      toast.error('Моля, качете изображение');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (ev) => {
       setImages(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
       setPreviews(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
+      toast.success(`Снимка ${index + 1} качена успешно`);
+    };
+    reader.onerror = () => {
+      toast.error('Грешка при четене на файла');
     };
     reader.readAsDataURL(file);
   }, []);
@@ -326,7 +337,7 @@ export const AIDesignerPage = () => {
                     <input
                       ref={fileRefs[idx]}
                       type="file"
-                      accept="image/jpeg,image/png"
+                      accept="image/*"
                       className="hidden"
                       onChange={(e) => handleImageUpload(idx, e)}
                       data-testid={`file-input-${idx}`}
