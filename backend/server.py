@@ -2485,19 +2485,16 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
 Генерирай ДЕТАЙЛЕН списък с всички материали, оборудване и цени за ремонт.
 Включи ВСИЧКО: подови настилки, стенни покрития, мебели, осветление, санитарно оборудване, аксесоари, електроуреди.
 
-ВАЖНО: Всички цени трябва да са в ЛЕВА (BGN) И ЕВРО (EUR). Курс: 1 EUR = 1.9558 BGN.
+ВАЖНО: Всички цени трябва да са в ЕВРО (EUR). Използвай EUR навсякъде.
 
 Отговори САМО в JSON формат:
 {
   "materials": [
-    {"name": "...", "quantity": "...", "unit": "...", "price_per_unit_bgn": "...", "price_per_unit_eur": "...", "total_price_bgn": "...", "total_price_eur": "...", "store": "...", "store_url": "..."}
+    {"name": "...", "quantity": "...", "unit": "...", "price_per_unit_eur": "... EUR", "total_price_eur": "... EUR", "store": "...", "store_url": "..."}
   ],
-  "total_estimate_bgn": "...",
-  "total_estimate_eur": "...",
-  "labor_estimate_bgn": "...",
-  "labor_estimate_eur": "...",
-  "grand_total_bgn": "...",
-  "grand_total_eur": "..."
+  "total_estimate_eur": "... EUR",
+  "labor_estimate_eur": "... EUR",
+  "grand_total_eur": "... EUR"
 }
 Използвай РЕАЛНИ цени от: Praktiker, Bauhaus, Mr. Bricolage, IKEA, Homemax, Bricoman, Jysk, Emag, Technopolis, Technomarket, Videnov, Ceramica, Leroy Merlin, Jumbo."""
         ).with_model("openai", "gpt-4o")

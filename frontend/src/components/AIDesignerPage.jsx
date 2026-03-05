@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Camera, Upload, Sparkles, Download, RefreshCw, ExternalLink, Star, Play, Image, Loader2, X, CheckCircle, FileText, ChevronRight, Share2, FileImage } from 'lucide-react';
+import { Camera, Upload, Sparkles, Download, RefreshCw, ExternalLink, Star, Play, Image, Loader2, X, CheckCircle, FileText, ChevronRight, Share2, FileImage, Box, RotateCcw, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -265,9 +265,9 @@ export const AIDesignerPage = () => {
             <Sparkles className="h-5 w-5 text-[#8C56FF]" />
             <span className="text-[#8C56FF] font-medium text-sm">AI ДИЗАЙНЕР</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">AI Интериорен дизайнер</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">AI Designer — 3D проект и материали</h1>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Снимайте помещението от 3 ъгъла — AI генерира проект с максимална точност
+            Качете 1–3 снимки или скици на помещението. AI ще генерира 3D визуализация и списък материали с цени.
           </p>
         </div>
 
@@ -671,7 +671,7 @@ export const AIDesignerPage = () => {
                 <div className="w-20 h-20 rounded-full bg-[#8C56FF]/15 flex items-center justify-center mx-auto mb-6">
                   <Loader2 className="h-10 w-10 text-[#8C56FF] animate-spin" />
                 </div>
-                <h3 className="text-white text-xl font-bold mb-2">AI генерира вашия дизайн...</h3>
+                <h3 className="text-white text-xl font-bold mb-2">AI генерира вашия 3D проект...</h3>
                 <p className="text-slate-400 mb-1">Анализ на {uploadedCount} снимки от различни ъгли</p>
                 <p className="text-slate-500 text-sm">Това може да отнеме 30-120 секунди</p>
                 <div className="mt-6 max-w-xs mx-auto">
@@ -682,19 +682,36 @@ export const AIDesignerPage = () => {
               </div>
             ) : results ? (
               <div className="space-y-8">
-                {/* Before/After */}
-                <Card className="bg-[#253545] border-[#3A4A5C] overflow-hidden">
-                  <CardHeader>
+                {/* 3D Project Header */}
+                <div className="bg-gradient-to-r from-[#FF8C42]/10 to-[#8C56FF]/10 border border-[#FF8C42]/20 rounded-2xl p-6 text-center" data-testid="result-header">
+                  <div className="inline-flex items-center gap-2 bg-[#28A745]/15 border border-[#28A745]/30 rounded-full px-4 py-1.5 mb-3">
+                    <CheckCircle className="h-4 w-4 text-[#28A745]" />
+                    <span className="text-[#28A745] font-medium text-sm">3D проект готов!</span>
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
+                    AI Designer — 3D проект и материали
+                  </h2>
+                  <p className="text-slate-400 text-sm">
+                    {results.room_analysis?.room_type || ROOM_TYPES.find(r => r.id === roomType)?.name} • {STYLES.find(s => s.id === style)?.name} • {dimensions.width}x{dimensions.length}x{dimensions.height}м
+                  </p>
+                </div>
+
+                {/* 3D Visualization Section */}
+                <Card className="bg-[#253545] border-[#3A4A5C] overflow-hidden" data-testid="3d-section">
+                  <CardHeader className="bg-[#FF8C42]/10 border-b border-[#FF8C42]/20">
                     <CardTitle className="text-white flex items-center gap-2">
-                      <Image className="h-5 w-5 text-[#4DA6FF]" />
-                      Преди и след — {results.room_analysis?.room_type || ROOM_TYPES.find(r => r.id === roomType)?.name}
+                      <Box className="h-5 w-5 text-[#FF8C42]" />
+                      3D визуализация — Преди и след
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-4">
+                  <CardContent className="p-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* Before */}
                       <div>
-                        <p className="text-slate-400 text-xs mb-2 font-medium uppercase tracking-wider">Преди (Оригинал)</p>
-                        <div className="rounded-xl overflow-hidden border border-[#3A4A5C]">
+                        <p className="text-slate-400 text-xs mb-2 font-medium uppercase tracking-wider flex items-center gap-2">
+                          <Eye className="h-3 w-3" /> Преди (Оригинал)
+                        </p>
+                        <div className="rounded-xl overflow-hidden border border-[#3A4A5C] bg-[#1E2A38]">
                           {previews[0] && <img src={previews[0]} alt="Before" className="w-full" data-testid="before-image" />}
                         </div>
                         {uploadedCount > 1 && (
@@ -707,11 +724,12 @@ export const AIDesignerPage = () => {
                           </div>
                         )}
                       </div>
+
+                      {/* After - 3D Render */}
                       <div>
-                        <p className="text-[#FF8C42] text-xs mb-2 font-medium uppercase tracking-wider">
-                          След — Вариант {activeImage + 1} / {results.generated_images?.length || 0}
+                        <p className="text-[#FF8C42] text-xs mb-2 font-medium uppercase tracking-wider flex items-center gap-2">
+                          <RotateCcw className="h-3 w-3" /> 3D рендер — Вариант {activeImage + 1} / {results.generated_images?.length || 0}
                         </p>
-                        {/* 2 angles for the active variant */}
                         {results.generated_images?.[activeImage]?.angles?.length > 1 ? (
                           <div className="space-y-3">
                             {results.generated_images[activeImage].angles.map((ang, ai) => (
@@ -719,7 +737,7 @@ export const AIDesignerPage = () => {
                                 <p className="text-slate-500 text-[10px] mb-1 uppercase tracking-wider">
                                   {ang.angle_label || (ai === 0 ? 'Фронтален ъгъл' : 'Страничен ъгъл')}
                                 </p>
-                                <div className="rounded-xl overflow-hidden border border-[#FF8C42]/30">
+                                <div className="rounded-xl overflow-hidden border-2 border-[#FF8C42]/30 shadow-lg shadow-[#FF8C42]/10">
                                   <img
                                     src={`data:image/png;base64,${ang.image_base64}`}
                                     alt={`V${activeImage+1} angle ${ai+1}`}
@@ -731,7 +749,7 @@ export const AIDesignerPage = () => {
                             ))}
                           </div>
                         ) : (
-                          <div className="rounded-xl overflow-hidden border border-[#FF8C42]/30">
+                          <div className="rounded-xl overflow-hidden border-2 border-[#FF8C42]/30 shadow-lg shadow-[#FF8C42]/10">
                             {results.generated_images?.[activeImage] && (
                               <img
                                 src={`data:image/png;base64,${results.generated_images[activeImage].image_base64}`}
@@ -742,21 +760,30 @@ export const AIDesignerPage = () => {
                             )}
                           </div>
                         )}
+                        {/* PNG render note */}
+                        <div className="mt-2 flex items-center gap-2 text-slate-500 text-xs">
+                          <Image className="h-3 w-3" />
+                          <span>PNG рендер — фотореалистична 3D визуализация</span>
+                        </div>
                       </div>
                     </div>
 
+                    {/* Variant thumbnails */}
                     {results.generated_images?.length > 1 && (
-                      <div className="flex gap-2 mt-4 justify-center">
+                      <div className="flex gap-3 mt-6 justify-center pt-4 border-t border-[#3A4A5C]">
                         {results.generated_images.map((img, i) => (
                           <button
                             key={i}
                             onClick={() => setActiveImage(i)}
-                            className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-                              activeImage === i ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/30' : 'border-[#3A4A5C]'
+                            className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                              activeImage === i ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/30 scale-105' : 'border-[#3A4A5C] hover:border-[#4DA6FF]/50'
                             }`}
                             data-testid={`variant-thumb-${i}`}
                           >
                             <img src={`data:image/png;base64,${img.image_base64}`} alt={`V${i+1}`} className="w-full h-full object-cover" />
+                            <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-0.5 text-center font-medium">
+                              V{i + 1}
+                            </div>
                           </button>
                         ))}
                       </div>
@@ -764,41 +791,39 @@ export const AIDesignerPage = () => {
                   </CardContent>
                 </Card>
 
-                {/* Materials table */}
+                {/* Materials Table - Enhanced with EUR pricing and orange header */}
                 {results.materials?.materials?.length > 0 && (
-                  <Card className="bg-[#253545] border-[#3A4A5C]">
-                    <CardHeader>
+                  <Card className="bg-[#253545] border-[#3A4A5C] overflow-hidden" data-testid="materials-section">
+                    <CardHeader className="bg-[#FF8C42]/10 border-b border-[#FF8C42]/20">
                       <CardTitle className="text-white text-sm flex items-center gap-2">
                         <FileText className="h-4 w-4 text-[#FF8C42]" />
-                        Материали, оборудване и цени
+                        Материали, оборудване и цени (EUR)
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-0">
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm" data-testid="materials-table">
                           <thead>
-                            <tr className="border-b border-[#3A4A5C]">
-                              <th className="text-left py-2 text-slate-400 font-medium">Материал</th>
-                              <th className="text-left py-2 text-slate-400 font-medium">Кол-во</th>
-                              <th className="text-right py-2 text-slate-400 font-medium">Ед. цена</th>
-                              <th className="text-right py-2 text-slate-400 font-medium">Общо (лв / €)</th>
-                              <th className="text-right py-2 text-slate-400 font-medium">Магазин</th>
+                            <tr className="bg-[#FF8C42] text-white">
+                              <th className="text-left py-3 px-4 font-semibold">Материал</th>
+                              <th className="text-left py-3 px-3 font-semibold">Количество</th>
+                              <th className="text-right py-3 px-3 font-semibold">Ед. цена</th>
+                              <th className="text-right py-3 px-3 font-semibold">Цена (EUR)</th>
+                              <th className="text-right py-3 px-4 font-semibold">Магазин</th>
                             </tr>
                           </thead>
                           <tbody>
                             {results.materials.materials.map((m, i) => (
-                              <tr key={i} className="border-b border-[#3A4A5C]/50 hover:bg-[#1E2A38]/50">
-                                <td className="py-2 text-white">{m.name}</td>
-                                <td className="py-2 text-slate-300">{m.quantity} {m.unit}</td>
-                                <td className="py-2 text-slate-300 text-right">
-                                  {m.price_per_unit_bgn || m.price_per_unit || '-'}
-                                  {m.price_per_unit_eur && <span className="text-slate-500 text-xs ml-1">/ {m.price_per_unit_eur}</span>}
+                              <tr key={i} className={`border-b border-[#3A4A5C]/50 hover:bg-[#1E2A38]/50 ${i % 2 === 0 ? 'bg-[#253545]' : 'bg-[#2A3F52]'}`}>
+                                <td className="py-2.5 px-4 text-white font-medium">{m.name}</td>
+                                <td className="py-2.5 px-3 text-slate-300">{m.quantity} {m.unit}</td>
+                                <td className="py-2.5 px-3 text-slate-300 text-right">
+                                  {m.price_per_unit_eur || m.price_per_unit || '-'}
                                 </td>
-                                <td className="py-2 text-right">
-                                  <span className="text-[#FF8C42] font-medium">{m.total_price_bgn || m.total_price || '-'}</span>
-                                  {m.total_price_eur && <span className="text-slate-400 text-xs block">{m.total_price_eur}</span>}
+                                <td className="py-2.5 px-3 text-right">
+                                  <span className="text-[#FF8C42] font-semibold">{m.total_price_eur || m.total_price || '-'}</span>
                                 </td>
-                                <td className="py-2 text-right">
+                                <td className="py-2.5 px-4 text-right">
                                   {m.store_url ? (
                                     <a href={m.store_url} target="_blank" rel="noopener noreferrer" className="text-[#4DA6FF] hover:underline text-xs inline-flex items-center gap-1">
                                       {m.store} <ExternalLink className="h-3 w-3" />
@@ -811,30 +836,27 @@ export const AIDesignerPage = () => {
                             ))}
                           </tbody>
                           <tfoot>
-                            <tr className="border-t-2 border-[#FF8C42]/30">
-                              <td colSpan="3" className="py-3 text-white font-bold">Материали:</td>
-                              <td className="py-3 text-right">
-                                <span className="text-[#FF8C42] font-bold text-lg">{results.materials.total_estimate_bgn || results.materials.total_estimate}</span>
-                                {results.materials.total_estimate_eur && <span className="text-slate-400 text-sm block">{results.materials.total_estimate_eur}</span>}
+                            <tr className="bg-[#1E2A38] border-t-2 border-[#FF8C42]/40">
+                              <td colSpan="3" className="py-3 px-4 text-white font-bold">Материали общо:</td>
+                              <td className="py-3 px-3 text-right">
+                                <span className="text-[#FF8C42] font-bold text-lg">{results.materials.total_estimate_eur || results.materials.total_estimate}</span>
                               </td>
                               <td />
                             </tr>
-                            {(results.materials.labor_estimate_bgn || results.materials.labor_estimate) && (
-                              <tr>
-                                <td colSpan="3" className="py-1 text-slate-300">Труд:</td>
-                                <td className="py-1 text-right">
-                                  <span className="text-slate-300">{results.materials.labor_estimate_bgn || results.materials.labor_estimate}</span>
-                                  {results.materials.labor_estimate_eur && <span className="text-slate-500 text-sm block">{results.materials.labor_estimate_eur}</span>}
+                            {(results.materials.labor_estimate_eur || results.materials.labor_estimate) && (
+                              <tr className="bg-[#1E2A38]">
+                                <td colSpan="3" className="py-2 px-4 text-slate-300">Труд:</td>
+                                <td className="py-2 px-3 text-right">
+                                  <span className="text-slate-300">{results.materials.labor_estimate_eur || results.materials.labor_estimate}</span>
                                 </td>
                                 <td />
                               </tr>
                             )}
-                            {(results.materials.grand_total_bgn || results.materials.grand_total) && (
-                              <tr className="border-t border-[#3A4A5C]">
-                                <td colSpan="3" className="py-3 text-white font-bold text-lg">ОБЩА СТОЙНОСТ:</td>
-                                <td className="py-3 text-right">
-                                  <span className="text-[#28A745] font-bold text-xl">{results.materials.grand_total_bgn || results.materials.grand_total}</span>
-                                  {results.materials.grand_total_eur && <span className="text-[#28A745]/70 text-sm block">{results.materials.grand_total_eur}</span>}
+                            {(results.materials.grand_total_eur || results.materials.grand_total) && (
+                              <tr className="bg-[#FF8C42]/10 border-t-2 border-[#FF8C42]">
+                                <td colSpan="3" className="py-4 px-4 text-white font-bold text-lg">ОБЩА СТОЙНОСТ НА ПРОЕКТА:</td>
+                                <td className="py-4 px-3 text-right">
+                                  <span className="text-[#28A745] font-bold text-xl">{results.materials.grand_total_eur || results.materials.grand_total}</span>
                                 </td>
                                 <td />
                               </tr>

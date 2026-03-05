@@ -574,8 +574,8 @@ const LandingPage = () => {
                 <Sparkles className="h-4 w-4 text-[#8C56FF]" />
                 <span className="text-xs font-medium text-[#8C56FF]">AI ДИЗАЙНЕР</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Визуализирайте мечтания интериор</h3>
-              <p className="text-slate-400 mb-4 text-sm">Качете снимки на помещението, изберете стил и материали — AI генерира фотореалистични визуализации с точен списък материали и цени от 18 български магазина.</p>
+              <h3 className="text-xl font-bold text-white mb-3">AI Designer — 3D проект и материали</h3>
+              <p className="text-slate-400 mb-4 text-sm">Качете 1–3 снимки на помещението. AI генерира 3D визуализация с точен списък материали и цени в EUR от 18 български магазина.</p>
               <ul className="space-y-2 text-sm text-slate-300 mb-6">
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> До 5 варианта дизайн с различни стилове</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> Преди/След сравнение + PDF експорт</li>
@@ -587,7 +587,7 @@ const LandingPage = () => {
             </div>
             <div className="bg-gradient-to-br from-[#8C56FF]/20 to-[#4DA6FF]/10 rounded-2xl p-8 border border-[#8C56FF]/20 text-center">
               <Sparkles className="h-16 w-16 text-[#8C56FF]/60 mx-auto mb-4" />
-              <p className="text-white font-medium">1-3 снимки &rarr; AI анализ &rarr; Фотореалистичен дизайн</p>
+              <p className="text-white font-medium">1-3 снимки &rarr; AI анализ &rarr; 3D визуализация + материали</p>
               <p className="text-slate-500 text-sm mt-2">от 12 EUR на генерация</p>
             </div>
           </div>

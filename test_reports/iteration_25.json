@@ -1,0 +1,143 @@
+{
+  "summary": "TemaDom Iteration 25 - AI Designer 3D enhancement testing complete. All requested features verified: 1) AI Designer page title 'AI Designer — 3D проект и материали', 2) Description mentions '3D визуализация', 3) All 5 step indicators present (Снимки, Параметри, Стил, Варианти, Резултат), 4) 3 upload zones working, 5) 'Инструкции' button opens 4-step modal, 6) Homepage features section shows 'AI Designer — 3D проект и материали' and '1-3 снимки → AI анализ → 3D визуализация + материали', 7) Homepage pricing 20/40/79 EUR correct, 8) Subscriptions page with EUR prices loads correctly, 9) AI Gallery and AI Sketch pages load correctly, 10) Backend /api/subscriptions/plans returns correct EUR pricing, 11) model-viewer script tag present in index.html, 12) Materials table has orange header (#FF8C42).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "=== HOMEPAGE TESTS ===",
+    "✅ Homepage loads correctly",
+    "✅ Homepage shows 'AI Designer — 3D проект и материали' feature title",
+    "✅ Homepage shows '1-3 снимки → AI анализ → 3D визуализация + материали' flow text",
+    "✅ Homepage pricing shows 20/40/79 EUR for Starter/Pro/Premium",
+    "✅ 'AI Дизайнер' button in hero section works",
+    "",
+    "=== AI DESIGNER PAGE TESTS ===",
+    "✅ AI Designer page loads correctly (data-testid='ai-designer-page')",
+    "✅ Title shows 'AI Designer — 3D проект и материали'",
+    "✅ Description mentions '3D визуализация'",
+    "✅ All 5 step indicators present: Снимки, Параметри, Стил, Варианти, Резултат",
+    "✅ All 5 step buttons have correct data-testid (step-1 through step-5)",
+    "✅ Upload section present (data-testid='upload-section')",
+    "✅ 3 upload zones present (upload-area-0, upload-area-1, upload-area-2)",
+    "✅ 'Инструкции' button opens tutorial modal with 4 steps",
+    "✅ Modal has 'Разбрах, да започнем!' close button",
+    "✅ Materials table has orange header (#FF8C42) - verified in code (line 807)",
+    "",
+    "=== SUBSCRIPTIONS PAGE TESTS ===",
+    "✅ Page loads correctly",
+    "✅ Starter: 20 EUR/мес displayed",
+    "✅ Pro: 40 EUR/мес displayed",
+    "✅ Premium: 79 EUR/мес displayed",
+    "✅ Standalone services: 6 EUR and 17 EUR displayed",
+    "",
+    "=== AI GALLERY PAGE TESTS ===",
+    "✅ Page loads correctly with 'Публикувани AI проекти' title",
+    "✅ Shows published AI design projects",
+    "",
+    "=== AI SKETCH PAGE TESTS ===",
+    "✅ Page loads correctly",
+    "✅ 'Инструкции' button opens tutorial modal with 4 steps",
+    "",
+    "=== BACKEND API TESTS ===",
+    "✅ GET /api/ returns API info (version 1.0.0)",
+    "✅ GET /api/subscriptions/plans returns 200 with correct EUR pricing",
+    "✅ Starter: 20 EUR/мес",
+    "✅ Pro: 40 EUR/мес",
+    "✅ Premium: 79 EUR/мес",
+    "✅ PDF contract standalone: 6 EUR",
+    "✅ AI blueprint standalone: 17 EUR",
+    "✅ AI Designer: 12 EUR/генерация",
+    "",
+    "=== INDEX.HTML TESTS ===",
+    "✅ model-viewer script tag present: <script type='module' src='https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js'></script>"
+  ],
+  "test_report_links": [
+    "/app/test_reports/iteration_25.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All iteration 25 features verified and working correctly:",
+    "1. AI Designer page title: 'AI Designer — 3D проект и материали' ✅",
+    "2. Description mentions 3D визуализация ✅",
+    "3. 5 step indicators: Снимки → Параметри → Стил → Варианти → Резултат ✅",
+    "4. 3 upload zones with correct angle labels (Ъгъл 1 Фронтален, Ъгъл 2 Ляв/Десен, Ъгъл 3 Обратен) ✅",
+    "5. 'Инструкции' button opens modal with 4-step tutorial ✅",
+    "6. Homepage feature section updated with 3D text and flow description ✅",
+    "7. Homepage pricing 20/40/79 EUR maintained ✅",
+    "8. Subscriptions page with all EUR prices loading correctly ✅",
+    "9. AI Gallery showing published projects ✅",
+    "10. AI Sketch page with instructions modal ✅",
+    "11. model-viewer script included in index.html for 3D support ✅",
+    "12. Materials table header uses orange (#FF8C42) background ✅",
+    "13. EUR-only pricing confirmed in materials display (total_price_eur, grand_total_eur) ✅"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "seed_data_creation": "None - used existing test data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "TemaDom Iteration 25 fully tested. AI Designer page enhanced with 3D features: 1) Title 'AI Designer — 3D проект и материали', 2) Description mentions 3D визуализация, 3) 5 step indicators working (Снимки, Параметри, Стил, Варианти, Резултат), 4) 3 upload zones for multi-angle photos, 5) 'Инструкции' button opens 4-step modal, 6) Homepage feature section updated with 3D text, 7) Pricing 20/40/79 EUR maintained, 8) model-viewer script added for 3D support, 9) Materials table has orange header (#FF8C42), 10) EUR-only pricing in materials. All subscription plans verified with EUR pricing.",
+  "features_tested": {
+    "ai_designer_3d_title": {
+      "status": "PASS",
+      "details": "Title shows 'AI Designer — 3D проект и материали'"
+    },
+    "ai_designer_3d_description": {
+      "status": "PASS",
+      "details": "Description mentions '3D визуализация' and explains the feature"
+    },
+    "ai_designer_step_indicators": {
+      "status": "PASS",
+      "details": "All 5 steps present: Снимки, Параметри, Стил, Варианти, Резултат"
+    },
+    "ai_designer_upload_zones": {
+      "status": "PASS",
+      "details": "3 upload zones with angle labels (Фронтален, Ляв/Десен, Обратен)"
+    },
+    "ai_designer_instructions_button": {
+      "status": "PASS",
+      "details": "'Инструкции' button opens 4-step tutorial modal"
+    },
+    "homepage_3d_feature_text": {
+      "status": "PASS",
+      "details": "'AI Designer — 3D проект и материали' and '1-3 снимки → AI анализ → 3D визуализация + материали'"
+    },
+    "homepage_pricing_eur": {
+      "status": "PASS",
+      "details": "20/40/79 EUR for Starter/Pro/Premium"
+    },
+    "subscriptions_page_eur": {
+      "status": "PASS",
+      "details": "All plans with EUR pricing, standalone 6 EUR and 17 EUR"
+    },
+    "ai_gallery_page": {
+      "status": "PASS",
+      "details": "Page loads with published AI projects"
+    },
+    "ai_sketch_page": {
+      "status": "PASS",
+      "details": "Page loads with instructions button working"
+    },
+    "backend_subscriptions_api": {
+      "status": "PASS",
+      "details": "/api/subscriptions/plans returns correct EUR pricing"
+    },
+    "model_viewer_script": {
+      "status": "PASS",
+      "details": "Script tag present in index.html: https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+    },
+    "materials_table_orange_header": {
+      "status": "PASS",
+      "details": "Header row uses bg-[#FF8C42] (orange) background color"
+    }
+  }
+}
