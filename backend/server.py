@@ -189,12 +189,41 @@ async def get_me(user: dict = Depends(get_current_user)):
         "city": user.get("city"),
         "telegram_username": user.get("telegram_username"),
         "bulstat": user.get("bulstat"),
+        "company_name": user.get("company_name"),
+        "description": user.get("description"),
+        "website": user.get("website"),
         "user_type": user["user_type"],
         "subscription_active": user.get("subscription_active", False),
         "subscription_expires": user.get("subscription_expires"),
         "purchased_leads": user.get("purchased_leads", []),
         "free_leads_used": user.get("free_leads_used", 0),
-        "calculator_uses": user.get("calculator_uses", 0)
+        "calculator_uses": user.get("calculator_uses", 0),
+        "created_at": user.get("created_at")
+    }
+
+
+@api_router.put("/auth/profile")
+async def update_profile(request: Request, user: dict = Depends(get_current_user)):
+    data = await request.json()
+    allowed = {"name", "company_name", "bulstat", "city", "description", "website"}
+    updates = {k: v for k, v in data.items() if k in allowed and v is not None}
+    if not updates:
+        raise HTTPException(status_code=400, detail="Няма данни за обновяване")
+
+    await db.users.update_one({"id": user["id"]}, {"$set": updates})
+    updated = await db.users.find_one({"id": user["id"]}, {"_id": 0, "password": 0})
+    return {
+        "id": updated["id"],
+        "email": updated["email"],
+        "name": updated.get("name"),
+        "company_name": updated.get("company_name"),
+        "bulstat": updated.get("bulstat"),
+        "city": updated.get("city"),
+        "description": updated.get("description"),
+        "website": updated.get("website"),
+        "user_type": updated["user_type"],
+        "subscription_active": updated.get("subscription_active", False),
+        "created_at": updated.get("created_at")
     }
 
 # ============== CATEGORIES ROUTES ==============

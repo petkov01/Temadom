@@ -24,6 +24,7 @@ import ProjectEstimator from '@/components/ProjectEstimator';
 import ServicesPage from '@/components/ServicesPage';
 import ChatPage from '@/components/ChatPage';
 import AboutPage from '@/components/AboutPage';
+import ProfilePage from '@/components/ProfilePage';
 import TermsPage from '@/components/TermsPage';
 import ProfessionsPage from '@/components/ProfessionsPage';
 import BlogPage from '@/components/BlogPage';
@@ -357,7 +358,9 @@ const Navbar = () => {
                   {t('nav_messages')}
                 </Link>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-slate-400">{user.name}</span>
+                  <Link to="/profile" className="text-sm text-slate-400 hover:text-[#FF8C42] transition-colors flex items-center gap-1" data-testid="nav-profile">
+                    <User className="h-3.5 w-3.5" /> {user.name}
+                  </Link>
                   <Button variant="ghost" size="sm" onClick={logout} className="text-slate-400 hover:text-white hover:bg-white/10" data-testid="logout-btn">
                     <LogOut className="h-4 w-4" />
                   </Button>
@@ -456,6 +459,9 @@ const Navbar = () => {
             </Link>
             {user ? (
               <>
+                <Link to="/profile" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+                  <User className="h-4 w-4" /> Профил
+                </Link>
                 <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
                   <LayoutGrid className="h-4 w-4" /> {t('nav_dashboard')}
                 </Link>
@@ -3239,39 +3245,30 @@ const SubscriptionsPage = () => {
           ))}
         </div>
 
-        {/* AI Designer module */}
-        <h2 className="text-2xl font-bold text-white mb-2">AI Дизайнер</h2>
-        <p className="text-slate-400 text-sm mb-6">Включен в PREMIUM план. За ПРО и БАЗОВ: еднократна такса.</p>
-        <div className="max-w-lg">
-          {plans.designer && Object.entries(plans.designer).map(([key, plan]) => (
-            <Card key={key} className="bg-gradient-to-r from-[#8C56FF]/20 to-[#4DA6FF]/20 border-[#8C56FF]/30" data-testid={`plan-designer-${key}`}>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <Sparkles className="h-6 w-6 text-[#8C56FF]" />
-                  <h3 className="text-xl font-bold text-white">{plan.name}</h3>
-                </div>
-                <p className="text-lg font-bold text-[#8C56FF] mb-4">{plan.price}</p>
-                {plan.note && (
-                  <div className="bg-[#8C56FF]/10 border border-[#8C56FF]/20 rounded-lg p-3 mb-4">
-                    <p className="text-xs text-[#8C56FF]">{plan.note}</p>
-                  </div>
-                )}
-                {plan.bundle_prices && (
-                  <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-lg p-3 mb-4">
-                    <p className="text-xs text-[#FF8C42] font-medium mb-1">Пакетни цени:</p>
-                    <p className="text-xs text-slate-400">3 варианта: {plan.bundle_prices['3_variants']}</p>
-                    <p className="text-xs text-slate-400">5 варианта: {plan.bundle_prices['5_variants']}</p>
-                  </div>
-                )}
-                <div className="space-y-2 mb-6">
-                  {plan.features.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-slate-300">
-                      <CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> {f}
+        {/* AI Video Designer module */}
+        <h2 className="text-2xl font-bold text-white mb-2">3D Video Designer</h2>
+        <p className="text-slate-400 text-sm mb-6">Качете видео на помещение → AI генерира 3D ремонт с 360° панорама.</p>
+        <div className="grid md:grid-cols-3 gap-4 max-w-3xl">
+          {[
+            { name: '1 помещение', price: '69 EUR', features: ['1 видео → 4 ъгъла', 'PDF проект', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
+            { name: '2-3 помещения', price: '129 EUR', features: ['До 3 видеа → 12 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
+            { name: '4-5 помещения', price: '220 EUR', features: ['До 5 видеа → 20 ъгъла', 'PDF за всяко помещение', 'Пълна сметка', 'Приоритетна обработка'] },
+          ].map((plan, i) => (
+            <Card key={i} className={`border ${plan.popular ? 'border-[#F97316] bg-[#F97316]/5' : 'border-[#2A3A4C] bg-[#1E2A38]'} relative`}>
+              {plan.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F97316] text-white text-[10px] font-bold px-3 py-0.5 rounded-full">ПОПУЛЯРЕН</div>}
+              <CardContent className="p-5">
+                <h3 className="text-lg font-bold text-white mb-1">{plan.name}</h3>
+                <p className="text-2xl font-black text-[#F97316] mb-4">{plan.price}</p>
+                <div className="space-y-2 mb-5">
+                  {plan.features.map((f, fi) => (
+                    <div key={fi} className="flex items-center gap-2 text-sm text-slate-300">
+                      <CheckCircle className="h-3.5 w-3.5 text-[#10B981] flex-shrink-0" /> {f}
                     </div>
                   ))}
                 </div>
-                <Button className="w-full bg-[#8C56FF] hover:bg-[#7a44ee] text-white" onClick={() => navigate('/ai-designer')}>
-                  Опитай AI Дизайнера
+                <Button className={`w-full ${plan.popular ? 'bg-[#F97316] hover:bg-[#EA580C]' : 'bg-[#253545] hover:bg-[#2A3A4C]'} text-white`}
+                  onClick={() => navigate('/room-scan')}>
+                  Започни
                 </Button>
               </CardContent>
             </Card>
@@ -3319,6 +3316,7 @@ function App() {
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/messages" element={<AuthGate><ChatPage /></AuthGate>} />
                 <Route path="/about" element={<AboutPage />} />
+                <Route path="/profile" element={<AuthGate><ProfilePage /></AuthGate>} />
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/professions" element={<ProfessionsPage />} />
                 <Route path="/blog" element={<BlogPage />} />

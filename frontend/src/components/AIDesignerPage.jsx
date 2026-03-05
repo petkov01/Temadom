@@ -103,11 +103,17 @@ export const AIDesignerPage = () => {
 
   const selectPackage = (p) => {
     setPkg(p);
-    const max = p.id === 1 ? 1 : p.id === 2 ? 3 : 5;
+    const min = p.id === 1 ? 1 : p.id === 2 ? 2 : 4;
     setRooms(prev => {
+      if (prev.length < min) {
+        const extra = Array.from({ length: min - prev.length }, () => emptyRoom());
+        return [...prev, ...extra];
+      }
+      const max = p.id === 1 ? 1 : p.id === 2 ? 3 : 5;
       if (prev.length > max) return prev.slice(0, max);
       return prev;
     });
+    setActiveRoom(0);
   };
 
   const addRoom = () => {
@@ -219,11 +225,14 @@ export const AIDesignerPage = () => {
             <div className="grid grid-cols-3 gap-2" data-testid="package-selection">
               {PACKAGES.map(p => (
                 <button key={p.id} onClick={() => selectPackage(p)}
-                  className={`p-3 rounded-xl border-2 text-center transition-all ${
-                    pkg.id === p.id ? 'border-[#F97316] bg-[#F97316]/10' : 'border-[#2A3A4C] bg-[#1E2A38] hover:border-[#F97316]/30'
+                  className={`p-4 rounded-xl border-2 text-center transition-all ${
+                    pkg.id === p.id
+                      ? 'border-[#F97316] bg-[#F97316]/10 shadow-lg shadow-[#F97316]/20 scale-105'
+                      : 'border-[#2A3A4C] bg-[#1E2A38] hover:border-[#F97316]/30'
                   }`} data-testid={`pkg-${p.id}`}>
-                  <p className={`text-lg font-black ${pkg.id === p.id ? 'text-[#F97316]' : 'text-white'}`}>{p.price} EUR</p>
-                  <p className="text-slate-400 text-xs">{p.label}</p>
+                  <p className={`text-2xl font-black ${pkg.id === p.id ? 'text-[#F97316]' : 'text-white'}`}>{p.price} <span className="text-sm">EUR</span></p>
+                  <p className="text-slate-400 text-xs mt-1">{p.label}</p>
+                  {pkg.id === p.id && <div className="w-8 h-0.5 bg-[#F97316] mx-auto mt-2 rounded-full" />}
                 </button>
               ))}
             </div>
