@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Camera, Upload, Sparkles, Download, RefreshCw, ExternalLink, Star, Play, Image, Loader2, X, CheckCircle, FileText, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Camera, Upload, Sparkles, Download, RefreshCw, ExternalLink, Star, Play, Image, Loader2, X, CheckCircle, FileText, ChevronRight, Share2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -85,6 +86,7 @@ const VIDEO_STEPS = [
 ];
 
 export const AIDesignerPage = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   // 3 images from 3 angles
   const [images, setImages] = useState([null, null, null]);
@@ -99,10 +101,62 @@ export const AIDesignerPage = () => {
   const [results, setResults] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [activeVideo, setActiveVideo] = useState(null);
+  const [publishTitle, setPublishTitle] = useState('');
+  const [publishDesc, setPublishDesc] = useState('');
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const fileRef0 = useRef(null);
   const fileRef1 = useRef(null);
   const fileRef2 = useRef(null);
   const fileRefs = [fileRef0, fileRef1, fileRef2];
+
+  const handlePublish = async () => {
+    if (!publishTitle.trim()) {
+      toast.error('Въведете заглавие за проекта');
+      return;
+    }
+    setPublishing(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Влезте в профила си, за да публикувате');
+        setPublishing(false);
+        return;
+      }
+      // Collect before images (original uploaded photos)
+      const beforeImgs = previews.filter(Boolean);
+      // Collect after images (generated designs - all angles from all variants)
+      const afterImgs = [];
+      if (results?.generated_images) {
+        for (const gi of results.generated_images) {
+          if (gi.angles?.length) {
+            for (const ang of gi.angles) {
+              afterImgs.push({ image_base64: ang.image_base64, angle_label: ang.angle_label || `Вариант ${gi.variant}` });
+            }
+          } else if (gi.image_base64) {
+            afterImgs.push({ image_base64: gi.image_base64, angle_label: `Вариант ${gi.variant}` });
+          }
+        }
+      }
+      await axios.post(`${API}/published-projects`, {
+        title: publishTitle,
+        description: publishDesc,
+        room_type: roomType,
+        style,
+        material_class: materialClass,
+        dimensions,
+        before_images: beforeImgs,
+        after_images: afterImgs,
+        materials: results?.materials || {}
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Проектът е публикуван успешно!');
+      setShowPublishDialog(false);
+      navigate('/gallery');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при публикуване');
+    }
+    setPublishing(false);
+  };
 
   const handleImageUpload = useCallback((index, e) => {
     const file = e.target.files?.[0];
@@ -799,6 +853,9 @@ export const AIDesignerPage = () => {
 
                 {/* CTA buttons */}
                 <div className="flex flex-wrap gap-3 justify-center">
+                  <Button className="bg-[#28A745] hover:bg-[#239a3b] text-white" onClick={() => setShowPublishDialog(true)} data-testid="publish-btn">
+                    <Share2 className="mr-2 h-4 w-4" /> Публикувай проекта
+                  </Button>
                   <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={resetDesigner} data-testid="new-design-btn">
                     <RefreshCw className="mr-2 h-4 w-4" /> Нов дизайн
                   </Button>
@@ -806,6 +863,54 @@ export const AIDesignerPage = () => {
                     <Sparkles className="mr-2 h-4 w-4" /> Редактирай параметри
                   </Button>
                 </div>
+
+                {/* Publish Dialog */}
+                {showPublishDialog && (
+                  <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowPublishDialog(false)}>
+                    <div className="bg-[#253545] border border-[#3A4A5C] rounded-2xl p-6 max-w-md w-full" onClick={e => e.stopPropagation()} data-testid="publish-dialog">
+                      <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                        <Share2 className="h-5 w-5 text-[#28A745]" />
+                        Публикуване на проекта
+                      </h3>
+                      <p className="text-slate-400 text-sm mb-4">
+                        Проектът ще бъде видим за всички потребители в Галерията.
+                      </p>
+                      <div className="space-y-3 mb-6">
+                        <div>
+                          <label className="text-slate-400 text-xs block mb-1">Заглавие *</label>
+                          <input
+                            type="text"
+                            value={publishTitle}
+                            onChange={(e) => setPublishTitle(e.target.value)}
+                            placeholder="Напр. Модерна баня в скандинавски стил"
+                            className="w-full bg-[#1E2A38] border border-[#3A4A5C] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FF8C42] focus:outline-none"
+                            data-testid="publish-title-input"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-slate-400 text-xs block mb-1">Описание (незадължително)</label>
+                          <textarea
+                            value={publishDesc}
+                            onChange={(e) => setPublishDesc(e.target.value)}
+                            placeholder="Кратко описание на проекта..."
+                            className="w-full bg-[#1E2A38] border border-[#3A4A5C] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FF8C42] focus:outline-none resize-none"
+                            rows={3}
+                            data-testid="publish-desc-input"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <Button variant="outline" className="flex-1 border-[#3A4A5C] text-slate-300" onClick={() => setShowPublishDialog(false)}>
+                          Отказ
+                        </Button>
+                        <Button className="flex-1 bg-[#28A745] hover:bg-[#239a3b] text-white" onClick={handlePublish} disabled={publishing} data-testid="confirm-publish-btn">
+                          {publishing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Share2 className="h-4 w-4 mr-2" />}
+                          {publishing ? 'Публикуване...' : 'Публикувай'}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : null}
           </div>

@@ -2602,6 +2602,436 @@ async def get_feedback():
         avg_rating = sum(f["rating"] for f in feedback_list) / len(feedback_list)
     return {"feedback": feedback_list, "avg_rating": round(avg_rating, 1), "total": len(feedback_list)}
 
+# ============== PUBLISHED PROJECTS (Gallery) ==============
+
+@api_router.post("/published-projects")
+async def publish_project(data: dict, user: dict = Depends(get_current_user)):
+    """Publish an AI design project to the public gallery"""
+    title = data.get("title", "").strip()
+    description = data.get("description", "").strip()
+    room_type = data.get("room_type", "")
+    style = data.get("style", "")
+    material_class = data.get("material_class", "")
+    dimensions = data.get("dimensions", {})
+    before_images = data.get("before_images", [])
+    after_images = data.get("after_images", [])
+    materials = data.get("materials", {})
+
+    if not title:
+        raise HTTPException(status_code=400, detail="Заглавието е задължително")
+    if not before_images:
+        raise HTTPException(status_code=400, detail="Необходима е поне 1 оригинална снимка")
+    if not after_images:
+        raise HTTPException(status_code=400, detail="Необходима е поне 1 генерирана снимка")
+
+    project_id = str(uuid.uuid4())
+    project = {
+        "id": project_id,
+        "user_id": user["id"],
+        "user_name": user["name"],
+        "user_type": user.get("user_type", "client"),
+        "title": title,
+        "description": description,
+        "room_type": room_type,
+        "style": style,
+        "material_class": material_class,
+        "dimensions": dimensions,
+        "before_images": before_images[:5],
+        "after_images": after_images[:10],
+        "materials": materials,
+        "likes": [],
+        "likes_count": 0,
+        "comments": [],
+        "ratings": [],
+        "avg_rating": 0,
+        "rating_count": 0,
+        "views": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.published_projects.insert_one(project)
+    return {"message": "Проектът е публикуван успешно!", "project_id": project_id}
+
+@api_router.get("/published-projects")
+async def get_published_projects(
+    room_type: Optional[str] = None,
+    style: Optional[str] = None,
+    sort_by: Optional[str] = "newest",
+    page: int = 1,
+    limit: int = 12
+):
+    """Get all published projects (public - no auth required)"""
+    query = {}
+    if room_type and room_type != "all":
+        query["room_type"] = room_type
+    if style and style != "all":
+        query["style"] = style
+
+    sort_field = "created_at"
+    sort_order = -1
+    if sort_by == "popular":
+        sort_field = "likes_count"
+    elif sort_by == "top_rated":
+        sort_field = "avg_rating"
+
+    skip = (page - 1) * limit
+    total = await db.published_projects.count_documents(query)
+    projects = await db.published_projects.find(
+        query,
+        {"_id": 0, "materials": 0}
+    ).sort(sort_field, sort_order).skip(skip).limit(limit).to_list(limit)
+
+    # Truncate base64 images for listing (send only first before/after)
+    for p in projects:
+        if p.get("before_images"):
+            p["before_thumb"] = p["before_images"][0][:200] + "..." if len(p["before_images"][0]) > 200 else p["before_images"][0]
+            p["before_count"] = len(p["before_images"])
+        if p.get("after_images"):
+            p["after_count"] = len(p["after_images"])
+        # Don't send full images in listing
+        p.pop("before_images", None)
+        p.pop("after_images", None)
+
+    return {
+        "projects": projects,
+        "total": total,
+        "page": page,
+        "pages": max(1, (total + limit - 1) // limit)
+    }
+
+@api_router.get("/published-projects/{project_id}")
+async def get_published_project(project_id: str):
+    """Get a single published project with full details"""
+    project = await db.published_projects.find_one({"id": project_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+
+    # Increment views
+    await db.published_projects.update_one({"id": project_id}, {"$inc": {"views": 1}})
+    project["views"] = project.get("views", 0) + 1
+    return project
+
+@api_router.post("/published-projects/{project_id}/like")
+async def toggle_like(project_id: str, user: dict = Depends(get_current_user)):
+    """Toggle like on a published project"""
+    project = await db.published_projects.find_one({"id": project_id})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+
+    user_id = user["id"]
+    likes = project.get("likes", [])
+
+    if user_id in likes:
+        await db.published_projects.update_one(
+            {"id": project_id},
+            {"$pull": {"likes": user_id}, "$inc": {"likes_count": -1}}
+        )
+        return {"liked": False, "likes_count": max(0, project.get("likes_count", 1) - 1)}
+    else:
+        await db.published_projects.update_one(
+            {"id": project_id},
+            {"$addToSet": {"likes": user_id}, "$inc": {"likes_count": 1}}
+        )
+        return {"liked": True, "likes_count": project.get("likes_count", 0) + 1}
+
+@api_router.post("/published-projects/{project_id}/comment")
+async def add_comment(project_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Add a comment to a published project"""
+    text = data.get("text", "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Коментарът не може да е празен")
+    if len(text) > 1000:
+        raise HTTPException(status_code=400, detail="Коментарът е твърде дълъг (макс. 1000 символа)")
+
+    comment = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_name": user["name"],
+        "user_type": user.get("user_type", "client"),
+        "text": text,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.published_projects.update_one(
+        {"id": project_id},
+        {"$push": {"comments": comment}}
+    )
+    return {"message": "Коментарът е добавен", "comment": comment}
+
+@api_router.post("/published-projects/{project_id}/rate")
+async def rate_project(project_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Rate a published project (1-5 stars)"""
+    rating = data.get("rating", 0)
+    if not isinstance(rating, int) or rating < 1 or rating > 5:
+        raise HTTPException(status_code=400, detail="Оценката трябва да е между 1 и 5")
+
+    project = await db.published_projects.find_one({"id": project_id})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+
+    ratings = project.get("ratings", [])
+    # Remove existing rating from this user
+    ratings = [r for r in ratings if r.get("user_id") != user["id"]]
+    ratings.append({"user_id": user["id"], "rating": rating})
+
+    avg = sum(r["rating"] for r in ratings) / len(ratings) if ratings else 0
+
+    await db.published_projects.update_one(
+        {"id": project_id},
+        {"$set": {
+            "ratings": ratings,
+            "avg_rating": round(avg, 1),
+            "rating_count": len(ratings)
+        }}
+    )
+    return {"avg_rating": round(avg, 1), "rating_count": len(ratings), "user_rating": rating}
+
+@api_router.get("/published-projects/{project_id}/pdf/design")
+async def download_design_pdf(project_id: str):
+    """Generate PDF with design images only (before/after)"""
+    from fpdf import FPDF
+    import io
+
+    project = await db.published_projects.find_one({"id": project_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+
+    pdf = FPDF()
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    bold_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    try:
+        pdf.add_font("DejaVu", "", font_path, uni=True)
+        pdf.add_font("DejaVu", "B", bold_font_path, uni=True)
+        fn = "DejaVu"
+    except:
+        fn = "Helvetica"
+
+    # Cover page
+    pdf.add_page()
+    pdf.set_fill_color(30, 42, 56)
+    pdf.rect(0, 0, 210, 297, 'F')
+    pdf.set_text_color(255, 140, 66)
+    pdf.set_font(fn, 'B', 28)
+    pdf.set_y(60)
+    pdf.cell(0, 15, "TemaDom", ln=True, align='C')
+    pdf.set_font(fn, '', 12)
+    pdf.set_text_color(200, 200, 200)
+    pdf.cell(0, 10, "AI Designer - Project", ln=True, align='C')
+    pdf.ln(20)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, 'B', 20)
+    pdf.multi_cell(0, 12, project.get("title", "AI Design"), align='C')
+    pdf.ln(10)
+    pdf.set_font(fn, '', 11)
+    pdf.set_text_color(180, 180, 180)
+    if project.get("description"):
+        pdf.multi_cell(0, 7, project["description"], align='C')
+
+    import tempfile
+    tmp_files = []
+
+    # Before images
+    before_images = project.get("before_images", [])
+    if before_images:
+        pdf.add_page()
+        pdf.set_fill_color(30, 42, 56)
+        pdf.rect(0, 0, 210, 297, 'F')
+        pdf.set_text_color(255, 140, 66)
+        pdf.set_font(fn, 'B', 16)
+        pdf.cell(0, 12, "ПРЕДИ (Оригинални снимки)", ln=True, align='C')
+        pdf.ln(5)
+        for idx, img_b64 in enumerate(before_images):
+            try:
+                clean_b64 = img_b64.split(",")[1] if "," in img_b64 else img_b64
+                img_bytes = base64.b64decode(clean_b64)
+                tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+                tmp.write(img_bytes)
+                tmp.close()
+                tmp_files.append(tmp.name)
+                pdf.image(tmp.name, x=20, w=170)
+                pdf.ln(5)
+            except:
+                pass
+
+    # After images
+    after_images = project.get("after_images", [])
+    if after_images:
+        pdf.add_page()
+        pdf.set_fill_color(30, 42, 56)
+        pdf.rect(0, 0, 210, 297, 'F')
+        pdf.set_text_color(255, 140, 66)
+        pdf.set_font(fn, 'B', 16)
+        pdf.cell(0, 12, "СЛЕД (AI Дизайн)", ln=True, align='C')
+        pdf.ln(5)
+        for idx, img_data in enumerate(after_images):
+            try:
+                img_b64 = img_data.get("image_base64", img_data) if isinstance(img_data, dict) else img_data
+                if "," in img_b64:
+                    img_b64 = img_b64.split(",")[1]
+                img_bytes = base64.b64decode(img_b64)
+                tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+                tmp.write(img_bytes)
+                tmp.close()
+                tmp_files.append(tmp.name)
+                label = img_data.get("angle_label", f"Вариант {idx+1}") if isinstance(img_data, dict) else f"Вариант {idx+1}"
+                pdf.set_text_color(200, 200, 200)
+                pdf.set_font(fn, '', 10)
+                pdf.cell(0, 6, label, ln=True, align='C')
+                pdf.image(tmp.name, x=20, w=170)
+                pdf.ln(5)
+            except:
+                pass
+
+    pdf_bytes = pdf.output()
+    buffer = io.BytesIO(pdf_bytes)
+    buffer.seek(0)
+
+    # Cleanup temp files
+    import os as os_mod
+    for f in tmp_files:
+        try:
+            os_mod.unlink(f)
+        except:
+            pass
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=temadom_design_{project_id[:8]}.pdf"}
+    )
+
+@api_router.get("/published-projects/{project_id}/pdf/survey")
+async def download_survey_pdf(project_id: str):
+    """Generate PDF with quantity survey / materials list only"""
+    from fpdf import FPDF
+    import io
+
+    project = await db.published_projects.find_one({"id": project_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+
+    materials = project.get("materials", {})
+
+    pdf = FPDF()
+    pdf.add_page()
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    bold_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    try:
+        pdf.add_font("DejaVu", "", font_path, uni=True)
+        pdf.add_font("DejaVu", "B", bold_font_path, uni=True)
+        fn = "DejaVu"
+    except:
+        fn = "Helvetica"
+
+    # Header
+    pdf.set_fill_color(255, 140, 66)
+    pdf.rect(0, 0, 210, 35, 'F')
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, 'B', 20)
+    pdf.set_y(8)
+    pdf.cell(0, 10, "TemaDom", ln=True, align='C')
+    pdf.set_font(fn, '', 9)
+    pdf.cell(0, 6, "КОЛИЧЕСТВЕНА СМЕТКА", ln=True, align='C')
+
+    # Project info
+    pdf.set_y(42)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font(fn, 'B', 14)
+    pdf.cell(0, 10, project.get("title", "AI Design Project"), ln=True, align='C')
+    pdf.set_font(fn, '', 9)
+    pdf.set_text_color(100, 100, 100)
+    dims = project.get("dimensions", {})
+    pdf.cell(0, 6, f"Помещение: {project.get('room_type', '')} | Размери: {dims.get('width','?')}x{dims.get('length','?')}x{dims.get('height','?')} м | Стил: {project.get('style','')}", ln=True, align='C')
+    pdf.ln(8)
+
+    # Materials table
+    mat_list = materials.get("materials", [])
+    if mat_list:
+        w_name = 55
+        w_qty = 22
+        w_unit = 28
+        w_bgn = 30
+        w_eur = 28
+        w_store = 27
+
+        pdf.set_fill_color(45, 55, 72)
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_font(fn, 'B', 8)
+        pdf.cell(w_name, 7, "Материал", 1, 0, 'L', True)
+        pdf.cell(w_qty, 7, "Кол-во", 1, 0, 'C', True)
+        pdf.cell(w_unit, 7, "Ед. цена", 1, 0, 'C', True)
+        pdf.cell(w_bgn, 7, "Общо (лв)", 1, 0, 'C', True)
+        pdf.cell(w_eur, 7, "Общо (EUR)", 1, 0, 'C', True)
+        pdf.cell(w_store, 7, "Магазин", 1, 1, 'C', True)
+
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font(fn, '', 7)
+        fill = False
+        for m in mat_list:
+            if fill:
+                pdf.set_fill_color(245, 245, 245)
+            else:
+                pdf.set_fill_color(255, 255, 255)
+            name = str(m.get("name", ""))[:30]
+            qty = str(m.get("quantity", ""))
+            unit_p = str(m.get("price_per_unit_bgn", m.get("price_per_unit", "")))
+            total_bgn = str(m.get("total_price_bgn", m.get("total_price", "")))
+            total_eur = str(m.get("total_price_eur", ""))
+            store = str(m.get("store", ""))[:15]
+
+            pdf.cell(w_name, 6, name, 1, 0, 'L', fill)
+            pdf.cell(w_qty, 6, f"{qty} {m.get('unit','')}", 1, 0, 'C', fill)
+            pdf.cell(w_unit, 6, unit_p, 1, 0, 'C', fill)
+            pdf.cell(w_bgn, 6, total_bgn, 1, 0, 'C', fill)
+            pdf.cell(w_eur, 6, total_eur, 1, 0, 'C', fill)
+            pdf.cell(w_store, 6, store, 1, 1, 'C', fill)
+            fill = not fill
+
+        # Totals
+        pdf.ln(4)
+        pdf.set_fill_color(255, 140, 66)
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_font(fn, 'B', 9)
+        total_w = w_name + w_qty + w_unit
+        pdf.cell(total_w, 8, "МАТЕРИАЛИ:", 1, 0, 'R', True)
+        pdf.cell(w_bgn, 8, str(materials.get("total_estimate_bgn", materials.get("total_estimate", ""))), 1, 0, 'C', True)
+        pdf.cell(w_eur, 8, str(materials.get("total_estimate_eur", "")), 1, 0, 'C', True)
+        pdf.cell(w_store, 8, "", 1, 1, 'C', True)
+
+        if materials.get("labor_estimate_bgn") or materials.get("labor_estimate"):
+            pdf.set_fill_color(77, 166, 255)
+            pdf.cell(total_w, 8, "ТРУД:", 1, 0, 'R', True)
+            pdf.cell(w_bgn, 8, str(materials.get("labor_estimate_bgn", materials.get("labor_estimate", ""))), 1, 0, 'C', True)
+            pdf.cell(w_eur, 8, str(materials.get("labor_estimate_eur", "")), 1, 0, 'C', True)
+            pdf.cell(w_store, 8, "", 1, 1, 'C', True)
+
+        if materials.get("grand_total_bgn") or materials.get("grand_total"):
+            pdf.set_fill_color(40, 167, 69)
+            pdf.cell(total_w, 9, "ОБЩА СТОЙНОСТ:", 1, 0, 'R', True)
+            pdf.cell(w_bgn, 9, str(materials.get("grand_total_bgn", materials.get("grand_total", ""))), 1, 0, 'C', True)
+            pdf.cell(w_eur, 9, str(materials.get("grand_total_eur", "")), 1, 0, 'C', True)
+            pdf.cell(w_store, 9, "", 1, 1, 'C', True)
+    else:
+        pdf.set_font(fn, '', 10)
+        pdf.cell(0, 10, "Няма налични данни за материали.", ln=True, align='C')
+
+    # Footer
+    pdf.ln(10)
+    pdf.set_text_color(120, 120, 120)
+    pdf.set_font(fn, '', 7)
+    pdf.multi_cell(0, 4,
+        "* Цените са ориентировъчни, базирани на средни пазарни цени за 2025-2026.\n"
+        "* Генерирано от AI Дизайнера на TemaDom - https://temadom.com"
+    )
+
+    pdf_bytes = pdf.output()
+    buffer = io.BytesIO(pdf_bytes)
+    buffer.seek(0)
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=temadom_survey_{project_id[:8]}.pdf"}
+    )
+
 # Include router - MUST be after all route definitions
 app.include_router(api_router)
 

@@ -26,6 +26,8 @@ import BlogArticle from '@/components/BlogArticle';
 import PricesByRegionPage from '@/components/PricesByRegionPage';
 import RegionalPage from '@/components/RegionalPage';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import { PublishedProjectsPage } from '@/components/PublishedProjectsPage';
+import { PublishedProjectDetailPage } from '@/components/PublishedProjectDetailPage';
 import { LanguageProvider, useLanguage } from '@/i18n/LanguageContext';
 import { LANGUAGES } from '@/i18n/translations';
 import { Chatbot } from '@/components/Chatbot';
@@ -185,6 +187,10 @@ const Navbar = () => {
               <Megaphone className="h-3.5 w-3.5" />
               Обяви
             </Link>
+            <Link to="/gallery" className="text-slate-300 hover:text-[#FF8C42] text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-gallery">
+              <Image className="h-3.5 w-3.5" />
+              Галерия
+            </Link>
 
             {/* More dropdown */}
             <div className="relative" ref={moreRef}>
@@ -200,6 +206,9 @@ const Navbar = () => {
                 <div className="absolute top-full right-0 mt-2 w-52 bg-[#1E2A38] border border-[#3A4A5C] rounded-lg shadow-2xl py-1 z-50" data-testid="nav-more-dropdown">
                   <Link to="/ai-designer" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-designer">
                     <Sparkles className="h-4 w-4" /> AI Дизайнер
+                  </Link>
+                  <Link to="/gallery" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-gallery-more">
+                    <Image className="h-4 w-4" /> Галерия проекти
                   </Link>
                   <Link to="/projects" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-projects">
                     <FolderSearch className="h-4 w-4" /> Проекти
@@ -354,6 +363,9 @@ const Navbar = () => {
             <Link to="/ads" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <Megaphone className="h-4 w-4" /> Обяви
             </Link>
+            <Link to="/gallery" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-gallery">
+              <Image className="h-4 w-4" /> Галерия
+            </Link>
             <Link to="/subscriptions" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <ShoppingCart className="h-4 w-4" /> Абонаменти
             </Link>
@@ -428,6 +440,7 @@ const Footer = () => {
             <li><Link to="/projects" className="hover:text-[#FF8C42] transition-colors">{t('footer_view_projects')}</Link></li>
             <li><Link to="/subscriptions" className="hover:text-[#FF8C42] transition-colors">Абонаменти</Link></li>
             <li><Link to="/ai-designer" className="hover:text-[#FF8C42] transition-colors">AI Дизайнер</Link></li>
+            <li><Link to="/gallery" className="hover:text-[#FF8C42] transition-colors">Галерия проекти</Link></li>
           </ul>
         </div>
         <div>
@@ -3010,6 +3023,8 @@ function App() {
                 <Route path="/ai-designer" element={<AIDesignerPage />} />
                 <Route path="/subscriptions" element={<SubscriptionsPage />} />
                 <Route path="/feedback" element={<FeedbackPage />} />
+                <Route path="/gallery" element={<PublishedProjectsPage />} />
+                <Route path="/gallery/:id" element={<PublishedProjectDetailPage />} />
               </Routes>
             </main>
             <Footer />
