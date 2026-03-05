@@ -784,9 +784,9 @@ const LandingPage = () => {
           <p className="text-center mb-10 text-sm" style={{ color: muted }}>Реалистичен 1:1 проект на вашето помещение</p>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['4 снимки от ъглите', 'Размери 2x4x2.6м', '10 стила', 'Пред/След рендер', 'Процент прогрес'], color: accent, popular: false },
-              { name: '2-3 ПОМЕЩЕНИЯ', price: '129', rooms: '2-3', features: ['До 3 помещения', '4 снимки на помещение', '10 стила за всяко', 'Пред/След рендер', '360 визуализация'], color: '#10B981', popular: true },
-              { name: '4-5 ПОМЕЩЕНИЯ', price: '220', rooms: '4-5', features: ['До 5 помещения', '4 снимки на помещение', 'Пълна калкулация', 'Всички стилове', 'Приоритетна обработка'], color: '#8B5CF6', popular: false },
+              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['Видео до 60 секунди', '12 keyframes', '10 стила', 'Пред/След рендер', 'PDF проект'], color: accent, popular: false },
+              { name: '2 ПОМЕЩЕНИЯ', price: '129', rooms: '2', features: ['2 помещения', 'Видео до 60 секунди', '10 стила за всяко', 'Пред/След рендер', 'Калкулация'], color: '#10B981', popular: true },
+              { name: 'АПАРТАМЕНТ', price: '199', rooms: '3-5', features: ['До 5 помещения', 'Видео до 60 секунди', 'Пълна калкулация', 'Всички стилове', 'Приоритетна обработка'], color: '#8B5CF6', popular: false },
             ].map((plan, i) => (
               <div key={i} className={`rounded-2xl p-6 text-center border backdrop-blur-lg relative transition-transform hover:scale-105 ${plan.popular ? 'ring-2' : ''}`}
                 style={{ background: dark ? 'rgba(30,41,59,0.6)' : 'rgba(255,255,255,0.8)', borderColor: plan.popular ? plan.color : border, ...(plan.popular ? { boxShadow: `0 0 40px ${plan.color}20` } : {}) }}
