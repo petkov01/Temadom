@@ -207,7 +207,7 @@ const Navbar = () => {
                     <FileText className="h-4 w-4" /> AI Sketch (скици)
                   </Link>
                   <Link to="/room-scan" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#8C56FF] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-room-scan">
-                    <Camera className="h-4 w-4" /> Помещения (снимка)
+                    <Camera className="h-4 w-4" /> IA Designer (ремонт 1:1)
                   </Link>
                   <Link to="/ready-projects" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#28A745] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ready-projects">
                     <FolderSearch className="h-4 w-4" /> Готови проекти
@@ -360,7 +360,7 @@ const Navbar = () => {
               <FileText className="h-4 w-4" /> AI Sketch (скици)
             </Link>
             <Link to="/room-scan" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#8C56FF]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-room-scan">
-              <Camera className="h-4 w-4" /> Помещения (снимка)
+              <Camera className="h-4 w-4" /> IA Designer (ремонт 1:1)
             </Link>
             <Link to="/ready-projects" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#28A745]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ready-projects">
               <FolderSearch className="h-4 w-4" /> Готови проекти
@@ -521,7 +521,7 @@ const LandingPage = () => {
                 <FileText className="mr-2 h-6 w-6" /> AI Sketch (скици)
               </Button>
               <Button size="lg" className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white text-lg px-8 h-14 shadow-lg shadow-[#8C56FF]/20" onClick={() => navigate('/room-scan')} data-testid="hero-room-btn">
-                <Camera className="mr-2 h-6 w-6" /> Помещения (снимка)
+                <Camera className="mr-2 h-6 w-6" /> IA Designer (ремонт 1:1)
               </Button>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
@@ -3208,7 +3208,7 @@ function App() {
                 <Route path="/ai-designer" element={<AIDesignerPage />} />
                 <Route path="/ai-sketch" element={<AISketchPage />} />
                 <Route path="/ai-chart" element={<AIChartPage />} />
-                <Route path="/room-scan" element={<Scanner3DPage />} />
+                <Route path="/room-scan" element={<AIDesignerPage />} />
                 <Route path="/3d-scanner" element={<Scanner3DPage />} />
                 <Route path="/3d-scanner/:projectId" element={<Scanner3DPage />} />
                 <Route path="/ai-gallery" element={<PublishedGalleryPage />} />

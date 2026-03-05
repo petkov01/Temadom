@@ -1,13 +1,16 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Sparkles, Loader2, X, FileText, Download, Image, ChevronRight, ExternalLink, Ruler, Building2, Layers } from 'lucide-react';
+import React, { useState, useRef, useCallback, Suspense } from 'react';
+import { Upload, Loader2, X, Download, Ruler, Building2, Layers, RotateCcw, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Environment } from '@react-three/drei';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import * as THREE from 'three';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -18,6 +21,28 @@ const BUILDING_TYPES = [
   { id: 'renovation', name: 'Ремонт на помещение', icon: Ruler },
   { id: 'other', name: 'Друго', icon: Building2 },
 ];
+
+// Three.js GLB Viewer component
+const GlbViewer = ({ glbBase64 }) => {
+  const [scene, setScene] = useState(null);
+
+  React.useEffect(() => {
+    if (!glbBase64) return;
+    const binary = atob(glbBase64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'model/gltf-binary' });
+    const url = URL.createObjectURL(blob);
+    const loader = new GLTFLoader();
+    loader.load(url, (gltf) => {
+      setScene(gltf.scene);
+      URL.revokeObjectURL(url);
+    });
+  }, [glbBase64]);
+
+  if (!scene) return null;
+  return <primitive object={scene} />;
+};
 
 export const AISketchPage = () => {
   const [sketches, setSketches] = useState([null, null, null]);
@@ -31,7 +56,6 @@ export const AISketchPage = () => {
   const fileRef2 = useRef(null);
   const fileRefs = [fileRef0, fileRef1, fileRef2];
 
-  // Convert image to JPEG for better compatibility
   const convertToJpeg = (file) => {
     return new Promise((resolve) => {
       const img = new window.Image();
@@ -62,13 +86,12 @@ export const AISketchPage = () => {
       const jpegDataUrl = await convertToJpeg(file);
       setSketches(prev => { const n = [...prev]; n[index] = jpegDataUrl; return n; });
       setPreviews(prev => { const n = [...prev]; n[index] = jpegDataUrl; return n; });
-      toast.success(`Файл ${index + 1} качен и конвертиран`);
+      toast.success(`Файл ${index + 1} качен`);
     } catch {
       const reader = new FileReader();
       reader.onload = (ev) => {
         setSketches(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
         setPreviews(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
-        toast.success(`Файл ${index + 1} качен успешно`);
       };
       reader.readAsDataURL(file);
     }
@@ -95,11 +118,26 @@ export const AISketchPage = () => {
         notes
       }, { timeout: 300000 });
       setResults(res.data);
-      toast.success('Анализът е готов!');
+      toast.success('3D модел генериран успешно!');
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка при анализ. Опитайте отново.');
     }
     setLoading(false);
+  };
+
+  const downloadGlb = () => {
+    if (!results?.glb_base64) return;
+    const binary = atob(results.glb_base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'model/gltf-binary' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `temadom-sketch-${results.id || 'model'}.glb`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('.glb файл изтеглен');
   };
 
   const reset = () => {
@@ -109,8 +147,8 @@ export const AISketchPage = () => {
     setNotes('');
   };
 
-  const analysis = results?.analysis;
-  const elements = analysis?.structural_elements;
+  const summary = results?.summary;
+  const geometry = results?.geometry;
 
   return (
     <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="ai-sketch-page">
@@ -119,24 +157,24 @@ export const AISketchPage = () => {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-[#FF8C42]/15 border border-[#FF8C42]/30 rounded-full px-4 py-2 mb-4">
             <Ruler className="h-5 w-5 text-[#FF8C42]" />
-            <span className="font-medium text-sm text-[#FF8C42]">AI SKETCH</span>
+            <span className="font-medium text-sm text-[#FF8C42]">AI SKETCH — CV/OCR Pipeline</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-            Скица &rarr; Чертеж + 3D визуализация
+            Скица &rarr; 3D модел (.glb)
           </h1>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Качете 1-3 снимки/скици/чертежи. AI ще разпознае колони, греди, стълби, фундаменти и покрив, ще генерира точен структурен чертеж (95-100%) и визуализация.
+            Качете ръчна скица или чертеж. OpenCV разпознава линии, Tesseract чете размери — генерира се ТОЧЕН 3D модел без халюцинации.
           </p>
         </div>
 
-        {/* 4 стъпки инструкции */}
+        {/* 4 steps */}
         <div className="bg-[#0F1923] rounded-xl border border-[#2A3A4C] p-5 mb-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { step: '1', title: 'Качете скица/снимка', desc: 'Химикал, молив или маркер' },
-              { step: '2', title: 'AI анализира 30сек', desc: 'Разпознава елементи и размери' },
-              { step: '3', title: '360° 3D модел готов', desc: 'Въртете и мащабирайте' },
-              { step: '4', title: 'Изтегли .glb + Оферта', desc: 'Телефон + десктоп' },
+              { step: '1', title: 'Качете скица', desc: 'Химикал, молив или маркер' },
+              { step: '2', title: 'CV анализира линии', desc: 'OpenCV + Tesseract OCR' },
+              { step: '3', title: '360 3D модел готов', desc: 'Въртете и мащабирайте' },
+              { step: '4', title: 'Изтегли .glb файл', desc: 'Телефон + десктоп' },
             ].map((s, i) => (
               <div key={i} className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-full bg-[#FF8C42] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">{s.step}</div>
@@ -151,44 +189,34 @@ export const AISketchPage = () => {
 
         {!results ? (
           <div className="space-y-6">
-            {/* Upload Section */}
+            {/* Upload */}
             <Card className="bg-[#253545] border-[#3A4A5C]">
               <CardHeader>
                 <CardTitle className="text-white text-sm flex items-center gap-2">
                   <Upload className="h-4 w-4 text-[#FF8C42]" />
-                  Качете скици/чертежи/снимки (1-3 файла)
+                  Качете скици/чертежи (1-3 файла)
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
                   {[0, 1, 2].map(idx => (
                     <div key={idx}>
-                      <input
-                        ref={fileRefs[idx]}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleUpload(idx, e)}
-                        data-testid={`sketch-upload-${idx}`}
-                      />
+                      <input ref={fileRefs[idx]} type="file" accept="image/*" className="hidden"
+                        onChange={(e) => handleUpload(idx, e)} data-testid={`sketch-upload-${idx}`} />
                       {previews[idx] ? (
                         <div className="relative group">
                           <div className="aspect-square rounded-xl overflow-hidden border-2 border-[#FF8C42]/30">
                             <img src={previews[idx]} alt={`Sketch ${idx+1}`} className="w-full h-full object-cover" />
                           </div>
-                          <button
-                            onClick={() => removeFile(idx)}
-                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
+                          <button onClick={() => removeFile(idx)}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <X className="h-3 w-3" />
                           </button>
                         </div>
                       ) : (
-                        <button
-                          onClick={() => fileRefs[idx].current?.click()}
+                        <button onClick={() => fileRefs[idx].current?.click()}
                           className="aspect-square w-full rounded-xl border-2 border-dashed border-[#3A4A5C] hover:border-[#FF8C42]/50 flex flex-col items-center justify-center gap-2 transition-colors bg-[#1E2A38]/50"
-                          data-testid={`sketch-upload-btn-${idx}`}
-                        >
+                          data-testid={`sketch-upload-btn-${idx}`}>
                           <Upload className="h-6 w-6 text-slate-500" />
                           <span className="text-slate-500 text-xs">Файл {idx + 1}</span>
                         </button>
@@ -196,28 +224,22 @@ export const AISketchPage = () => {
                     </div>
                   ))}
                 </div>
-                <p className="text-slate-500 text-xs mt-3">Поддържа: снимки на скици, ръчни чертежи, реални обекти. Формати: JPG, PNG, WebP (макс. 15MB)</p>
+                <p className="text-slate-500 text-xs mt-3">JPG, PNG, WebP (макс. 15MB). Ръчни скици, чертежи с размери.</p>
               </CardContent>
             </Card>
 
             {/* Building Type */}
             <Card className="bg-[#253545] border-[#3A4A5C]">
-              <CardHeader>
-                <CardTitle className="text-white text-sm">Тип строеж</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle className="text-white text-sm">Тип строеж</CardTitle></CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                   {BUILDING_TYPES.map(bt => {
                     const Icon = bt.icon;
                     return (
-                      <button
-                        key={bt.id}
-                        onClick={() => setBuildingType(bt.id)}
+                      <button key={bt.id} onClick={() => setBuildingType(bt.id)}
                         className={`p-3 rounded-xl border-2 text-center transition-all ${
                           buildingType === bt.id ? 'border-[#FF8C42] bg-[#FF8C42]/10' : 'border-[#3A4A5C] hover:border-[#FF8C42]/30'
-                        }`}
-                        data-testid={`building-type-${bt.id}`}
-                      >
+                        }`} data-testid={`building-type-${bt.id}`}>
                         <Icon className={`h-5 w-5 mx-auto mb-1 ${buildingType === bt.id ? 'text-[#FF8C42]' : 'text-slate-500'}`} />
                         <p className="text-white text-xs font-medium">{bt.name}</p>
                       </button>
@@ -230,77 +252,162 @@ export const AISketchPage = () => {
             {/* Notes */}
             <Card className="bg-[#253545] border-[#3A4A5C]">
               <CardContent className="pt-5">
-                <Label className="text-slate-300 text-sm mb-2 block">Допълнителни бележки (по избор)</Label>
-                <Textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Опишете какво вижда скицата, специални изисквания..."
-                  className="bg-[#1E2A38] border-[#3A4A5C] text-white min-h-[80px]"
-                  data-testid="sketch-notes"
-                />
+                <Label className="text-slate-300 text-sm mb-2 block">Бележки (по избор)</Label>
+                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Допълнителни размери, бележки..."
+                  className="bg-[#1E2A38] border-[#3A4A5C] text-white min-h-[80px]" data-testid="sketch-notes" />
               </CardContent>
             </Card>
 
-            {/* Generate Button */}
-            <Button
-              className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white text-lg h-14 shadow-lg shadow-[#FF8C42]/20"
-              onClick={handleAnalyze}
-              disabled={uploadedCount === 0 || loading}
-              data-testid="analyze-btn"
-            >
+            {/* Generate */}
+            <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white text-lg h-14 shadow-lg shadow-[#FF8C42]/20"
+              onClick={handleAnalyze} disabled={uploadedCount === 0 || loading} data-testid="analyze-btn">
               {loading ? (
-                <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> AI анализира... (30-120 сек)</>
+                <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> CV анализира... (5-15 сек)</>
               ) : (
-                <><Sparkles className="mr-2 h-5 w-5" /> Генерирай чертеж + визуализация ({uploadedCount} файла)</>
+                <><Ruler className="mr-2 h-5 w-5" /> Генерирай 3D модел ({uploadedCount} файла)</>
               )}
             </Button>
-
-            {/* 3D model coming soon notice */}
-            <div className="text-center">
-              <Badge className="bg-[#8C56FF]/15 text-[#8C56FF] border border-[#8C56FF]/30 px-4 py-2">
-                <Layers className="h-4 w-4 mr-2 inline" />
-                3D модел (Meshy.ai) - Очаквайте скоро
-              </Badge>
-            </div>
           </div>
         ) : (
           /* ===== RESULTS ===== */
           <div className="space-y-6">
-            {/* Generated Views */}
-            {results.generated_views?.length > 0 && (
-              <Card className="bg-[#253545] border-[#3A4A5C] overflow-hidden">
-                <CardHeader>
+            {/* 3D Viewer */}
+            <Card className="bg-[#253545] border-[#3A4A5C] overflow-hidden">
+              <CardHeader>
+                <div className="flex items-center justify-between">
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Image className="h-5 w-5 text-[#4DA6FF]" />
-                    Генерирани визуализации
+                    <Eye className="h-5 w-5 text-[#4DA6FF]" />
+                    360 3D модел
+                  </CardTitle>
+                  <Button onClick={downloadGlb} className="bg-[#28A745] hover:bg-[#22943e] text-white" data-testid="download-glb-btn">
+                    <Download className="mr-2 h-4 w-4" /> Изтегли .glb
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full h-[400px] md:h-[500px] bg-[#0F1923] rounded-xl overflow-hidden border border-[#3A4A5C]" data-testid="3d-viewer">
+                  <Canvas camera={{ position: [15, 12, 15], fov: 50 }}>
+                    <ambientLight intensity={0.6} />
+                    <directionalLight position={[10, 20, 10]} intensity={0.8} />
+                    <Suspense fallback={null}>
+                      <GlbViewer glbBase64={results.glb_base64} />
+                    </Suspense>
+                    <OrbitControls enablePan enableZoom enableRotate autoRotate autoRotateSpeed={1} />
+                  </Canvas>
+                </div>
+                <p className="text-slate-500 text-xs mt-2 text-center">
+                  Задръжте мишката за въртене | Скролване за zoom | Среден бутон за преместване
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Summary */}
+            {summary && (
+              <Card className="bg-[#253545] border-[#3A4A5C]">
+                <CardHeader>
+                  <CardTitle className="text-white text-sm flex items-center gap-2">
+                    <Ruler className="h-4 w-4 text-[#FF8C42]" />
+                    Резултат от анализа (CV/OCR)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {results.generated_views.map((view, i) => (
-                      <div key={i}>
-                        <p className="text-[#FF8C42] text-xs mb-2 uppercase tracking-wider font-medium">{view.label}</p>
-                        <div className="rounded-xl overflow-hidden border border-[#FF8C42]/30">
-                          <img
-                            src={`data:image/png;base64,${view.image_base64}`}
-                            alt={view.label}
-                            className="w-full"
-                            data-testid={`sketch-view-${i}`}
-                          />
-                        </div>
-                      </div>
-                    ))}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-[#1E2A38] rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-[#FF8C42]">{summary.walls_detected}</p>
+                      <p className="text-slate-400 text-xs">Стени</p>
+                    </div>
+                    <div className="bg-[#1E2A38] rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-[#4DA6FF]">{summary.stairs_detected}</p>
+                      <p className="text-slate-400 text-xs">Стълби</p>
+                    </div>
+                    <div className="bg-[#1E2A38] rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-[#28A745]">{summary.dimensions_found}</p>
+                      <p className="text-slate-400 text-xs">Размери (OCR)</p>
+                    </div>
+                    <div className="bg-[#1E2A38] rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-[#8C56FF]">{summary.floor_area_sqm || '-'}</p>
+                      <p className="text-slate-400 text-xs">Площ (м2)</p>
+                    </div>
                   </div>
+                  {summary.unknowns > 0 && (
+                    <div className="mt-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                      <p className="text-yellow-400 text-xs">{summary.unknowns} неразпознати елементи маркирани като "unknown"</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
 
-            {/* Original sketches for reference */}
-            {previews.filter(Boolean).length > 0 && (
+            {/* Detected geometry details */}
+            {geometry && (
               <Card className="bg-[#253545] border-[#3A4A5C]">
                 <CardHeader>
-                  <CardTitle className="text-white text-sm">Оригинални скици</CardTitle>
+                  <CardTitle className="text-white text-sm">Разпознати елементи</CardTitle>
                 </CardHeader>
+                <CardContent className="space-y-3">
+                  {geometry.walls?.length > 0 && (
+                    <div>
+                      <h4 className="text-[#FF8C42] text-xs font-semibold mb-1">Стени ({geometry.walls.length})</h4>
+                      <div className="grid gap-1">
+                        {geometry.walls.map((w, i) => (
+                          <div key={i} className="flex gap-3 text-xs text-slate-300 bg-[#1E2A38] rounded px-3 py-1.5">
+                            <span className="text-white font-medium">Стена {i+1}</span>
+                            <span>{w.orientation === 'horizontal' ? 'Хоризонтална' : 'Вертикална'}</span>
+                            <span className="text-[#FF8C42]">{w.length_m}м</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {geometry.stairs?.length > 0 && (
+                    <div>
+                      <h4 className="text-[#4DA6FF] text-xs font-semibold mb-1">Стълби ({geometry.stairs.length})</h4>
+                      {geometry.stairs.map((s, i) => (
+                        <div key={i} className="text-xs text-slate-300 bg-[#1E2A38] rounded px-3 py-1.5">
+                          Дължина: {s.length_m}м | Ъгъл: {s.angle}°
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {geometry.slab && (
+                    <div>
+                      <h4 className="text-[#28A745] text-xs font-semibold mb-1">Подова плоча</h4>
+                      <div className="text-xs text-slate-300 bg-[#1E2A38] rounded px-3 py-1.5">
+                        {geometry.slab.width_m}м x {geometry.slab.depth_m}м = {geometry.slab.area_sqm} м2
+                      </div>
+                    </div>
+                  )}
+                  {geometry.detected_dimensions?.length > 0 && (
+                    <div>
+                      <h4 className="text-[#8C56FF] text-xs font-semibold mb-1">OCR размери ({geometry.detected_dimensions.length})</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {geometry.detected_dimensions.map((d, i) => (
+                          <Badge key={i} className="bg-[#8C56FF]/15 text-[#8C56FF] border-[#8C56FF]/30">
+                            {d.raw} = {d.value_m}м
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {geometry.unknowns?.length > 0 && (
+                    <div>
+                      <h4 className="text-yellow-500 text-xs font-semibold mb-1">Неразпознати ({geometry.unknowns.length})</h4>
+                      {geometry.unknowns.map((u, i) => (
+                        <div key={i} className="text-xs text-yellow-400 bg-yellow-500/10 rounded px-3 py-1.5">
+                          {u.description}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Original sketches */}
+            {previews.filter(Boolean).length > 0 && (
+              <Card className="bg-[#253545] border-[#3A4A5C]">
+                <CardHeader><CardTitle className="text-white text-sm">Оригинални скици</CardTitle></CardHeader>
                 <CardContent>
                   <div className="flex gap-3">
                     {previews.filter(Boolean).map((p, i) => (
@@ -313,198 +420,13 @@ export const AISketchPage = () => {
               </Card>
             )}
 
-            {/* Structural Analysis */}
-            {analysis && (
-              <Card className="bg-[#253545] border-[#3A4A5C]">
-                <CardHeader>
-                  <CardTitle className="text-white text-sm flex items-center gap-2">
-                    <Ruler className="h-4 w-4 text-[#FF8C42]" />
-                    Структурен анализ (95-100% точност)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Dimensions Summary */}
-                  {analysis.dimensions_summary && (
-                    <div className="bg-[#1E2A38] rounded-lg p-4">
-                      <h4 className="text-white text-sm font-semibold mb-2">Общи размери</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                        {Object.entries(analysis.dimensions_summary).map(([key, val]) => (
-                          <div key={key}>
-                            <span className="text-slate-400 capitalize">{key}:</span>{' '}
-                            <span className="text-white font-medium">{val}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Structural Elements */}
-                  {elements && (
-                    <div className="space-y-3">
-                      {elements.columns?.length > 0 && (
-                        <div>
-                          <h4 className="text-[#FF8C42] text-sm font-semibold mb-1">Колони ({elements.columns.length})</h4>
-                          <div className="grid gap-1">
-                            {elements.columns.map((c, i) => (
-                              <div key={i} className="flex gap-3 text-xs text-slate-300 bg-[#1E2A38] rounded px-3 py-1.5">
-                                <span className="text-white font-medium">{c.id}</span>
-                                <span>{c.type}</span>
-                                <span>{c.dimensions}</span>
-                                <span className="text-slate-500">{c.position}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {elements.beams?.length > 0 && (
-                        <div>
-                          <h4 className="text-[#4DA6FF] text-sm font-semibold mb-1">Греди ({elements.beams.length})</h4>
-                          <div className="grid gap-1">
-                            {elements.beams.map((b, i) => (
-                              <div key={i} className="flex gap-3 text-xs text-slate-300 bg-[#1E2A38] rounded px-3 py-1.5">
-                                <span className="text-white font-medium">{b.id}</span>
-                                <span>{b.type}</span>
-                                <span>{b.dimensions}</span>
-                                <span>L={b.span}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {elements.walls?.length > 0 && (
-                        <div>
-                          <h4 className="text-[#28A745] text-sm font-semibold mb-1">Стени ({elements.walls.length})</h4>
-                          <div className="grid gap-1">
-                            {elements.walls.map((w, i) => (
-                              <div key={i} className="flex gap-3 text-xs text-slate-300 bg-[#1E2A38] rounded px-3 py-1.5">
-                                <span className="text-white font-medium">{w.type}</span>
-                                <span>{w.material}</span>
-                                <span>{w.thickness}</span>
-                                <span>L={w.length}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {elements.foundations && (
-                        <div>
-                          <h4 className="text-[#8C56FF] text-sm font-semibold mb-1">Фундаменти</h4>
-                          {(Array.isArray(elements.foundations) ? elements.foundations : [elements.foundations]).map((f, i) => (
-                            <div key={i} className="text-xs text-slate-300 bg-[#1E2A38] rounded px-3 py-1.5">
-                              {f.type} | {f.width} x {f.depth} | {f.material}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {elements.roof && (
-                        <div>
-                          <h4 className="text-[#DC3545] text-sm font-semibold mb-1">Покрив</h4>
-                          <div className="text-xs text-slate-300 bg-[#1E2A38] rounded px-3 py-1.5">
-                            {elements.roof.type} | Наклон: {elements.roof.slope} | {elements.roof.material} | Площ: {elements.roof.area}
-                          </div>
-                        </div>
-                      )}
-
-                      {elements.stairs?.length > 0 && (
-                        <div>
-                          <h4 className="text-yellow-500 text-sm font-semibold mb-1">Стълби</h4>
-                          {elements.stairs.map((s, i) => (
-                            <div key={i} className="text-xs text-slate-300 bg-[#1E2A38] rounded px-3 py-1.5">
-                              {s.type} | Ширина: {s.width} | {s.steps} стъпала | Стъпка: {s.rise}/{s.tread}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Materials Estimate */}
-            {analysis?.materials_estimate?.length > 0 && (
-              <Card className="bg-[#253545] border-[#3A4A5C]">
-                <CardHeader>
-                  <CardTitle className="text-white text-sm flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-[#FF8C42]" />
-                    Количествена сметка
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm" data-testid="sketch-materials-table">
-                      <thead>
-                        <tr className="border-b border-[#3A4A5C]">
-                          <th className="text-left py-2 text-slate-400 font-medium">Материал</th>
-                          <th className="text-left py-2 text-slate-400 font-medium">Кол-во</th>
-                          <th className="text-right py-2 text-slate-400 font-medium">Ед. цена</th>
-                          <th className="text-right py-2 text-slate-400 font-medium">Общо (лв / EUR)</th>
-                          <th className="text-right py-2 text-slate-400 font-medium">Магазин</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {analysis.materials_estimate.map((m, i) => (
-                          <tr key={i} className="border-b border-[#3A4A5C]/50 hover:bg-[#1E2A38]/50">
-                            <td className="py-2 text-white">{m.name}</td>
-                            <td className="py-2 text-slate-300">{m.quantity} {m.unit}</td>
-                            <td className="py-2 text-slate-300 text-right">
-                              {m.price_per_unit_bgn} лв
-                              <span className="text-slate-500 text-xs ml-1">/ {m.price_per_unit_eur} EUR</span>
-                            </td>
-                            <td className="py-2 text-right">
-                              <span className="text-[#FF8C42] font-medium">{m.total_bgn} лв</span>
-                              <span className="text-slate-400 text-xs block">{m.total_eur} EUR</span>
-                            </td>
-                            <td className="py-2 text-right text-slate-500 text-xs">{m.store || '-'}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                      <tfoot>
-                        <tr className="border-t-2 border-[#FF8C42]/30">
-                          <td colSpan="3" className="py-3 text-white font-bold">Материали:</td>
-                          <td className="py-3 text-right text-[#FF8C42] font-bold">{analysis.total_materials_bgn} лв / {analysis.total_materials_eur} EUR</td>
-                          <td />
-                        </tr>
-                        {analysis.labor_bgn && (
-                          <tr>
-                            <td colSpan="3" className="py-1 text-slate-300">Труд:</td>
-                            <td className="py-1 text-right text-slate-300">{analysis.labor_bgn} лв / {analysis.labor_eur} EUR</td>
-                            <td />
-                          </tr>
-                        )}
-                        {analysis.grand_total_bgn && (
-                          <tr className="border-t border-[#3A4A5C]">
-                            <td colSpan="3" className="py-3 text-white font-bold text-lg">ОБЩА СТОЙНОСТ:</td>
-                            <td className="py-3 text-right text-[#28A745] font-bold text-xl">{analysis.grand_total_bgn} лв / {analysis.grand_total_eur} EUR</td>
-                            <td />
-                          </tr>
-                        )}
-                      </tfoot>
-                    </table>
-                  </div>
-                  {analysis.accuracy_note && (
-                    <p className="text-xs text-slate-500 mt-3">{analysis.accuracy_note}</p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* 3D Coming Soon */}
-            <div className="text-center py-4">
-              <Badge className="bg-[#8C56FF]/15 text-[#8C56FF] border border-[#8C56FF]/30 px-4 py-2">
-                <Layers className="h-4 w-4 mr-2 inline" />
-                3D модел (.glb) с Meshy.ai - Очаквайте скоро
-              </Badge>
-            </div>
-
-            {/* CTA */}
+            {/* Actions */}
             <div className="flex flex-wrap gap-3 justify-center">
               <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={reset} data-testid="new-sketch-btn">
-                <Upload className="mr-2 h-4 w-4" /> Нов анализ
+                <RotateCcw className="mr-2 h-4 w-4" /> Нов анализ
+              </Button>
+              <Button className="bg-[#28A745] hover:bg-[#22943e] text-white" onClick={downloadGlb} data-testid="download-glb-btn-2">
+                <Download className="mr-2 h-4 w-4" /> Изтегли .glb
               </Button>
             </div>
           </div>

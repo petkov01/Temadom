@@ -2127,15 +2127,16 @@ AI_MATERIAL_CLASS = {
 
 @api_router.post("/ai-designer/generate")
 async def generate_ai_design(request: Request):
-    """Generate AI interior design based on uploaded room photos (1-3 angles)"""
+    """IA Designer: 1:1 renovation — strict geometry preservation.
+    Takes a photo + renovation text and generates the SAME space renovated."""
     data = await request.json()
-    
+
     # Support both single image and multiple images
     images_list = data.get("images", [])
     single_image = data.get("image")
     if not images_list and single_image:
         images_list = [single_image]
-    
+
     style = data.get("style", "modern")
     material_class = data.get("material_class", "standard")
     room_type_id = data.get("room_type", "bathroom")
@@ -2144,6 +2145,7 @@ async def generate_ai_design(request: Request):
     room_height = data.get("height", "2.6")
     variants = data.get("variants", 1)
     notes = data.get("notes", "")
+    renovation_text = data.get("renovation_text", notes)
     
     if not images_list:
         raise HTTPException(status_code=400, detail="Качете поне 1 снимка")
@@ -2173,31 +2175,29 @@ async def generate_ai_design(request: Request):
     room_type_name = ROOM_TYPE_NAMES.get(room_type_id, "помещение")
     
     try:
-        # Step 1: Analyze ALL uploaded photos with GPT for comprehensive understanding
+        # Step 1: Analyze photos — strict 1:1 description
         analysis_chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"ai-designer-{uuid.uuid4()}",
-            system_message=f"""Ти си експерт интериорен дизайнер. Получаваш {len(cleaned_images)} снимки на {room_type_name} от различни ъгли.
-Анализирай ВСИЧКИ снимки заедно и опиши ТОЧНО какво виждаш:
-- Тип помещение и текущо състояние
-- Конкретни елементи: плочки, стени, мебели, тоалетна, вана/душ, мивка, осветление
-- Цветове, материали, пропорции
-- Какво може да се подобри
+            system_message=f"""Ти си експерт интериорен дизайнер. Получаваш {len(cleaned_images)} снимки на {room_type_name}.
 
-Отговори в JSON формат:
-{{"room_type": "{room_type_name}", "current_state": "детайлно описание", "elements": ["списък на всички елементи"], "lighting": "тип осветление", "colors": ["цветове"], "furniture": ["мебели/оборудване"], "layout": "описание на разпределението", "description": "detailed description in English of the exact room for image generation - include specific elements, materials, colors, layout, fixtures visible in the photos"}}"""
+СТРИКТЕН РЕЖИМ 1:1 — анализирай ТОЧНО какво виждаш:
+- САМО елементи от снимката (плочки, стени, мебели, вана/душ, мивка, тоалетна, осветление)
+- НЕ добавяй нови елементи
+- Опиши ТОЧНАТА геометрия, пропорции и позиции
+
+Отговори в JSON:
+{{"room_type": "{room_type_name}", "current_state": "детайлно описание", "elements": ["списък"], "lighting": "тип", "colors": ["цветове"], "furniture": ["мебели"], "layout": "разпределение", "description": "VERY DETAILED English description of the EXACT room visible — include every fixture, wall position, floor area, window/door positions, lighting. This must be precise enough to recreate the SAME room."}}"""
         ).with_model("openai", "gpt-4o")
-        
-        # Build message with all images
+
         image_contents = [ImageContent(image_base64=img) for img in cleaned_images]
         analysis_msg = UserMessage(
-            text=f"Анализирай тези {len(cleaned_images)} снимки на {room_type_name}. Опиши ТОЧНО какво виждаш от всеки ъгъл.",
+            text=f"Анализирай ТОЧНО тези {len(cleaned_images)} снимки на {room_type_name}. Опиши 1:1 какво виждаш.",
             file_contents=image_contents
         )
-        
+
         analysis_response = await analysis_chat.send_message(analysis_msg)
-        
-        # Parse analysis
+
         room_analysis = {}
         try:
             json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', analysis_response)
@@ -2205,55 +2205,55 @@ async def generate_ai_design(request: Request):
                 room_analysis = json_module.loads(json_match.group(1))
             else:
                 room_analysis = json_module.loads(analysis_response)
-        except:
+        except Exception:
             room_analysis = {"room_type": room_type_name, "description": f"a {room_type_name} interior", "current_state": "needs renovation"}
-        
+
         room_desc = room_analysis.get("description", f"a {room_type_name} interior")
-        room_type = room_analysis.get("room_type", room_type_name)
-        
-        # Step 2: Generate design images using GPT Image 1
+
+        # Step 2: Generate 4 angles of renovated room — STRICT 1:1
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
-        
+
         generated_images = []
         variants_count = min(int(variants), 5)
-        
-        variant_focuses = [
-            "Focus on warm tones, cozy atmosphere, soft lighting",
-            "Focus on light, airy, spacious feel with bright colors",
-            "Focus on bold design choices, high contrast, statement pieces",
-            "Focus on natural materials, wood, stone, organic textures",
-            "Focus on luxury premium finishes, marble, brass, designer fixtures"
+
+        # 4 camera angles for each variant
+        camera_angles = [
+            ("photographed from the entrance/door looking inward, full room visible", "Фронтален"),
+            ("photographed from the left wall at 45 degrees showing depth", "Ляв ъгъл"),
+            ("photographed from the right wall at 45 degrees showing depth", "Десен ъгъл"),
+            ("photographed from the far corner looking back towards entrance", "Обратен ъгъл"),
         ]
-        
-        # For 1 variant: 2 angles (frontal + side). For 3+ variants: 1 angle each to save time
-        use_two_angles = variants_count == 1
-        
-        angles = [
-            ("photographed from the entrance/door looking inward, showing the full room layout", "Фронтален"),
-            ("photographed from the opposite corner at a diagonal angle, showing depth and side walls", "Страничен")
-        ]
-        
+
+        # Build strict renovation prompt
+        reno_instruction = renovation_text or notes or "обновяване на покрития и осветление"
+
         for i in range(variants_count):
             variant_angles = []
-            angles_to_gen = angles if use_two_angles else [angles[0]]
-            
-            for angle_idx, (angle_desc, angle_label) in enumerate(angles_to_gen):
+            for angle_idx, (angle_desc, angle_label) in enumerate(camera_angles):
                 try:
-                    variant_prompt = f"""Professional interior design photograph of {room_desc}, {angle_desc}.
-This is a {room_type_name} with dimensions {room_width}m x {room_length}m, height {room_height}m.
-Redesigned in {style_desc} with {material_desc}.
-The design must show the SAME room layout and proportions but completely renovated.
-Keep the same basic structure (walls, windows, doors in same positions).
-{f'Special requirements: {notes}' if notes else ''}
-{variant_focuses[i % len(variant_focuses)]}.
-Ultra-realistic professional interior photography, 8K quality, perfect lighting, photorealistic materials and textures."""
-                    
+                    strict_prompt = f"""STRICT 1:1 RENOVATION of the EXACT room described below. {angle_desc}.
+
+ROOM DESCRIPTION (keep EXACT layout): {room_desc}
+Dimensions: {room_width}m x {room_length}m, height {room_height}m.
+
+RENOVATION REQUEST: {reno_instruction}
+
+STRICT RULES:
+1. Keep the EXACT same room geometry, proportions, and layout
+2. Do NOT add new objects/elements that aren't in the original
+3. Do NOT use Pinterest/stock images — generate THIS specific room
+4. Apply ONLY the requested renovation changes
+5. Preserve 1:1 scale and proportions
+
+Style: {style_desc}. Materials: {material_desc}.
+Ultra-realistic professional interior photography, 8K quality, perfect lighting."""
+
                     img_result = await image_gen.generate_images(
-                        prompt=variant_prompt,
+                        prompt=strict_prompt,
                         model="gpt-image-1",
                         number_of_images=1
                     )
-                    
+
                     if img_result and len(img_result) > 0:
                         img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
                         variant_angles.append({
@@ -2262,15 +2262,14 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
                             "image_base64": img_b64
                         })
                 except Exception as img_err:
-                    logger.error(f"Image generation error for variant {i+1} angle {angle_idx+1}: {img_err}")
+                    logging.error(f"IA Designer image gen error variant {i+1} angle {angle_idx+1}: {img_err}")
                     continue
-            
+
             if variant_angles:
                 generated_images.append({
                     "variant": i + 1,
                     "angles": variant_angles,
                     "image_base64": variant_angles[0]["image_base64"] if variant_angles else "",
-                    "prompt_used": variant_prompt[:200] if variant_angles else ""
                 })
         
         # Step 3: Generate materials list with prices using GPT
@@ -2845,23 +2844,20 @@ async def download_project_materials_pdf(project_id: str):
         headers={"Content-Disposition": f"attachment; filename=temadom_project_{project_id}_materials.pdf"})
 
 
-# ============== AI SKETCH ANALYSIS ==============
+# ============== AI SKETCH ANALYSIS (CV/OCR Pipeline) ==============
+
+from cv_pipeline import process_sketch
 
 @api_router.post("/ai-sketch/analyze")
 async def analyze_sketch(request: Request):
-    """Analyze uploaded sketches/blueprints and generate structural analysis + visualization"""
+    """Analyze sketches using OpenCV line detection + Tesseract OCR → .glb 3D model.
+    STRICT MODE: Only geometry present in the drawing. No hallucination."""
     data = await request.json()
-    
+
     sketches = data.get("sketches", [])
     if not sketches:
         raise HTTPException(status_code=400, detail="Качете поне 1 скица или чертеж")
-    
-    if not EMERGENT_LLM_KEY:
-        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
-    
-    building_type = data.get("building_type", "residential")
-    notes = data.get("notes", "")
-    
+
     # Clean base64
     cleaned = []
     for s in sketches[:3]:
@@ -2869,143 +2865,39 @@ async def analyze_sketch(request: Request):
             cleaned.append(s.split(",")[1])
         elif s:
             cleaned.append(s)
-    
+
     if not cleaned:
         raise HTTPException(status_code=400, detail="Невалидни файлове")
-    
+
     try:
-        # Step 1: AI Analysis - identify structural elements
-        analysis_chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"sketch-{uuid.uuid4()}",
-            system_message="""Ти си експерт строителен инженер и архитект с 30+ години опит. Получаваш скици, чертежи и снимки на реални сгради и помещения.
+        # Process primary sketch through CV/OCR pipeline
+        result = process_sketch(cleaned[0])
 
-ВАЖНО: Трябва да анализираш ТОЧНО това, което виждаш на изображението. Не измисляй елементи, които НЕ присъстват. Опиши само видимите конструктивни елементи.
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
 
-За всеки разпознат елемент дай:
-- Колони: точен брой, приблизителни размери и позиции
-- Греди: видими греди, размери и посока
-- Стълби: ако има — брой стъпала, ширина, тип
-- Фундаменти: ако са видими или могат да се определят от чертежа
-- Покрив: тип, наклон, материал ако е видимо
-- Стени: носещи/неносещи, материал, дебелина
-- Отвори: врати и прозорци с приблизителни размери
-
-ЗАДЪЛЖИТЕЛНО поле "description_en" — трябва да е МНОГО ПОДРОБНО описание на ТОЧНО това, което виждаш в скицата/чертежа. Например: "A hand-drawn floor plan showing a rectangular apartment with 3 rooms. The entrance is on the north side. There is a long corridor leading to a living room (approx 5x4m), a bedroom (3x4m), and a bathroom (2x3m). Load-bearing walls are on the perimeter."
-
-Отговори САМО в JSON (без допълнителен текст):
-{
-  "building_type": "тип на обекта",
-  "what_i_see": "описание на български какво точно виждам на скицата/чертежа",
-  "structural_elements": {
-    "columns": [{"id": "C1", "type": "тип", "dimensions": "размери", "position": "позиция", "height": "височина"}],
-    "beams": [{"id": "B1", "type": "тип", "dimensions": "размери", "span": "отвор", "load": "натоварване"}],
-    "stairs": [{"type": "тип", "width": "ширина", "steps": 0, "rise": "стъпка", "tread": "настъпка"}],
-    "foundations": [{"type": "тип", "width": "ширина", "depth": "дълбочина", "material": "материал"}],
-    "roof": {"type": "тип", "slope": "наклон", "material": "материал", "area": "площ"},
-    "walls": [{"type": "носеща/неносеща", "thickness": "дебелина", "material": "материал", "length": "дължина"}],
-    "openings": [{"type": "врата/прозорец", "dimensions": "размери", "position": "позиция"}]
-  },
-  "dimensions_summary": {"length": "м", "width": "м", "height": "м", "floors": 1, "total_area": "м²"},
-  "description_en": "DETAILED English description of EXACTLY what is shown in the sketch/drawing for accurate image generation",
-  "materials_estimate": [
-    {"name": "материал", "quantity": "кол-во", "unit": "единица", "price_per_unit_eur": "цена EUR", "total_eur": "общо EUR", "store": "магазин"}
-  ],
-  "total_materials_eur": "сума EUR",
-  "labor_eur": "труд EUR",
-  "grand_total_eur": "обща стойност EUR",
-  "accuracy_note": "бележка за точността"
-}"""
-        ).with_model("openai", "gpt-4o")
-        
-        image_contents = [ImageContent(image_base64=img) for img in cleaned]
-        analysis_msg = UserMessage(
-            text=f"""Анализирай ВНИМАТЕЛНО тези {len(cleaned)} скици/чертежи/снимки.
-Тип обект: {building_type}
-{f'Бележки от потребителя: {notes}' if notes else ''}
-
-ВАЖНО: Опиши ТОЧНО какво виждаш на изображението. Не добавяй елементи, които не са видими.
-Полето "description_en" трябва да описва ТОЧНО какво е на скицата — включително позиции на стени, стаи, отвори и всичко видимо. Това описание ще се използва за генериране на точен 2D план и 3D визуализация.
-Количествената сметка трябва да е с цени в EUR.
-Дай JSON отговор.""",
-            file_contents=image_contents
-        )
-        
-        analysis_response = await analysis_chat.send_message(analysis_msg)
-        
-        # Parse analysis
-        analysis_data = {}
-        try:
-            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', analysis_response)
-            if json_match:
-                analysis_data = json_module.loads(json_match.group(1))
-            else:
-                # Try to find JSON object directly
-                json_obj_match = re_module.search(r'\{[\s\S]*\}', analysis_response)
-                if json_obj_match:
-                    analysis_data = json_module.loads(json_obj_match.group(0))
-                else:
-                    analysis_data = {"raw_analysis": analysis_response[:3000], "note": "AI анализът е в текстов формат"}
-        except Exception:
-            analysis_data = {"raw_analysis": analysis_response[:3000], "note": "AI анализът е в текстов формат"}
-        
-        desc_en = analysis_data.get("description_en", "")
-        dims = analysis_data.get("dimensions_summary", {})
-        
-        # Build detailed description from analysis
-        if not desc_en:
-            desc_en = f"A {building_type} building structure"
-        
-        dims_str = ""
-        if dims:
-            dims_str = f"Dimensions: {dims.get('length','?')} x {dims.get('width','?')}, height {dims.get('height','?')}, {dims.get('floors',1)} floors, total area {dims.get('total_area','?')}"
-        
-        # Step 2: Generate structural visualization based on EXACT analysis
-        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
-        
-        generated_views = []
-        view_prompts = [
-            f"Professional architectural floor plan / blueprint based on this description: {desc_en}. {dims_str}. Show EXACT layout as described: all walls as thick black lines, doors as arcs, windows as double lines, dimensions annotated in meters, room labels in the center of each room. Clean white background, CAD-quality 2D technical drawing. Scale bar included. North arrow in corner.",
-            f"Professional 3D cutaway isometric rendering based on: {desc_en}. {dims_str}. Show the building from a 45-degree elevated angle with one wall removed to reveal interior layout. Visible structural elements: columns, beams, floor slabs. Photorealistic materials - concrete, brick, glass. Clean white background, architecture visualization quality."
-        ]
-        view_labels = ["2D план (чертеж)", "3D визуализация"]
-        
-        for i, prompt in enumerate(view_prompts):
-            try:
-                img_result = await image_gen.generate_images(
-                    prompt=prompt,
-                    model="gpt-image-1",
-                    number_of_images=1
-                )
-                if img_result and len(img_result) > 0:
-                    img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
-                    generated_views.append({
-                        "label": view_labels[i],
-                        "image_base64": img_b64
-                    })
-            except Exception as e:
-                logger.error(f"Sketch image gen error: {e}")
-        
         # Save to DB
         sketch_id = str(uuid.uuid4())
         await db.ai_sketches.insert_one({
             "id": sketch_id,
-            "building_type": building_type,
-            "notes": notes,
+            "building_type": data.get("building_type", "residential"),
+            "notes": data.get("notes", ""),
             "sketches_count": len(cleaned),
-            "views_count": len(generated_views),
-            "analysis_summary": analysis_data.get("dimensions_summary", {}),
+            "summary": result["summary"],
             "created_at": datetime.now(timezone.utc).isoformat()
         })
-        
+
         return {
             "id": sketch_id,
-            "analysis": analysis_data,
-            "generated_views": generated_views,
-            "test_mode": True
+            "geometry": result["geometry"],
+            "glb_base64": result["glb_base64"],
+            "summary": result["summary"],
         }
-        
+
+    except HTTPException:
+        raise
     except Exception as e:
+        logging.error(f"CV Pipeline error: {e}")
         raise HTTPException(status_code=500, detail=f"Грешка при анализ: {str(e)}")
 
 
