@@ -159,10 +159,10 @@ const Navbar = () => {
     <nav className="bg-[#0F1923] border-b border-[#2A3A4C] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-[80px]">
-          {/* Left: Logo - prominent and left-aligned */}
-          <div className="flex items-center -ml-1">
-            <Link to="/" className="flex items-center" data-testid="logo-link">
-              <TemaDomLogo className="h-[65px] md:h-[90px] w-auto" />
+          {/* Left: Logo - prominent and left-corner */}
+          <div className="flex items-center -ml-2 lg:-ml-4">
+            <Link to="/" className="flex items-center pt-1" data-testid="logo-link">
+              <TemaDomLogo className="h-[58px] md:h-[72px] w-auto" />
             </Link>
           </div>
 
@@ -2893,19 +2893,22 @@ const SubscriptionsPage = () => {
     }
   };
 
+  const planColors = { starter: '#4DA6FF', pro: '#FF8C42', premium: '#8C56FF' };
+  const planIcons = { starter: '1', pro: '2', premium: '3' };
+
   return (
     <div className="min-h-screen bg-[#1E2A38] py-12" data-testid="subscriptions-page">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Абонаментни планове</h1>
-          <p className="text-lg text-slate-400">Всички функции в тестов режим — без показани цени</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Фирмени абонаменти — Тестов период</h1>
+          <p className="text-lg text-slate-400">Всички функции са достъпни безплатно</p>
         </div>
 
         <PageInstructions
           title="Абонаментни планове"
           description="Изберете план според вашите нужди"
-          steps={['Разгледайте наличните планове за фирми', 'AI Designer е отделен платен модул', 'В тестов режим всичко е безплатно', 'Регистрирайте се и активирайте']}
-          benefits={['Всички функции безплатни в тестов режим', 'Без показани цени', 'Email / Telegram известия за Pro и Premium']}
+          steps={['Разгледайте наличните планове', 'Starter — основни функции', 'Pro — AI Builder + визуализация', 'Premium — чертежи + персонален мениджър']}
+          benefits={['Всички функции безплатни в тестов режим', 'AI Builder с 3D визуализация', 'Структурни чертежи с 95-100% точност']}
           videoUrl="https://temadom.com/videos/subscriptions"
         />
 
@@ -2915,27 +2918,38 @@ const SubscriptionsPage = () => {
         </div>
 
         {/* Plans for companies */}
-        <h2 className="text-2xl font-bold text-white mb-6">За фирми</h2>
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {plans.company && Object.entries(plans.company).map(([key, plan]) => (
-            <Card key={key} className={`relative bg-[#253545] border-[#3A4A5C] ${key === 'pro' ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20' : ''}`} data-testid={`plan-${key}`}>
-              {key === 'pro' && <div className="bg-[#FF8C42] text-white text-center text-xs py-1 font-medium">ПРЕПОРЪЧАН</div>}
-              <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
-                <p className="text-lg font-bold text-[#FF8C42] mb-4">{plan.price}</p>
-                <div className="space-y-2 mb-6">
-                  {plan.features.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-slate-300">
-                      <CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> {f}
+          {plans.company && Object.entries(plans.company).map(([key, plan]) => {
+            const color = planColors[key] || '#FF8C42';
+            const isPro = key === 'pro';
+            const isPremium = key === 'premium';
+            return (
+              <Card key={key} className={`relative bg-[#253545] border-[#3A4A5C] overflow-hidden ${isPro ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20' : ''} ${isPremium ? 'border-[#8C56FF] ring-1 ring-[#8C56FF]/20' : ''}`} data-testid={`plan-${key}`}>
+                {isPro && <div className="bg-[#FF8C42] text-white text-center text-xs py-1.5 font-bold tracking-wider">ПРЕПОРЪЧАН</div>}
+                {isPremium && <div className="bg-gradient-to-r from-[#8C56FF] to-[#4DA6FF] text-white text-center text-xs py-1.5 font-bold tracking-wider">ПЪЛНА ФУНКЦИОНАЛНОСТ</div>}
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white" style={{ backgroundColor: `${color}20`, color }}>
+                      {planIcons[key]}
                     </div>
-                  ))}
-                </div>
-                <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
-                  Регистрирай се
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+                    <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                  </div>
+                  <p className="text-sm font-bold mb-5" style={{ color }}>{plan.price}</p>
+                  <div className="space-y-2.5 mb-6">
+                    {plan.features.map((f, i) => (
+                      <div key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                        <CheckCircle className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color }} /> 
+                        <span>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Button className="w-full text-white" style={{ backgroundColor: color }} onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
+                    Регистрирай се
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* AI Designer - separate module */}

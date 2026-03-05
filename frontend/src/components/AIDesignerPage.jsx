@@ -7,6 +7,7 @@ import { PageInstructions } from './PageInstructions';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const SITE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const STYLES = [
   { id: 'modern', name: 'Модерен', desc: 'Чисти линии, неутрални цветове', color: '#FF8C42' },
@@ -101,6 +102,7 @@ export const AIDesignerPage = () => {
   const [activeVideo, setActiveVideo] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished] = useState(false);
+  const [publishedId, setPublishedId] = useState(null);
   const fileRef0 = useRef(null);
   const fileRef1 = useRef(null);
   const fileRef2 = useRef(null);
@@ -194,6 +196,7 @@ export const AIDesignerPage = () => {
         author_name: "TemaDom потребител"
       });
       setPublished(true);
+      setPublishedId(res.data.project_id);
       toast.success(res.data.message || 'Публикувано успешно!');
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка при публикуване');
@@ -887,6 +890,39 @@ export const AIDesignerPage = () => {
                     <RefreshCw className="mr-2 h-4 w-4" /> Нов дизайн
                   </Button>
                 </div>
+
+                {/* Social Sharing */}
+                {published && publishedId && (
+                  <div className="bg-[#253545] rounded-xl p-5 border border-[#3A4A5C]" data-testid="share-section">
+                    <p className="text-white text-sm font-medium text-center mb-3">
+                      <Share2 className="h-4 w-4 inline mr-2" />Споделете вашия проект
+                    </p>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      <Button size="sm" className="bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs" 
+                        onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${SITE_URL}/ai-gallery?project=${publishedId}`)}`, '_blank', 'width=600,height=400')}
+                        data-testid="designer-share-facebook">
+                        Facebook
+                      </Button>
+                      <Button size="sm" className="bg-[#7360F2] hover:bg-[#6050e0] text-white text-xs"
+                        onClick={() => window.open(`viber://forward?text=${encodeURIComponent(`Вижте AI дизайн на TemaDom! ${SITE_URL}/ai-gallery?project=${publishedId}`)}`)}>
+                        Viber
+                      </Button>
+                      <Button size="sm" className="bg-[#25D366] hover:bg-[#20c05c] text-white text-xs"
+                        onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Вижте AI дизайн на TemaDom! ${SITE_URL}/ai-gallery?project=${publishedId}`)}`, '_blank')}>
+                        WhatsApp
+                      </Button>
+                      <Button size="sm" className="bg-[#0088CC] hover:bg-[#007ab8] text-white text-xs"
+                        onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(`${SITE_URL}/ai-gallery?project=${publishedId}`)}`, '_blank')}>
+                        Telegram
+                      </Button>
+                      <Button size="sm" variant="outline" className="border-[#3A4A5C] text-slate-300 text-xs"
+                        onClick={() => { navigator.clipboard.writeText(`${SITE_URL}/ai-gallery?project=${publishedId}`); toast.success('Линкът е копиран!'); }}
+                        data-testid="designer-share-copy">
+                        Копирай линк
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : null}
           </div>

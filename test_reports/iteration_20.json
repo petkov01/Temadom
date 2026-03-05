@@ -1,0 +1,133 @@
+{
+  "summary": "TemaDom Iteration 20 - Complete testing of batch changes: Logo fix (72px height verified), Social sharing buttons (Facebook, Viber, WhatsApp, Telegram, Copy Link), Updated subscription plans (Starter/Basic, Pro, Premium), AI Sketch page at /ai-sketch. All 15 backend tests passed. All 18+ frontend UI checks passed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Gallery Modal",
+        "issues": ["Console warnings: DialogContent missing DialogTitle/aria-describedby for accessibility - minor (carried over from iteration 19)"]
+      }
+    ]
+  },
+  "passed_tests": [
+    "Backend (15/15):",
+    "✅ GET /api/ - API root returns 200",
+    "✅ GET /api/subscriptions/plans - returns starter, pro, premium with correct features",
+    "✅ Subscription plans: starter has 'Starter / Basic' name",
+    "✅ Subscription plans: pro has 'Pro' name with AI Builder features",
+    "✅ Subscription plans: premium has 'Premium' name with structural drawings",
+    "✅ GET /api/ai-designer/published - returns projects list with pagination",
+    "✅ GET /api/ai-designer/published/{id} - returns project with views increment",
+    "✅ GET /api/ai-designer/published/nonexistent - returns 404",
+    "✅ GET /api/ai-designer/published/{id}/pdf/images - returns PDF file (200)",
+    "✅ GET /api/ai-designer/published/{id}/pdf/materials - returns PDF file (200)",
+    "✅ GET /api/ai-designer/published/nonexistent/pdf/images - returns 404",
+    "✅ POST /api/ai-sketch/analyze - rejects empty sketches (400)",
+    "✅ POST /api/ai-designer/publish - rejects empty generated_images (400)",
+    "✅ GET /subscriptions - frontend route returns 200",
+    "✅ GET /ai-gallery - frontend route returns 200",
+    "✅ GET /ai-sketch - frontend route returns 200",
+    "✅ GET /ai-designer - frontend route returns 200",
+    "✅ GET / - homepage returns 200",
+    "Frontend (18/18):",
+    "✅ Homepage loads with data-testid='landing-page'",
+    "✅ Logo link found with data-testid='logo-link'",
+    "✅ Logo element found with data-testid='temadom-logo'",
+    "✅ Logo dimensions: 238px x 72px (correct h-[72px] on desktop)",
+    "✅ Logo height within expected range (58-90px)",
+    "✅ More dropdown opens and contains AI Дизайнер link",
+    "✅ More dropdown contains AI Sketch link",
+    "✅ More dropdown contains AI Галерия link",
+    "✅ Subscriptions page loads with data-testid='subscriptions-page'",
+    "✅ Test mode notice displayed on subscriptions",
+    "✅ Starter/Basic plan card found",
+    "✅ Pro plan card with ПРЕПОРЪЧАН (RECOMMENDED) badge",
+    "✅ Premium plan card with ПЪЛНА ФУНКЦИОНАЛНОСТ badge",
+    "✅ AI Дизайнер module card displayed below plans",
+    "✅ AI Gallery page loads with 2 project cards",
+    "✅ Share/copy link buttons on gallery cards (2 found)",
+    "✅ Gallery modal opens with share buttons: Facebook, Viber, WhatsApp, Telegram, Copy Link",
+    "✅ Gallery modal has PDF Images and PDF Materials buttons",
+    "✅ AI Sketch page loads with data-testid='ai-sketch-page'",
+    "✅ AI Sketch has 3 upload zones for files",
+    "✅ AI Sketch has all 5 building type options",
+    "✅ AI Sketch has notes textarea",
+    "✅ AI Sketch analyze button disabled when no files uploaded"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration20_batch_features.py",
+    "/app/test_reports/pytest/pytest_results_iter20.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All requested features are correctly implemented",
+    "Logo is properly sized at h-[72px] on desktop, positioned in left corner with pt-1",
+    "Subscription plans updated: starter (Starter/Basic), pro (Pro with RECOMMENDED), premium (Premium with FULL FUNCTIONALITY)",
+    "Social sharing implemented: Facebook, Viber, WhatsApp, Telegram, Copy Link buttons working",
+    "AI Sketch page at /ai-sketch with 3 upload zones, 5 building types, notes field",
+    "Gallery cards have share button, modal has full social sharing suite",
+    "Minor: DialogContent accessibility warnings remain - add DialogTitle and aria-describedby for screen readers"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration20_batch_features.py"
+  ],
+  "success_rate": {
+    "backend": "100% (15/15 tests passed)",
+    "frontend": "100% (18/18 UI checks passed)"
+  },
+  "seed_data_creation": "Used existing test project d54cb750-0a3a-4845-8460-0eb714f6ccf9",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "TemaDom Iteration 20 fully tested. ALL features verified: 1) Logo fix - 72px height on desktop, pt-1 padding, left corner position - PASS, 2) Social sharing - Facebook, Viber, WhatsApp, Telegram, Copy Link buttons on gallery modal and AI Designer after publish - PASS, 3) Updated subscription plans - Starter/Basic, Pro (recommended), Premium (full functionality) with AI features - PASS, 4) AI Sketch page at /ai-sketch with 3 upload zones, 5 building types, notes textarea - PASS, 5) PDF endpoints working for published projects - PASS. Test project ID: d54cb750-0a3a-4845-8460-0eb714f6ccf9. Minor accessibility warning for DialogContent remains from iteration 19.",
+  "features_tested": {
+    "logo_fix": {
+      "status": "PASS",
+      "details": "Logo is 72px height on desktop, positioned in left corner with pt-1 padding. Dimensions verified: 238px x 72px"
+    },
+    "social_sharing_gallery": {
+      "status": "PASS",
+      "details": "Gallery modal shows Facebook, Viber, WhatsApp, Telegram, Copy Link buttons. Gallery cards have share button."
+    },
+    "social_sharing_ai_designer": {
+      "status": "PASS",
+      "details": "AI Designer page shows social sharing section after publish with all 5 share options"
+    },
+    "subscription_plans_starter": {
+      "status": "PASS",
+      "details": "Starter/Basic plan with correct features displayed"
+    },
+    "subscription_plans_pro": {
+      "status": "PASS",
+      "details": "Pro plan with RECOMMENDED badge and AI Builder features displayed"
+    },
+    "subscription_plans_premium": {
+      "status": "PASS",
+      "details": "Premium plan with FULL FUNCTIONALITY badge and structural drawings features displayed"
+    },
+    "ai_designer_module": {
+      "status": "PASS",
+      "details": "AI Дизайнер module card displayed below company plans"
+    },
+    "ai_sketch_page": {
+      "status": "PASS",
+      "details": "Page loads at /ai-sketch with 3 upload zones, 5 building types, notes field"
+    },
+    "ai_sketch_building_types": {
+      "status": "PASS",
+      "details": "All 5 building types available: residential, commercial, industrial, renovation, other"
+    },
+    "pdf_endpoints": {
+      "status": "PASS",
+      "details": "Both /pdf/images and /pdf/materials endpoints return valid PDFs"
+    },
+    "navbar_more_dropdown": {
+      "status": "PASS",
+      "details": "More dropdown contains AI Дизайнер, AI Sketch, AI Галерия links"
+    }
+  }
+}

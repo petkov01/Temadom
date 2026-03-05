@@ -1,13 +1,68 @@
 import React, { useState, useEffect } from 'react';
-import { Image, Eye, Download, FileText, FileImage, ChevronLeft, ChevronRight, Sparkles, Loader2, X } from 'lucide-react';
+import { Image, Eye, FileText, FileImage, ChevronLeft, ChevronRight, Sparkles, Loader2, Share2, Link2, Copy, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { PageInstructions } from './PageInstructions';
+import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const SITE_URL = process.env.REACT_APP_BACKEND_URL;
+
+const ShareButtons = ({ projectId, title }) => {
+  const shareUrl = `${SITE_URL}/ai-gallery?project=${projectId}`;
+  const shareText = `Вижте AI дизайн проект "${title}" на TemaDom!`;
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      toast.success('Линкът е копиран!');
+    }).catch(() => {
+      toast.error('Грешка при копиране');
+    });
+  };
+
+  const shareFacebook = () => {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, '_blank', 'width=600,height=400');
+  };
+
+  const shareViber = () => {
+    window.open(`viber://forward?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank');
+  };
+
+  const shareWhatsApp = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank');
+  };
+
+  const shareTelegram = () => {
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+  };
+
+  return (
+    <div className="flex flex-wrap gap-2 justify-center" data-testid="share-buttons">
+      <Button size="sm" className="bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs" onClick={shareFacebook} data-testid="share-facebook">
+        <svg className="h-4 w-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook
+      </Button>
+      <Button size="sm" className="bg-[#7360F2] hover:bg-[#6050e0] text-white text-xs" onClick={shareViber} data-testid="share-viber">
+        <svg className="h-4 w-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.4 0C9.473.028 5.34.472 3.363 2.345 1.757 3.96 1.124 6.326 1.04 9.243c-.084 2.917-.19 8.39 5.138 9.894h.004l-.004 2.28s-.037.921.572 1.109c.737.228 1.169-.474 1.874-1.229.387-.413.92-.991 1.322-1.44 3.644.307 6.448-.394 6.765-.505.733-.256 4.879-.77 5.556-6.283.697-5.676-.338-9.264-2.2-10.883 0 0 0 .002 0 0C18.455.715 15.36.072 11.4 0z"/></svg>
+        Viber
+      </Button>
+      <Button size="sm" className="bg-[#25D366] hover:bg-[#20c05c] text-white text-xs" onClick={shareWhatsApp} data-testid="share-whatsapp">
+        <svg className="h-4 w-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.624-1.466A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+        WhatsApp
+      </Button>
+      <Button size="sm" className="bg-[#0088CC] hover:bg-[#007ab8] text-white text-xs" onClick={shareTelegram} data-testid="share-telegram">
+        <svg className="h-4 w-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm5.654 8.22l-1.85 8.708c-.14.617-.504.768-.102.48l-2.848-2.1-1.375 1.324c-.152.152-.28.28-.574.28l.204-2.904 5.28-4.772c.23-.204-.05-.318-.356-.114l-6.528 4.11-2.812-.878c-.612-.192-.624-.612.128-.906l10.996-4.238c.508-.184.954.124.786.91z"/></svg>
+        Telegram
+      </Button>
+      <Button size="sm" variant="outline" className="border-[#3A4A5C] text-slate-300 hover:bg-[#253545] text-xs" onClick={handleCopyLink} data-testid="share-copy-link">
+        <Copy className="h-3.5 w-3.5 mr-1.5" /> Копирай линк
+      </Button>
+    </div>
+  );
+};
 
 export const PublishedGalleryPage = () => {
   const [projects, setProjects] = useState([]);
@@ -16,6 +71,16 @@ export const PublishedGalleryPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedProject, setSelectedProject] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
+
+  useEffect(() => {
+    fetchProjects();
+    // Auto-open shared project from URL
+    const params = new URLSearchParams(window.location.search);
+    const projectId = params.get('project');
+    if (projectId) {
+      openProject(projectId);
+    }
+  }, []);
 
   useEffect(() => {
     fetchProjects();
@@ -117,7 +182,17 @@ export const PublishedGalleryPage = () => {
                     <div className="flex items-center justify-between text-xs text-slate-500">
                       <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {project.views || 0}</span>
                       <span>{project.generated_images?.length || 0} варианта</span>
-                      <span>{new Date(project.created_at).toLocaleDateString('bg-BG')}</span>
+                      <button 
+                        className="flex items-center gap-1 hover:text-[#FF8C42] transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const url = `${SITE_URL}/ai-gallery?project=${project.id}`;
+                          navigator.clipboard.writeText(url).then(() => toast.success('Линкът е копиран!'));
+                        }}
+                        data-testid={`share-card-${project.id}`}
+                      >
+                        <Share2 className="h-3 w-3" /> Сподели
+                      </button>
                     </div>
                   </CardContent>
                 </Card>
@@ -239,6 +314,12 @@ export const PublishedGalleryPage = () => {
                   >
                     <FileText className="mr-2 h-4 w-4" /> PDF количествена сметка
                   </Button>
+                </div>
+
+                {/* Social Share */}
+                <div className="pt-2">
+                  <p className="text-slate-500 text-xs text-center mb-2 uppercase tracking-wider">Споделете проекта</p>
+                  <ShareButtons projectId={selectedProject.id} title={selectedProject.room_type || 'AI Дизайн'} />
                 </div>
               </div>
             ) : null}
