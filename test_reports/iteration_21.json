@@ -1,0 +1,117 @@
+{
+  "summary": "TemaDom Iteration 21 - Bug fixes testing: Subscription prices verified (49/99/199 BGN), admin clean-test-data endpoint with key validation, logo visibility, navigation dropdown links, share buttons. All 21 backend tests passed. All frontend UI checks passed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend (21/21):",
+    "✅ GET /api/subscriptions/plans returns 200",
+    "✅ Plans include company section with starter, pro, premium",
+    "✅ Starter plan: 49 лв/мес, 25 EUR/мес",
+    "✅ Pro plan: 99 лв/мес, 50 EUR/мес",
+    "✅ Premium plan: 199 лв/мес, 102 EUR/мес",
+    "✅ Starter plan has limitations (Ограничен, Без AI)",
+    "✅ Pro plan has AI Builder feature with 1 variant limitation",
+    "✅ Premium plan has AI Designer 5 variants, AI Sketch, structural drawings",
+    "✅ AI Designer module: 29 лв/генерация with bundle prices",
+    "✅ POST /api/admin/clean-test-data with wrong key returns 403",
+    "✅ POST /api/admin/clean-test-data with correct key returns success",
+    "✅ POST /api/admin/clean-test-data with empty key returns 403",
+    "✅ GET /api/ai-designer/published returns 200",
+    "✅ AI Gallery API returns projects list",
+    "✅ AI Gallery has pagination",
+    "✅ Homepage loads (200)",
+    "✅ Subscriptions page loads (200)",
+    "✅ AI Gallery page loads (200)",
+    "✅ AI Sketch page loads (200)",
+    "✅ AI Designer page loads (200)",
+    "✅ POST /api/ai-designer/publish rejects empty generated_images (400)",
+    "Frontend UI:",
+    "✅ Logo fully visible in navbar (238px x 72px), not cropped",
+    "✅ Navigation dropdown 'Още' opens with all required links",
+    "✅ Dropdown contains: AI Дизайнер, AI Sketch, AI Галерия, Абонаменти",
+    "✅ Subscriptions page shows 3 plans with correct prices",
+    "✅ Starter: 49 лв/мес with limitations section",
+    "✅ Pro: 99 лв/мес with ПРЕПОРЪЧАН badge, AI Builder 1 variant",
+    "✅ Premium: 199 лв/мес with full features",
+    "✅ AI Designer module: 29 лв/генерация with bundle prices (69 лв / 99 лв)",
+    "✅ AI Gallery shows share buttons (Facebook, Viber, WhatsApp, Telegram, Copy Link)",
+    "✅ AI Sketch page loads with upload zones and building types"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration21_bug_fixes.py",
+    "/app/test_reports/pytest/pytest_results_iter21.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All requested bug fixes verified:",
+    "1. Subscription prices updated: Starter 49 лв, Pro 99 лв, Premium 199 лв",
+    "2. Admin clean-test-data endpoint works with key validation (403 for wrong key)",
+    "3. Logo is fully visible in navbar left corner (238x72px)",
+    "4. Navigation dropdown 'Още' contains AI Дизайнер, AI Sketch, AI Галерия links",
+    "5. Share buttons on gallery: Facebook, Viber, WhatsApp, Telegram, Copy Link"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration21_bug_fixes.py"
+  ],
+  "success_rate": {
+    "backend": "100% (21/21 tests passed)",
+    "frontend": "100% (All UI checks passed)"
+  },
+  "seed_data_creation": "None - used existing test data from previous iterations",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "TemaDom Iteration 21 fully tested. Bug fixes verified: 1) Subscription prices - Starter 49 лв/мес, Pro 99 лв/мес, Premium 199 лв/мес - PASS, 2) Admin clean-test-data with key temadom-clean-2026 - PASS, 3) Logo visibility 238x72px in navbar - PASS, 4) Navigation dropdown contains AI links - PASS, 5) Share buttons (Facebook, Viber, WhatsApp, Telegram, Copy Link) - PASS. AI Gallery has 1 project remaining after cleanup. DB was cleaned via admin endpoint.",
+  "features_tested": {
+    "subscription_prices": {
+      "status": "PASS",
+      "details": "Starter 49 лв/мес (25 EUR), Pro 99 лв/мес (50 EUR), Premium 199 лв/мес (102 EUR)"
+    },
+    "starter_limitations": {
+      "status": "PASS",
+      "details": "Shows: Ограничен брой проекти, Без AI функции, Без приоритетно показване"
+    },
+    "pro_ai_builder": {
+      "status": "PASS",
+      "details": "Pro plan shows AI Builder with 1 variant limitation"
+    },
+    "premium_full_features": {
+      "status": "PASS",
+      "details": "AI Designer 5 variants, AI Sketch, structural drawings"
+    },
+    "ai_designer_pricing": {
+      "status": "PASS",
+      "details": "29 лв/генерация, bundles: 3 variants = 69 лв, 5 variants = 99 лв"
+    },
+    "admin_clean_test_data": {
+      "status": "PASS",
+      "details": "Correct key (temadom-clean-2026) returns 200, wrong key returns 403"
+    },
+    "logo_visibility": {
+      "status": "PASS",
+      "details": "Logo 238x72px in navbar, fully visible, not cropped"
+    },
+    "navigation_dropdown": {
+      "status": "PASS",
+      "details": "Dropdown 'Още' contains AI Дизайнер, AI Sketch, AI Галерия links"
+    },
+    "share_buttons": {
+      "status": "PASS",
+      "details": "Facebook, Viber, WhatsApp, Telegram, Copy Link buttons in gallery modal"
+    },
+    "ai_gallery_page": {
+      "status": "PASS",
+      "details": "Loads at /ai-gallery, shows 1 project after cleanup"
+    },
+    "ai_sketch_page": {
+      "status": "PASS",
+      "details": "Loads at /ai-sketch with upload zones and building types"
+    }
+  }
+}

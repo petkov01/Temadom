@@ -2887,7 +2887,7 @@ const SubscriptionsPage = () => {
     if (!user) { navigate('/login'); return; }
     try {
       await axios.post(`${API}/subscriptions/activate`, { plan }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('Абонаментът е активиран (тестов режим)');
+      toast.success('Абонаментът е активиран!');
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка');
     }
@@ -2900,22 +2900,17 @@ const SubscriptionsPage = () => {
     <div className="min-h-screen bg-[#1E2A38] py-12" data-testid="subscriptions-page">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Фирмени абонаменти — Тестов период</h1>
-          <p className="text-lg text-slate-400">Всички функции са достъпни безплатно</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Фирмени абонаменти</h1>
+          <p className="text-lg text-slate-400">Изберете план, който отговаря на вашите нужди</p>
         </div>
 
         <PageInstructions
           title="Абонаментни планове"
-          description="Изберете план според вашите нужди"
-          steps={['Разгледайте наличните планове', 'Starter — основни функции', 'Pro — AI Builder + визуализация', 'Premium — чертежи + персонален мениджър']}
-          benefits={['Всички функции безплатни в тестов режим', 'AI Builder с 3D визуализация', 'Структурни чертежи с 95-100% точност']}
+          description="Сравнете плановете и изберете подходящия за вас"
+          steps={['Starter — основни функции, ограничен достъп', 'Pro — AI Builder + визуализация, неограничени проекти', 'Premium — пълен достъп до всички AI функции + персонален мениджър']}
+          benefits={['Цени в лева и евро', 'Без дългосрочен ангажимент', 'Месечен абонамент']}
           videoUrl="https://temadom.com/videos/subscriptions"
         />
-
-        <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-xl p-4 mb-8 text-center" data-testid="test-mode-notice">
-          <span className="text-[#FF8C42] font-bold">ТЕСТОВ РЕЖИМ — Всички функции активни, без ограничения</span>
-          <p className="text-slate-400 text-xs mt-1">Цените ще бъдат обявени след приключване на тестовия период</p>
-        </div>
 
         {/* Plans for companies */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -2924,7 +2919,7 @@ const SubscriptionsPage = () => {
             const isPro = key === 'pro';
             const isPremium = key === 'premium';
             return (
-              <Card key={key} className={`relative bg-[#253545] border-[#3A4A5C] overflow-hidden ${isPro ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20' : ''} ${isPremium ? 'border-[#8C56FF] ring-1 ring-[#8C56FF]/20' : ''}`} data-testid={`plan-${key}`}>
+              <Card key={key} className={`relative bg-[#253545] border-[#3A4A5C] overflow-hidden ${isPro ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20 scale-[1.02]' : ''} ${isPremium ? 'border-[#8C56FF] ring-1 ring-[#8C56FF]/20' : ''}`} data-testid={`plan-${key}`}>
                 {isPro && <div className="bg-[#FF8C42] text-white text-center text-xs py-1.5 font-bold tracking-wider">ПРЕПОРЪЧАН</div>}
                 {isPremium && <div className="bg-gradient-to-r from-[#8C56FF] to-[#4DA6FF] text-white text-center text-xs py-1.5 font-bold tracking-wider">ПЪЛНА ФУНКЦИОНАЛНОСТ</div>}
                 <CardContent className="p-6">
@@ -2934,8 +2929,11 @@ const SubscriptionsPage = () => {
                     </div>
                     <h3 className="text-xl font-bold text-white">{plan.name}</h3>
                   </div>
-                  <p className="text-sm font-bold mb-5" style={{ color }}>{plan.price}</p>
-                  <div className="space-y-2.5 mb-6">
+                  <div className="mb-5">
+                    <p className="text-2xl font-bold" style={{ color }}>{plan.price}</p>
+                    {plan.price_eur && <p className="text-xs text-slate-500">{plan.price_eur}</p>}
+                  </div>
+                  <div className="space-y-2.5 mb-4">
                     {plan.features.map((f, i) => (
                       <div key={i} className="flex items-start gap-2 text-sm text-slate-300">
                         <CheckCircle className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color }} /> 
@@ -2943,8 +2941,18 @@ const SubscriptionsPage = () => {
                       </div>
                     ))}
                   </div>
+                  {plan.limitations && plan.limitations.length > 0 && (
+                    <div className="space-y-1.5 mb-4 pt-3 border-t border-[#3A4A5C]">
+                      {plan.limitations.map((l, i) => (
+                        <div key={i} className="flex items-start gap-2 text-xs text-slate-500">
+                          <AlertCircle className="h-3 w-3 flex-shrink-0 mt-0.5 text-slate-600" />
+                          <span>{l}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <Button className="w-full text-white" style={{ backgroundColor: color }} onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
-                    Регистрирай се
+                    Абонирай се
                   </Button>
                 </CardContent>
               </Card>
@@ -2954,8 +2962,8 @@ const SubscriptionsPage = () => {
 
         {/* AI Designer - separate module */}
         <h2 className="text-2xl font-bold text-white mb-2">AI Дизайнер</h2>
-        <p className="text-slate-400 text-sm mb-6">Отделен платен модул — безплатен в тестовия период</p>
-        <div className="grid md:grid-cols-1 gap-6 max-w-md">
+        <p className="text-slate-400 text-sm mb-6">Еднократна такса или включен в абонамент</p>
+        <div className="grid md:grid-cols-1 gap-6 max-w-lg">
           {plans.designer && Object.entries(plans.designer).map(([key, plan]) => (
             <Card key={key} className="bg-gradient-to-r from-[#8C56FF]/20 to-[#4DA6FF]/20 border-[#8C56FF]/30" data-testid={`plan-designer-${key}`}>
               <CardContent className="p-6">
@@ -2963,10 +2971,20 @@ const SubscriptionsPage = () => {
                   <Sparkles className="h-6 w-6 text-[#8C56FF]" />
                   <h3 className="text-xl font-bold text-white">{plan.name}</h3>
                 </div>
-                <p className="text-sm font-medium text-[#8C56FF] mb-4">{plan.price}</p>
+                <div className="mb-4">
+                  <p className="text-lg font-bold text-[#8C56FF]">{plan.price}</p>
+                  {plan.price_eur && <p className="text-xs text-slate-500">{plan.price_eur}</p>}
+                </div>
                 {plan.note && (
                   <div className="bg-[#8C56FF]/10 border border-[#8C56FF]/20 rounded-lg p-3 mb-4">
                     <p className="text-xs text-[#8C56FF]">{plan.note}</p>
+                  </div>
+                )}
+                {plan.bundle_prices && (
+                  <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-lg p-3 mb-4">
+                    <p className="text-xs text-[#FF8C42] font-medium mb-1">Пакетни цени:</p>
+                    <p className="text-xs text-slate-400">3 варианта: {plan.bundle_prices['3_variants']}</p>
+                    <p className="text-xs text-slate-400">5 варианта: {plan.bundle_prices['5_variants']}</p>
                   </div>
                 )}
                 <div className="space-y-2 mb-6">
@@ -2977,7 +2995,7 @@ const SubscriptionsPage = () => {
                   ))}
                 </div>
                 <Button className="w-full bg-[#8C56FF] hover:bg-[#7a44ee] text-white" onClick={() => navigate('/ai-designer')}>
-                  Опитай безплатно
+                  Опитай AI Дизайнера
                 </Button>
               </CardContent>
             </Card>

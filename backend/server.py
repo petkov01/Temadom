@@ -73,64 +73,78 @@ BG_STORES = [
     {"name": "Leroy Merlin", "url": "https://www.leroymerlin.bg", "category": "Строителство и дом"},
 ]
 
-# Subscription plans - updated for soft launch with AI features
+# Subscription plans - with pricing for production launch
 SUBSCRIPTION_PLANS = {
     "company": {
         "starter": {
             "name": "Starter / Basic",
-            "price": "Тестов режим",
+            "price": "49 лв/мес",
+            "price_eur": "25 EUR/мес",
             "features": [
-                "Управление на проекти",
-                "Създаване на тестови проекти",
-                "Преглед на фиктивни 3D рендери на помещения (тестови данни)",
-                "Демонстрация на материали и бюджети",
-                "Профил страница",
-                "Обяви: до 3 снимки"
-            ]
+                "До 2 активни проекта",
+                "Основен профил на фирмата",
+                "Обяви: до 3 снимки",
+                "Преглед на запитвания от клиенти",
+                "Email известия (до 10/мес)"
+            ],
+            "limitations": ["Ограничен брой проекти", "Без AI функции", "Без приоритетно показване"]
         },
         "pro": {
             "name": "Pro",
-            "price": "Тестов режим",
+            "price": "99 лв/мес",
+            "price_eur": "50 EUR/мес",
             "features": [
                 "Всички функции от Starter",
-                "AI Builder: скици/снимки (1-3) → 3D визуализация (тестови рендери)",
-                "Multi-upload за по-точна визуализация на помещенията",
+                "Неограничени проекти",
+                "AI Builder: скици/снимки (1-3) → визуализация (1 вариант)",
+                "Multi-upload за визуализация",
                 "Видео инструкции за 3D скенера",
-                "Демонстрация на таблици с материали и разходи",
-                "Email / Telegram известия",
+                "Таблици с материали и разходи",
+                "Email + Telegram известия",
                 "Приоритетно показване",
-                "Обяви: до 5 снимки"
-            ]
+                "Обяви: до 5 снимки",
+                "Разширена статистика"
+            ],
+            "limitations": ["AI Designer: 1 вариант на генерация"]
         },
         "premium": {
             "name": "Premium",
-            "price": "Тестов режим",
+            "price": "199 лв/мес",
+            "price_eur": "102 EUR/мес",
             "features": [
                 "Всички функции от Pro",
+                "AI Designer: до 5 варианта на генерация",
                 "Структурни чертежи (PDF/Excel, 95-100% точност)",
+                "AI Sketch: анализ на чертежи и скици",
                 "Таблици с колони, греди, покриви, фундаменти",
-                "Видео инструкции за 3D скенера и чертежите",
+                "Видео инструкции за чертежите",
                 "Персонален мениджър",
                 "Топ позиция в търсачката",
-                "Обяви: до 10 снимки"
-            ]
+                "Обяви: до 10 снимки",
+                "Неограничени Email + Telegram известия"
+            ],
+            "limitations": []
         }
     },
     "designer": {
         "designer": {
             "name": "AI Дизайнер",
-            "price": "Отделен модул (тестов)",
+            "price": "29 лв/генерация",
+            "price_eur": "15 EUR/генерация",
             "features": [
-                "AI интериорен дизайн",
-                "1/3/5 варианта генерация",
+                "AI интериорен дизайн (1 вариант)",
                 "Преди и след сравнение",
-                "Списък материали с цени",
-                "Линкове към магазини",
+                "Списък материали с цени (BGN + EUR)",
+                "Линкове към 18 магазина",
                 "PDF експорт (изображения + количествена сметка)",
                 "Публикуване в AI Галерия",
                 "Споделяне в социални мрежи"
             ],
-            "note": "AI Designer е отделен платен модул. Безплатен в тестов режим."
+            "note": "За Pro абонати: включен 1 вариант. За Premium: до 5 варианта. Без абонамент: еднократна такса.",
+            "bundle_prices": {
+                "3_variants": "69 лв / 35 EUR",
+                "5_variants": "99 лв / 50 EUR"
+            }
         }
     }
 }
@@ -2394,16 +2408,21 @@ async def generate_ai_design(request: Request):
             "Focus on luxury premium finishes, marble, brass, designer fixtures"
         ]
         
-        # 2 camera angles per variant
+        # For 1 variant: 2 angles (frontal + side). For 3+ variants: 1 angle each to save time
+        use_two_angles = variants_count == 1
+        
         angles = [
-            "photographed from the entrance/door looking inward, showing the full room layout",
-            "photographed from the opposite corner at a diagonal angle, showing depth and side walls"
+            ("photographed from the entrance/door looking inward, showing the full room layout", "Фронтален"),
+            ("photographed from the opposite corner at a diagonal angle, showing depth and side walls", "Страничен")
         ]
         
         for i in range(variants_count):
             variant_angles = []
-            for angle_idx, angle_desc in enumerate(angles):
-                variant_prompt = f"""Professional interior design photograph of {room_desc}, {angle_desc}.
+            angles_to_gen = angles if use_two_angles else [angles[0]]
+            
+            for angle_idx, (angle_desc, angle_label) in enumerate(angles_to_gen):
+                try:
+                    variant_prompt = f"""Professional interior design photograph of {room_desc}, {angle_desc}.
 This is a {room_type_name} with dimensions {room_width}m x {room_length}m, height {room_height}m.
 Redesigned in {style_desc} with {material_desc}.
 The design must show the SAME room layout and proportions but completely renovated.
@@ -2411,27 +2430,31 @@ Keep the same basic structure (walls, windows, doors in same positions).
 {f'Special requirements: {notes}' if notes else ''}
 {variant_focuses[i % len(variant_focuses)]}.
 Ultra-realistic professional interior photography, 8K quality, perfect lighting, photorealistic materials and textures."""
-                
-                img_result = await image_gen.generate_images(
-                    prompt=variant_prompt,
-                    model="gpt-image-1",
-                    number_of_images=1
-                )
-                
-                if img_result and len(img_result) > 0:
-                    img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
-                    variant_angles.append({
-                        "angle": angle_idx + 1,
-                        "angle_label": "Фронтален" if angle_idx == 0 else "Страничен",
-                        "image_base64": img_b64
-                    })
+                    
+                    img_result = await image_gen.generate_images(
+                        prompt=variant_prompt,
+                        model="gpt-image-1",
+                        number_of_images=1
+                    )
+                    
+                    if img_result and len(img_result) > 0:
+                        img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
+                        variant_angles.append({
+                            "angle": angle_idx + 1,
+                            "angle_label": angle_label,
+                            "image_base64": img_b64
+                        })
+                except Exception as img_err:
+                    logger.error(f"Image generation error for variant {i+1} angle {angle_idx+1}: {img_err}")
+                    continue
             
-            generated_images.append({
-                "variant": i + 1,
-                "angles": variant_angles,
-                "image_base64": variant_angles[0]["image_base64"] if variant_angles else "",
-                "prompt_used": variant_prompt[:200] if variant_angles else ""
-            })
+            if variant_angles:
+                generated_images.append({
+                    "variant": i + 1,
+                    "angles": variant_angles,
+                    "image_base64": variant_angles[0]["image_base64"] if variant_angles else "",
+                    "prompt_used": variant_prompt[:200] if variant_angles else ""
+                })
         
         # Step 3: Generate materials list with prices using GPT
         materials_chat = LlmChat(
@@ -2605,6 +2628,54 @@ async def get_feedback():
     if feedback_list:
         avg_rating = sum(f["rating"] for f in feedback_list) / len(feedback_list)
     return {"feedback": feedback_list, "avg_rating": round(avg_rating, 1), "total": len(feedback_list)}
+
+# ============== ADMIN: CLEAN TEST DATA ==============
+
+@api_router.post("/admin/clean-test-data")
+async def clean_test_data(data: dict):
+    """Delete all test/demo companies, users, and associated data for production readiness"""
+    admin_key = data.get("admin_key", "")
+    if admin_key != "temadom-clean-2026":
+        raise HTTPException(status_code=403, detail="Невалиден ключ")
+    
+    results = {}
+    
+    # Delete test users (keep real registered users if any)
+    deleted_users = await db.users.delete_many({"$or": [
+        {"email": {"$regex": "^test"}},
+        {"email": {"$regex": "^demo"}},
+        {"name": {"$regex": "^Test"}},
+        {"name": {"$regex": "^Demo"}},
+        {"is_test": True}
+    ]})
+    results["deleted_users"] = deleted_users.deleted_count
+    
+    # Delete test companies
+    deleted_companies = await db.companies.delete_many({"$or": [
+        {"name": {"$regex": "^Тест"}},
+        {"name": {"$regex": "^Demo"}},
+        {"is_test": True}
+    ]})
+    results["deleted_companies"] = deleted_companies.deleted_count
+    
+    # Delete test published projects
+    deleted_projects = await db.published_projects.delete_many({"$or": [
+        {"author_name": "TemaDom потребител"},
+        {"design_id": "test-123"}
+    ]})
+    results["deleted_published_projects"] = deleted_projects.deleted_count
+    
+    # Delete old AI designs that were just tests
+    deleted_designs = await db.ai_designs.delete_many({"notes": ""})
+    results["deleted_ai_designs"] = deleted_designs.deleted_count
+    
+    # Delete test referrals
+    deleted_referrals = await db.referrals.delete_many({})
+    results["deleted_referrals"] = deleted_referrals.deleted_count
+    
+    results["message"] = "Тестовите данни са изтрити. Системата е готова за продукция."
+    return results
+
 
 # ============== PUBLISH AI PROJECT + GALLERY + PDF ==============
 
@@ -3055,9 +3126,14 @@ async def analyze_sketch(request: Request):
             if json_match:
                 analysis_data = json_module.loads(json_match.group(1))
             else:
-                analysis_data = json_module.loads(analysis_response)
+                # Try to find JSON object directly
+                json_obj_match = re_module.search(r'\{[\s\S]*\}', analysis_response)
+                if json_obj_match:
+                    analysis_data = json_module.loads(json_obj_match.group(0))
+                else:
+                    analysis_data = {"raw_analysis": analysis_response[:3000], "note": "AI анализът е в текстов формат"}
         except Exception:
-            analysis_data = {"error": "Не може да се парсне анализа", "raw": analysis_response[:2000]}
+            analysis_data = {"raw_analysis": analysis_response[:3000], "note": "AI анализът е в текстов формат"}
         
         desc_en = analysis_data.get("description_en", "a building structure with columns, beams and foundations")
         
