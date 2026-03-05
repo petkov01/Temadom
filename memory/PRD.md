@@ -1,84 +1,58 @@
 # TemaDom - PRD (Product Requirements Document)
 
 ## Original Problem Statement
-Marketplace app "TemaDom" for construction project leads. Connects clients with verified companies/masters in Bulgaria. Features AI-powered design, price calculator, and project management.
+Marketplace "TemaDom" for construction project leads. Connects clients with companies/masters in Bulgaria. AI-powered design, price calculator, project management.
 
-## Current Phase: Phase 3 - Soft Launch (all features free for testing)
+## Current Phase: Production Launch Preparation
 
 ## Tech Stack
 - Frontend: React.js, TailwindCSS, Shadcn/UI, Lucide React
 - Backend: FastAPI, Python, MongoDB
 - AI: OpenAI GPT-4o (analysis) + GPT Image 1 (generation) via Emergent LLM Key
-- i18n: Custom LanguageContext (BG/EN)
 
 ## What's Been Implemented
 
 ### Visual Identity
-- Dark theme: #1E2A38, #2B2B2B, accents #FF8C42, #28A745, #DC3545, #4DA6FF, #8C56FF
-- TemaDom logo - h-[72px] desktop / h-[58px] mobile, left-corner aligned with pt-1, no cutoff
-- Gradient text, glass morphism effects
+- Dark theme: #1E2A38 with accent colors
+- Logo: h-[72px] desktop / h-[58px] mobile, left-corner, fully visible
 
-### AI Designer (COMPLETE)
-- 3 photo upload from 3 different angles
-- Room type selection (9 types), dimensions, 5 styles, 3 material classes, 1/3/5 variants
-- GPT-4o room analysis + GPT Image 1 design generation
-- Materials list with prices in BGN + EUR from 18 Bulgarian stores
-- Before/After comparison with 2 angles per variant
-- Publish to Gallery button + social sharing after publish
-- Dual PDF download (images PDF + materials PDF separately)
+### AI Designer
+- 3 photo upload, 9 room types, 5 styles, 3 material classes
+- 1 variant: 2 angles (frontal + side); 3/5 variants: 1 angle each (optimized)
+- Materials list in BGN + EUR from 18 Bulgarian stores
+- Publish to Gallery + Social sharing + Dual PDF
 
-### AI Gallery (March 5, 2026)
-- Public gallery of published AI design projects at /ai-gallery
-- Card grid with thumbnails, style badges, views counter
-- Click modal with full before/after comparison
-- PDF download + Social sharing (Facebook, Viber, WhatsApp, Telegram, Copy Link)
-- Auto-open from shared URL (?project=ID)
-- Pagination support
+### AI Gallery (/ai-gallery)
+- Public gallery of published projects with before/after
+- Social sharing: Facebook, Viber, WhatsApp, Telegram, Copy Link
+- Deep linking from shared URLs
 
-### AI Sketch (March 5, 2026)
-- Page at /ai-sketch for blueprint/sketch analysis
-- Upload 1-3 sketches/blueprints/photos
-- 5 building types: residential, commercial, industrial, renovation, other
-- AI structural analysis: columns, beams, stairs, foundations, roof, walls
-- Generated 2D plan + 3D visualization using GPT Image 1
-- Quantity survey with 95-100% accuracy in BGN + EUR
-- Meshy.ai 3D model integration marked as "Coming Soon"
+### AI Sketch (/ai-sketch)
+- Upload 1-3 sketches/blueprints, 5 building types
+- AI structural analysis (95-100%): columns, beams, stairs, foundations, roof
+- 2D plan + 3D visualization + quantity survey
 
-### Social Sharing (March 5, 2026)
-- Facebook, Viber, WhatsApp, Telegram, Copy Link buttons
-- Available on: Gallery modal, Gallery cards, AI Designer after publish
-- Direct share URLs with project deep linking
+### Subscription Plans (Production Pricing)
+- Starter/Basic: 49 лв/мес (25 EUR) — до 2 проекта, без AI
+- Pro: 99 лв/мес (50 EUR) — неограничени проекти, AI Builder 1 вариант
+- Premium: 199 лв/мес (102 EUR) — пълен достъп, 5 варианта, чертежи
+- AI Дизайнер: 29 лв/генерация (15 EUR), пакети: 3 варианта=69лв, 5=99лв
 
-### Subscription Plans (Updated March 5, 2026)
-- **Starter/Basic**: Project management, test 3D renders, demo materials/budgets
-- **Pro**: + AI Builder (sketches/photos to 3D), multi-upload, video instructions, material tables
-- **Premium**: + Structural drawings (PDF/Excel, 95-100%), columns/beams/roofs/foundations tables, personal manager
-- AI Designer: Separate paid module (free in test mode)
+### Admin
+- POST /api/admin/clean-test-data — изтриване на тестови данни (key: temadom-clean-2026)
+- Test data cleaned: 21 users, 7 AI designs, 1 published project removed
 
 ### Other Features
-- PageInstructions, Feedback system, Registration (multi-role)
-- Price Calculator (28 regions), AI Chatbot, Full BG/EN translation
-- Navbar "Още" dropdown: AI Дизайнер, AI Sketch, AI Галерия
-
-## API Endpoints
-- POST /api/ai-designer/generate - Generate AI design
-- POST /api/ai-designer/publish - Publish project to gallery
-- GET /api/ai-designer/published - List published projects
-- GET /api/ai-designer/published/{id} - Project details
-- GET /api/ai-designer/published/{id}/pdf/images - Images PDF
-- GET /api/ai-designer/published/{id}/pdf/materials - Materials PDF
-- POST /api/ai-sketch/analyze - Analyze sketches
-- POST /api/feedback - Submit feedback
-- GET /api/feedback - Get feedback
-- GET /api/subscriptions/plans - Subscription plans (starter/pro/premium)
+- Feedback system, PageInstructions, Registration (multi-role)
+- Price Calculator (28 regions), AI Chatbot
+- Social sharing (Facebook, Viber, WhatsApp, Telegram)
 
 ## P1 Backlog
-- Meshy.ai integration for real 3D model generation (needs API key)
-- AI Blueprint Analysis (Phase 4) - advanced PDF/DWG parsing
-- server.py refactoring into routers/services/models
+- Meshy.ai for real 3D models (needs API key)
+- AI Blueprint Analysis (PDF/DWG)
+- server.py refactoring
 
 ## P2 Backlog
-- Mobile app (React Native/Expo or PWA)
-- Real payments (EasyPay Bulgaria)
+- Mobile app (PWA/React Native)
+- Real payments (Stripe/EasyPay)
 - Admin dashboard
-- Product carousel from stores
