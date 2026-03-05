@@ -1,46 +1,41 @@
-# TemaDom - PRD (Product Requirements Document)
+# TemaDom - PRD
 
 ## Original Problem Statement
-Build "TemaDom" — AI-powered construction/renovation platform that converts sketches and room photos into realistic 1:1 renovation renders with cost estimates.
+AI-powered construction/renovation platform that converts sketches and room photos into realistic 1:1 renovation renders with cost estimates.
 
 ## Core Features
 
 ### 1. Landing Page v6.5
-- **HERO**: "ПЪРВИ 50 ФИРМИ = 1 ГОДИНА ПРЕМИУМ 0 EUR" counter [0/50]
-- **Dark/Light mode** toggle with system preference detection
-- **Demo**: TikTok-style horizontal scroll with 6 project cards
-- **Pricing**: 3 glassmorphism cards (69/129/220 EUR)
-- **10 Style tiles**: Модерен, Скандинавски, Лофт, Класически, Минималистичен, Бохо, Индустриален, Арт Деко, Рустик, Хай-тек
-- **CTA**: "РЕГИСТРИРАЙ ФИРМАТА" + mobile sticky CTA
-- **Removed**: All "безплатно", "първи 1000 клиенти", магазинни цени
+- Dark/Light mode toggle (☀️/🌙) with system preference
+- HERO: "ПЪРВИ 50 ФИРМИ = 1 ГОДИНА ПРЕМИУМ 0 EUR" counter [0/50]
+- Demo: TikTok scroll 6 projects
+- Pricing: 69/129/220 EUR glassmorphism cards
+- 10 style tiles + CTA "РЕГИСТРИРАЙ ФИРМАТА"
+- Mobile sticky CTA
+- Removed: "безплатно", "първи 1000 клиенти", phone numbers
 
-### 2. AI CAD Sketch (`/ai-sketch`)
-- **Draw mode**: 2D canvas with 13 tools, parametric L/W/H inputs, touch support, auto-cost EUR/BGN
-- **Upload mode**: CV/OCR analysis → GLB 360° viewer
-- **3D viewer removed** from draw mode (kept in upload mode only)
+### 2. IA Designer (`/room-scan`) — Multi-Room System
+- **Plan selector**: 1 пом.=69€, 2-3=129€, 4-5=220€
+- **Multi-room upload**: Each plan unlocks room slots (1/3/5)
+- **4 photos per room** from different angles
+- **10 styles**: Модерен, Сканди, Лофт, Класика, Минимал, Бохо, Индустр., Арт Деко, Рустик, Хай-тек
+- **Image compression** (1200px, 80% JPEG) before API
+- Before/After slider, percentage progress
 
-### 3. IA Designer (`/room-scan`)
-- **Pricing**: 1 пом.=69€, 2-3=129€, 4-5=220€
-- **10 styles**, 4 снимки/помещение, размери 2x4x2.6м
-- **Pред/След рендер** with before/after slider
-- **Percentage progress** (no seconds)
-- **Variant selector** (1-3)
+### 3. AI CAD Sketch (`/ai-sketch`)
+- 2D canvas only (3D viewer removed from draw mode)
+- 13 tools, parametric L/W/H, touch, auto-cost EUR/BGN
+- Upload mode: GLB 360° viewer preserved
 
-### 4. Live Counter Widget
-### 5. Social Gallery (`/ready-projects`)
-### 6. Subscriptions (3 tiers)
-
-## Architecture
-- **Backend:** FastAPI + MongoDB + OpenCV + Tesseract + Emergent LLM
-- **Frontend:** React + TailwindCSS + Three.js + Shadcn/UI + HTML5 Canvas
-- **Theme:** Dark/Light mode via ThemeContext.jsx
+### 4. Live Counter + Social Gallery + Subscriptions + Telegram
 
 ## Implemented
-- [x] v6.5 Landing Page: counter [0/50], pricing 69/129/220, 10 styles, dark/light, CTA
-- [x] CAD v5.1: 13 tools, touch canvas, floor selector, auto-cost, L/W/H dimensions
-- [x] 3D removed from CAD draw mode (kept in upload mode)
-- [x] IA Designer: 10 styles, pricing badges, percentage progress, variant selector
-- [x] Live Counter, Social Gallery, Subscriptions, Telegram
+- [x] v6.5 Landing: counter, pricing 69/129/220, dark/light, 10 styles
+- [x] IA Designer: multi-room (1/3/5), 4 photos/room, plan selector, 10 styles
+- [x] Phone removed from registration + footer + leads
+- [x] Designer pricing in backend config (69/129/220)
+- [x] CAD: 3D removed from draw mode, 2D canvas intact
+- [x] Subscription plans proportional (15/35/75 EUR + designer 69/129/220)
 
 ## Backlog
 - P0: Editable Contract with e-signature
@@ -53,6 +48,5 @@ Build "TemaDom" — AI-powered construction/renovation platform that converts sk
 - P3: Stripe monetization
 
 ## Test Reports
-- iteration_33: CAD v5.1 (36/36 = 100%)
-- iteration_34: Dimensions + 3D rendering (100%)
-- iteration_35: v6.5 redesign (100% - all features verified)
+- iteration_35: v6.5 landing page (100%)
+- iteration_36: Bug fixes: multi-room, phone removed, styles, pricing (100%)
