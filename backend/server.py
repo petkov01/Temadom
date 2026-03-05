@@ -21,170 +21,30 @@ import json as json_module
 import re as re_module
 import base64
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+# Import shared config
+from config import (
+    db, client, JWT_SECRET, JWT_ALGORITHM, JWT_EXPIRATION_HOURS,
+    STRIPE_API_KEY, TELEGRAM_BOT_TOKEN, EMERGENT_LLM_KEY,
+    PLATFORM_FREE, TEST_MODE, AI_DESIGN_GLOBAL_FREE_LIMIT, AI_DESIGN_PER_PROFILE_LIMIT,
+    BG_STORES, SUBSCRIPTION_PLANS,
+    security, hash_password, verify_password, create_token, decode_token,
+    get_current_user, get_optional_user, ROOT_DIR
+)
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# Import models
+from models import (
+    UserBase, UserCreate, UserLogin, User,
+    CompanyProfile, ProjectCreate, Project,
+    ReviewCreate, Review, PaymentTransaction,
+    PortfolioProjectCreate, PortfolioProject,
+    Scanner3DPDFRequest, AIChartAnalyzeRequest, AIChartPDFRequest,
+    Scanner3DProjectSave,
+    FREE_LEADS_LIMIT, CALCULATOR_FREE_USES, CALCULATOR_PAY_AMOUNT,
+    BLOCKED_PATTERNS, contains_contact_info, censor_contact_info
+)
 
-# JWT Config
-JWT_SECRET = os.environ.get('JWT_SECRET', 'maistori-secret-key-2024')
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_HOURS = 24
+# App is configured via config.py imports above
 
-# Stripe Config
-STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
-
-# Telegram Config
-TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
-
-# AI Config
-EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
-
-# PLATFORM IS FREE - all payment gates disabled
-PLATFORM_FREE = True
-TEST_MODE = True  # All prices shown as "тестов режим"
-
-# AI Designer limits - TEST MODE: all free
-AI_DESIGN_GLOBAL_FREE_LIMIT = 10000
-AI_DESIGN_PER_PROFILE_LIMIT = 100
-
-# Bulgarian stores for materials
-BG_STORES = [
-    {"name": "Praktiker", "url": "https://www.praktiker.bg", "category": "Строителство и ремонт"},
-    {"name": "Bauhaus", "url": "https://www.bauhaus.bg", "category": "Строителство и материали"},
-    {"name": "Mr. Bricolage", "url": "https://www.mr-bricolage.bg", "category": "Дом и градина"},
-    {"name": "Homemax", "url": "https://www.homemax.bg", "category": "Обзавеждане и интериор"},
-    {"name": "IKEA", "url": "https://www.ikea.bg", "category": "Мебели и аксесоари"},
-    {"name": "Bricoman", "url": "https://www.bricoman.bg", "category": "Строителни материали"},
-    {"name": "Technopolis", "url": "https://www.technopolis.bg", "category": "Електроуреди и техника"},
-    {"name": "Technomarket", "url": "https://www.technomarket.bg", "category": "Електроуреди"},
-    {"name": "Emag", "url": "https://www.emag.bg", "category": "Електроника и дом"},
-    {"name": "Jysk", "url": "https://www.jysk.bg", "category": "Мебели и текстил"},
-    {"name": "Jumbo", "url": "https://www.jumbo.bg", "category": "Дом и декорация"},
-    {"name": "Videnov", "url": "https://www.videnov.bg", "category": "Мебели"},
-    {"name": "Masko", "url": "https://www.masko.bg", "category": "Мебели и обзавеждане"},
-    {"name": "Forma Ideale", "url": "https://www.formaideale.bg", "category": "Мебели"},
-    {"name": "Mebeli 1", "url": "https://www.mebeli1.bg", "category": "Мебели онлайн"},
-    {"name": "Selion", "url": "https://www.selilon.bg", "category": "Осветление"},
-    {"name": "Ceramica", "url": "https://www.ceramica.bg", "category": "Плочки и керамика"},
-    {"name": "Leroy Merlin", "url": "https://www.leroymerlin.bg", "category": "Строителство и дом"},
-]
-
-# Subscription plans - EUR pricing (production)
-SUBSCRIPTION_PLANS = {
-    "company": {
-        "basic": {
-            "name": "БАЗОВ",
-            "price": "15 EUR/мес",
-            "stars": 1,
-            "features": [
-                "Профил + портфолио",
-                "До 10 снимки в профила",
-                "5 оферти на месец",
-                "Основен профил на фирмата",
-                "Преглед на запитвания от клиенти"
-            ],
-            "limitations": [
-                "Без PDF договори",
-                "Без AI скици",
-                "Без количествени сметки",
-                "Без Telegram известия",
-                "Търси обяви ръчно в сайта"
-            ],
-            "notification_delay": "Без известия — търси в сайта"
-        },
-        "pro": {
-            "name": "ПРО",
-            "price": "35 EUR/мес",
-            "stars": 2,
-            "popular": True,
-            "features": [
-                "Всичко от БАЗОВ",
-                "Telegram известия (едновременно с всички ПРО)",
-                "PDF договори",
-                "AI скици",
-                "Количествени сметки",
-                "Неограничени оферти",
-                "Приоритетно показване",
-                "Разширена статистика"
-            ],
-            "limitations": [
-                "Без 10-минутно предимство",
-                "Без персонализирани PDF",
-                "Без екипен достъп"
-            ],
-            "notification_delay": "Получава известие на 10-тата минута"
-        },
-        "premium": {
-            "name": "PREMIUM",
-            "price": "75 EUR/мес",
-            "stars": 3,
-            "features": [
-                "ВСИЧКО от ПРО",
-                "ПЪРВИ 10 МИНУТИ предимство!",
-                "Персонализирани PDF договори",
-                "Неограничени AI скици (профи)",
-                "Професионални количествени сметки",
-                "Екип до 5 души",
-                "API достъп",
-                "Персонален мениджър",
-                "Топ позиция в търсачката"
-            ],
-            "limitations": [],
-            "notification_delay": "Вижда обявата ПЪРВИ — 10 мин. преди ПРО!"
-        }
-    },
-    "standalone": {
-        "pdf_contract_calculator": {
-            "name": "PDF договор + количествена сметка",
-            "price": "6 EUR",
-            "description": "PDF договор с количествена сметка, готов за подписване, по данни от калкулатора",
-            "features": [
-                "PDF договор с данни от калкулатора",
-                "Количествена сметка с цени",
-                "Готов за подписване",
-                "Детайлна разбивка по материали",
-                "Включва дати и условия"
-            ]
-        },
-        "pdf_ai_blueprint": {
-            "name": "AI анализ на чертежи + PDF договор",
-            "price": "17 EUR",
-            "description": "AI анализ на чертежи с количествена сметка (95-100% точност) + PDF договор за подписване",
-            "features": [
-                "AI анализ на скици/чертежи",
-                "Количествена сметка с 95-100% точност",
-                "PDF договор готов за подписване",
-                "Структурен анализ: колони, греди, покрив",
-                "Цени в EUR от водещи магазини",
-                "2D план + 3D визуализация"
-            ]
-        }
-    },
-    "designer": {
-        "designer": {
-            "name": "AI Дизайнер",
-            "price": "12 EUR/генерация",
-            "features": [
-                "AI интериорен дизайн (1 вариант)",
-                "Преди и след сравнение",
-                "Списък материали с цени (EUR)",
-                "Линкове към 18 магазина",
-                "PDF експорт (изображения + количествена сметка)",
-                "Публикуване в AI Галерия",
-                "Споделяне в социални мрежи"
-            ],
-            "note": "За Premium абонати: до 5 варианта включени. Без абонамент: еднократна такса.",
-            "bundle_prices": {
-                "3_variants": "29 EUR",
-                "5_variants": "45 EUR"
-            }
-        }
-    }
-}
 
 # Analytics password
 ANALYTICS_ADMIN_PASSWORD = os.environ.get("ANALYTICS_PASSWORD", "temadom2026")
@@ -198,7 +58,6 @@ PAYMENT_PACKAGES = {
 # Create the main app
 app = FastAPI(title="Maistori Marketplace API")
 api_router = APIRouter(prefix="/api")
-security = HTTPBearer(auto_error=False)
 
 # Categories for construction/renovation
 CATEGORIES = [
@@ -218,205 +77,6 @@ CATEGORIES = [
     {"id": "carpentry", "name": "Дърводелство", "icon": "Axe"},
     {"id": "general", "name": "Общо строителство", "icon": "Building2"}
 ]
-
-# ============== MODELS ==============
-
-class UserBase(BaseModel):
-    email: EmailStr
-    name: str
-    phone: Optional[str] = None
-    user_type: str  # "client", "company", "master", "admin"
-    city: Optional[str] = None
-    telegram_username: Optional[str] = None
-    bulstat: Optional[str] = None  # Required for companies (9 digits)
-
-class UserCreate(UserBase):
-    password: str
-
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
-
-class User(UserBase):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    is_active: bool = True
-    subscription_active: bool = False
-    subscription_expires: Optional[datetime] = None
-    purchased_leads: List[str] = []  # List of project IDs
-    free_leads_used: int = 0  # Track free leads (first 3 are free)
-
-FREE_LEADS_LIMIT = 3  # First 3 contacts are free for companies
-CALCULATOR_FREE_USES = 5  # Companies get 5 free calculator uses
-CALCULATOR_PAY_AMOUNT = 10.0  # €10 per additional use
-
-# Contact info patterns for chat filtering
-import re
-BLOCKED_PATTERNS = [
-    re.compile(r'\+?\d[\d\s\-()]{7,}'),  # Phone numbers
-    re.compile(r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}'),  # Emails
-    re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'),  # IP addresses
-    re.compile(r'@[a-zA-Z0-9_]{3,}'),  # Social media handles
-    re.compile(r'(viber|whatsapp|telegram|skype|facebook|messenger|instagram)\s*[:\-]?\s*\S+', re.IGNORECASE),  # Messenger refs
-    re.compile(r'0\d{9}'),  # Bulgarian phone (0888123456)
-    re.compile(r'\b\d{2,4}[\s\-\.]\d{3}[\s\-\.]\d{3,4}\b'),  # Formatted phones
-]
-
-def contains_contact_info(text: str) -> bool:
-    """Check if text contains phone numbers, emails, or other contact info"""
-    for pattern in BLOCKED_PATTERNS:
-        if pattern.search(text):
-            return True
-    return False
-
-def censor_contact_info(text: str) -> str:
-    """Replace contact info with [***]"""
-    result = text
-    for pattern in BLOCKED_PATTERNS:
-        result = pattern.sub('[*** контактна информация скрита ***]', result)
-    return result
-
-class CompanyProfile(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str
-    company_name: str
-    description: Optional[str] = None
-    categories: List[str] = []
-    city: Optional[str] = None
-    address: Optional[str] = None
-    website: Optional[str] = None
-    logo_url: Optional[str] = None
-    portfolio_images: List[str] = []
-    rating: float = 0.0
-    review_count: int = 0
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class ProjectCreate(BaseModel):
-    title: str
-    description: str
-    category: str
-    city: str
-    address: Optional[str] = None
-    budget_min: Optional[float] = None
-    budget_max: Optional[float] = None
-    deadline: Optional[str] = None
-    images: List[str] = []  # Up to 10 images (base64 or URLs)
-    estimated_budget: Optional[float] = None  # Calculator estimate in EUR
-
-class Project(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_id: str
-    client_name: str
-    client_email: str
-    client_phone: str
-    title: str
-    description: str
-    category: str
-    city: str
-    address: Optional[str] = None
-    budget_min: Optional[float] = None
-    budget_max: Optional[float] = None
-    deadline: Optional[str] = None
-    images: List[str] = []  # Project images
-    estimated_budget: Optional[float] = None  # Calculator estimate in EUR
-    status: str = "active"  # active, closed, in_progress
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    views: int = 0
-    purchases: int = 0
-
-class ReviewCreate(BaseModel):
-    company_id: str
-    rating: int  # 1-5
-    comment: str
-    project_id: Optional[str] = None
-
-class Review(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    company_id: str
-    client_id: str
-    client_name: str
-    rating: int
-    comment: str
-    project_id: Optional[str] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    # Reviews are immutable - no edit/delete for companies
-
-class PaymentTransaction(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str
-    session_id: str
-    package_type: str
-    amount: float
-    currency: str
-    status: str = "pending"  # pending, completed, failed, expired
-    payment_status: str = "pending"
-    project_id: Optional[str] = None  # For single lead purchase
-    metadata: Dict[str, Any] = {}
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class PortfolioProjectCreate(BaseModel):
-    title: str
-    description: Optional[str] = None
-    category: Optional[str] = None
-    location: Optional[str] = None
-    before_images: List[str] = []  # Base64 or URLs
-    after_images: List[str] = []
-
-class PortfolioProject(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    company_id: str
-    title: str
-    description: Optional[str] = None
-    category: Optional[str] = None
-    location: Optional[str] = None
-    before_images: List[str] = []
-    after_images: List[str] = []
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-# ============== AUTH HELPERS ==============
-
-def hash_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-def verify_password(password: str, hashed: str) -> bool:
-    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
-
-def create_token(user_id: str, user_type: str) -> str:
-    payload = {
-        "user_id": user_id,
-        "user_type": user_type,
-        "exp": datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRATION_HOURS)
-    }
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-
-def decode_token(token: str) -> dict:
-    try:
-        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Токенът е изтекъл")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Невалиден токен")
-
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    if not credentials:
-        raise HTTPException(status_code=401, detail="Необходима е автентикация")
-    
-    payload = decode_token(credentials.credentials)
-    user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
-    if not user:
-        raise HTTPException(status_code=401, detail="Потребителят не е намерен")
-    return user
-
-async def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    if not credentials:
-        return None
-    try:
-        payload = decode_token(credentials.credentials)
-        user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
-        return user
-    except:
-        return None
 
 # ============== AUTH ROUTES ==============
 
@@ -3229,9 +2889,326 @@ async def analyze_sketch(request: Request):
         raise HTTPException(status_code=500, detail=f"Грешка при анализ: {str(e)}")
 
 
+# ============== AI CHART ANALYZER ==============
+AI_CHART_SYSTEM_PROMPT = """Ти си експертен строителен инженер с 30+ години опит в количествени сметки и остойностяване на строителни проекти.
+
+Анализирай техническия чертеж/скица и извлечи ВСИЧКИ конструктивни елементи с ТОЧНИ размери и количества.
+
+ОТГОВОРИ ЗАДЪЛЖИТЕЛНО в JSON формат:
+{
+  "title": "Кратко заглавие на обекта",
+  "description": "Описание какво виждаш на чертежа",
+  "structural_elements": [
+    {"name": "елемент", "type": "тип", "dimensions": "размери", "quantity": "брой/м²/м³", "notes": "бележки"}
+  ],
+  "materials": [
+    {"name": "материал", "unit": "единица (м², м³, бр., кг, м.л.)", "quantity": число, "price_per_unit": число, "total": число, "notes": "бележки"}
+  ],
+  "labor": [
+    {"name": "вид работа", "unit": "единица", "quantity": число, "price_per_unit": число, "total": число}
+  ],
+  "summary": {
+    "materials_total": число,
+    "labor_total": число,
+    "overhead_percent": 10,
+    "overhead_total": число,
+    "grand_total": число,
+    "currency": "EUR"
+  },
+  "dimensions": {"length": "м", "width": "м", "height": "м", "area": "м²"},
+  "accuracy_note": "Точност на анализа: 95-100%. Бележки за допълнителна проверка."
+}
+
+ПРАВИЛА:
+- Цените са в EUR за българския пазар (2025-2026)
+- Включи ВСИЧКИ необходими материали (бетон, арматура, кофраж, тухли, мазилка, хидроизолация и т.н.)
+- Включи труд за всяка дейност
+- Добави 10% за непредвидени разходи
+- Количествата трябва да са РЕАЛИСТИЧНИ за показаните размери
+- Ако не виждаш ясно определен елемент, НЕ го добавяй"""
+
+# AIChartAnalyzeRequest imported from models
+
+@api_router.post("/ai-chart/analyze")
+async def analyze_chart(req: AIChartAnalyzeRequest):
+    """Analyze a technical drawing/blueprint using AI vision and generate quantity survey"""
+    if not req.image:
+        raise HTTPException(status_code=400, detail="Изображението е задължително")
+    
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+    
+    image_base64 = req.image
+    if "," in image_base64:
+        image_base64 = image_base64.split(",")[1]
+    
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"chart-{uuid.uuid4()}",
+            system_message=AI_CHART_SYSTEM_PROMPT
+        ).with_model("openai", "gpt-4o")
+        
+        image_content = ImageContent(image_base64=image_base64)
+        
+        user_text = "Анализирай ВНИМАТЕЛНО този технически чертеж/скица. Извлечи ВСИЧКИ конструктивни елементи, размери и количества. Генерирай ПЪЛНА количествена сметка с материали, труд и общо. Отговори в JSON формат."
+        if req.notes:
+            user_text += f"\nДопълнителни бележки: {req.notes}"
+        
+        user_message = UserMessage(text=user_text, file_contents=[image_content])
+        response = await chat.send_message(user_message)
+        
+        # Parse JSON from response
+        response_text = response.strip()
+        json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', response_text)
+        if json_match:
+            response_text = json_match.group(1).strip()
+        else:
+            json_obj_match = re_module.search(r'\{[\s\S]*\}', response_text)
+            if json_obj_match:
+                response_text = json_obj_match.group(0)
+        
+        try:
+            result = json_module.loads(response_text)
+        except json_module.JSONDecodeError:
+            result = {
+                "title": "Анализ на чертеж",
+                "description": response[:500],
+                "materials": [],
+                "labor": [],
+                "summary": {"materials_total": 0, "labor_total": 0, "overhead_percent": 10, "overhead_total": 0, "grand_total": 0, "currency": "EUR"},
+                "accuracy_note": "AI анализът не върна структуриран отговор. Моля, опитайте отново."
+            }
+        
+        # Save to DB
+        chart_id = str(uuid.uuid4())
+        await db.ai_charts.insert_one({
+            "id": chart_id,
+            "title": result.get("title", ""),
+            "materials_count": len(result.get("materials", [])),
+            "grand_total": result.get("summary", {}).get("grand_total", 0),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        result["id"] = chart_id
+        return result
+        
+    except Exception as e:
+        logging.error(f"AI Chart analysis error: {e}")
+        raise HTTPException(status_code=500, detail=f"Грешка при AI анализ: {str(e)}")
+
+
+# AIChartPDFRequest imported from models
+
+@api_router.post("/ai-chart/pdf-contract")
+async def generate_chart_pdf_contract(req: AIChartPDFRequest):
+    """Generate a formal PDF contract with quantity survey from AI chart analysis"""
+    from fpdf import FPDF
+    import io
+
+    pdf = FPDF()
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    bold_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+
+    try:
+        pdf.add_font("DejaVu", "", font_path, uni=True)
+        pdf.add_font("DejaVu", "B", bold_font_path, uni=True)
+        fn = "DejaVu"
+    except Exception:
+        fn = "Helvetica"
+
+    # --- Page 1: Contract ---
+    pdf.add_page()
+    
+    # Header
+    pdf.set_fill_color(140, 86, 255)
+    pdf.rect(0, 0, 210, 30, 'F')
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, 'B', 18)
+    pdf.set_y(5)
+    pdf.cell(0, 10, "ДОГОВОР ЗА СТРОИТЕЛНО-РЕМОНТНИ ДЕЙНОСТИ", ln=True, align='C')
+    pdf.set_font(fn, '', 9)
+    pdf.cell(0, 8, "TemaDom | AI Анализатор на чертежи", ln=True, align='C')
+    
+    # Contract info
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_y(38)
+    pdf.set_font(fn, '', 10)
+    today = datetime.now(timezone.utc).strftime('%d.%m.%Y')
+    pdf.cell(0, 7, f"Дата: {today}", ln=True)
+    pdf.cell(0, 7, f"Договор No: TD-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}", ln=True)
+    pdf.ln(3)
+    
+    # Parties
+    pdf.set_font(fn, 'B', 11)
+    pdf.cell(0, 8, "СТРАНИ ПО ДОГОВОРА:", ln=True)
+    pdf.set_font(fn, '', 10)
+    pdf.cell(0, 7, f"ВЪЗЛОЖИТЕЛ: {req.client_name or '____________________________'}", ln=True)
+    pdf.cell(0, 7, f"Адрес: {req.client_address or '____________________________'}", ln=True)
+    pdf.ln(2)
+    pdf.cell(0, 7, f"ИЗПЪЛНИТЕЛ: {req.contractor_name or '____________________________'}", ln=True)
+    pdf.ln(3)
+    
+    # Object
+    pdf.set_font(fn, 'B', 11)
+    pdf.cell(0, 8, "ПРЕДМЕТ НА ДОГОВОРА:", ln=True)
+    pdf.set_font(fn, '', 10)
+    pdf.multi_cell(0, 6, f"{req.title}. {req.description[:300]}" if req.description else req.title)
+    pdf.ln(3)
+    
+    # Summary
+    summary = req.summary or {}
+    grand_total = summary.get("grand_total", 0)
+    pdf.set_font(fn, 'B', 11)
+    pdf.cell(0, 8, f"ОБЩА СТОЙНОСТ: {grand_total} EUR (с ДДС)", ln=True)
+    pdf.ln(3)
+    
+    # Terms
+    pdf.set_font(fn, 'B', 10)
+    pdf.cell(0, 7, "УСЛОВИЯ:", ln=True)
+    pdf.set_font(fn, '', 9)
+    terms = [
+        "1. Изпълнителят се задължава да извърши дейностите по количествената сметка (Приложение 1).",
+        "2. Срок за изпълнение: ______ работни дни от датата на подписване.",
+        "3. Плащане: 30% аванс при подписване, 70% при приемане на работата.",
+        "4. Гаранционен срок: 24 месеца от датата на приемане.",
+        "5. Промени в обема на работите се извършват само с писмено допълнение.",
+        "6. При спор страните се обръщат към компетентния съд по седалище на Възложителя."
+    ]
+    for t in terms:
+        pdf.multi_cell(0, 5.5, t)
+        pdf.ln(1)
+    
+    # Signatures
+    pdf.ln(8)
+    pdf.set_font(fn, 'B', 10)
+    pdf.cell(95, 7, "ВЪЗЛОЖИТЕЛ:", 0, 0)
+    pdf.cell(95, 7, "ИЗПЪЛНИТЕЛ:", 0, 1)
+    pdf.ln(12)
+    pdf.set_font(fn, '', 9)
+    pdf.cell(95, 5, "Подпис: ________________", 0, 0)
+    pdf.cell(95, 5, "Подпис: ________________", 0, 1)
+    pdf.cell(95, 5, f"Дата: {today}", 0, 0)
+    pdf.cell(95, 5, f"Дата: {today}", 0, 1)
+    
+    # --- Page 2: Quantity Survey (Materials) ---
+    pdf.add_page()
+    
+    pdf.set_fill_color(255, 140, 66)
+    pdf.rect(0, 0, 210, 25, 'F')
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, 'B', 16)
+    pdf.set_y(4)
+    pdf.cell(0, 10, "ПРИЛОЖЕНИЕ 1: КОЛИЧЕСТВЕНА СМЕТКА", ln=True, align='C')
+    pdf.set_font(fn, '', 8)
+    pdf.cell(0, 6, f"{req.title}", ln=True, align='C')
+    
+    # Materials table
+    pdf.set_y(30)
+    pdf.set_font(fn, 'B', 9)
+    pdf.set_fill_color(50, 60, 80)
+    pdf.set_text_color(255, 255, 255)
+    col_w = [8, 58, 18, 18, 22, 22, 44]
+    headers = ["#", "Материал", "Ед.", "Кол.", "Цена/ед.", "Общо EUR", "Бележки"]
+    for i, h in enumerate(headers):
+        pdf.cell(col_w[i], 8, h, 1, 0, 'C', True)
+    pdf.ln()
+    
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font(fn, '', 8)
+    mat_total = 0
+    for i, m in enumerate(req.materials, 1):
+        total = m.get("total", 0)
+        mat_total += total if isinstance(total, (int, float)) else 0
+        fill = i % 2 == 0
+        if fill:
+            pdf.set_fill_color(245, 245, 250)
+        pdf.cell(col_w[0], 7, str(i), 1, 0, 'C', fill)
+        name = str(m.get("name", ""))[:30]
+        pdf.cell(col_w[1], 7, name, 1, 0, 'L', fill)
+        pdf.cell(col_w[2], 7, str(m.get("unit", ""))[:8], 1, 0, 'C', fill)
+        pdf.cell(col_w[3], 7, str(m.get("quantity", "")), 1, 0, 'C', fill)
+        pdf.cell(col_w[4], 7, str(m.get("price_per_unit", "")), 1, 0, 'R', fill)
+        pdf.cell(col_w[5], 7, str(total), 1, 0, 'R', fill)
+        notes_text = str(m.get("notes", ""))[:22]
+        pdf.cell(col_w[6], 7, notes_text, 1, 0, 'L', fill)
+        pdf.ln()
+    
+    # Materials subtotal
+    pdf.set_font(fn, 'B', 9)
+    pdf.set_fill_color(255, 140, 66)
+    pdf.set_text_color(255, 255, 255)
+    pdf.cell(sum(col_w[:5]), 8, "МАТЕРИАЛИ ОБЩО:", 1, 0, 'R', True)
+    pdf.cell(col_w[5], 8, f"{mat_total:.0f}", 1, 0, 'R', True)
+    pdf.cell(col_w[6], 8, "EUR", 1, 1, 'L', True)
+    
+    # Labor table
+    if req.labor:
+        pdf.ln(5)
+        pdf.set_font(fn, 'B', 11)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 8, "ТРУД:", ln=True)
+        
+        pdf.set_font(fn, 'B', 9)
+        pdf.set_fill_color(50, 60, 80)
+        pdf.set_text_color(255, 255, 255)
+        labor_w = [8, 82, 18, 18, 22, 42]
+        labor_h = ["#", "Вид работа", "Ед.", "Кол.", "Цена/ед.", "Общо EUR"]
+        for i, h in enumerate(labor_h):
+            pdf.cell(labor_w[i], 8, h, 1, 0, 'C', True)
+        pdf.ln()
+        
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font(fn, '', 8)
+        labor_total = 0
+        for i, l in enumerate(req.labor, 1):
+            total = l.get("total", 0)
+            labor_total += total if isinstance(total, (int, float)) else 0
+            fill = i % 2 == 0
+            if fill:
+                pdf.set_fill_color(245, 245, 250)
+            pdf.cell(labor_w[0], 7, str(i), 1, 0, 'C', fill)
+            pdf.cell(labor_w[1], 7, str(l.get("name", ""))[:42], 1, 0, 'L', fill)
+            pdf.cell(labor_w[2], 7, str(l.get("unit", ""))[:8], 1, 0, 'C', fill)
+            pdf.cell(labor_w[3], 7, str(l.get("quantity", "")), 1, 0, 'C', fill)
+            pdf.cell(labor_w[4], 7, str(l.get("price_per_unit", "")), 1, 0, 'R', fill)
+            pdf.cell(labor_w[5], 7, str(total), 1, 0, 'R', fill)
+            pdf.ln()
+        
+        pdf.set_font(fn, 'B', 9)
+        pdf.set_fill_color(255, 140, 66)
+        pdf.set_text_color(255, 255, 255)
+        pdf.cell(sum(labor_w[:4]), 8, "ТРУД ОБЩО:", 1, 0, 'R', True)
+        pdf.cell(labor_w[4], 8, "", 1, 0, 'C', True)
+        pdf.cell(labor_w[5], 8, f"{labor_total:.0f} EUR", 1, 1, 'R', True)
+    
+    # Grand total
+    pdf.ln(5)
+    pdf.set_font(fn, 'B', 12)
+    pdf.set_fill_color(140, 86, 255)
+    pdf.set_text_color(255, 255, 255)
+    overhead = summary.get("overhead_total", 0)
+    pdf.cell(130, 10, f"Непредвидени ({summary.get('overhead_percent', 10)}%):", 1, 0, 'R', True)
+    pdf.cell(60, 10, f"{overhead} EUR", 1, 1, 'R', True)
+    pdf.cell(130, 12, "ОБЩА СТОЙНОСТ:", 1, 0, 'R', True)
+    pdf.cell(60, 12, f"{grand_total} EUR", 1, 1, 'R', True)
+    
+    # Footer
+    pdf.set_text_color(120, 120, 120)
+    pdf.set_font(fn, '', 7)
+    pdf.ln(6)
+    pdf.cell(0, 5, "Генерирано от TemaDom AI Анализатор | temadom.com", ln=True, align='C')
+    pdf.cell(0, 5, "Цените са ориентировъчни за българския пазар 2025-2026. Моля, потвърдете с изпълнителя.", ln=True, align='C')
+
+    pdf_bytes = pdf.output()
+    buf = io.BytesIO(pdf_bytes)
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=temadom-dogovor-smetka.pdf"})
+
+
 # ============== 3D Scanner PDF ==============
-class Scanner3DPDFRequest(BaseModel):
-    items: List[Dict[str, Any]]
+# Scanner3DPDFRequest imported from models
 
 @api_router.post("/scanner3d/pdf")
 async def generate_scanner3d_pdf(req: Scanner3DPDFRequest):
@@ -3311,6 +3288,45 @@ async def generate_scanner3d_pdf(req: Scanner3DPDFRequest):
     buf.seek(0)
     return StreamingResponse(buf, media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=temadom-3d-smetka.pdf"})
+
+
+# ============== 3D Scanner Project Save/Load ==============
+@api_router.post("/scanner3d/projects")
+async def save_scanner3d_project(req: Scanner3DProjectSave, user: dict = Depends(get_current_user)):
+    project_id = str(uuid.uuid4())[:8]
+    doc = {
+        "id": project_id,
+        "user_id": user["id"],
+        "user_name": user.get("name", ""),
+        "title": req.title,
+        "selections": req.selections,
+        "photo_count": len(req.photos),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.scanner3d_projects.insert_one(doc)
+    return {"id": project_id, "message": "Проектът е запазен"}
+
+@api_router.get("/scanner3d/projects")
+async def list_scanner3d_projects(user: dict = Depends(get_current_user)):
+    projects = await db.scanner3d_projects.find(
+        {"user_id": user["id"]}, {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    return projects
+
+@api_router.get("/scanner3d/projects/{project_id}")
+async def get_scanner3d_project(project_id: str):
+    project = await db.scanner3d_projects.find_one({"id": project_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    return project
+
+@api_router.delete("/scanner3d/projects/{project_id}")
+async def delete_scanner3d_project(project_id: str, user: dict = Depends(get_current_user)):
+    result = await db.scanner3d_projects.delete_one({"id": project_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    return {"message": "Проектът е изтрит"}
 
 
 # Include router - MUST be after all route definitions

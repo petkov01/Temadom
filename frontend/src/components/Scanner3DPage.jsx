@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useEffect, useMemo, Suspense } fr
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { Camera, Upload, RotateCcw, FileText, Building2, Share2, ChevronRight, CheckCircle, Loader2, X, Eye, Move3D, MousePointer } from 'lucide-react';
+import { Camera, Upload, RotateCcw, FileText, Building2, Share2, ChevronRight, CheckCircle, Loader2, X, Eye, Move3D, MousePointer, Save, Link2, Copy } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -345,7 +345,7 @@ const SwapPanel = ({ activeHotspot, selections, setSelections, onClose }) => {
 };
 
 // --- Results Summary ---
-const ResultsSummary = ({ selections, onPDF, onShare }) => {
+const ResultsSummary = ({ selections, onPDF, onShare, onSave, projectId }) => {
   const selected = Object.entries(selections).filter(([, v]) => v);
   const total = selected.reduce((sum, [, opt]) => sum + (opt?.price || 0), 0);
 
@@ -376,7 +376,7 @@ const ResultsSummary = ({ selections, onPDF, onShare }) => {
         <span className="text-white font-bold text-lg">{total.toLocaleString()} лв.</span>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mt-5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
         <Button
           onClick={onPDF}
           className="bg-[#28A745] hover:bg-[#22943e] text-white text-xs h-10"
@@ -398,7 +398,28 @@ const ResultsSummary = ({ selections, onPDF, onShare }) => {
         >
           <Share2 className="mr-1 h-3.5 w-3.5" /> Сподели
         </Button>
+        <Button
+          onClick={onSave}
+          className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white text-xs h-10"
+          data-testid="save-project-btn"
+        >
+          <Save className="mr-1 h-3.5 w-3.5" /> Запази
+        </Button>
       </div>
+      {projectId && (
+        <div className="mt-3 flex items-center gap-2 bg-[#253545] rounded-lg p-3 border border-[#3A4A5C]">
+          <Link2 className="h-4 w-4 text-[#8C56FF] flex-shrink-0" />
+          <span className="text-slate-400 text-xs">Линк за споделяне:</span>
+          <code className="text-[#8C56FF] text-xs flex-1 truncate">{`${window.location.origin}/3d-scanner/${projectId}`}</code>
+          <button
+            onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/3d-scanner/${projectId}`); toast.success('Линкът е копиран'); }}
+            className="text-slate-400 hover:text-white transition-colors"
+            data-testid="copy-link-btn"
+          >
+            <Copy className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -410,6 +431,7 @@ export const Scanner3DPage = () => {
   const [generating, setGenerating] = useState(false);
   const [activeHotspot, setActiveHotspot] = useState(null);
   const [selections, setSelections] = useState({});
+  const [projectId, setProjectId] = useState(null);
   const canvasRef = useRef();
 
   // Stitch 3 images into one panoramic strip
@@ -507,6 +529,25 @@ export const Scanner3DPage = () => {
       toast.success('Линкът е копиран');
     }
   }, []);
+
+  const handleSave = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('Моля, влезте в профила си за да запазите проекта');
+      return;
+    }
+    try {
+      const res = await axios.post(`${API}/scanner3d/projects`, {
+        title: '3D Проект',
+        selections,
+        photos: [],
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setProjectId(res.data.id);
+      toast.success('Проектът е запазен! Споделете линка.');
+    } catch {
+      toast.error('Грешка при запазване');
+    }
+  }, [selections]);
 
   return (
     <div className="min-h-screen bg-[#1E2A38]" data-testid="scanner-3d-page">
@@ -628,7 +669,7 @@ export const Scanner3DPage = () => {
             </div>
 
             {/* Results */}
-            <ResultsSummary selections={selections} onPDF={handlePDF} onShare={handleShare} />
+            <ResultsSummary selections={selections} onPDF={handlePDF} onShare={handleShare} onSave={handleSave} projectId={projectId} />
           </div>
         )}
       </div>

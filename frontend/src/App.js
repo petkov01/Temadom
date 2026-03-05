@@ -16,6 +16,7 @@ import { FeedbackPage } from '@/components/FeedbackPage';
 import { PublishedGalleryPage } from '@/components/PublishedGalleryPage';
 import { AISketchPage } from '@/components/AISketchPage';
 import { Scanner3DPage } from '@/components/Scanner3DPage';
+import { AIChartPage } from '@/components/AIChartPage';
 import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 import ProjectEstimator from '@/components/ProjectEstimator';
@@ -210,6 +211,9 @@ const Navbar = () => {
                   <Link to="/ai-sketch" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-sketch">
                     <FileText className="h-4 w-4" /> AI Sketch
                   </Link>
+                  <Link to="/ai-chart" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#28A745] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-chart">
+                    <ClipboardList className="h-4 w-4" /> AI Анализатор
+                  </Link>
                   <Link to="/ai-gallery" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-gallery">
                     <Image className="h-4 w-4" /> AI Галерия
                   </Link>
@@ -365,6 +369,9 @@ const Navbar = () => {
             </Link>
             <Link to="/ai-sketch" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-sketch">
               <FileText className="h-4 w-4" /> AI Sketch
+            </Link>
+            <Link to="/ai-chart" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#28A745]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-chart">
+              <ClipboardList className="h-4 w-4" /> AI Анализатор
             </Link>
             <Link to="/ai-gallery" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-gallery">
               <Image className="h-4 w-4" /> AI Галерия
@@ -3240,7 +3247,9 @@ function App() {
                 <Route path="/ads" element={<AdsPage />} />
                 <Route path="/ai-designer" element={<AIDesignerPage />} />
                 <Route path="/ai-sketch" element={<AISketchPage />} />
+                <Route path="/ai-chart" element={<AIChartPage />} />
                 <Route path="/3d-scanner" element={<Scanner3DPage />} />
+                <Route path="/3d-scanner/:projectId" element={<Scanner3DPage />} />
                 <Route path="/ai-gallery" element={<PublishedGalleryPage />} />
                 <Route path="/subscriptions" element={<SubscriptionsPage />} />
                 <Route path="/feedback" element={<FeedbackPage />} />
