@@ -9,7 +9,7 @@ import {
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
   ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator, Camera, ChevronLeft, Image, MessageSquare,
   FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench,
-  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play
+  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, UserPlus
 } from 'lucide-react';
 import { AIDesignerPage } from '@/components/AIDesignerPage';
 import { FeedbackPage } from '@/components/FeedbackPage';
@@ -2064,7 +2064,7 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '', // hidden but kept for backend compatibility
+    phone: '',
     city: '',
     telegram_username: '',
     bulstat: '',
@@ -2072,6 +2072,10 @@ const RegisterPage = () => {
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
+
+  // Extract referral code from URL
+  const searchParams = new URLSearchParams(window.location.search);
+  const refCode = searchParams.get('ref') || '';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -2097,7 +2101,9 @@ const RegisterPage = () => {
     try {
       const { confirmPassword, ...data } = formData;
       if (userType !== 'company') delete data.bulstat;
-      await register({ ...data, user_type: userType });
+      const payload = { ...data, user_type: userType };
+      if (refCode) payload.referral_code = refCode;
+      await register(payload);
       toast.success(t('reg_success'));
       navigate(userType === 'client' ? '/dashboard/client' : '/dashboard');
     } catch (err) {
@@ -2119,6 +2125,16 @@ const RegisterPage = () => {
           <CardDescription>{t('reg_subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Referral banner */}
+          {refCode && (
+            <div className="bg-[#F97316]/10 border border-[#F97316]/20 rounded-lg p-4 mb-4" data-testid="referral-banner">
+              <div className="flex items-center gap-2">
+                <UserPlus className="h-5 w-5 text-[#F97316] flex-shrink-0" />
+                <span className="text-sm font-bold text-[#F97316]">Поканени сте от приятел!</span>
+              </div>
+              <p className="text-xs text-[#F97316] mt-1">Регистрирайте се и вашият приятел получава бонус точки</p>
+            </div>
+          )}
           {/* Free platform banner */}
           <div className="bg-[#28A745]/10 border border-[#28A745]/20 rounded-lg p-4 mb-4" data-testid="register-free-banner">
             <div className="flex items-center gap-2 mb-1">

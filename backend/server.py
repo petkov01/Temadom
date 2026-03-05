@@ -84,7 +84,7 @@ CATEGORIES = [
 # ============== AUTH ROUTES ==============
 
 @api_router.post("/auth/register")
-async def register(user_data: UserCreate):
+async def register(user_data: UserCreate, request: Request):
     # Check if email exists
     existing = await db.users.find_one({"email": user_data.email})
     if existing:
@@ -109,8 +109,10 @@ async def register(user_data: UserCreate):
     # Create user
     user_dict = user_data.model_dump()
     password = user_dict.pop("password")
+    referral_code = user_dict.pop("referral_code", None)
     user_dict["password_hash"] = hash_password(password)
     user_dict["id"] = str(uuid.uuid4())
+    user_dict["referral_code"] = user_dict["id"][:8]
     user_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     user_dict["is_active"] = True
     user_dict["subscription_active"] = False
@@ -126,6 +128,23 @@ async def register(user_data: UserCreate):
         "user_type": user_data.user_type, "action": "register",
         "points": 10, "created_at": datetime.now(timezone.utc).isoformat()
     })
+
+    # Process referral if provided
+    if referral_code and referral_code.strip():
+        try:
+            import httpx as _httpx
+            async with _httpx.AsyncClient() as _client:
+                await _client.post(
+                    f"http://localhost:8001/api/referrals/apply",
+                    json={
+                        "referral_code": referral_code.strip(),
+                        "new_user_id": user_dict["id"],
+                        "new_user_name": user_dict["name"]
+                    },
+                    timeout=5
+                )
+        except Exception:
+            pass
     
     # Create company/master/designer profile
     if user_data.user_type in ("company", "master", "designer"):
