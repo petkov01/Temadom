@@ -2677,19 +2677,35 @@ async def get_published_projects(
     total = await db.published_projects.count_documents(query)
     projects = await db.published_projects.find(
         query,
-        {"_id": 0, "materials": 0}
+        {"_id": 0}
     ).sort(sort_field, sort_order).skip(skip).limit(limit).to_list(limit)
 
-    # Truncate base64 images for listing (send only first before/after)
+    # Send first before/after images for card preview + materials summary
     for p in projects:
-        if p.get("before_images"):
-            p["before_thumb"] = p["before_images"][0][:200] + "..." if len(p["before_images"][0]) > 200 else p["before_images"][0]
-            p["before_count"] = len(p["before_images"])
-        if p.get("after_images"):
-            p["after_count"] = len(p["after_images"])
-        # Don't send full images in listing
+        before = p.get("before_images", [])
+        after = p.get("after_images", [])
+        p["first_before_image"] = before[0] if before else None
+        first_after = after[0] if after else None
+        if first_after and isinstance(first_after, dict):
+            p["first_after_image"] = f"data:image/png;base64,{first_after.get('image_base64', '')}"
+        elif first_after:
+            p["first_after_image"] = first_after
+        else:
+            p["first_after_image"] = None
+        p["before_count"] = len(before)
+        p["after_count"] = len(after)
+        # Materials summary for card
+        mats = p.get("materials", {})
+        p["budget"] = mats.get("grand_total_bgn", mats.get("total_estimate_bgn", ""))
+        p["budget_eur"] = mats.get("grand_total_eur", mats.get("total_estimate_eur", ""))
+        p["materials_count"] = len(mats.get("materials", []))
+        p["materials_preview"] = mats.get("materials", [])[:3]
+        # Remove full arrays from listing
         p.pop("before_images", None)
         p.pop("after_images", None)
+        p.pop("materials", None)
+        p.pop("ratings", None)
+        p.pop("likes", None)
 
     return {
         "projects": projects,
