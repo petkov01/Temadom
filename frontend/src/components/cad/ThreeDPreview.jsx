@@ -1,153 +1,150 @@
-// TemaDom IA CAD v5.1 — Three.js Live 3D Preview
+// TemaDom IA CAD v5.1 — Three.js Live 3D Preview (all element types)
 import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GRID } from './constants';
 import { autoType } from './utils';
 
+const SEL_COLOR = 0xFF8C42;
+const FLOOR_H = 3; // default floor height (meters)
+
+function addObj(scene, geo, mat, pos, rot) {
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.userData.isObj = true;
+  mesh.position.set(pos.x, pos.y, pos.z);
+  if (rot) { if (rot.x) mesh.rotation.x = rot.x; if (rot.y) mesh.rotation.y = rot.y; if (rot.z) mesh.rotation.z = rot.z; }
+  scene.add(mesh);
+  // Edge wireframe
+  const edges = new THREE.EdgesGeometry(geo);
+  const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x444444 }));
+  line.userData.isObj = true;
+  line.position.copy(mesh.position); line.rotation.copy(mesh.rotation);
+  scene.add(line);
+  return mesh;
+}
+
 function buildMesh(scene, el, i, sc, selIdx) {
   if (el.tool === 'dimension') return;
   const t = el._type || autoType(el);
   if (t === 'ignore') return;
   const isSel = i === selIdx;
-  const selColor = 0xFF8C42;
+  const floorY = (el.floor || 0) * FLOOR_H;
+
+  // Line-based elements: compute world coords
+  let sx = 0, sz = 0, ex = 0, ez = 0, len = 0, ang = 0;
+  if (t !== 'circle' && el.x1 != null) {
+    sx = el.x1 / GRID * sc; sz = el.y1 / GRID * sc;
+    ex = (el.x2 ?? el.x1) / GRID * sc; ez = (el.y2 ?? el.y1) / GRID * sc;
+    len = Math.sqrt((ex - sx) ** 2 + (ez - sz) ** 2);
+    ang = Math.atan2(ez - sz, ex - sx);
+  }
+  const mx = (sx + ex) / 2, mz = (sz + ez) / 2;
 
   if (t === 'wall') {
     const h = el.height ?? 3, th = (el.thickness ?? 25) / 100;
-    const sx = el.x1 / GRID * sc, sz = el.y1 / GRID * sc;
-    const ex = el.x2 / GRID * sc, ez = el.y2 / GRID * sc;
-    const dx = ex - sx, dz = ez - sz;
-    const len = Math.sqrt(dx * dx + dz * dz);
-    if (len < 0.1) return;
-    const ang = Math.atan2(dz, dx);
+    if (len < 0.05) return;
     const geo = new THREE.BoxGeometry(len, h, th);
-    const mat = new THREE.MeshStandardMaterial({ color: isSel ? selColor : 0xd4d4d4, roughness: 0.7 });
-    const mesh = new THREE.Mesh(geo, mat); mesh.userData.isObj = true;
-    mesh.position.set((sx + ex) / 2, h / 2, (sz + ez) / 2);
-    mesh.rotation.y = -ang;
-    scene.add(mesh);
-    addEdges(scene, geo, mesh);
-  } else if (t === 'roof') {
-    const sx = el.x1 / GRID * sc, sz = el.y1 / GRID * sc;
-    const ex = el.x2 / GRID * sc, ez = el.y2 / GRID * sc;
-    const len = Math.sqrt((ex - sx) ** 2 + (ez - sz) ** 2);
-    if (len < 0.1) return;
-    const ang = Math.atan2(ez - sz, ex - sx);
+    const mat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0xd4d4d4, roughness: 0.7 });
+    addObj(scene, geo, mat, { x: mx, y: floorY + h / 2, z: mz }, { y: -ang });
+  }
+
+  else if (t === 'roof') {
+    if (len < 0.05) return;
     const roofAngle = (el.roofAngle || 30) * Math.PI / 180;
-    const width = 4, peakH = (width / 2) * Math.tan(roofAngle);
-    // Triangular prism
+    const roofWidth = 4;
+    const peakH = (roofWidth / 2) * Math.tan(roofAngle);
     const shape = new THREE.Shape();
-    shape.moveTo(-width / 2, 0);
+    shape.moveTo(-roofWidth / 2, 0);
     shape.lineTo(0, peakH);
-    shape.lineTo(width / 2, 0);
-    shape.lineTo(-width / 2, 0);
-    const extrudeSettings = { depth: len, bevelEnabled: false };
-    const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    const mat = new THREE.MeshStandardMaterial({ color: isSel ? selColor : 0xcc6633, roughness: 0.5 });
+    shape.lineTo(roofWidth / 2, 0);
+    shape.closePath();
+    const geo = new THREE.ExtrudeGeometry(shape, { depth: len, bevelEnabled: false });
+    const mat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0xcc6633, roughness: 0.5, side: THREE.DoubleSide });
+    // Position roof on top of walls
+    const baseH = el.height ?? 3;
     const mesh = new THREE.Mesh(geo, mat); mesh.userData.isObj = true;
-    mesh.position.set(sx, (el.height ?? 3), sz);
-    mesh.rotation.y = -ang;
-    mesh.rotation.x = -Math.PI / 2;
+    mesh.position.set(sx, floorY + baseH, sz);
+    mesh.rotation.set(-Math.PI / 2, 0, -ang);
     scene.add(mesh);
-    addEdges(scene, geo, mesh);
-  } else if (t === 'stairs') {
-    const steps = el.steps ?? 8, rise = el.rise ?? 0.17, run = el.run ?? 0.30, w = el.stairWidth ?? 1.2;
-    const sx = el.x1 / GRID * sc, sz = el.y1 / GRID * sc;
-    for (let s = 0; s < steps; s++) {
-      const geo = new THREE.BoxGeometry(run * 0.95, rise, w);
-      const mat = new THREE.MeshStandardMaterial({ color: isSel ? selColor : 0xb8a080, roughness: 0.6 });
-      const mesh = new THREE.Mesh(geo, mat); mesh.userData.isObj = true;
-      mesh.position.set(sx + s * run + run / 2, (s + 0.5) * rise, sz);
-      scene.add(mesh);
-    }
-  } else if (t === 'slab') {
+  }
+
+  else if (t === 'slab') {
     const x1m = Math.min(el.x1, el.x2) / GRID * sc, z1m = Math.min(el.y1, el.y2) / GRID * sc;
     const wm = Math.abs(el.x2 - el.x1) / GRID * sc, dm = Math.abs(el.y2 - el.y1) / GRID * sc;
     const th = (el.slabThickness ?? 15) / 100;
-    if (wm < 0.1 || dm < 0.1) return;
+    if (wm < 0.05 || dm < 0.05) return;
     const geo = new THREE.BoxGeometry(wm, th, dm);
-    const mat = new THREE.MeshStandardMaterial({ color: isSel ? selColor : 0xc0c0c0, roughness: 0.8 });
-    const mesh = new THREE.Mesh(geo, mat); mesh.userData.isObj = true;
-    mesh.position.set(x1m + wm / 2, -th / 2, z1m + dm / 2);
-    scene.add(mesh);
-    addEdges(scene, geo, mesh);
-  } else if (t === 'door') {
-    const sx = el.x1 / GRID * sc, sz = el.y1 / GRID * sc;
-    const ex = el.x2 / GRID * sc, ez = el.y2 / GRID * sc;
-    const len = Math.sqrt((ex - sx) ** 2 + (ez - sz) ** 2);
-    if (len < 0.1) return;
-    const ang = Math.atan2(ez - sz, ex - sx);
+    const mat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0xc0c0c0, roughness: 0.8 });
+    addObj(scene, geo, mat, { x: x1m + wm / 2, y: floorY - th / 2, z: z1m + dm / 2 });
+  }
+
+  else if (t === 'door') {
+    if (len < 0.05) return;
     const dw = el.doorWidth || 0.9, dh = el.doorHeight || 2.1;
-    // Door frame
-    const geo = new THREE.BoxGeometry(dw, dh, 0.08);
-    const mat = new THREE.MeshStandardMaterial({ color: isSel ? selColor : 0x8B4513, roughness: 0.4 });
-    const mesh = new THREE.Mesh(geo, mat); mesh.userData.isObj = true;
-    mesh.position.set((sx + ex) / 2, dh / 2, (sz + ez) / 2);
-    mesh.rotation.y = -ang;
-    scene.add(mesh);
-    addEdges(scene, geo, mesh);
-  } else if (t === 'window') {
-    const sx = el.x1 / GRID * sc, sz = el.y1 / GRID * sc;
-    const ex = el.x2 / GRID * sc, ez = el.y2 / GRID * sc;
-    const ang = Math.atan2(ez - sz, ex - sx);
+    // Door frame (thicker for visibility)
+    const frameGeo = new THREE.BoxGeometry(dw, dh, 0.12);
+    const frameMat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0x8B4513, roughness: 0.4 });
+    addObj(scene, frameGeo, frameMat, { x: mx, y: floorY + dh / 2, z: mz }, { y: -ang });
+    // Door panel (slightly recessed)
+    const panelGeo = new THREE.BoxGeometry(dw - 0.1, dh - 0.15, 0.05);
+    const panelMat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0xA0522D, roughness: 0.3 });
+    addObj(scene, panelGeo, panelMat, { x: mx, y: floorY + dh / 2, z: mz }, { y: -ang });
+  }
+
+  else if (t === 'window') {
+    if (len < 0.05) return;
     const ww = el.windowWidth || 1.2, wh = el.windowHeight || 1.5, sill = el.windowSill || 0.9;
-    // Frame
-    const fGeo = new THREE.BoxGeometry(ww, wh, 0.06);
-    const fMat = new THREE.MeshStandardMaterial({ color: isSel ? selColor : 0xffffff, roughness: 0.3 });
-    const frame = new THREE.Mesh(fGeo, fMat); frame.userData.isObj = true;
-    frame.position.set((sx + ex) / 2, sill + wh / 2, (sz + ez) / 2);
-    frame.rotation.y = -ang;
-    scene.add(frame);
-    // Glass
+    // White frame
+    const fGeo = new THREE.BoxGeometry(ww, wh, 0.1);
+    const fMat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0xffffff, roughness: 0.3 });
+    addObj(scene, fGeo, fMat, { x: mx, y: floorY + sill + wh / 2, z: mz }, { y: -ang });
+    // Glass (transparent blue)
     const gGeo = new THREE.PlaneGeometry(ww - 0.1, wh - 0.1);
-    const gMat = new THREE.MeshStandardMaterial({ color: 0x87CEEB, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+    const gMat = new THREE.MeshStandardMaterial({ color: 0x87CEEB, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
     const glass = new THREE.Mesh(gGeo, gMat); glass.userData.isObj = true;
-    glass.position.copy(frame.position);
+    glass.position.set(mx, floorY + sill + wh / 2, mz);
     glass.rotation.y = -ang;
     scene.add(glass);
-  } else if (t === 'column') {
+  }
+
+  else if (t === 'column') {
     const cx = el.x1 / GRID * sc, cz = el.y1 / GRID * sc;
     const r = (el.columnDiameter || 30) / 200, h = el.columnHeight || 3;
     const geo = new THREE.CylinderGeometry(r, r, h, 16);
-    const mat = new THREE.MeshStandardMaterial({ color: isSel ? selColor : 0x999999, roughness: 0.5 });
-    const mesh = new THREE.Mesh(geo, mat); mesh.userData.isObj = true;
-    mesh.position.set(cx, h / 2, cz);
-    scene.add(mesh);
-    addEdges(scene, geo, mesh);
-  } else if (t === 'beam') {
-    const sx = el.x1 / GRID * sc, sz = el.y1 / GRID * sc;
-    const ex = el.x2 / GRID * sc, ez = el.y2 / GRID * sc;
-    const len = Math.sqrt((ex - sx) ** 2 + (ez - sz) ** 2);
-    if (len < 0.1) return;
-    const ang = Math.atan2(ez - sz, ex - sx);
+    const mat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0x808080, roughness: 0.5 });
+    addObj(scene, geo, mat, { x: cx, y: floorY + h / 2, z: cz });
+  }
+
+  else if (t === 'beam') {
+    if (len < 0.05) return;
     const bw = (el.beamWidth || 25) / 100, bh = (el.beamHeight || 45) / 100;
     const elev = el.beamElevation || 2.7;
     const geo = new THREE.BoxGeometry(len, bh, bw);
-    const mat = new THREE.MeshStandardMaterial({ color: isSel ? selColor : 0xaaaaaa, roughness: 0.6 });
-    const mesh = new THREE.Mesh(geo, mat); mesh.userData.isObj = true;
-    mesh.position.set((sx + ex) / 2, elev + bh / 2, (sz + ez) / 2);
-    mesh.rotation.y = -ang;
-    scene.add(mesh);
-    addEdges(scene, geo, mesh);
-  } else if (t === 'circle') {
+    const mat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0xaaaaaa, roughness: 0.6 });
+    addObj(scene, geo, mat, { x: mx, y: floorY + elev + bh / 2, z: mz }, { y: -ang });
+  }
+
+  else if (t === 'stairs') {
+    const steps = el.steps ?? 8, rise = el.rise ?? 0.17, run = el.run ?? 0.30, w = el.stairWidth ?? 1.2;
+    if (len < 0.05) return;
+    const stepDir = Math.atan2(ez - sz, ex - sx);
+    for (let s = 0; s < steps; s++) {
+      const geo = new THREE.BoxGeometry(run * 0.95, rise, w);
+      const mat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0xb8a080, roughness: 0.6 });
+      const px = sx + Math.cos(stepDir) * (s * run + run / 2);
+      const pz = sz + Math.sin(stepDir) * (s * run + run / 2);
+      addObj(scene, geo, mat, { x: px, y: floorY + (s + 0.5) * rise, z: pz }, { y: -stepDir });
+    }
+  }
+
+  else if (t === 'circle') {
     const cx = el.cx / GRID * sc, cz = el.cy / GRID * sc;
     const r = (el.r || GRID) / GRID * sc;
     const th = (el.circleThickness || 15) / 100;
     const geo = new THREE.CylinderGeometry(r, r, th, 32);
-    const mat = new THREE.MeshStandardMaterial({ color: isSel ? selColor : 0x1abc9c, roughness: 0.7 });
-    const mesh = new THREE.Mesh(geo, mat); mesh.userData.isObj = true;
-    mesh.position.set(cx, th / 2, cz);
-    scene.add(mesh);
-    addEdges(scene, geo, mesh);
+    const mat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0x1abc9c, roughness: 0.7 });
+    addObj(scene, geo, mat, { x: cx, y: floorY + th / 2, z: cz });
   }
-}
-
-function addEdges(scene, geo, mesh) {
-  const edges = new THREE.EdgesGeometry(geo);
-  const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x444444 }));
-  line.position.copy(mesh.position); line.rotation.copy(mesh.rotation);
-  line.userData.isObj = true;
-  scene.add(line);
 }
 
 function buildScene(scene, els, sc, selIdx) {

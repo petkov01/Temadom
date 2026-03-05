@@ -141,19 +141,45 @@ export const AISketchPage = () => {
     if (draft.tool === 'circle') {
       if ((draft.r || 0) > 5) {
         const newEl = { ...draft, _type: 'circle', ...getDefaults('circle') };
-        setEls(p => [...p, newEl]);
+        setEls(p => { const next = [...p, newEl]; setSelIdx(next.length - 1); return next; });
       }
     } else {
       const len = Math.hypot(draft.x2 - draft.x1, draft.y2 - draft.y1);
       if (len > 10) {
         const newEl = { ...draft, _type: autoType(draft), ...getDefaults(draft.tool) };
-        setEls(p => [...p, newEl]);
+        setEls(p => { const next = [...p, newEl]; setSelIdx(next.length - 1); return next; });
       }
     }
     setDraft(null);
   }, [draft]);
 
-  const updateEl = (i, f, v) => setEls(p => p.map((e, j) => j === i ? { ...e, [f]: v } : e));
+  const updateEl = useCallback((i, f, v) => setEls(p => p.map((e, j) => j === i ? { ...e, [f]: v } : e)), []);
+
+  // Parametric dimension update: change length keeps angle, recalcs x2/y2
+  const updateDimension = useCallback((i, dim, val) => {
+    setEls(p => p.map((e, j) => {
+      if (j !== i) return e;
+      const el = { ...e };
+      if (dim === 'length') {
+        const canvasDist = val * GRID / scale;
+        const angle = Math.atan2((el.y2 || 0) - (el.y1 || 0), (el.x2 || 0) - (el.x1 || 0));
+        el.x2 = el.x1 + Math.cos(angle) * canvasDist;
+        el.y2 = el.y1 + Math.sin(angle) * canvasDist;
+      } else if (dim === 'width') {
+        if (el.tool === 'rect' || el._type === 'slab') {
+          const canvasDist = val * GRID / scale;
+          el.x2 = el.x1 + canvasDist;
+        }
+      } else if (dim === 'depth') {
+        if (el.tool === 'rect' || el._type === 'slab') {
+          const canvasDist = val * GRID / scale;
+          el.y2 = el.y1 + canvasDist;
+        }
+      }
+      return el;
+    }));
+  }, [scale]);
+
   const deleteEl = (i) => { setEls(p => p.filter((_, j) => j !== i)); setSelIdx(-1); };
 
   const addManual = (type) => {
@@ -307,6 +333,7 @@ export const AISketchPage = () => {
               <CardContent className="px-3 py-3">
                 <StructurePanel els={els} selIdx={selIdx} scale={scale}
                   onSelect={setSelIdx} onDelete={deleteEl} onUpdate={updateEl}
+                  onUpdateDimension={updateDimension}
                   onAddManual={addManual} onClear={reset} />
               </CardContent>
             </Card>
