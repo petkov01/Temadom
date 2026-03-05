@@ -36,17 +36,13 @@ import { PageInstructions } from '@/components/PageInstructions';
 
 // TemaDom Logo Component - New Phase 3 logo
 const TemaDomLogo = ({ className = "h-12" }) => (
-  <div className="flex items-center gap-3" data-testid="temadom-logo">
+  <div className="flex items-center" data-testid="temadom-logo">
     <img 
       src="/logo-temadom.png" 
       alt="TemaDom" 
       className={className}
       style={{ objectFit: 'contain' }}
     />
-    <div className="hidden sm:flex flex-col leading-tight">
-      <span className="text-white font-bold text-lg tracking-wide">TemaDom</span>
-      <span className="text-slate-400 text-[10px] font-medium tracking-wider uppercase">Строителство и ремонт</span>
-    </div>
   </div>
 );
 import { Button } from "@/components/ui/button";
