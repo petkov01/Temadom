@@ -455,7 +455,6 @@ const Footer = () => {
       </div>
       <Separator className="my-8 bg-[#2A3A4C]" />
       <div className="flex flex-col items-center gap-3">
-        <TemaDomLogo className="h-12 w-auto opacity-60" />
         <p className="text-center text-slate-500 text-sm">
           © 2025-2026 TemaDom. {t('footer_rights')}
         </p>
