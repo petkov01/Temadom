@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Camera, Upload, Loader2, X, Download, RotateCcw, Eye } from 'lucide-react';
+import { Camera, Upload, Loader2, X, Download, RotateCcw, Eye, GripVertical } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +29,60 @@ const STYLES = [
   { id: 'classic', name: 'Класически', color: '#8C56FF' },
   { id: 'minimalist', name: 'Минималистичен', color: '#28A745' },
 ];
+
+// Before/After Comparison Slider
+const BeforeAfterSlider = ({ beforeSrc, afterSrc }) => {
+  const containerRef = useRef(null);
+  const [sliderPos, setSliderPos] = useState(50);
+  const [dragging, setDragging] = useState(false);
+
+  const handleMove = useCallback((clientX) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const pct = Math.max(2, Math.min(98, (x / rect.width) * 100));
+    setSliderPos(pct);
+  }, []);
+
+  useEffect(() => {
+    if (!dragging) return;
+    const onMove = (e) => handleMove(e.touches ? e.touches[0].clientX : e.clientX);
+    const onUp = () => setDragging(false);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('touchend', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+    };
+  }, [dragging, handleMove]);
+
+  return (
+    <div ref={containerRef} className="relative aspect-[4/3] rounded-xl overflow-hidden cursor-col-resize select-none"
+      onMouseDown={(e) => { setDragging(true); handleMove(e.clientX); }}
+      onTouchStart={(e) => { setDragging(true); handleMove(e.touches[0].clientX); }}
+      data-testid="before-after-slider">
+      {/* After (full) */}
+      <img src={afterSrc} alt="След ремонт" className="absolute inset-0 w-full h-full object-cover" />
+      {/* Before (clipped) */}
+      <div className="absolute inset-0 overflow-hidden" style={{ width: `${sliderPos}%` }}>
+        <img src={beforeSrc} alt="Преди" className="absolute inset-0 w-full h-full object-cover" style={{ minWidth: containerRef.current ? containerRef.current.offsetWidth : '100%' }} />
+      </div>
+      {/* Divider line */}
+      <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg" style={{ left: `${sliderPos}%`, transform: 'translateX(-50%)' }}>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 bg-white rounded-full shadow-lg flex items-center justify-center">
+          <GripVertical className="h-4 w-4 text-slate-700" />
+        </div>
+      </div>
+      {/* Labels */}
+      <div className="absolute top-3 left-3 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wider">Преди</div>
+      <div className="absolute top-3 right-3 bg-[#28A745]/80 text-white text-[10px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wider">След</div>
+    </div>
+  );
+};
 
 const ProgressBar = ({ elapsed, total }) => {
   const pct = Math.min(100, (elapsed / total) * 100);
@@ -295,32 +349,21 @@ export const AIDesignerPage = () => {
                   </div>
                 )}
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Before */}
-                  <div>
-                    <p className="text-slate-400 text-xs mb-2 uppercase tracking-wider font-medium">Преди</p>
-                    <div className="aspect-[4/3] rounded-xl overflow-hidden border border-[#3A4A5C]">
-                      <img src={preview} alt="Before" className="w-full h-full object-cover" />
+                {/* Before/After Slider */}
+                {(() => {
+                  const afterImg = angles[activeAngle]
+                    ? `data:image/png;base64,${angles[activeAngle].image_base64}`
+                    : results?.images?.[0]?.image_base64
+                      ? `data:image/png;base64,${results.images[0].image_base64}`
+                      : null;
+                  return afterImg ? (
+                    <BeforeAfterSlider beforeSrc={preview} afterSrc={afterImg} />
+                  ) : (
+                    <div className="aspect-[4/3] rounded-xl bg-[#1E2A38] flex items-center justify-center text-slate-500">
+                      Няма генерирано изображение
                     </div>
-                  </div>
-                  {/* After */}
-                  <div>
-                    <p className="text-[#28A745] text-xs mb-2 uppercase tracking-wider font-medium">След ремонт</p>
-                    <div className="aspect-[4/3] rounded-xl overflow-hidden border border-[#28A745]/30">
-                      {angles[activeAngle] ? (
-                        <img src={`data:image/png;base64,${angles[activeAngle].image_base64}`}
-                          alt="After" className="w-full h-full object-cover" data-testid="result-image" />
-                      ) : results?.images?.[0]?.image_base64 ? (
-                        <img src={`data:image/png;base64,${results.images[0].image_base64}`}
-                          alt="After" className="w-full h-full object-cover" data-testid="result-image" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#1E2A38] text-slate-500">
-                          Няма генерирано изображение
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* All 4 angles grid */}
                 {angles.length > 1 && (

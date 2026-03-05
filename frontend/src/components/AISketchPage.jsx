@@ -1,5 +1,5 @@
-import React, { useState, useRef, useCallback, Suspense } from 'react';
-import { Upload, Loader2, X, Download, Ruler, Building2, Layers, RotateCcw, Eye } from 'lucide-react';
+import React, { useState, useRef, useCallback, Suspense, useEffect } from 'react';
+import { Upload, Loader2, X, Download, Ruler, Building2, Layers, RotateCcw, Eye, Share2, Link2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as THREE from 'three';
+import { useSearchParams } from 'react-router-dom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -51,10 +52,28 @@ export const AISketchPage = () => {
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
+  const [searchParams] = useSearchParams();
   const fileRef0 = useRef(null);
   const fileRef1 = useRef(null);
   const fileRef2 = useRef(null);
   const fileRefs = [fileRef0, fileRef1, fileRef2];
+
+  // Load shared project from URL ?id=xxx
+  useEffect(() => {
+    const sharedId = searchParams.get('id');
+    if (sharedId) {
+      axios.get(`${API}/ai-sketch/${sharedId}`).then(res => {
+        setResults(res.data);
+        toast.success('Проект зареден от споделен линк');
+      }).catch(() => toast.error('Проектът не е намерен'));
+    }
+  }, [searchParams]);
+
+  const shareProject = () => {
+    if (!results?.id) return;
+    const url = `${window.location.origin}/ai-sketch?id=${results.id}`;
+    navigator.clipboard.writeText(url).then(() => toast.success('Линк копиран!')).catch(() => toast.error('Грешка'));
+  };
 
   const convertToJpeg = (file) => {
     return new Promise((resolve) => {
@@ -427,6 +446,9 @@ export const AISketchPage = () => {
               </Button>
               <Button className="bg-[#28A745] hover:bg-[#22943e] text-white" onClick={downloadGlb} data-testid="download-glb-btn-2">
                 <Download className="mr-2 h-4 w-4" /> Изтегли .glb
+              </Button>
+              <Button className="bg-[#4DA6FF] hover:bg-[#3a8fe0] text-white" onClick={shareProject} data-testid="share-project-btn">
+                <Share2 className="mr-2 h-4 w-4" /> Сподели линк
               </Button>
             </div>
           </div>

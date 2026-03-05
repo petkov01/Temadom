@@ -1163,6 +1163,22 @@ async def get_stats():
         "total_reviews": total_reviews
     }
 
+@api_router.get("/stats/live")
+async def get_live_stats():
+    """Live counter stats for the floating widget."""
+    total_clients = await db.users.count_documents({})
+    total_companies = await db.company_profiles.count_documents({})
+    total_masters = await db.users.count_documents({"role": "company"})
+    total_projects = await db.projects.count_documents({"status": "active"})
+    free_used = min(total_clients, 50)
+    return {
+        "clients": total_clients,
+        "companies": total_companies,
+        "masters": total_masters,
+        "projects": total_projects,
+        "free_slots": {"used": free_used, "total": 50}
+    }
+
 # ============== ROOT ROUTE ==============
 
 @api_router.get("/")
@@ -2884,6 +2900,8 @@ async def analyze_sketch(request: Request):
             "notes": data.get("notes", ""),
             "sketches_count": len(cleaned),
             "summary": result["summary"],
+            "geometry": result["geometry"],
+            "glb_base64": result["glb_base64"],
             "created_at": datetime.now(timezone.utc).isoformat()
         })
 
@@ -2899,6 +2917,15 @@ async def analyze_sketch(request: Request):
     except Exception as e:
         logging.error(f"CV Pipeline error: {e}")
         raise HTTPException(status_code=500, detail=f"Грешка при анализ: {str(e)}")
+
+
+@api_router.get("/ai-sketch/{sketch_id}")
+async def get_sketch_project(sketch_id: str):
+    """Load a saved AI Sketch project by ID (shareable link)."""
+    project = await db.ai_sketches.find_one({"id": sketch_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    return project
 
 
 # ============== AI CHART ANALYZER ==============

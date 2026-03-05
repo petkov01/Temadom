@@ -39,17 +39,13 @@ import { PageInstructions } from '@/components/PageInstructions';
 
 // TemaDom Logo Component - New Phase 3 logo
 const TemaDomLogo = ({ className = "h-12" }) => (
-  <div className="flex items-center gap-3" data-testid="temadom-logo">
+  <div className="flex items-center" data-testid="temadom-logo">
     <img 
       src="/logo-temadom.png" 
       alt="TemaDom" 
       className={className}
       style={{ objectFit: 'contain' }}
     />
-    <div className="hidden sm:flex flex-col leading-tight">
-      <span className="text-white font-bold text-lg tracking-wide">TemaDom</span>
-      <span className="text-slate-400 text-[10px] font-medium tracking-wider uppercase">Строителство и ремонт</span>
-    </div>
   </div>
 );
 import { Button } from "@/components/ui/button";
@@ -151,6 +147,38 @@ const Navbar = () => {
   const moreRef = useRef(null);
   const langRef = useRef(null);
   const mobileLangRef = useRef(null);
+  const [mobileStats, setMobileStats] = useState(null);
+
+  useEffect(() => {
+    if (mobileMenuOpen && !mobileStats) {
+      axios.get(`${API}/stats/live`).then(r => setMobileStats(r.data)).catch(() => {});
+    }
+  }, [mobileMenuOpen, mobileStats]);
+
+  const MobileLiveStats = () => {
+    if (!mobileStats) return null;
+    const freeLeft = Math.max(0, mobileStats.free_slots.total - mobileStats.free_slots.used);
+    return (
+      <div className="grid grid-cols-4 gap-2" data-testid="mobile-live-counter">
+        <div className="bg-[#1E2A38] rounded-lg p-2 text-center">
+          <p className="text-sm font-bold text-[#A8D5BA]">{mobileStats.clients}</p>
+          <p className="text-[9px] text-slate-500">клиенти</p>
+        </div>
+        <div className="bg-[#1E2A38] rounded-lg p-2 text-center">
+          <p className="text-sm font-bold text-[#B8D0E8]">{mobileStats.companies}</p>
+          <p className="text-[9px] text-slate-500">фирми</p>
+        </div>
+        <div className="bg-[#1E2A38] rounded-lg p-2 text-center">
+          <p className="text-sm font-bold text-[#E8DAB2]">{mobileStats.masters}</p>
+          <p className="text-[9px] text-slate-500">майстори</p>
+        </div>
+        <div className="bg-[#1E2A38] rounded-lg p-2 text-center">
+          <p className="text-sm font-bold text-[#28A745]">{freeLeft} FREE</p>
+          <p className="text-[9px] text-slate-500">{mobileStats.free_slots.used}/{mobileStats.free_slots.total}</p>
+        </div>
+      </div>
+    );
+  };
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -347,6 +375,9 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#0F1923] border-t border-[#2A3A4C] animate-slideDown">
           <div className="px-4 py-4 space-y-3">
+            {/* Mobile Live Counter */}
+            <MobileLiveStats />
+            <div className="h-px bg-[#2A3A4C]" />
             <Link to="/projects" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <FolderSearch className="h-4 w-4" /> {t('nav_projects')}
             </Link>
@@ -406,6 +437,77 @@ const Navbar = () => {
         </div>
       )}
     </nav>
+  );
+};
+
+// ============== LIVE COUNTER (fixed top-right) ==============
+const LiveCounter = () => {
+  const [stats, setStats] = useState({ clients: 0, companies: 0, masters: 0, free_slots: { used: 0, total: 50 } });
+  const [show, setShow] = useState(true);
+  const [pulse, setPulse] = useState(false);
+
+  useEffect(() => {
+    const fetchStats = () => {
+      axios.get(`${API}/stats/live`).then(res => {
+        setStats(prev => {
+          if (res.data.clients !== prev.clients) setPulse(true);
+          return res.data;
+        });
+      }).catch(() => {});
+    };
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (pulse) {
+      const t = setTimeout(() => setPulse(false), 1500);
+      return () => clearTimeout(t);
+    }
+  }, [pulse]);
+
+  const freeLeft = Math.max(0, stats.free_slots.total - stats.free_slots.used);
+
+  return (
+    <div className={`fixed top-[90px] right-4 z-40 hidden md:block transition-all duration-300 ${show ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`} data-testid="live-counter">
+      <button onClick={() => setShow(!show)} className="absolute -left-7 top-2 bg-[#0F1923] border border-[#2A3A4C] rounded-l-lg px-1.5 py-2 text-slate-400 hover:text-white transition-colors" data-testid="live-counter-toggle">
+        {show ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+      </button>
+      <div className={`bg-[#0F1923]/95 backdrop-blur-lg border border-[#2A3A4C] rounded-xl p-3 min-w-[160px] shadow-xl ${pulse ? 'ring-2 ring-[#28A745]/50' : ''}`} style={{ transition: 'box-shadow 0.5s' }}>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Users className="h-3.5 w-3.5 text-[#A8D5BA]" />
+            <span className={`text-white text-xs font-bold tabular-nums ${pulse ? 'text-[#A8D5BA]' : ''}`} style={{ transition: 'color 0.5s' }}>{(stats.clients || 0).toLocaleString()}</span>
+            <span className="text-slate-500 text-[10px]">клиенти</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Building2 className="h-3.5 w-3.5 text-[#B8D0E8]" />
+            <span className="text-white text-xs font-bold tabular-nums">{stats.companies || 0}</span>
+            <span className="text-slate-500 text-[10px]">фирми</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Wrench className="h-3.5 w-3.5 text-[#E8DAB2]" />
+            <span className="text-white text-xs font-bold tabular-nums">{stats.masters || 0}</span>
+            <span className="text-slate-500 text-[10px]">майстори</span>
+          </div>
+          <div className="h-px bg-[#2A3A4C] my-1" />
+          <div className="flex items-center gap-2">
+            <Zap className="h-3.5 w-3.5 text-[#28A745]" />
+            <div className="flex-1">
+              <div className="flex justify-between items-center">
+                <span className="text-[#28A745] text-[10px] font-bold">{freeLeft} FREE</span>
+                <span className="text-slate-600 text-[9px]">{stats.free_slots.used}/{stats.free_slots.total}</span>
+              </div>
+              <div className="h-1 bg-[#1E2A38] rounded-full mt-0.5 overflow-hidden">
+                <div className="h-full bg-[#28A745] rounded-full transition-all duration-1000"
+                  style={{ width: `${(stats.free_slots.used / stats.free_slots.total) * 100}%` }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -3179,6 +3281,7 @@ function App() {
           <BrowserRouter>
             <PageTracker />
             <Navbar />
+            <LiveCounter />
             <main className="flex-1">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
