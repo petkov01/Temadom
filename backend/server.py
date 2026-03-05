@@ -118,6 +118,14 @@ async def register(user_data: UserCreate):
     user_dict["purchased_leads"] = []
     
     await db.users.insert_one(user_dict)
+
+    # Award leaderboard points for registration
+    await db.users.update_one({"id": user_dict["id"]}, {"$set": {"leaderboard_points": 10}})
+    await db.leaderboard_log.insert_one({
+        "id": str(uuid.uuid4()), "user_id": user_dict["id"],
+        "user_type": user_data.user_type, "action": "register",
+        "points": 10, "created_at": datetime.now(timezone.utc).isoformat()
+    })
     
     # Create company/master/designer profile
     if user_data.user_type in ("company", "master", "designer"):
@@ -253,6 +261,14 @@ async def create_project(project_data: ProjectCreate, user: dict = Depends(get_c
     project_dict["images"] = project_dict.get("images", [])[:10]
     
     await db.projects.insert_one(project_dict)
+
+    # Award leaderboard points for creating project
+    await db.users.update_one({"id": user["id"]}, {"$inc": {"leaderboard_points": 20}})
+    await db.leaderboard_log.insert_one({
+        "id": str(uuid.uuid4()), "user_id": user["id"],
+        "user_type": user.get("user_type", "client"), "action": "create_project",
+        "points": 20, "created_at": datetime.now(timezone.utc).isoformat()
+    })
     
     # Notify companies via Telegram about new project
     try:
@@ -458,6 +474,14 @@ async def add_portfolio_project(
     }
     
     await db.portfolio_projects.insert_one(project_dict)
+
+    # Award leaderboard points for portfolio add
+    await db.users.update_one({"id": user["id"]}, {"$inc": {"leaderboard_points": 10}})
+    await db.leaderboard_log.insert_one({
+        "id": str(uuid.uuid4()), "user_id": user["id"],
+        "user_type": user.get("user_type", "company"), "action": "portfolio_add",
+        "points": 10, "created_at": datetime.now(timezone.utc).isoformat()
+    })
     
     return {"message": "Проектът е добавен успешно", "project_id": project_dict["id"]}
 
@@ -530,6 +554,23 @@ async def create_review(review_data: ReviewCreate, user: dict = Depends(get_curr
     }
     
     await db.reviews.insert_one(review_dict)
+
+    # Award leaderboard points for leaving review
+    await db.users.update_one({"id": user["id"]}, {"$inc": {"leaderboard_points": 15}})
+    await db.leaderboard_log.insert_one({
+        "id": str(uuid.uuid4()), "user_id": user["id"],
+        "user_type": user.get("user_type", "client"), "action": "leave_review",
+        "points": 15, "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    # Award points to reviewed company
+    comp_profile = await db.company_profiles.find_one({"id": review_data.company_id})
+    if comp_profile:
+        await db.users.update_one({"id": comp_profile["user_id"]}, {"$inc": {"leaderboard_points": 10}})
+        await db.leaderboard_log.insert_one({
+            "id": str(uuid.uuid4()), "user_id": comp_profile["user_id"],
+            "user_type": "company", "action": "receive_review",
+            "points": 10, "created_at": datetime.now(timezone.utc).isoformat()
+        })
     
     # Update company rating
     all_reviews = await db.reviews.find({"company_id": review_data.company_id}, {"_id": 0}).to_list(1000)
@@ -3992,8 +4033,13 @@ async def delete_scanner3d_project(project_id: str, user: dict = Depends(get_cur
     return {"message": "Проектът е изтрит"}
 
 
+# ============== LEADERBOARD ROUTES (modular - routes/leaderboard.py) ==============
+from routes.leaderboard import router as leaderboard_router
+
+
 # Include router - MUST be after all route definitions
 app.include_router(api_router)
+app.include_router(leaderboard_router)
 
 # ============== BACKGROUND TASKS: SUBSCRIPTION MANAGEMENT ==============
 import asyncio

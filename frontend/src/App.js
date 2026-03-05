@@ -32,6 +32,7 @@ import BlogArticle from '@/components/BlogArticle';
 import PricesByRegionPage from '@/components/PricesByRegionPage';
 import RegionalPage from '@/components/RegionalPage';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import LeaderboardPage from '@/components/LeaderboardPage';
 import { LanguageProvider, useLanguage } from '@/i18n/LanguageContext';
 import { LANGUAGES } from '@/i18n/translations';
 import { Chatbot } from '@/components/Chatbot';
@@ -144,9 +145,10 @@ const ThemeToggle = () => {
   if (!theme) return null;
   return (
     <button onClick={theme.toggle}
-      className="p-2 rounded-lg text-slate-400 hover:text-[#F97316] transition-colors hover:bg-white/5"
+      className="p-2 rounded-lg transition-colors"
+      style={{ color: 'var(--td-text-muted)' }}
       data-testid="theme-toggle" title={theme.dark ? 'Светъл режим' : 'Тъмен режим'}>
-      {theme.dark ? <span className="text-sm">☀️</span> : <span className="text-sm">🌙</span>}
+      {theme.dark ? <span className="text-lg">&#9728;&#65039;</span> : <span className="text-lg">&#127769;</span>}
     </button>
   );
 };
@@ -155,19 +157,21 @@ const ThemeToggle = () => {
 const AuthGate = ({ children }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const dark = theme?.dark ?? true;
   if (user) return children;
   return (
     <div className="relative min-h-screen">
       <div className="pointer-events-none opacity-40 blur-[2px] select-none">{children}</div>
-      <div className="absolute inset-0 flex items-center justify-center z-50 bg-[#0F1923]/60 backdrop-blur-sm">
-        <div className="bg-[#1E2A38] border border-[#3A4A5C] rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl" data-testid="auth-gate-modal">
+      <div className="absolute inset-0 flex items-center justify-center z-50" style={{ backgroundColor: dark ? 'rgba(15,25,35,0.6)' : 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)' }}>
+        <div className="rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl" style={{ backgroundColor: 'var(--td-bg-card)', border: '1px solid var(--td-border-light)' }} data-testid="auth-gate-modal">
           <div className="w-16 h-16 bg-[#F97316]/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="h-8 w-8 text-[#F97316]" />
           </div>
-          <h3 className="text-white text-xl font-bold mb-2">Само за регистрирани</h3>
-          <p className="text-slate-400 text-sm mb-6">Регистрирайте се безплатно, за да използвате тази функция.</p>
+          <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--td-text)' }}>Само за регистрирани</h3>
+          <p className="text-sm mb-6" style={{ color: 'var(--td-text-muted)' }}>Регистрирайте се безплатно, за да използвате тази функция.</p>
           <div className="flex gap-3">
-            <button onClick={() => navigate('/login')} className="flex-1 py-3 rounded-xl border border-[#3A4A5C] text-slate-300 hover:bg-white/5 font-medium text-sm" data-testid="auth-gate-login">Вход</button>
+            <button onClick={() => navigate('/login')} className="flex-1 py-3 rounded-xl font-medium text-sm" style={{ border: '1px solid var(--td-border-light)', color: 'var(--td-text-secondary)' }} data-testid="auth-gate-login">Вход</button>
             <button onClick={() => navigate('/register')} className="flex-1 py-3 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-sm" data-testid="auth-gate-register">Регистрация</button>
           </div>
         </div>
@@ -231,7 +235,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-[#0F1923] border-b border-[#2A3A4C] sticky top-0 z-50">
+    <nav className="td-bg-nav border-b td-border sticky top-0 z-50" style={{ backgroundColor: 'var(--td-bg-nav)', borderColor: 'var(--td-border)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-[80px]">
           {/* Left: Logo - prominent and left-corner */}
@@ -300,6 +304,9 @@ const Navbar = () => {
                   </Link>
                   <Link to="/feedback" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-feedback">
                     <Star className="h-4 w-4" /> Обратна връзка
+                  </Link>
+                  <Link to="/leaderboard" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FFD700] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-leaderboard">
+                    <Award className="h-4 w-4" /> Класация
                   </Link>
                 </div>
               )}
@@ -419,7 +426,7 @@ const Navbar = () => {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0F1923] border-t border-[#2A3A4C] animate-slideDown">
+        <div className="md:hidden border-t animate-slideDown" style={{ backgroundColor: 'var(--td-bg-nav)', borderColor: 'var(--td-border)' }}>
           <div className="px-4 py-4 space-y-3">
             {/* Mobile Live Counter */}
             <MobileLiveStats />
@@ -456,6 +463,9 @@ const Navbar = () => {
             </Link>
             <Link to="/about" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <Info className="h-4 w-4" /> {t('nav_about')}
+            </Link>
+            <Link to="/leaderboard" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FFD700]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-leaderboard">
+              <Award className="h-4 w-4" /> Класация
             </Link>
             {user ? (
               <>
@@ -531,10 +541,10 @@ const LiveCounter = () => {
 
   return (
     <div className={`fixed top-[90px] right-4 z-40 hidden md:block transition-all duration-300 ${show ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`} data-testid="live-counter">
-      <button onClick={() => setShow(!show)} className="absolute -left-7 top-2 bg-[#0F1923] border border-[#2A3A4C] rounded-l-lg px-1.5 py-2 text-slate-400 hover:text-white transition-colors" data-testid="live-counter-toggle">
+      <button onClick={() => setShow(!show)} className="absolute -left-7 top-2 rounded-l-lg px-1.5 py-2 transition-colors" style={{ backgroundColor: 'var(--td-bg-nav)', borderColor: 'var(--td-border)', border: '1px solid var(--td-border)', color: 'var(--td-text-muted)' }} data-testid="live-counter-toggle">
         {show ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </button>
-      <div className={`bg-[#0F1923]/95 backdrop-blur-lg border border-[#2A3A4C] rounded-xl p-3 min-w-[160px] shadow-xl ${pulse ? 'ring-2 ring-[#28A745]/50' : ''}`} style={{ transition: 'box-shadow 0.5s' }}>
+      <div className={`backdrop-blur-lg border rounded-xl p-3 min-w-[160px] shadow-xl ${pulse ? 'ring-2 ring-[#28A745]/50' : ''}`} style={{ transition: 'box-shadow 0.5s', backgroundColor: 'var(--td-bg-nav)', borderColor: 'var(--td-border)' }}>
         <div className="space-y-2">
           {/* Online now */}
           <div className="flex items-center gap-2">
@@ -582,7 +592,7 @@ const LiveCounter = () => {
 const Footer = () => {
   const { t } = useLanguage();
   return (
-  <footer className="bg-[#0F1923] border-t border-[#2A3A4C] text-white py-12 mt-auto">
+  <footer className="border-t py-12 mt-auto" style={{ backgroundColor: 'var(--td-bg-nav)', borderColor: 'var(--td-border)', color: 'var(--td-text)' }}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
@@ -1007,10 +1017,10 @@ const ProjectsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-card)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">{t('projects_title')}</h1>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--td-text)' }}>{t('projects_title')}</h1>
           <p className="text-slate-400">{t('projects_subtitle')}</p>
         </div>
 
@@ -1206,7 +1216,7 @@ const ProjectDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] py-8">
+      <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }}>
         <div className="max-w-4xl mx-auto px-4">
           <Card className="h-96 animate-pulse bg-[#253545]" />
         </div>
@@ -1217,7 +1227,7 @@ const ProjectDetailPage = () => {
   if (!project) return null;
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button 
           variant="ghost" 
@@ -1477,7 +1487,7 @@ const CompaniesPage = () => {
   }, [category, city]);
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">{t('comp_title')}</h1>
@@ -1599,7 +1609,7 @@ const FindMasterPage = () => {
   }, [category, city, proType]);
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="find-master-page">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }} data-testid="find-master-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">{t('fm_title')}</h1>
@@ -1782,7 +1792,7 @@ const CompanyDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] py-8">
+      <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }}>
         <div className="max-w-4xl mx-auto px-4">
           <Card className="h-96 animate-pulse bg-[#253545]" />
         </div>
@@ -1793,7 +1803,7 @@ const CompanyDetailPage = () => {
   if (!company) return null;
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button variant="ghost" className="mb-4" onClick={() => navigate('/companies')}>
           {t('cd_back')}
@@ -1990,8 +2000,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-md bg-[#253545] border-[#3A4A5C]" data-testid="login-form">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4" style={{ backgroundColor: 'var(--td-bg-card)' }}>
+      <Card className="w-full max-w-md" data-testid="login-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <TemaDomLogo className="h-16 w-auto" />
@@ -2099,8 +2109,8 @@ const RegisterPage = () => {
   const isProUser = userType === 'company' || userType === 'master';
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-md bg-[#253545] border-[#3A4A5C]" data-testid="register-form">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4" style={{ backgroundColor: 'var(--td-bg-card)' }}>
+      <Card className="w-full max-w-md" data-testid="register-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <TemaDomLogo className="h-16 w-auto" />
@@ -2430,7 +2440,7 @@ const CompanyDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] py-8">
+      <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="animate-pulse space-y-6">
             <Card className="h-32 bg-[#253545]" />
@@ -2442,10 +2452,10 @@ const CompanyDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="company-dashboard">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }} data-testid="company-dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">{t('dash_title')}</h1>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--td-text)' }}>{t('dash_title')}</h1>
           <p className="text-slate-400">{t('dash_subtitle')}</p>
         </div>
 
@@ -2652,7 +2662,7 @@ const ClientDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] py-8">
+      <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }}>
         <div className="max-w-7xl mx-auto px-4">
           <Card className="h-64 animate-pulse bg-[#253545]" />
         </div>
@@ -2661,11 +2671,11 @@ const ClientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="client-dashboard">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }} data-testid="client-dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white">{t('cl_my_projects')}</h1>
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--td-text)' }}>{t('cl_my_projects')}</h1>
             <p className="text-slate-400">{t('cl_manage')}</p>
           </div>
           <Button 
@@ -2911,7 +2921,7 @@ const PaymentSuccessPage = () => {
   }, [sessionId, token, refreshUser]);
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4" style={{ backgroundColor: 'var(--td-bg-page)' }}>
       <Card className="w-full max-w-md text-center p-8" data-testid="payment-success">
         {status === 'checking' && (
           <>
@@ -2963,7 +2973,7 @@ const PaymentCancelPage = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4" style={{ backgroundColor: 'var(--td-bg-page)' }}>
       <Card className="w-full max-w-md text-center p-8" data-testid="payment-cancel">
         <AlertCircle className="h-16 w-16 mx-auto mb-4 text-slate-400" />
         <h2 className="text-2xl font-bold mb-2">{t('pay_cancelled')}</h2>
@@ -3004,11 +3014,11 @@ const AdsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="ads-page">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--td-bg-page)' }} data-testid="ads-page">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white">Обяви</h1>
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--td-text)' }}>Обяви</h1>
             <p className="text-slate-400">Безплатни обяви за строителство и ремонти</p>
           </div>
           <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" onClick={() => user ? setShowCreate(true) : navigate('/login')} data-testid="create-ad-btn">
@@ -3132,7 +3142,7 @@ const SubscriptionsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-12" data-testid="subscriptions-page">
+    <div className="min-h-screen py-12" style={{ backgroundColor: 'var(--td-bg-page)' }} data-testid="subscriptions-page">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Абонаменти и услуги</h1>
@@ -3340,6 +3350,7 @@ function App() {
                 <Route path="/ai-gallery" element={<PublishedGalleryPage />} />
                 <Route path="/ready-projects" element={<ReadyProjectsPage />} />
                 <Route path="/subscriptions" element={<SubscriptionsPage />} />
+                <Route path="/leaderboard" element={<LeaderboardPage />} />
                 <Route path="/feedback" element={<FeedbackPage />} />
               </Routes>
             </main>

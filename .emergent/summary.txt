@@ -1,148 +1,140 @@
 <analysis>**original_problem_statement:**
-The user is building TemaDom, a multifaceted web application for construction and interior design. The project has two main products:
+The user is building TemaDom, a multifaceted web application for construction and interior design. The project is being developed in iterative versions.
 
-1.  **AI-Assisted CAD System ():** A tool for architects to draw 2D plans with a live 3D preview and cost estimation. The core user frustration is with the drawing controls. The user wants to be able to freely position elements and, most importantly, reshape elements like walls by dragging their individual endpoints, not just moving the whole object. Dimension labels also need to be corrected to Дължина (Length), Широчина (Width), and Дебелина (Thickness).
-2.  **Video 3D Designer ():** An interior design tool that takes a user's room video (up to 60s) and generates a fully renovated 360° panorama and 3D model. This has been recently overhauled to version 6.1 with a new UI, pricing packages, and technical specifications.
+**Initial Goal (Completed):**
+*   **AI-Assisted CAD System ():** The primary goal was to fix the unusable drawing controls. The user required the ability to freely position elements, reshape them by dragging individual endpoints (not just moving the whole object), and see corrected dimension labels (Дължина, Широчина, Дебелина). This was delivered as CAD v5.2.
 
-The entire application is now gated, requiring user registration to access the core tools.
+**Current & Future Requirements (Provided by User):**
+1.  **v6.5 - Global Theme System:** Implement a site-wide, persistent (localStorage) dark/light mode toggle that is fixed in the top-right corner and affects all pages, including the CAD canvas, main page, 3D designer, and profile.
+2.  **v6.6 - Logo & Profile Page:** Add a fixed company logo in the top-left corner. Overhaul the  page to be much more detailed, including personal info, a list of user projects, payment/balance history, and account settings.
+3.  **v6.7 - Community Feed:** Create a new  page modeled after a social network feed (like Facebook). It should feature an infinite scroll of user posts (containing text, images, 3D/CAD projects), with real-time comments, reactions, stories, and notifications.
+4.  **v6.8 - Professions Page UI Fix:** Fix a CSS bug on the profesii (professions) page where text and card backgrounds are both light-colored in the light theme, making content unreadable.
+5.  **Dual Leaderboard:** Implement a competitive leaderboard for both clients and firms, awarding points for orders and reviews. This feature should remain inactive until the user launches paid plans.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-The application consists of a React frontend and a monolithic FastAPI backend.
--   **Frontend**: Features a dark/light mode, a comprehensive landing page, an authentication gate (), a new user profile page (), a fully redesigned Video Designer (), and the AI-assisted CAD tool (). The CAD tool's logic is centralized in the  hook.
--   **Backend**: A single  file handles all API endpoints, including user auth, video processing (frame extraction with OpenCV), and PDF generation ().
-
-The application is functional, but the core drawing experience in the  tool is not meeting user requirements, making it the most critical issue to address.
+The application is a full-stack React (frontend) and FastAPI (backend) project.
+- **Frontend:** Features a comprehensive landing page, an  requiring user registration, a redesigned Video Designer (), and a user profile page. Most importantly, the AI CAD tool () has been successfully updated to **CAD v5.2**, implementing all advanced manipulation features requested by the user (endpoint dragging, rotation, property panels, undo/redo).
+- **Backend:** A single  file handles all API endpoints.
+- **Theming:** A partial theme system exists (), but it is not implemented globally across all pages. The agent has started investigating the files needed to make it site-wide.
 
 **Last working item**:
-*   Last item agent was working: The agent attempted to fix fundamental usability issues in the CAD tool () based on user feedback. The goals were to enable free placement of elements (disabling grid snap during drag), allow reshaping of elements by dragging their endpoints, and correct dimension labels.
-*   Status: IN PROGRESS (The user has confirmed the previous fix was unsuccessful).
-*   Agent Testing Done: N (The agent's own tests did not catch the user experience failure).
-*   Which testing method agent to use? Frontend testing agent. The test case must specifically verify that clicking and dragging the end of a wall resizes the wall, while clicking the middle moves the whole wall.
-*   User Testing Done: Y (User confirmed the issues persist).
+*   Last item agent was working: The agent began **Phase 1** of the user's new requests: implementing a **global dark/light theme system (v6.5)**. It was in the initial investigation stage, reviewing existing files like , , , and various page components to understand the current structure before making changes.
+*   Status: IN PROGRESS
+*   Agent Testing Done: N
+*   Which testing method agent to use? Frontend testing agent. The test should verify that the theme toggle appears on all pages (, , , ) and that toggling it correctly changes the background and text colors on each page, with the choice persisting across reloads.
+*   User Testing Done: N
 
 **All Pending/In progress Issue list**:
-*   **Issue 1: CAD Element Manipulation is Unusable (P0)**
-    *   **Description:** The user cannot intuitively edit elements on the CAD canvas. They need to be able to:
-        1.  Reshape elements (like walls) by clicking and dragging their individual start/end points. Currently, clicking anywhere on an element only allows moving the entire object.
-        2.  Position elements freely on the canvas without being rigidly locked to a grid during the drag operation.
-        3.  See correct dimension labels: Дължина (Length), Широчина (Width), Дебелина (Thickness).
-    *   **Attempted fixes:** The previous agent introduced a  state in  and modified the  and  handlers. This approach failed because it likely did not correctly differentiate between clicking an endpoint versus the body of the element, and it did not implement visible handles for the endpoints.
+*   **Issue 1: Professions Page is Unreadable (P0)**
+    *   **Description:** On the profesii page, the light theme uses light-colored text on light-colored cards, rendering the content unreadable. This needs a CSS fix that works for both light and dark themes.
+    *   **Attempted fixes:** None yet.
     *   **Next debug checklist:**
-        1.  **File:** .
-        2.  ** function:** Modify the logic to detect if the click is near an element's endpoint ( or ). If it is, set a state indicating which endpoint is being dragged (e.g., ). Otherwise, proceed with dragging the whole element.
-        3.  ** function:** If an endpoint is being dragged, update only its coordinates. If the whole element is being dragged, update both sets of coordinates.
-        4.  **File:** .
-        5.  **Render visual handles:** When an element is selected, draw small circles or squares at its start and end points to make it clear they are interactive.
-        6.  **File:** .
-        7.  **Find and replace labels:** Change the input labels for dimensions to Дължина, Широчина, and Дебелина.
-    *   **Why fix this issue and what will be achieved with the fix?** This is the single most critical blocker to making the CAD tool useful. Fixing it will allow users to actually draw and edit plans effectively.
-    *   **Status:** IN PROGRESS
-    *   **Is recurring issue?** Y
+        1.  Locate the CSS or component style for  or .
+        2.  Implement CSS variables for background and text colors that swap based on the theme (e.g.,  or a theme-based class).
+        3.  Ensure the new global  is applied to this page to control the CSS variables.
+        4.  Reference the user's detailed CSS fix suggestion in the chat history.
+    *   **Why fix this issue and what will be achieved with the fix?** It's a critical UI bug that makes a page unusable. Fixing it is part of the approved Phase 1 plan.
+    *   **Status:** NOT STARTED
+    *   **Is recurring issue?** N
     *   **Should Test frontend/backend/both after fix?** Frontend
-    *   **Blocked on other issue:** None.
+    *   **Blocked on other issue:** None. This should be worked on in conjunction with the Global Theme task.
 
 **In progress Task List**:
-None. The focus is solely on the P0 issue above.
+*   **Task 1: Implement Global Theme System (v6.5) (P0)**
+    *   **Description:** Make the existing theme functionality global. A single toggle button, fixed in the top-right corner, should control the theme for the entire application. The user's choice must be saved to .
+    *   **Where to resume:** The agent has already viewed , , and . The next step is to modify  to manage a global state and wrap the entire application in  with the . Then, create the sticky toggle button and apply theme-based classes to the  element to control site-wide styles via CSS variables defined in .
+    *   **What will be achieved with this?** A consistent, modern user experience across the entire application, fulfilling a direct user request.
+    *   **Status:** IN PROGRESS
+    *   **Should Test frontend/backend/both after fix?** Frontend
+    *   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
-*   **Upcoming Tasks:**
-    *   **P1: Video Demo Section:** Add a new section to the landing page to embed a promotional video.
-    *   **P1: GLB File Generation:** Implement functionality for users to download a  3D model file from the Video Designer results.
-*   **Future Tasks:**
-    *   **P1: Backend Refactoring:** Break down the monolithic  into a modular structure using a  directory to improve maintainability and scalability.
+*   **Upcoming Tasks (Phase 2 & 3):**
+    *   **P1: Logo & Detailed Profile Page (v6.6):** Add a fixed logo to the top-left. Overhaul  to include sections for personal info, projects, payment history, and settings.
+    *   **P1: Facebook-style Community Feed (v6.7):** Create the  page with an infinite-scroll feed, posts, comments, reactions, and real-time updates.
+*   **Future Tasks (Backlog):**
+    *   **P2: Dual Leaderboard:** Implement the client/firm leaderboard, to be activated when paid plans launch.
+    *   **P2: Backend Refactoring:** Break down the monolithic  into a modular  structure.
 
 **Completed work in this session**
-- **Video Designer Overhaul (v6.1):**
-  - Completely new UI based on user's detailed spec.
-  - Implemented multi-room packages (1, 2, or apartment) with dynamic UI.
-  - Backend updated to handle 60-second/50MB videos and extract 12 keyframes.
-  - Pricing on landing page and Video Designer page synchronized to 69/129/199 EUR.
-- **User Authentication & Profile:**
-  - Implemented an  component that restricts access to all tools (, ) to registered users only, showing a login/register prompt over a blurred background.
-  - Created a new  page where users can view and update their information.
-  - Added a backend endpoint () to handle profile updates.
-- **UI/UX Fixes:**
-  - Resolved a text visibility issue on the  page where white text was on a light background.
-  - Added 3D panning (Right-click + Drag) to the  3D viewer.
-  - Implemented a feature to remove individual items from the cost estimate in the CAD tool.
-- **CAD Tool Features:**
-  - Added support for rectangular columns in addition to round ones.
-  - Added a theme toggle (dark/light mode) to the mobile navigation menu.
-  - Implemented PDF and editable contract generation.
+- **CAD Tool Overhaul (v5.2 - DONE & VERIFIED):**
+  - Implemented professional-grade element manipulation in .
+  - Users can now click and drag the individual endpoints of walls to reshape them.
+  - Implemented element rotation and free-form positioning.
+  - Added colored handles (start, end, center) for intuitive interaction.
+  - Added an undo/redo system.
+  - Corrected dimension labels in the side panel to Дължина, Широчина, Дебелина.
+  - **Testing:** Passed 14/14 automated tests from the testing agent, confirming all new features work as expected.
 
 **Earlier issues found/mentioned but not fixed**
-*   **Issue 1: CAD Element Manipulation:** The primary issue described in All Pending/In progress Issue list remains unresolved despite previous attempts.
+*   **Issue 1:** The Professions page UI bug. This is now a prioritized task (P0) in the current plan.
 
 **Known issue recurrence from previous fork**
-The intuitive manipulation of CAD elements has been a recurring request. Previous solutions focused on moving entire objects, but the user has consistently asked for more granular control (reshaping via endpoints), which has not yet been successfully delivered.
+*   **CAD Element Manipulation:** This was a major recurring issue that is now considered **RESOLVED** and verified by the testing agent.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, React Hooks (, , ), Konva.js (for 2D canvas), Three.js (for 3D rendering), TailwindCSS.
--   **Backend:** FastAPI, OpenCV () for video frame extraction,  for PDF generation, Pillow for image handling.
+- **Frontend:** React, React Hooks, Konva.js, Three.js, TailwindCSS, localStorage.
+- **Backend:** FastAPI, OpenCV, fpdf2.
 
 **key DB schema**
--   **users**:  (Now includes more user details for the profile page).
+-   **users**: 
 
 **changes in tech stack**
--   No changes to the core tech stack.  and  were added as dependencies.
+- No changes.
 
 **All files of reference**
-*   **/app/frontend/src/hooks/useAISketch.js**: **(Highest Priority)** The core logic for the CAD tool. Needs significant changes for endpoint dragging.
-*   **/app/frontend/src/components/CAD/CADCanvas.jsx**: Needs to be updated to render visual handles on selected elements.
-*   **/app/frontend/src/components/CAD/StructurePanel.jsx**: Needs text label changes for dimensions.
-*   **/app/frontend/src/pages/AISketchPage.jsx**: The container for the CAD tool components.
-*   **/app/frontend/src/App.js**: Contains the new  and  routing logic.
-*   **/app/frontend/src/pages/AIDesignerPage.jsx**: The new Video Designer v6.1.
-*   **/app/backend/server.py**: Contains all backend logic.
+-   **/app/frontend/src/contexts/ThemeContext.jsx**: Core file for the current task.
+-   **/app/frontend/src/index.css**: File to define global CSS variables for themes.
+-   **/app/frontend/src/App.js**: Needs to be wrapped with the .
+-   **/app/frontend/src/pages/ProfessionsPage.jsx**: Page containing the UI bug to be fixed.
+-   **/app/frontend/src/hooks/useAISketch.js**: Contains the recently completed and verified CAD logic.
 
 **Areas that need refactoring**:
--    is a large monolith that should be broken down into a  structure for better organization and maintenance. This is a P1 future task.
+-  is a monolith and is on the backlog for refactoring into a  structure.
 
 **key api endpoints**
--   : Updates user profile information.
--   : Processes uploaded video for the designer tool.
--   : Exports the CAD plan as a PDF.
--   : Exports a boilerplate contract as a PDF.
--   : Exports the Video Designer results as a PDF.
+- : Used by the agent via  to create a test user.
 
 **Critical Info for New Agent**
--   **Your immediate and only priority is to fix the CAD drawing experience.** The user is blocked and has clearly specified the required behavior: reshaping elements by dragging their endpoints and placing them freely.
--   The previous agent's attempt to fix this in  failed. You must re-evaluate the approach. The key is to robustly detect clicks on endpoints versus the element body and to provide clear visual feedback (handles) to the user.
--   Do not start any Upcoming Tasks until the user confirms that the CAD drawing functionality is working to their satisfaction.
+- You must continue with the approved plan. **Phase 1 is your immediate priority**: implement the **global theme system** and fix the **Professions page UI bug**.
+- The user has provided detailed specifications for all new tasks. Refer to the user's messages for precise implementation details (e.g., color codes for themes).
+- The CAD v5.2 functionality is complete, tested, and verified. Do not modify the core logic in  unless a new bug is found.
+- The user is highly technical and provides excellent, structured feedback. Adhere closely to their requests.
+- Remember to respond in **Bulgarian**.
 
 **documents and test reports created in this job**
--    (Updated)
--   Multiple test reports in , with the latest being .
+-  (or similar latest iteration) was created after testing the CAD v5.2 features.
+-  was updated after completing the CAD v5.2 task.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (Message 386):** Stated that the CAD v5.1 problems were not fixed. Specifically mentioned not being able to drop items where desired, incorrect parameter names (length/width/thickness), and the inability to move a single end of a wall to reposition it.
-2.  **Agent (Message 391):** Acknowledged the three key fixes required: endpoint dragging, visual handles, and label corrections.
-3.  **User (Message 345):** Provided a very detailed final specification for the TEMADOM VIDEO 3D v6.1, which was successfully implemented.
-4.  **User (Message 286):** Reported bugs: the pricing link in the Video Designer was incorrect, the About Us page had unreadable text, and requested a new Profile page. (All fixed).
-5.  **User (Message 214 & 217):** Requested a large batch of features: 3D view panning, unlocked dimensions, removable items in cost estimate, and gating the entire site for registered users. (All implemented).
+- **User (Message 50):** Provided five separate, detailed specifications for new features and fixes: Global Theme (v6.5), Logo/Profile (v6.6), Community Feed (v6.7), Professions Page Fix (v6.8), and a Leaderboard.
+- **Agent (Message 52):** Proposed a phased plan to tackle the new requests, prioritizing the theme and UI fix.
+- **User (Message 53):** Approved the plan with да (yes).
 
 **Project Health Check:**
-*   **Broken:** The core interaction model of the  page is broken from a user experience perspective, making it difficult to use.
+*   **Broken:** The UI of the  page is broken in light mode, making it unreadable.
+*   **Mocked:** None.
 
 **3rd Party Integrations**
--   **Konva.js / react-konva:** Used for the 2D CAD canvas.
--   **Three.js / @react-three/drei / @react-three/fiber:** Used for the 3D preview.
--   **OpenCV (python-headless):** Used on the backend for video frame extraction.
--   **fpdf2:** Used on the backend for generating PDFs.
+- Konva.js / react-konva
+- Three.js / @react-three/drei / @react-three/fiber
+- OpenCV (python-headless)
+- fpdf2
 
 **Testing status**
--   Testing agent used after significant changes: YES. The last run reported 100% success.
--   Troubleshoot agent used after agent stuck in loop: NO
--   Test files created: None.
--   Known regressions: None. The issue is a failure to meet user experience requirements, not a regression of a previously working feature. The existing tests do not cover the nuanced interaction of endpoint dragging.
+- Testing agent used after significant changes: YES (for the completed CAD v5.2 task, which passed 100%).
+- Troubleshoot agent used after agent stuck in loop: NO
+- Test files created: None.
+- Known regressions: None.
 
 **Credentials to test flow:**
-Use the registration flow to create a new user. The application is now gated, so you must be logged in to test any of the tools.
+- The application is behind an authentication gate. Register a new user to access any features. The agent successfully used  for registration when the UI form had issues.
+- 
 
 **What agent forgot to execute**
-The agent failed to correctly implement the user's primary requirement for the CAD tool: the ability to reshape elements by dragging their endpoints. The requested label changes (Дължина, Широчина, Дебелина) were also missed.</analysis>
+- Nothing was forgotten. The agent successfully completed the highest priority task, then correctly parsed multiple new user requests, formulated a plan, got user approval, and began work on the next phase.</analysis>

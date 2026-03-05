@@ -7,6 +7,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useTheme } from '@/components/ThemeContext';
 
 const professions = [
   {
@@ -850,6 +851,8 @@ const ProfessionsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('Всички');
   const [expandedId, setExpandedId] = useState(null);
   const { lang } = useLanguage();
+  const theme = useTheme();
+  const dark = theme?.dark ?? true;
   const isEn = lang === 'en';
 
   const filtered = professions.filter(p => {
@@ -860,17 +863,17 @@ const ProfessionsPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#1E2A38]" data-testid="professions-page">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--td-bg-page)' }} data-testid="professions-page">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-16">
+      <section className="py-16" style={{ background: dark ? 'linear-gradient(135deg, #0f172a, #1e293b, #0f172a)' : 'linear-gradient(135deg, #f8fafc, #e2e8f0, #f8fafc)' }}>
         <div className="max-w-5xl mx-auto px-4 text-center">
           <HardHat className="h-12 w-12 text-orange-400 mx-auto mb-4" />
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: 'var(--td-text)' }}>
             {isEn 
               ? <>{`Guide to `}<span className="text-orange-400">28 construction professions</span></>
               : <>Наръчник за <span className="text-orange-400">28 строителни професии</span></>}
           </h1>
-          <p className="text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg max-w-3xl mx-auto leading-relaxed" style={{ color: 'var(--td-text-muted)' }}>
             {isEn 
               ? 'Learn how each construction activity should be performed, what the technological times are, and how to distinguish a quality craftsman from one who only came to take your money.'
               : 'Научете как трябва да се извършва всяка строителна дейност, какви са технологичните времена и как да разпознаете качествен майстор от такъв, който е дошъл само да ви вземе парите.'}
@@ -880,12 +883,12 @@ const ProfessionsPage = () => {
 
       {/* Intro warning */}
       <div className="max-w-5xl mx-auto px-4 py-6">
-        <Card className="bg-amber-50 border-amber-200">
+        <Card className="border" style={{ backgroundColor: dark ? '#78350f20' : '#FEF3C7', borderColor: dark ? '#92400e40' : '#F59E0B' }}>
           <CardContent className="p-5 flex items-start gap-4">
-            <AlertTriangle className="h-6 w-6 text-amber-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-6 w-6 flex-shrink-0 mt-0.5" style={{ color: dark ? '#FBBF24' : '#D97706' }} />
             <div>
-              <h3 className="font-bold text-amber-900 mb-1">{isEn ? 'Why is it important to know this?' : 'Защо е важно да знаете това?'}</h3>
-              <p className="text-amber-800 text-sm leading-relaxed">
+              <h3 className="font-bold mb-1" style={{ color: dark ? '#FDE68A' : '#92400E' }}>{isEn ? 'Why is it important to know this?' : 'Защо е важно да знаете това?'}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: dark ? '#FCD34D' : '#78350F' }}>
                 {isEn 
                   ? 'In Bulgaria, a huge number of clients become victims of poor quality work because they don\'t know what proper execution should look like. Dishonest craftsmen rely on your ignorance.'
                   : 'В България огромна част от клиентите стават жертви на некачествена работа, защото не знаят как трябва да изглежда правилното изпълнение. Некоректните майстори разчитат на вашето незнание. Този наръчник ви дава знанията, от които се нуждаете, за да контролирате качеството и да защитите инвестицията си.'}
@@ -899,7 +902,7 @@ const ProfessionsPage = () => {
       <div className="max-w-5xl mx-auto px-4 pb-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: 'var(--td-text-muted)' }} />
             <Input
               placeholder={isEn ? 'Search profession...' : 'Търси професия...'}
               value={searchQuery}
@@ -923,7 +926,7 @@ const ProfessionsPage = () => {
             ))}
           </div>
         </div>
-        <p className="text-sm text-slate-500 mt-3">{filtered.length} професии</p>
+        <p className="text-sm mt-3" style={{ color: 'var(--td-text-muted)' }}>{filtered.length} професии</p>
       </div>
 
       {/* Professions List */}
@@ -946,55 +949,55 @@ const ProfessionsPage = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <h3 className="font-bold text-lg text-white">{prof.name}</h3>
+                    <h3 className="font-bold text-lg" style={{ color: 'var(--td-text)' }}>{prof.name}</h3>
                     <Badge variant="outline" className="text-xs">{prof.category}</Badge>
-                    <Badge className="bg-slate-100 text-slate-300 text-xs">{prof.priceRange}</Badge>
+                    <Badge className="text-xs" style={{ backgroundColor: dark ? '#334155' : '#E2E8F0', color: 'var(--td-text-muted)' }}>{prof.priceRange}</Badge>
                   </div>
-                  <p className="text-slate-400 text-sm mt-1">{prof.description}</p>
+                  <p className="text-sm mt-1" style={{ color: 'var(--td-text-muted)' }}>{prof.description}</p>
                 </div>
-                {isExpanded ? <ChevronUp className="h-5 w-5 text-slate-400 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 text-slate-400 flex-shrink-0" />}
+                {isExpanded ? <ChevronUp className="h-5 w-5 flex-shrink-0" style={{ color: 'var(--td-text-muted)' }} /> : <ChevronDown className="h-5 w-5 flex-shrink-0" style={{ color: 'var(--td-text-muted)' }} />}
               </button>
 
               {/* Expanded content */}
               {isExpanded && (
-                <div className="px-5 pb-6 space-y-6 border-t border-slate-100 pt-4">
+                <div className="px-5 pb-6 space-y-6 border-t pt-4" style={{ borderColor: 'var(--td-border)' }}>
                   
                   {/* Time estimates */}
-                  <div className="bg-blue-50 rounded-lg p-4">
+                  <div className="rounded-lg p-4" style={{ backgroundColor: dark ? '#1e3a5f30' : '#EFF6FF', border: `1px solid ${dark ? '#1e3a5f50' : '#BFDBFE'}` }}>
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-5 w-5 text-blue-600" />
-                      <h4 className="font-semibold text-blue-900">Технологично време</h4>
+                      <Clock className="h-5 w-5" style={{ color: dark ? '#60A5FA' : '#2563EB' }} />
+                      <h4 className="font-semibold" style={{ color: dark ? '#93C5FD' : '#1E40AF' }}>Технологично време</h4>
                     </div>
-                    <p className="text-blue-800 text-sm">{prof.timeEstimates}</p>
+                    <p className="text-sm" style={{ color: dark ? '#BFDBFE' : '#1E3A8A' }}>{prof.timeEstimates}</p>
                   </div>
 
                   {/* How it should be done */}
                   <div>
                     <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      <h4 className="font-semibold text-white">Как ТРЯБВА да се направи</h4>
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <h4 className="font-semibold" style={{ color: 'var(--td-text)' }}>Как ТРЯБВА да се направи</h4>
                     </div>
                     <div className="space-y-2">
                       {prof.howItShouldBeDone.map((step, i) => (
-                        <div key={i} className="flex items-start gap-2.5 bg-green-50 rounded-lg p-3">
-                          <span className="bg-green-200 text-green-800 text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                          <p className="text-sm text-green-900">{step}</p>
+                        <div key={i} className="flex items-start gap-2.5 rounded-lg p-3" style={{ backgroundColor: dark ? '#05966930' : '#F0FDF4', border: `1px solid ${dark ? '#05966950' : '#BBF7D0'}` }}>
+                          <span className="text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: dark ? '#05966940' : '#BBF7D0', color: dark ? '#4ADE80' : '#166534' }}>{i + 1}</span>
+                          <p className="text-sm" style={{ color: dark ? '#BBF7D0' : '#14532D' }}>{step}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <Separator />
+                  <Separator style={{ backgroundColor: 'var(--td-border)' }} />
 
                   {/* Quality signs */}
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <Star className="h-5 w-5 text-amber-500" />
-                      <h4 className="font-semibold text-white">Признаци за качествена работа</h4>
+                      <h4 className="font-semibold" style={{ color: 'var(--td-text)' }}>Признаци за качествена работа</h4>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-2">
                       {prof.qualitySigns.map((sign, i) => (
-                        <div key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                        <div key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--td-text-secondary)' }}>
                           <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
                           <span>{sign}</span>
                         </div>
@@ -1002,19 +1005,19 @@ const ProfessionsPage = () => {
                     </div>
                   </div>
 
-                  <Separator />
+                  <Separator style={{ backgroundColor: 'var(--td-border)' }} />
 
                   {/* Red flags */}
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <AlertTriangle className="h-5 w-5 text-red-500" />
-                      <h4 className="font-semibold text-red-900">Червени флагове - Как да разпознаете лош майстор</h4>
+                      <h4 className="font-semibold" style={{ color: dark ? '#FCA5A5' : '#991B1B' }}>Червени флагове - Как да разпознаете лош майстор</h4>
                     </div>
                     <div className="space-y-2">
                       {prof.redFlags.map((flag, i) => (
-                        <div key={i} className="flex items-start gap-2.5 bg-red-50 rounded-lg p-3">
+                        <div key={i} className="flex items-start gap-2.5 rounded-lg p-3" style={{ backgroundColor: dark ? '#7f1d1d30' : '#FEF2F2', border: `1px solid ${dark ? '#7f1d1d50' : '#FECACA'}` }}>
                           <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-red-900">{flag}</p>
+                          <p className="text-sm" style={{ color: dark ? '#FCA5A5' : '#7F1D1D' }}>{flag}</p>
                         </div>
                       ))}
                     </div>
@@ -1027,10 +1030,10 @@ const ProfessionsPage = () => {
       </div>
 
       {/* CTA */}
-      <section className="py-12 bg-slate-900 text-white text-center">
+      <section className="py-12 text-center" style={{ backgroundColor: dark ? '#0f172a' : '#F1F5F9' }}>
         <div className="max-w-2xl mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-4">Нуждаете се от качествен майстор?</h2>
-          <p className="text-slate-400 mb-6">Публикувайте проект и получете оферти от проверени фирми с реални отзиви</p>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--td-text)' }}>Нуждаете се от качествен майстор?</h2>
+          <p className="mb-6" style={{ color: 'var(--td-text-muted)' }}>Публикувайте проект и получете оферти от проверени фирми с реални отзиви</p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/register">
               <Button className="bg-[#FF8C42] hover:bg-[#e67a30] px-6" data-testid="professions-register-btn">
@@ -1039,7 +1042,7 @@ const ProfessionsPage = () => {
               </Button>
             </Link>
             <Link to="/calculator">
-              <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-800 px-6" data-testid="professions-calc-btn">
+              <Button variant="outline" className="px-6" data-testid="professions-calc-btn">
                 <Hammer className="mr-2 h-4 w-4" />
                 Калкулатор на цени
               </Button>

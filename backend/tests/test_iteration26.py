@@ -9,7 +9,7 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://teemadom-cad.preview.emergentagent.com"
+    BASE_URL = "https://ui-refresh-staging.preview.emergentagent.com"
 
 
 class TestHealthCheck:
