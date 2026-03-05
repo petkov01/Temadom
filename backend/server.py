@@ -78,7 +78,7 @@ SUBSCRIPTION_PLANS = {
     "company": {
         "starter": {
             "name": "Starter",
-            "price": "17 EUR/мес",
+            "price": "20 EUR/мес",
             "features": [
                 "До 2 активни проекта",
                 "Основен профил на фирмата",
@@ -90,23 +90,22 @@ SUBSCRIPTION_PLANS = {
         },
         "pro": {
             "name": "Pro",
-            "price": "35 EUR/мес",
+            "price": "40 EUR/мес",
             "features": [
                 "Всички функции от Starter",
                 "Неограничени проекти",
-                "AI Designer: 1 вариант визуализация",
-                "Multi-upload за визуализация",
                 "Таблици с материали и разходи",
                 "Email + Telegram известия",
                 "Приоритетно показване",
                 "Обяви: до 5 снимки",
-                "Разширена статистика"
+                "Разширена статистика",
+                "Видео инструкции"
             ],
-            "limitations": ["AI Designer: 1 вариант на генерация", "Без AI Sketch анализ"]
+            "limitations": ["Без AI Designer", "Без AI Sketch анализ"]
         },
         "premium": {
             "name": "Premium",
-            "price": "69 EUR/мес",
+            "price": "79 EUR/мес",
             "features": [
                 "Всички функции от Pro",
                 "AI Designer: до 5 варианта визуализация",
@@ -125,7 +124,7 @@ SUBSCRIPTION_PLANS = {
     "standalone": {
         "pdf_contract_calculator": {
             "name": "PDF договор + количествена сметка",
-            "price": "5 EUR",
+            "price": "6 EUR",
             "description": "PDF договор с количествена сметка, готов за подписване, по данни от калкулатора",
             "features": [
                 "PDF договор с данни от калкулатора",
@@ -137,7 +136,7 @@ SUBSCRIPTION_PLANS = {
         },
         "pdf_ai_blueprint": {
             "name": "AI анализ на чертежи + PDF договор",
-            "price": "15 EUR",
+            "price": "17 EUR",
             "description": "AI анализ на чертежи с количествена сметка (95-100% точност) + PDF договор за подписване",
             "features": [
                 "AI анализ на скици/чертежи",
@@ -152,7 +151,7 @@ SUBSCRIPTION_PLANS = {
     "designer": {
         "designer": {
             "name": "AI Дизайнер",
-            "price": "10 EUR/генерация",
+            "price": "12 EUR/генерация",
             "features": [
                 "AI интериорен дизайн (1 вариант)",
                 "Преди и след сравнение",
@@ -162,10 +161,10 @@ SUBSCRIPTION_PLANS = {
                 "Публикуване в AI Галерия",
                 "Споделяне в социални мрежи"
             ],
-            "note": "За Pro абонати: включен 1 вариант. За Premium: до 5 варианта. Без абонамент: еднократна такса.",
+            "note": "За Premium абонати: до 5 варианта включени. Без абонамент: еднократна такса.",
             "bundle_prices": {
-                "3_variants": "25 EUR",
-                "5_variants": "39 EUR"
+                "3_variants": "29 EUR",
+                "5_variants": "45 EUR"
             }
         }
     }
@@ -3089,53 +3088,56 @@ async def analyze_sketch(request: Request):
         analysis_chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"sketch-{uuid.uuid4()}",
-            system_message="""Ти си експерт строителен инженер и архитект с 30 години опит. Анализираш скици, чертежи и снимки на сгради/помещения.
+            system_message="""Ти си експерт строителен инженер и архитект с 30+ години опит. Получаваш скици, чертежи и снимки на реални сгради и помещения.
 
-Трябва да разпознаеш и опишеш с 95-100% точност:
-- Колони (размери, позиции, тип - стоманобетонни, метални)
-- Греди (размери, натоварвания, тип)
-- Стълби (ширина, стъпала, наклон, тип)
-- Фундаменти (тип - ленточен, плочест, единични, размери)
-- Покрив (тип - двускатен, четирискатен, плосък, наклон, материал)
-- Стени (носещи/неносещи, дебелина, материал)
-- Отвори (врати, прозорци - размери и позиции)
-- Инсталации (ВиК, електро - ако са видими)
+ВАЖНО: Трябва да анализираш ТОЧНО това, което виждаш на изображението. Не измисляй елементи, които НЕ присъстват. Опиши само видимите конструктивни елементи.
 
-Отговори в JSON:
+За всеки разпознат елемент дай:
+- Колони: точен брой, приблизителни размери и позиции
+- Греди: видими греди, размери и посока
+- Стълби: ако има — брой стъпала, ширина, тип
+- Фундаменти: ако са видими или могат да се определят от чертежа
+- Покрив: тип, наклон, материал ако е видимо
+- Стени: носещи/неносещи, материал, дебелина
+- Отвори: врати и прозорци с приблизителни размери
+
+ЗАДЪЛЖИТЕЛНО поле "description_en" — трябва да е МНОГО ПОДРОБНО описание на ТОЧНО това, което виждаш в скицата/чертежа. Например: "A hand-drawn floor plan showing a rectangular apartment with 3 rooms. The entrance is on the north side. There is a long corridor leading to a living room (approx 5x4m), a bedroom (3x4m), and a bathroom (2x3m). Load-bearing walls are on the perimeter."
+
+Отговори САМО в JSON (без допълнителен текст):
 {
-  "building_type": "тип сграда",
+  "building_type": "тип на обекта",
+  "what_i_see": "описание на български какво точно виждам на скицата/чертежа",
   "structural_elements": {
-    "columns": [{"id": "C1", "type": "стоманобетонна", "dimensions": "30x30cm", "position": "описание", "height": "3.0m"}],
-    "beams": [{"id": "B1", "type": "стоманобетонна", "dimensions": "30x50cm", "span": "6.0m", "load": "описание"}],
-    "stairs": [{"type": "прав марш", "width": "1.2m", "steps": 18, "rise": "17cm", "tread": "28cm"}],
-    "foundations": [{"type": "ленточен", "width": "0.6m", "depth": "1.2m", "material": "стоманобетон"}],
-    "roof": {"type": "двускатен", "slope": "30 градуса", "material": "керемиди", "area": "120 m²"},
-    "walls": [{"type": "носеща", "thickness": "25cm", "material": "тухла", "length": "6m"}],
-    "openings": [{"type": "прозорец", "dimensions": "1.2x1.5m", "position": "южна стена"}]
+    "columns": [{"id": "C1", "type": "тип", "dimensions": "размери", "position": "позиция", "height": "височина"}],
+    "beams": [{"id": "B1", "type": "тип", "dimensions": "размери", "span": "отвор", "load": "натоварване"}],
+    "stairs": [{"type": "тип", "width": "ширина", "steps": 0, "rise": "стъпка", "tread": "настъпка"}],
+    "foundations": [{"type": "тип", "width": "ширина", "depth": "дълбочина", "material": "материал"}],
+    "roof": {"type": "тип", "slope": "наклон", "material": "материал", "area": "площ"},
+    "walls": [{"type": "носеща/неносеща", "thickness": "дебелина", "material": "материал", "length": "дължина"}],
+    "openings": [{"type": "врата/прозорец", "dimensions": "размери", "position": "позиция"}]
   },
-  "dimensions_summary": {"length": "12m", "width": "8m", "height": "6m", "floors": 2, "total_area": "192 m²"},
-  "description_en": "detailed English description of the building structure for image generation",
+  "dimensions_summary": {"length": "м", "width": "м", "height": "м", "floors": 1, "total_area": "м²"},
+  "description_en": "DETAILED English description of EXACTLY what is shown in the sketch/drawing for accurate image generation",
   "materials_estimate": [
-    {"name": "Бетон C25/30", "quantity": "15", "unit": "m³", "price_per_unit_bgn": "180", "price_per_unit_eur": "92", "total_bgn": "2700", "total_eur": "1380", "store": "Bricoman"},
-    {"name": "Арматура B500", "quantity": "2000", "unit": "kg", "price_per_unit_bgn": "2.20", "price_per_unit_eur": "1.12", "total_bgn": "4400", "total_eur": "2250", "store": "Bauhaus"}
+    {"name": "материал", "quantity": "кол-во", "unit": "единица", "price_per_unit_eur": "цена EUR", "total_eur": "общо EUR", "store": "магазин"}
   ],
-  "total_materials_bgn": "...",
-  "total_materials_eur": "...",
-  "labor_bgn": "...",
-  "labor_eur": "...",
-  "grand_total_bgn": "...",
-  "grand_total_eur": "...",
-  "accuracy_note": "95-100% точност за стандартни конструкции"
+  "total_materials_eur": "сума EUR",
+  "labor_eur": "труд EUR",
+  "grand_total_eur": "обща стойност EUR",
+  "accuracy_note": "бележка за точността"
 }"""
         ).with_model("openai", "gpt-4o")
         
         image_contents = [ImageContent(image_base64=img) for img in cleaned]
         analysis_msg = UserMessage(
-            text=f"""Анализирай тези {len(cleaned)} скици/чертежи/снимки на {building_type} строеж.
-Разпознай ВСИЧКИ структурни елементи: колони, греди, стълби, фундаменти, покрив.
-Генерирай количествена сметка с цени в лева и евро.
-{f'Допълнителни бележки: {notes}' if notes else ''}
-Дай максимално точен анализ (95-100%).""",
+            text=f"""Анализирай ВНИМАТЕЛНО тези {len(cleaned)} скици/чертежи/снимки.
+Тип обект: {building_type}
+{f'Бележки от потребителя: {notes}' if notes else ''}
+
+ВАЖНО: Опиши ТОЧНО какво виждаш на изображението. Не добавяй елементи, които не са видими.
+Полето "description_en" трябва да описва ТОЧНО какво е на скицата — включително позиции на стени, стаи, отвори и всичко видимо. Това описание ще се използва за генериране на точен 2D план и 3D визуализация.
+Количествената сметка трябва да е с цени в EUR.
+Дай JSON отговор.""",
             file_contents=image_contents
         )
         
@@ -3157,17 +3159,26 @@ async def analyze_sketch(request: Request):
         except Exception:
             analysis_data = {"raw_analysis": analysis_response[:3000], "note": "AI анализът е в текстов формат"}
         
-        desc_en = analysis_data.get("description_en", "a building structure with columns, beams and foundations")
+        desc_en = analysis_data.get("description_en", "")
+        dims = analysis_data.get("dimensions_summary", {})
         
-        # Step 2: Generate structural visualization
+        # Build detailed description from analysis
+        if not desc_en:
+            desc_en = f"A {building_type} building structure"
+        
+        dims_str = ""
+        if dims:
+            dims_str = f"Dimensions: {dims.get('length','?')} x {dims.get('width','?')}, height {dims.get('height','?')}, {dims.get('floors',1)} floors, total area {dims.get('total_area','?')}"
+        
+        # Step 2: Generate structural visualization based on EXACT analysis
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         
         generated_views = []
         view_prompts = [
-            f"Professional architectural blueprint drawing, clean technical 2D plan view from above showing: {desc_en}. Show all columns marked as dots, walls as thick lines, dimensions annotated, room labels. White background, precise engineering drawing style, CAD-quality.",
-            f"Professional 3D architectural rendering of: {desc_en}. Cutaway isometric view showing structural elements - columns, beams, floors, roof structure. Clean visualization with labeled structural members, photorealistic materials. Architecture magazine quality."
+            f"Professional architectural floor plan / blueprint based on this description: {desc_en}. {dims_str}. Show EXACT layout as described: all walls as thick black lines, doors as arcs, windows as double lines, dimensions annotated in meters, room labels in the center of each room. Clean white background, CAD-quality 2D technical drawing. Scale bar included. North arrow in corner.",
+            f"Professional 3D cutaway isometric rendering based on: {desc_en}. {dims_str}. Show the building from a 45-degree elevated angle with one wall removed to reveal interior layout. Visible structural elements: columns, beams, floor slabs. Photorealistic materials - concrete, brick, glass. Clean white background, architecture visualization quality."
         ]
-        view_labels = ["План (2D чертеж)", "3D визуализация"]
+        view_labels = ["2D план (чертеж)", "3D визуализация"]
         
         for i, prompt in enumerate(view_prompts):
             try:

@@ -1,9 +1,58 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Info, Play, CheckCircle, Lightbulb } from 'lucide-react';
+import { ChevronDown, ChevronUp, Info, Play, CheckCircle, Lightbulb, Sparkles, Calculator, FileText, Image, ArrowRight } from 'lucide-react';
+
+const VIDEO_TUTORIALS = {
+  "ai-designer": {
+    title: "Как да използвате AI Дизайнера",
+    steps: [
+      { title: "Качете снимки", desc: "Направете 1-3 снимки на помещението от различни ъгли. По-качествените снимки дават по-добър резултат.", icon: Image },
+      { title: "Изберете параметри", desc: "Изберете тип помещение, стил на дизайн и клас материали. AI ще генерира визуализация според вашия избор.", icon: Sparkles },
+      { title: "Генерирайте дизайн", desc: "Натиснете 'Генерирай' и изчакайте 30-60 секунди. AI ще създаде фотореалистична визуализация с количествена сметка.", icon: ArrowRight },
+      { title: "Споделете и изтеглете", desc: "Публикувайте в галерията, споделете в социалните мрежи или изтеглете PDF с изображения и материали.", icon: FileText }
+    ]
+  },
+  "ai-sketch": {
+    title: "Как работи AI Sketch",
+    steps: [
+      { title: "Качете скица или чертеж", desc: "Качете 1-3 файла — ръчна скица, чертеж или снимка на реален обект. Поддържа JPG, PNG, WebP.", icon: Image },
+      { title: "Изберете тип строеж", desc: "Посочете дали е жилищна сграда, търговски обект, промишлена сграда или ремонт.", icon: CheckCircle },
+      { title: "AI анализира", desc: "AI разпознава колони, греди, стълби, фундаменти и покрив с 95-100% точност. Генерира 2D план и 3D визуализация.", icon: Sparkles },
+      { title: "Количествена сметка", desc: "Получавате детайлна сметка с цени в EUR от водещи магазини + PDF договор за подписване.", icon: FileText }
+    ]
+  },
+  "calculator": {
+    title: "Как да използвате калкулатора",
+    steps: [
+      { title: "Изберете област", desc: "Изберете от 28 области в България. Цените се различават по региони.", icon: CheckCircle },
+      { title: "Въведете параметри", desc: "Площ, тип ремонт, брой стаи, допълнителни услуги.", icon: Calculator },
+      { title: "Получете оценка", desc: "Моментална оценка на разходите с разбивка по категории.", icon: ArrowRight },
+      { title: "PDF договор", desc: "Генерирайте PDF договор с количествена сметка за 6 EUR, готов за подписване.", icon: FileText }
+    ]
+  },
+  "default": {
+    title: "Видео инструкции",
+    steps: [
+      { title: "Стъпка 1", desc: "Следвайте инструкциите на страницата", icon: CheckCircle },
+      { title: "Стъпка 2", desc: "Въведете необходимите данни", icon: ArrowRight },
+      { title: "Стъпка 3", desc: "Получете резултат", icon: Sparkles }
+    ]
+  }
+};
 
 export const PageInstructions = ({ title, description, steps = [], benefits = [], tips = [], videoUrl }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
+
+  // Determine which tutorial to show based on videoUrl
+  const getTutorial = () => {
+    if (!videoUrl) return VIDEO_TUTORIALS["default"];
+    if (videoUrl.includes('designer')) return VIDEO_TUTORIALS["ai-designer"];
+    if (videoUrl.includes('sketch')) return VIDEO_TUTORIALS["ai-sketch"];
+    if (videoUrl.includes('calculator') || videoUrl.includes('subscriptions')) return VIDEO_TUTORIALS["calculator"];
+    return VIDEO_TUTORIALS["default"];
+  };
+
+  const tutorial = getTutorial();
 
   return (
     <div className="mb-8" data-testid="page-instructions">
@@ -29,7 +78,7 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
                 data-testid="watch-video-btn"
               >
                 <Play className="h-3.5 w-3.5" />
-                Видео
+                Инструкции
               </button>
             )}
             {isOpen ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />}
@@ -88,20 +137,40 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
         </div>
       )}
 
-      {/* Video Modal */}
-      {videoOpen && videoUrl && (
+      {/* Interactive Tutorial Modal */}
+      {videoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setVideoOpen(false)}>
-          <div className="bg-[#1E2A38] border border-[#3A4A5C] rounded-xl p-2 max-w-3xl w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-3">
-              <h3 className="text-white font-semibold text-sm">Видео инструкции</h3>
-              <button onClick={() => setVideoOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+          <div className="bg-[#1E2A38] border border-[#3A4A5C] rounded-xl max-w-2xl w-full mx-4 shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-4 border-b border-[#3A4A5C]">
+              <h3 className="text-white font-semibold">{tutorial.title}</h3>
+              <button onClick={() => setVideoOpen(false)} className="text-slate-400 hover:text-white text-lg" data-testid="close-video-modal">&times;</button>
             </div>
-            <div className="aspect-video bg-[#0F1923] rounded-lg flex items-center justify-center">
-              <div className="text-center text-slate-400">
-                <Play className="h-12 w-12 mx-auto mb-2 text-[#FF8C42]" />
-                <p className="text-sm">Видео демонстрация ще бъде добавена скоро</p>
-                <p className="text-xs text-slate-500 mt-1">{videoUrl}</p>
-              </div>
+            <div className="p-6 space-y-4">
+              {tutorial.steps.map((step, i) => {
+                const Icon = step.icon;
+                return (
+                  <div key={i} className="flex items-start gap-4 group" data-testid={`tutorial-step-${i}`}>
+                    <div className="w-12 h-12 rounded-xl bg-[#FF8C42]/15 flex items-center justify-center flex-shrink-0 group-hover:bg-[#FF8C42]/25 transition-colors">
+                      <Icon className="h-6 w-6 text-[#FF8C42]" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[#FF8C42] text-xs font-bold bg-[#FF8C42]/10 rounded-full px-2 py-0.5">Стъпка {i + 1}</span>
+                        <h4 className="text-white font-medium text-sm">{step.title}</h4>
+                      </div>
+                      <p className="text-slate-400 text-sm">{step.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="p-4 border-t border-[#3A4A5C] text-center">
+              <button
+                onClick={() => setVideoOpen(false)}
+                className="bg-[#FF8C42] hover:bg-[#e67a30] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              >
+                Разбрах, да започнем!
+              </button>
             </div>
           </div>
         </div>

@@ -1,0 +1,128 @@
+{
+  "summary": "TemaDom Iteration 23 - Price increases +15% and video instructions. All 23 backend tests passed. All frontend UI tests passed. EUR pricing verified: Starter 20, Pro 40, Premium 79. Pro plan correctly shows 'Без AI Designer' in limitations (AI Designer REMOVED from Pro). Premium includes AI Designer up to 5 variants. Standalone services: PDF contract 6 EUR, AI blueprint 17 EUR. AI Designer 12 EUR/gen with bundles 29/45 EUR. Video 'Инструкции' button works on both AI Designer and AI Sketch pages, opening interactive tutorial modal with 4 steps and 'Разбрах, да започнем!' close button.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend (23/23):",
+    "✅ GET /api/subscriptions/plans returns 200",
+    "✅ Starter plan: 20 EUR/мес (from 17 EUR, +15%)",
+    "✅ Pro plan: 40 EUR/мес (from 35 EUR, +15%)",
+    "✅ Premium plan: 79 EUR/мес (from 69 EUR, +15%)",
+    "✅ Pro plan has 'Без AI Designer' limitation",
+    "✅ Pro plan features do NOT include AI Designer",
+    "✅ Premium includes AI Designer up to 5 variants",
+    "✅ Premium has no limitations (empty array)",
+    "✅ PDF contract standalone: 6 EUR",
+    "✅ AI blueprint standalone: 17 EUR",
+    "✅ AI Designer standalone: 12 EUR/генерация",
+    "✅ AI Designer bundle 3 variants: 29 EUR",
+    "✅ AI Designer bundle 5 variants: 45 EUR",
+    "✅ Starter plan limitations verified",
+    "✅ Homepage loads (200)",
+    "✅ Subscriptions page loads (200)",
+    "✅ AI Designer page loads (200)",
+    "✅ AI Sketch page loads (200)",
+    "✅ AI Gallery page loads (200)",
+    "✅ Calculator page loads (200)",
+    "✅ GET /api/stats returns valid data",
+    "✅ GET /api/categories returns categories list",
+    "✅ GET /api/ai-designer/published returns 200",
+    "Frontend UI:",
+    "✅ Homepage pricing shows 20/40/79 EUR correctly",
+    "✅ Homepage standalone prices: 6 EUR PDF, 17 EUR AI blueprint",
+    "✅ Subscriptions page shows 3 plans with correct EUR pricing",
+    "✅ Pro plan shows 'Без AI Designer' and 'Без AI Sketch анализ' limitations",
+    "✅ Premium shows 'AI Designer: до 5 варианта визуализация' feature",
+    "✅ 'Еднократни услуги' section visible with 6 EUR / 17 EUR",
+    "✅ AI Designer module: 12 EUR/gen, bundles 29/45 EUR",
+    "✅ Logo visible in navbar (238x72px)",
+    "✅ AI Designer page: 'Инструкции' button visible and working",
+    "✅ AI Designer: Tutorial modal opens with 4 steps",
+    "✅ AI Designer: 'Разбрах, да започнем!' close button works",
+    "✅ AI Sketch page: Upload zones (1-3 files) present",
+    "✅ AI Sketch page: Building types (residential/commercial/industrial/renovation/other) present",
+    "✅ AI Sketch page: 'Инструкции' button visible and working",
+    "✅ AI Sketch: Tutorial modal opens correctly",
+    "✅ AI Gallery page loads correctly"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration23_pricing_updates.py",
+    "/app/test_reports/pytest/pytest_results_iter23.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All requested features verified and working correctly:",
+    "1. EUR prices increased +15%: Starter 20 EUR (was 17), Pro 40 EUR (was 35), Premium 79 EUR (was 69)",
+    "2. AI Designer REMOVED from Pro plan - Pro now shows 'Без AI Designer' and 'Без AI Sketch анализ' in limitations",
+    "3. Premium still includes AI Designer with up to 5 variants",
+    "4. Standalone services updated: PDF contract 6 EUR (was 5), AI blueprint 17 EUR (was 15)",
+    "5. AI Designer standalone: 12 EUR/gen (was 10), bundles 29/45 EUR (was 25/39)",
+    "6. Video 'Инструкции' button works on AI Designer page with interactive 4-step tutorial modal",
+    "7. AI Sketch page has videoUrl prop added - 'Инструкции' button visible with AI Sketch tutorial",
+    "8. All tutorial modals have 'Разбрах, да започнем!' close button"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration23_pricing_updates.py"
+  ],
+  "success_rate": {
+    "backend": "100% (23/23 tests passed)",
+    "frontend": "100% (All UI checks passed)"
+  },
+  "seed_data_creation": "None - used existing test data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "TemaDom Iteration 23 fully tested. Major updates verified: 1) EUR prices increased +15%: Starter 20 EUR, Pro 40 EUR, Premium 79 EUR, 2) AI Designer REMOVED from Pro plan (now shows 'Без AI Designer' limitation), 3) Premium includes AI Designer up to 5 variants, 4) Standalone services: PDF 6 EUR, AI blueprint 17 EUR, 5) AI Designer 12 EUR/gen with bundles 29/45 EUR, 6) Video 'Инструкции' button on AI Designer and AI Sketch pages opens interactive tutorial modal with 4 steps, 7) All modals have 'Разбрах, да започнем!' close button. All pages load correctly with proper Bulgarian language.",
+  "features_tested": {
+    "eur_price_increase": {
+      "status": "PASS",
+      "details": "Starter 20 EUR (+15%), Pro 40 EUR (+15%), Premium 79 EUR (+15%)"
+    },
+    "pro_plan_ai_designer_removed": {
+      "status": "PASS",
+      "details": "Pro plan correctly shows 'Без AI Designer' in limitations, no AI Designer in features"
+    },
+    "premium_ai_designer": {
+      "status": "PASS",
+      "details": "Premium includes 'AI Designer: до 5 варианта визуализация', no limitations"
+    },
+    "standalone_pdf_contract": {
+      "status": "PASS",
+      "details": "PDF договор + количествена сметка: 6 EUR"
+    },
+    "standalone_ai_blueprint": {
+      "status": "PASS",
+      "details": "AI анализ на чертежи + PDF договор: 17 EUR"
+    },
+    "ai_designer_standalone": {
+      "status": "PASS",
+      "details": "12 EUR/генерация, bundles: 3 variants = 29 EUR, 5 variants = 45 EUR"
+    },
+    "ai_designer_video_instructions": {
+      "status": "PASS",
+      "details": "'Инструкции' button visible, opens modal with 4 steps, 'Разбрах, да започнем!' button closes modal"
+    },
+    "ai_sketch_video_instructions": {
+      "status": "PASS",
+      "details": "'Инструкции' button visible on AI Sketch page with videoUrl prop, tutorial modal works"
+    },
+    "ai_sketch_page_elements": {
+      "status": "PASS",
+      "details": "Upload zones (3 files), building types (5 options) all present and working"
+    },
+    "logo_visibility": {
+      "status": "PASS",
+      "details": "Logo 238x72px in navbar left corner, fully visible"
+    },
+    "all_pages_load": {
+      "status": "PASS",
+      "details": "Homepage, Subscriptions, AI Designer, AI Sketch, AI Gallery, Calculator all load correctly"
+    }
+  }
+}

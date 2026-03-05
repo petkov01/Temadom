@@ -113,6 +113,7 @@ export const AISketchPage = () => {
             'Получавате: 2D чертеж, 3D визуализация и количествена сметка с 95-100% точност'
           ]}
           benefits={['Бърз анализ с AI', 'Точна количествена сметка', '2D план + 3D визуализация']}
+          videoUrl="https://temadom.com/videos/sketch"
         />
 
         {!results ? (

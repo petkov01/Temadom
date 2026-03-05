@@ -584,7 +584,7 @@ const LandingPage = () => {
             <div className="bg-gradient-to-br from-[#8C56FF]/20 to-[#4DA6FF]/10 rounded-2xl p-8 border border-[#8C56FF]/20 text-center">
               <Sparkles className="h-16 w-16 text-[#8C56FF]/60 mx-auto mb-4" />
               <p className="text-white font-medium">1-3 снимки &rarr; AI анализ &rarr; Фотореалистичен дизайн</p>
-              <p className="text-slate-500 text-sm mt-2">от 10 EUR на генерация</p>
+              <p className="text-slate-500 text-sm mt-2">от 12 EUR на генерация</p>
             </div>
           </div>
 
@@ -624,8 +624,8 @@ const LandingPage = () => {
               <p className="text-slate-400 mb-4 text-sm">Безплатен калкулатор за 28 области в България. Изчислете точна цена за ремонт и генерирайте PDF договор с количествена сметка, готов за подписване.</p>
               <ul className="space-y-2 text-sm text-slate-300 mb-6">
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> Безплатен калкулатор за всички области</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> PDF договор + количествена сметка: 5 EUR</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> AI чертеж + PDF договор: 15 EUR</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> PDF договор + количествена сметка: 6 EUR</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> AI чертеж + PDF договор: 17 EUR</li>
               </ul>
               <Button className="bg-[#28A745] hover:bg-[#22943e] text-white" onClick={() => navigate('/calculator')} data-testid="feature-calc-btn">
                 <Calculator className="mr-2 h-4 w-4" /> Безплатен калкулатор
@@ -674,9 +674,9 @@ const LandingPage = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             {[
-              { name: 'Starter', price: '17', features: ['До 2 проекта', 'Основен профил', 'Email известия'], color: '#4DA6FF', popular: false },
-              { name: 'Pro', price: '35', features: ['Неограничени проекти', 'AI Designer: 1 вариант', 'Приоритетно показване'], color: '#FF8C42', popular: true },
-              { name: 'Premium', price: '69', features: ['AI Designer: 5 варианта', 'AI Sketch анализ', 'PDF договори включени', 'Персонален мениджър'], color: '#8C56FF', popular: false },
+              { name: 'Starter', price: '20', features: ['До 2 проекта', 'Основен профил', 'Email известия'], color: '#4DA6FF', popular: false },
+              { name: 'Pro', price: '40', features: ['Неограничени проекти', 'Таблици материали', 'Приоритетно показване'], color: '#FF8C42', popular: true },
+              { name: 'Premium', price: '79', features: ['AI Designer: 5 варианта', 'AI Sketch анализ', 'PDF договори включени', 'Персонален мениджър'], color: '#8C56FF', popular: false },
             ].map((plan, i) => (
               <Card key={i} className={`bg-[#253545] border-[#3A4A5C] p-6 text-center ${plan.popular ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20 scale-[1.03]' : ''}`}>
                 {plan.popular && <div className="bg-[#FF8C42] text-white text-[10px] font-bold rounded-full px-3 py-1 inline-block mb-3">ПРЕПОРЪЧАН</div>}
@@ -698,12 +698,12 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
             <Card className="bg-[#253545]/50 border-[#3A4A5C] p-4 text-center">
               <p className="text-white font-medium text-sm">PDF договор + количествена сметка</p>
-              <p className="text-[#28A745] text-2xl font-bold">5 EUR</p>
+              <p className="text-[#28A745] text-2xl font-bold">6 EUR</p>
               <p className="text-slate-500 text-xs">По данни от калкулатора</p>
             </Card>
             <Card className="bg-[#253545]/50 border-[#3A4A5C] p-4 text-center">
               <p className="text-white font-medium text-sm">AI анализ чертежи + PDF договор</p>
-              <p className="text-[#FF8C42] text-2xl font-bold">15 EUR</p>
+              <p className="text-[#FF8C42] text-2xl font-bold">17 EUR</p>
               <p className="text-slate-500 text-xs">95-100% точност</p>
             </Card>
           </div>
