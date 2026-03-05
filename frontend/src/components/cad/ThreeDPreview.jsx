@@ -183,6 +183,11 @@ export function useThreeViewer(containerRef, els, scale, selIdx) {
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; controls.dampingFactor = 0.05;
+    controls.enablePan = true;
+    controls.panSpeed = 1.2;
+    controls.screenSpacePanning = true;
+    controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+    controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.5));
     const d1 = new THREE.DirectionalLight(0xffffff, 0.9); d1.position.set(10, 20, 10); scene.add(d1);

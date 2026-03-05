@@ -433,7 +433,7 @@ export const AISketchPage = () => {
                 </CardHeader>
                 <CardContent className="p-2">
                   <div ref={viewerRef} className="w-full h-[350px] lg:h-[420px] bg-[#0F1923] rounded-lg overflow-hidden border border-[#2A3A4C]" data-testid="3d-viewer" />
-                  <p className="text-slate-600 text-[9px] mt-1 text-center">Въртене | Zoom | Pan</p>
+                  <p className="text-slate-600 text-[9px] mt-1 text-center">Ляв бутон: Въртене | Десен бутон: Местене | Скрол: Zoom</p>
                 </CardContent>
               </Card>
             </div>
@@ -453,20 +453,25 @@ export const AISketchPage = () => {
               <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
                 <CardContent className="px-3 py-3">
                   <CostEstimate els={els} scale={scale} region={region} onRegionChange={setRegion} />
-                  {/* Export buttons */}
-                  <div className="flex gap-2 mt-3 pt-3 border-t border-[#3A4A5C]">
-                    <Button size="sm" className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white text-xs h-8"
-                      onClick={exportPlanPdf} data-testid="export-plan-pdf">
-                      <FileText className="mr-1.5 h-3.5 w-3.5" /> PDF План + Сметка
-                    </Button>
-                    <Button size="sm" className="flex-1 bg-[#4DA6FF] hover:bg-[#3B8FE0] text-white text-xs h-8"
-                      onClick={() => setShowContract(true)} data-testid="export-contract-btn">
-                      <FileText className="mr-1.5 h-3.5 w-3.5" /> Договор
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
             )}
+
+            {/* PDF Export Buttons — always visible */}
+            <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
+              <CardContent className="px-3 py-3">
+                <div className="flex gap-2">
+                  <Button size="sm" className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white text-xs h-10 font-bold"
+                    onClick={exportPlanPdf} data-testid="export-plan-pdf">
+                    <FileText className="mr-1.5 h-4 w-4" /> PDF План + Сметка
+                  </Button>
+                  <Button size="sm" className="flex-1 bg-[#4DA6FF] hover:bg-[#3B8FE0] text-white text-xs h-10 font-bold"
+                    onClick={() => setShowContract(true)} data-testid="export-contract-btn">
+                    <FileText className="mr-1.5 h-4 w-4" /> PDF Договор
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Contract Dialog */}
             {showContract && (

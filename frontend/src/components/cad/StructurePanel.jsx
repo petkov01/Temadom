@@ -111,16 +111,16 @@ function ObjectCard({ el, i, isSel, scale, onSelect, onDelete, onUpdate, onUpdat
               {el.columnShape === 'rect' ? (
                 <>
                   <DimInput label="W (ширина)" val={dims.width} unit="см"
-                    onChange={v => onUpdate(i, 'columnWidth', Math.max(10, v))} step={1} color="#9b59b6" />
+                    onChange={v => onUpdate(i, 'columnWidth', v)} step={1} color="#9b59b6" />
                   <DimInput label="L (дължина)" val={dims.length} unit="см"
-                    onChange={v => onUpdate(i, 'columnLength', Math.max(10, v))} step={1} color="#FF8C42" />
+                    onChange={v => onUpdate(i, 'columnLength', v)} step={1} color="#FF8C42" />
                 </>
               ) : (
                 <DimInput label="D (диаметър)" val={dims.diameter} unit="см"
-                  onChange={v => onUpdate(i, 'columnDiameter', Math.max(10, v))} step={1} color="#9b59b6" />
+                  onChange={v => onUpdate(i, 'columnDiameter', v)} step={1} color="#9b59b6" />
               )}
               <DimInput label="H (височина)" val={dims.height}
-                onChange={v => onUpdate(i, 'columnHeight', Math.max(0.5, v))} color="#28A745" />
+                onChange={v => onUpdate(i, 'columnHeight', v)} color="#28A745" />
             </>
           ) : t === 'circle' ? (
             <>
@@ -132,19 +132,19 @@ function ObjectCard({ el, i, isSel, scale, onSelect, onDelete, onUpdate, onUpdat
           ) : t === 'slab' ? (
             <>
               <DimInput label="X (ширина)" val={dims.width}
-                onChange={v => onUpdateDimension(i, 'width', Math.max(0.1, v))} color="#FF8C42" />
+                onChange={v => onUpdateDimension(i, 'width', v)} color="#FF8C42" />
               <DimInput label="Y (дълбочина)" val={dims.depth}
-                onChange={v => onUpdateDimension(i, 'depth', Math.max(0.1, v))} color="#4DA6FF" />
+                onChange={v => onUpdateDimension(i, 'depth', v)} color="#4DA6FF" />
               <DimInput label="Z (дебелина)" val={(el.slabThickness || 15)} unit="см"
-                onChange={v => onUpdate(i, 'slabThickness', Math.max(12, Math.min(30, v)))} step={1} color="#28A745" />
+                onChange={v => onUpdate(i, 'slabThickness', v)} step={1} color="#28A745" />
             </>
           ) : (
             <>
               <DimInput label="L (дължина)" val={dims.length}
-                onChange={v => onUpdateDimension(i, 'length', Math.max(0.1, v))} color="#FF8C42" />
+                onChange={v => onUpdateDimension(i, 'length', v)} color="#FF8C42" />
               {(t === 'wall') && (
                 <DimInput label="W (дебелина)" val={(el.thickness || 25)} unit="см"
-                  onChange={v => onUpdate(i, 'thickness', Math.max(15, Math.min(40, v)))} step={1} color="#4DA6FF" />
+                  onChange={v => onUpdate(i, 'thickness', v)} step={1} color="#4DA6FF" />
               )}
               {(t === 'wall' || t === 'roof' || t === 'beam') && (
                 <DimInput label="H (височина)" val={t === 'beam' ? ((el.beamHeight || 45)) : (el.height ?? 3)} unit={t === 'beam' ? 'см' : 'м'}
@@ -159,7 +159,7 @@ function ObjectCard({ el, i, isSel, scale, onSelect, onDelete, onUpdate, onUpdat
       {/* === EXTRA PARAMETERS === */}
       <div className="grid grid-cols-2 gap-1.5">
         {t === 'roof' && (<>
-          <ParamInput label="Ъгъл (°)" val={el.roofAngle ?? 30} onChange={v => onUpdate(i, 'roofAngle', Math.max(15, Math.min(60, v)))} />
+          <ParamInput label="Ъгъл (°)" val={el.roofAngle ?? 30} onChange={v => onUpdate(i, 'roofAngle', v)} />
           <ParamInput label="Надвес (м)" val={el.overhang ?? 0.5} onChange={v => onUpdate(i, 'overhang', v)} step={0.1} />
         </>)}
         {t === 'stairs' && (<>

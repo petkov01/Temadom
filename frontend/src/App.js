@@ -150,6 +150,31 @@ const ThemeToggle = () => {
   );
 };
 
+// ============== AUTH GATE ==============
+const AuthGate = ({ children }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  if (user) return children;
+  return (
+    <div className="relative min-h-screen">
+      <div className="pointer-events-none opacity-40 blur-[2px] select-none">{children}</div>
+      <div className="absolute inset-0 flex items-center justify-center z-50 bg-[#0F1923]/60 backdrop-blur-sm">
+        <div className="bg-[#1E2A38] border border-[#3A4A5C] rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl" data-testid="auth-gate-modal">
+          <div className="w-16 h-16 bg-[#F97316]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="h-8 w-8 text-[#F97316]" />
+          </div>
+          <h3 className="text-white text-xl font-bold mb-2">Само за регистрирани</h3>
+          <p className="text-slate-400 text-sm mb-6">Регистрирайте се безплатно, за да използвате тази функция.</p>
+          <div className="flex gap-3">
+            <button onClick={() => navigate('/login')} className="flex-1 py-3 rounded-xl border border-[#3A4A5C] text-slate-300 hover:bg-white/5 font-medium text-sm" data-testid="auth-gate-login">Вход</button>
+            <button onClick={() => navigate('/register')} className="flex-1 py-3 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-sm" data-testid="auth-gate-register">Регистрация</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ============== NAVBAR ==============
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -3292,7 +3317,7 @@ function App() {
                 <Route path="/find-master" element={<FindMasterPage />} />
                 <Route path="/calculator" element={<PriceCalculator />} />
                 <Route path="/services" element={<ServicesPage />} />
-                <Route path="/messages" element={<ChatPage />} />
+                <Route path="/messages" element={<AuthGate><ChatPage /></AuthGate>} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/professions" element={<ProfessionsPage />} />
@@ -3303,17 +3328,17 @@ function App() {
                 <Route path="/analytics" element={<AnalyticsDashboard />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                <Route path="/dashboard" element={<CompanyDashboard />} />
-                <Route path="/dashboard/client" element={<ClientDashboard />} />
+                <Route path="/dashboard" element={<AuthGate><CompanyDashboard /></AuthGate>} />
+                <Route path="/dashboard/client" element={<AuthGate><ClientDashboard /></AuthGate>} />
                 <Route path="/payment/success" element={<PaymentSuccessPage />} />
                 <Route path="/payment/cancel" element={<PaymentCancelPage />} />
                 <Route path="/ads" element={<AdsPage />} />
-                <Route path="/ai-designer" element={<AIDesignerPage />} />
-                <Route path="/ai-sketch" element={<AISketchPage />} />
-                <Route path="/ai-chart" element={<AIChartPage />} />
-                <Route path="/room-scan" element={<AIDesignerPage />} />
-                <Route path="/3d-scanner" element={<Scanner3DPage />} />
-                <Route path="/3d-scanner/:projectId" element={<Scanner3DPage />} />
+                <Route path="/ai-designer" element={<AuthGate><AIDesignerPage /></AuthGate>} />
+                <Route path="/ai-sketch" element={<AuthGate><AISketchPage /></AuthGate>} />
+                <Route path="/ai-chart" element={<AuthGate><AIChartPage /></AuthGate>} />
+                <Route path="/room-scan" element={<AuthGate><AIDesignerPage /></AuthGate>} />
+                <Route path="/3d-scanner" element={<AuthGate><Scanner3DPage /></AuthGate>} />
+                <Route path="/3d-scanner/:projectId" element={<AuthGate><Scanner3DPage /></AuthGate>} />
                 <Route path="/ai-gallery" element={<PublishedGalleryPage />} />
                 <Route path="/ready-projects" element={<ReadyProjectsPage />} />
                 <Route path="/subscriptions" element={<SubscriptionsPage />} />

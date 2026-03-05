@@ -1,13 +1,21 @@
-// TemaDom IA CAD v5.1 — Auto Cost Estimate with Regional Pricing
-import React from 'react';
+// TemaDom IA CAD v5.1 — Auto Cost Estimate with Regional Pricing + Removable Items
+import React, { useState, useMemo } from 'react';
+import { X } from 'lucide-react';
 import { EUR_TO_BGN } from './constants';
 import { calculateCosts, REGIONS } from './utils';
 
 export const CostEstimate = ({ els, scale, region, onRegionChange }) => {
-  const { items, totalEur, totalBgn } = calculateCosts(els, scale, region);
+  const allCosts = useMemo(() => calculateCosts(els, scale, region), [els, scale, region]);
+  const [removedIdx, setRemovedIdx] = useState([]);
   const currentRegion = REGIONS.find(r => r.id === region) || REGIONS[1];
 
-  if (!items.length) return null;
+  if (!allCosts.items.length) return null;
+
+  const items = allCosts.items.filter((_, i) => !removedIdx.includes(i));
+  const totalEur = items.reduce((s, it) => s + it.total, 0);
+  const totalBgn = Math.round(totalEur * EUR_TO_BGN);
+
+  const restoreAll = () => setRemovedIdx([]);
 
   return (
     <div data-testid="cost-estimate">
@@ -30,12 +38,18 @@ export const CostEstimate = ({ els, scale, region, onRegionChange }) => {
           ))}
         </select>
         <span className="text-slate-600 text-[9px]">x{currentRegion.multiplier}</span>
+        {removedIdx.length > 0 && (
+          <button onClick={restoreAll} className="text-[9px] text-[#4DA6FF] hover:underline ml-auto" data-testid="restore-items-btn">
+            Възстанови ({removedIdx.length})
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-[10px]">
           <thead>
             <tr className="text-slate-500 border-b border-[#2A3A4C]">
+              <th className="text-left py-1 font-medium w-5"></th>
               <th className="text-left py-1 font-medium">Позиция</th>
               <th className="text-right py-1 font-medium">Кол.</th>
               <th className="text-right py-1 font-medium">Ед.</th>
@@ -45,19 +59,33 @@ export const CostEstimate = ({ els, scale, region, onRegionChange }) => {
             </tr>
           </thead>
           <tbody>
-            {items.map((it, i) => (
-              <tr key={i} className="border-b border-[#2A3A4C]/50 text-slate-300">
-                <td className="py-1">{it.label}</td>
-                <td className="text-right py-1">{it.qty}</td>
-                <td className="text-right py-1 text-slate-500">{it.unit}</td>
-                <td className="text-right py-1">{it.price} EUR</td>
-                <td className="text-right py-1 text-[#FF8C42] font-medium">{it.total.toLocaleString()}</td>
-                <td className="text-right py-1 text-[#4DA6FF]">{(it.total * EUR_TO_BGN).toFixed(0)}</td>
-              </tr>
-            ))}
+            {allCosts.items.map((it, i) => {
+              if (removedIdx.includes(i)) return null;
+              return (
+                <tr key={i} className="border-b border-[#2A3A4C]/50 text-slate-300 group">
+                  <td className="py-1">
+                    <button
+                      onClick={() => setRemovedIdx(p => [...p, i])}
+                      className="text-red-500/40 hover:text-red-400 transition-colors"
+                      title="Премахни от сметката"
+                      data-testid={`remove-cost-${i}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </td>
+                  <td className="py-1">{it.label}</td>
+                  <td className="text-right py-1">{it.qty}</td>
+                  <td className="text-right py-1 text-slate-500">{it.unit}</td>
+                  <td className="text-right py-1">{it.price} EUR</td>
+                  <td className="text-right py-1 text-[#FF8C42] font-medium">{it.total.toLocaleString()}</td>
+                  <td className="text-right py-1 text-[#4DA6FF]">{(it.total * EUR_TO_BGN).toFixed(0)}</td>
+                </tr>
+              );
+            })}
           </tbody>
           <tfoot>
             <tr className="border-t-2 border-[#FF8C42]/30 font-bold text-white">
+              <td></td>
               <td colSpan={4} className="py-2">ОБЩО</td>
               <td className="text-right py-2 text-[#FF8C42]">{totalEur.toLocaleString()} EUR</td>
               <td className="text-right py-2 text-[#4DA6FF]">{totalBgn.toLocaleString()} BGN</td>
