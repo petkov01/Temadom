@@ -710,12 +710,17 @@ const LandingPage = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             {[
-              { name: 'Starter', price: '20', features: ['До 2 проекта', 'Основен профил', 'Email известия'], color: '#4DA6FF', popular: false },
-              { name: 'Pro', price: '40', features: ['Неограничени проекти', 'Таблици материали', 'Приоритетно показване'], color: '#FF8C42', popular: true },
-              { name: 'Premium', price: '79', features: ['AI Designer: 5 варианта', 'AI Sketch анализ', 'PDF договори включени', 'Персонален мениджър'], color: '#8C56FF', popular: false },
+              { name: 'БАЗОВ', price: '15', stars: 1, features: ['Профил + портфолио + 10 снимки', '5 оферти/месец', 'Основен профил'], color: '#4DA6FF', popular: false },
+              { name: 'ПРО', price: '35', stars: 2, features: ['Telegram известия', 'PDF договори', 'AI скици + сметки', 'Неограничени оферти'], color: '#FF8C42', popular: true },
+              { name: 'PREMIUM', price: '75', stars: 3, features: ['ПЪРВИ 10 мин. предимство!', 'Персонализирани PDF', 'Неограничени AI скици', 'Екип до 5 души + API'], color: '#8C56FF', popular: false },
             ].map((plan, i) => (
               <Card key={i} className={`bg-[#253545] border-[#3A4A5C] p-6 text-center ${plan.popular ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20 scale-[1.03]' : ''}`}>
-                {plan.popular && <div className="bg-[#FF8C42] text-white text-[10px] font-bold rounded-full px-3 py-1 inline-block mb-3">ПРЕПОРЪЧАН</div>}
+                {plan.popular && <div className="bg-[#FF8C42] text-white text-[10px] font-bold rounded-full px-3 py-1 inline-block mb-3">90% ИЗБИРАТ ТОЗИ!</div>}
+                <div className="flex gap-0.5 justify-center mb-2">
+                  {Array.from({ length: plan.stars }, (_, si) => (
+                    <Star key={si} className="h-4 w-4 fill-current" style={{ color: plan.color }} />
+                  ))}
+                </div>
                 <h3 className="text-lg font-bold text-white">{plan.name}</h3>
                 <p className="text-3xl font-bold mt-2 mb-1" style={{ color: plan.color }}>{plan.price} <span className="text-base font-normal text-slate-400">EUR/мес</span></p>
                 <div className="space-y-2 mt-4 text-left">
@@ -3013,33 +3018,86 @@ const SubscriptionsPage = () => {
     }
   };
 
-  const planColors = { starter: '#4DA6FF', pro: '#FF8C42', premium: '#8C56FF' };
+  const planConfig = {
+    basic: { color: '#4DA6FF', stars: 1, badge: null, ring: '' },
+    pro: { color: '#FF8C42', stars: 2, badge: '90% ИЗБИРАТ ТОЗИ!', ring: 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20 scale-[1.03]' },
+    premium: { color: '#8C56FF', stars: 3, badge: 'КРАЛСКИ!', ring: 'border-[#8C56FF] ring-1 ring-[#8C56FF]/20' },
+  };
+
+  const renderStars = (count, color) => (
+    <div className="flex gap-0.5 justify-center mb-2">
+      {Array.from({ length: count }, (_, i) => (
+        <Star key={i} className="h-5 w-5 fill-current" style={{ color }} />
+      ))}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#1E2A38] py-12" data-testid="subscriptions-page">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Абонаменти и услуги</h1>
-          <p className="text-lg text-slate-400">Изберете план или еднократна услуга</p>
+          <p className="text-lg text-slate-400">Изберете план, който отговаря на вашите нужди</p>
+        </div>
+
+        {/* How notification timing works */}
+        <div className="bg-[#0F1923] border border-[#2A3A4C] rounded-xl p-5 mb-8 max-w-3xl mx-auto" data-testid="notification-explainer">
+          <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
+            <Clock className="h-4 w-4 text-[#FF8C42]" /> Как работят известията за нови обяви?
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div className="bg-[#8C56FF]/10 border border-[#8C56FF]/20 rounded-lg p-3 text-center">
+              <p className="text-[#8C56FF] font-bold">PREMIUM</p>
+              <p className="text-white mt-1">10:00 ч. — вижда обявата ПЪРВИ</p>
+              <p className="text-slate-500 mt-0.5">10 мин. преди ПРО!</p>
+            </div>
+            <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-lg p-3 text-center">
+              <p className="text-[#FF8C42] font-bold">ПРО</p>
+              <p className="text-white mt-1">10:10 ч. — получава известие</p>
+              <p className="text-slate-500 mt-0.5">Едновременно с всички ПРО</p>
+            </div>
+            <div className="bg-[#4DA6FF]/10 border border-[#4DA6FF]/20 rounded-lg p-3 text-center">
+              <p className="text-[#4DA6FF] font-bold">БАЗОВ</p>
+              <p className="text-white mt-1">Търси ръчно в сайта</p>
+              <p className="text-slate-500 mt-0.5">Без автоматични известия</p>
+            </div>
+          </div>
+          <p className="text-center text-[#FF8C42] font-bold text-xs mt-3">PREMIUM взима 80% от договорите!</p>
         </div>
 
         {/* Subscription plans */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {plans.company && Object.entries(plans.company).map(([key, plan]) => {
-            const color = planColors[key] || '#FF8C42';
-            const isPro = key === 'pro';
-            const isPremium = key === 'premium';
+            const cfg = planConfig[key] || planConfig.basic;
             return (
-              <Card key={key} className={`relative bg-[#253545] border-[#3A4A5C] overflow-hidden ${isPro ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20 scale-[1.02]' : ''} ${isPremium ? 'border-[#8C56FF] ring-1 ring-[#8C56FF]/20' : ''}`} data-testid={`plan-${key}`}>
-                {isPro && <div className="bg-[#FF8C42] text-white text-center text-xs py-1.5 font-bold tracking-wider">ПРЕПОРЪЧАН</div>}
-                {isPremium && <div className="bg-gradient-to-r from-[#8C56FF] to-[#4DA6FF] text-white text-center text-xs py-1.5 font-bold tracking-wider">ПЪЛНА ФУНКЦИОНАЛНОСТ</div>}
+              <Card key={key} className={`relative bg-[#253545] border-[#3A4A5C] overflow-hidden ${cfg.ring}`} data-testid={`plan-${key}`}>
+                {cfg.badge && (
+                  <div className="text-white text-center text-xs py-2 font-bold tracking-wider" style={{ backgroundColor: cfg.color }}>
+                    {cfg.badge}
+                  </div>
+                )}
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-                  <p className="text-2xl font-bold mb-5" style={{ color }}>{plan.price}</p>
+                  {renderStars(cfg.stars, cfg.color)}
+                  <h3 className="text-xl font-bold text-white text-center mb-1">{plan.name}</h3>
+                  <p className="text-3xl font-bold text-center mb-1" style={{ color: cfg.color }}>{plan.price}</p>
+
+                  {/* Notification delay badge */}
+                  {plan.notification_delay && (
+                    <div className="text-center mb-4 mt-2">
+                      <span className="inline-block text-[10px] font-medium px-3 py-1 rounded-full border" style={{
+                        color: cfg.color,
+                        borderColor: `${cfg.color}40`,
+                        backgroundColor: `${cfg.color}10`
+                      }}>
+                        {plan.notification_delay}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="space-y-2.5 mb-4">
                     {plan.features.map((f, i) => (
                       <div key={i} className="flex items-start gap-2 text-sm text-slate-300">
-                        <CheckCircle className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color }} /> 
+                        <CheckCircle className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: cfg.color }} />
                         <span>{f}</span>
                       </div>
                     ))}
@@ -3048,14 +3106,14 @@ const SubscriptionsPage = () => {
                     <div className="space-y-1.5 mb-4 pt-3 border-t border-[#3A4A5C]">
                       {plan.limitations.map((l, i) => (
                         <div key={i} className="flex items-start gap-2 text-xs text-slate-500">
-                          <AlertCircle className="h-3 w-3 flex-shrink-0 mt-0.5 text-slate-600" />
+                          <X className="h-3 w-3 flex-shrink-0 mt-0.5 text-red-400/60" />
                           <span>{l}</span>
                         </div>
                       ))}
                     </div>
                   )}
-                  <Button className="w-full text-white" style={{ backgroundColor: color }} onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
-                    Абонирай се
+                  <Button className="w-full text-white font-bold" style={{ backgroundColor: cfg.color }} onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
+                    Избери {plan.name}
                   </Button>
                 </CardContent>
               </Card>
@@ -3090,7 +3148,7 @@ const SubscriptionsPage = () => {
 
         {/* AI Designer module */}
         <h2 className="text-2xl font-bold text-white mb-2">AI Дизайнер</h2>
-        <p className="text-slate-400 text-sm mb-6">Включен в Pro (1 вариант) и Premium (5 варианта)</p>
+        <p className="text-slate-400 text-sm mb-6">Включен в PREMIUM план. За ПРО и БАЗОВ: еднократна такса.</p>
         <div className="max-w-lg">
           {plans.designer && Object.entries(plans.designer).map(([key, plan]) => (
             <Card key={key} className="bg-gradient-to-r from-[#8C56FF]/20 to-[#4DA6FF]/20 border-[#8C56FF]/30" data-testid={`plan-designer-${key}`}>
