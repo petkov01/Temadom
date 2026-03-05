@@ -3,7 +3,7 @@ import { Image, Eye, Download, FileText, FileImage, ChevronLeft, ChevronRight, S
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { PageInstructions } from './PageInstructions';
 import axios from 'axios';
 
@@ -148,6 +148,7 @@ export const PublishedGalleryPage = () => {
               </div>
             ) : selectedProject ? (
               <div className="space-y-6">
+                <DialogTitle className="sr-only">Детайли на проект</DialogTitle>
                 <div>
                   <h2 className="text-xl font-bold text-white">{selectedProject.room_type || 'AI Дизайн проект'}</h2>
                   <div className="flex flex-wrap gap-2 mt-2">
