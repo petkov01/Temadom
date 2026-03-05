@@ -589,7 +589,6 @@ const Footer = () => {
             <li><Link to="/about" className="hover:text-[#FF8C42] transition-colors">{t('footer_about')}</Link></li>
             <li><Link to="/terms" className="hover:text-[#FF8C42] transition-colors">{t('footer_terms')}</Link></li>
             <li className="text-[#4DA6FF]">info@temadom.com</li>
-            <li className="text-[#4DA6FF]">+359 88 888 8888</li>
           </ul>
         </div>
       </div>
@@ -1342,14 +1341,6 @@ const ProjectDetailPage = () => {
                       <span className="font-medium">{project.client_name}</span>
                     </div>
                   )}
-                  {project.client_phone && (
-                    <div className="flex items-center gap-3">
-                      <Phone className="h-5 w-5 text-slate-400" />
-                      <a href={`tel:${project.client_phone}`} className="text-[#FF8C42] hover:underline">
-                        {project.client_phone}
-                      </a>
-                    </div>
-                  )}
                   {project.client_email && (
                     <div className="flex items-center gap-3">
                       <Mail className="h-5 w-5 text-slate-400" />
@@ -2031,7 +2022,7 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
+    phone: '', // hidden but kept for backend compatibility
     city: '',
     telegram_username: '',
     bulstat: '',
@@ -2180,16 +2171,6 @@ const RegisterPage = () => {
                 onChange={(e) => setFormData(d => ({ ...d, email: e.target.value }))}
                 required
                 data-testid="register-email"
-              />
-            </div>
-            <div>
-              <Label>{t('reg_phone')}</Label>
-              <Input 
-                type="tel"
-                placeholder="+359 88 888 8888"
-                value={formData.phone}
-                onChange={(e) => setFormData(d => ({ ...d, phone: e.target.value }))}
-                data-testid="register-phone"
               />
             </div>
             <div>
@@ -2509,12 +2490,6 @@ const CompanyDashboard = () => {
                           <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-slate-400" />
                             <span>{lead.client_name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-slate-400" />
-                            <a href={`tel:${lead.client_phone}`} className="text-[#FF8C42] hover:underline">
-                              {lead.client_phone}
-                            </a>
                           </div>
                           <div className="flex items-center gap-2">
                             <Mail className="h-4 w-4 text-slate-400" />
