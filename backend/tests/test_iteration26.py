@@ -9,7 +9,7 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://multiangle-3d-model.preview.emergentagent.com"
+    BASE_URL = "https://sketch-to-3d-16.preview.emergentagent.com"
 
 
 class TestHealthCheck:

@@ -3,7 +3,7 @@
 import requests
 import json
 
-BASE_URL = "https://multiangle-3d-model.preview.emergentagent.com/api"
+BASE_URL = "https://sketch-to-3d-16.preview.emergentagent.com/api"
 
 def test_portfolio_endpoints():
     # Login as company to get token

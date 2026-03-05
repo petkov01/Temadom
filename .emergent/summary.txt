@@ -1,87 +1,81 @@
 <analysis>**original_problem_statement:**
-The user's goal is to build a full-featured marketplace, TemaDom, for construction project leads. The project started with a multi-phase plan and evolved significantly based on user feedback. Key features implemented include a site-wide dark theme, a new logo, a public gallery for AI-generated designs, social sharing, multi-tiered subscription plans, and PDF contract generation. The project's latest direction is to replace the existing AI designer with a more advanced 3D Multi-Angle Scanner and to build out an AI Chart Analyzer for processing blueprints.
+The user's primary goal is to build a web application, TemaDom, that converts hand-drawn construction sketches or structural drawings into a precise 3D visualization. This is a significant pivot from previous features.
 
 **LATEST PRODUCT REQUIREMENTS (Synthesized from user's prompts):**
 
-*   **3D Multi-Angle Scanner (HIGHEST PRIORITY):**
-    *   Create a new feature that replaces the current AI designer.
-    *   It should take 3 user photos (front, left, right) of a room.
-    *   Generate a full 360° photorealistic 3D model of the space.
-    *   The model must be interactive (rotatable via mouse/touch).
-    *   The user should be able to swap out interior elements (furniture, fixtures) while keeping the core structure (walls, windows, doors) fixed.
-    *   The feature must be compatible with desktop, mobile, and VR.
+*   **AI Sketch () - STRICT GEOMETRIC CONVERSION (HIGHEST PRIORITY):**
+    *   The user uploads a hand-drawn sketch, scanned drawing, or architectural plan (JPG, PNG, PDF).
+    *   A backend pipeline using Computer Vision (OpenCV) and OCR (Tesseract) must analyze the image.
+    *   **Processing Pipeline:**
+        1.  **Image Preprocessing:** Normalize, remove noise, detect edges.
+        2.  **Line Detection (CV):** Extract structural lines (walls, stairs, slabs).
+        3.  **Dimension Detection (OCR):** Extract dimensions written on the drawing (e.g., 10m).
+        4.  **Vectorization:** Convert detected lines into vector geometry (e.g., ).
+        5.  **3D Model Generation:** Convert vector geometry into a 3D model ().
+    *   **STRICT MODE:** The system must NOT hallucinate or invent elements like doors, windows, or roofs. It should only generate geometry present in the drawing. Unclear geometry should be marked unknown.
+    *   **UI:** The result page should render the model using Three.js with rotate/zoom/pan controls. The user should be able to download the  file.
+    *   **Removed Functionality:** All quantity survey (bill of materials) generation should be removed from this flow. It is purely for 3D visualization.
 
-*   **AI Chart Analyzer ():**
-    *   A page where users can upload a technical drawing (e.g., of stairs, foundations).
-    *   An AI should analyze the drawing with 95-100% accuracy to extract structural elements and dimensions.
-    *   Generate a detailed quantity survey (bill of materials) with pricing.
-    *   Generate a formal PDF contract based on the survey, ready for signing.
-
-*   **Final Launch Preparations:**
-    *   Ensure all test/demo data (projects, ads, users) is deleted.
-    *   Ensure all features are fully functional and the site is ready for a public launch.
-    *   Video tutorials should be in Bulgarian and feature the company logo.
+*   **Site-Wide Final Configuration:**
+    *   **New Structure:** The site is structured around  (drawings to 3D),  (photos to 3D), and  (a social gallery).
+    *   **Psychological Copy:** The homepage and marketing text must use specific, user-centric language provided by the user (e.g., Ремонт без стрес - БЕЗПЛАТНО, Спести 20ч търсене на майстори).
+    *   **Free Model:** All features are currently free for the first 1000 clients, with monetization planned for the future.
+    *   **Social Zone ():** A public gallery where clients upload their finished projects for others to like, comment on, and share. This replaces the old AI Gallery.
+    *   **Deprecated Features:** All video instructions, the 3D Multi-Angle Scanner UI, and the old AI Gallery must be removed.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-The application is in a stable, feature-rich state and has undergone multiple rounds of implementation and testing. Key existing features include:
-*   A redesigned homepage featuring the company's mission and an AI-generated promotional video (Sora 2).
-*   A functional  page that accepts an image upload, displays a (currently mocked) quantity survey, and generates a PDF contract using .
-*   A public gallery () where users can view and share published projects via social media links.
-*   A multi-tiered subscription system (Starter, Pro, Premium) with prices in EUR and standalone, one-off purchase options for PDF generation.
-*   Backend endpoints for managing projects, subscriptions, and PDF generation.
-*   Client-side JPEG conversion for all image uploads to prevent file format issues.
-*   A cleanup mechanism to remove all test data from the database.
+The application is stable and has undergone a major restructuring. The monolith  has been partially refactored, with models and configuration moved to  and . The subscription system is fully implemented with three tiers (БАЗОВ, ПРО, PREMIUM) and integrated with a priority-based Telegram notification system. The frontend features a completely redesigned homepage, a new social gallery page (), and updated navigation reflecting the user's latest final configuration. The  page exists, but its backend logic uses a generic LLM, which does not meet the new, strict CV/OCR pipeline requirements.
 
 **Last working item**:
-*   Last item agent was working: The user provided a detailed new requirement for a 3D Multi-Angle Scanner to replace the existing AI designer. The agent acknowledged the request and was preparing to begin implementation.
-*   Status: NOT STARTED
+*   Last item agent was working: Implementing the new Computer Vision and OCR pipeline for the  feature. The agent correctly identified the user's detailed technical requirements, planned the implementation, and installed the necessary dependencies (, ).
+*   Status: IN PROGRESS
 *   Agent Testing Done: N
 *   Which testing method agent to use? both
 *   User Testing Done: N
 
 **All Pending/In progress Issue list**:
-There are no known bugs. The entire backlog consists of new feature requests.
+*   **Issue 1:  Backend Logic is Incorrect (P0)**
+    *   **Description:** The current  endpoint uses a general-purpose vision LLM. This needs to be completely replaced with the user-specified pipeline using OpenCV for line detection and Tesseract for OCR to achieve precise, rule-based 3D model generation.
+    *   **Status:** IN PROGRESS
 
 **In progress Task List**:
-There are no tasks currently in progress.
+*   **Task 1: Implement CV/OCR Pipeline for AI Sketch (P0)**
+    *   **Where to resume:** The dependencies (, ) are installed. The next step is to modify the  endpoint in . The new logic should implement the full pipeline: image preprocessing, line/dimension detection, vectorization, and finally, 3D model data generation.
+    *   **What will be achieved with this?** The application will be able to convert technical drawings into accurate 3D models according to the user's strict geometric rules, which is the current highest priority.
+    *   **Status:** IN PROGRESS
+    *   **Should Test frontend/backend/both after fix?** both
 
 **Upcoming and Future Tasks**
-
-*   **Upcoming Tasks:**
-    *   **P0: Implement 3D Multi-Angle Scanner:** This is the immediate priority.
-        *   **Action:** Research and select a suitable 3D technology (e.g., Three.js, Spline, or a dedicated 3D reconstruction API). Use  to get an implementation plan.
-        *   **Action:** Build the frontend UI for uploading 3 images and displaying the interactive 3D model.
-        *   **Action:** Develop the backend service to process the images and generate the 3D model.
 *   **Future Tasks:**
-    *   **P1: Fully Implement AI Chart Analysis:** The current  page uses mocked data. The next step is to integrate a real AI service to perform the blueprint analysis with the required 95-100% accuracy.
-    *   **P2: Refactor :** The monolithic backend file is large and should be broken down into a standard FastAPI project structure (routers, services, models) for better maintainability.
-    *   **P3: Mobile App Development:** Revisit the user's original request for a native mobile application (React Native/Expo).
+    *   **P1: Complete Backend Refactoring:** The refactoring of  was started by creating  and . The next step is to split the large  file into a modular structure with separate router files (e.g., , , etc.) to improve maintainability.
+    *   **P2: Implement Monetization:** The user has specified that the service is free for now but will be paid later. This will involve integrating payment processing and locking features based on subscription status.
+    *   **P3: Save AI Sketch Projects:** The user previously approved saving 3D projects to the database with a shareable link. This functionality should be implemented for the new  feature after the core pipeline is working.
 
 **Completed work in this session**
-- **Major Feature Implementations:**
-  - **AI Chart Analyzer ():** Created the page and implemented frontend/backend logic for mock analysis and PDF contract generation.
-  - **AI-Generated Video:** Used Sora 2 via  to create a promotional video in Bulgarian with the company logo and integrated it into the homepage.
-  - **Public Gallery & Social Sharing:** Built the  page and added social sharing functionality to both the gallery and the AI designer results.
-- **Subscription & Pricing Overhaul:**
-  - Restructured subscription plans (Starter, Pro, Premium) multiple times based on user feedback.
-  - Updated pricing from BGN to EUR and adjusted values.
-  - Removed AI Designer from the Pro plan.
-  - Implemented standalone one-time purchase options for PDF contracts.
-- **UI/UX & Content:**
-  - Redesigned the homepage () to showcase key features and the company mission.
-  - Finalized the logo design to include the subtitle СТРОИТЕЛСТВО И РЕМОНТ.
-  - Created interactive video instruction modals with step-by-step guides.
-  - Removed the Designers () link from all navigation menus.
-- **Technical Enhancements & Bug Fixes:**
-  - Implemented client-side JPEG conversion for image uploads in  and  to handle different file types.
-  - Fixed PDF generation font errors by installing DejaVu fonts on the backend.
-  - Created and executed a script to delete all test users, projects, and ads from the database.
-- **Testing:** Ran  successfully after every major feature deployment, achieving 100% pass rates.
+- **Major Site-Wide Restructuring:**
+  - Redesigned the  with new psychological copy and a simplified two-button layout.
+  - Updated  with a new navigation structure: IA Sketch, Помещения, Готови проекти, Фирми.
+  - Created the  as a new social zone for users to share projects, with backend support for likes and comments.
+  - Removed all video instruction modals (), the 3D scanner page, and the old AI gallery from the UI.
+- **Advanced Telegram Notifications:**
+  - Implemented a priority-based notification system that sends instant alerts to PREMIUM users and delayed alerts to PRO users.
+  - Notifications are now rich, including project budget, a photo, and a direct link.
+  - Added a Connect Telegram component () to the user dashboard.
+- **Backend Refactoring (Partial):**
+  - Created  to house shared configurations like database connections and secret keys.
+  - Created  to consolidate all Pydantic and database models.
+  - Updated  to import from these new modules, reducing its size.
+- **Feature Implementation & Subscription Overhaul:**
+  - Implemented the full 3D Multi-Angle Scanner feature (frontend & backend), though it was later deprecated from the UI per user request.
+  - Implemented saving/loading of 3D projects to MongoDB with unique shareable links.
+  - Overhauled the subscription plans to a БАЗОВ/ПРО/PREMIUM structure with new pricing and features, updating both  and .
+  - Created the  analyzer page and backend (later superseded by the new  requirements).
+- **Testing:** Consistently used  after every major change, achieving 100% pass rates and resolving all reported issues.
 
 **Earlier issues found/mentioned but not fixed**
-- None. All identified issues were addressed.
+- None.
 
 **Known issue recurrence from previous fork**
 - None.
@@ -90,78 +84,81 @@ There are no tasks currently in progress.
 
 
 **Key Technical Concepts**
-- **Backend:** Monolithic FastAPI () using Pydantic.
-- **Frontend:** React, TailwindCSS, , .
-- **AI/ML:** , , **Sora 2** for video generation.
-- **PDF Generation:**  (backend),  &  (frontend).
-- **Image Handling:** Client-side conversion to JPEG before upload using  and .
-- **Upcoming Tech:** A 3D library/framework (e.g., **Three.js, WebGL, Spline**) will be required for the new 3D Scanner feature.
+- **Backend:** FastAPI, Pydantic, MongoDB ().
+- **Frontend:** React, TailwindCSS, , , , , .
+- **AI/ML:**
+    - **Current:**  for general LLM vision tasks (to be replaced).
+    - **Upcoming:**  for computer vision (edge/line detection) and  for OCR (dimension detection).
+- **PDF Generation:**  (backend),  (frontend).
+- **Real-time Communication:** Telegram Bot API for notifications.
 
 **key DB schema**
-- **users**: Stores user data and roles (, , ).
-- **reviews**: Stores user feedback and ratings.
-- **ai_projects**: Stores published AI designs for the public gallery.
-- **subscriptions**: A list defined in  acts as the source of truth for pricing plans.
+- **users**: Stores user data, roles, and .
+- **projects**: Stores user-submitted projects.
+- **telegram_chats**: Maps user IDs to Telegram chat IDs and subscription tiers.
+- **scanner3d_projects**: Stores saved 3D scanner projects with image data and unique IDs.
+- **ready_projects**: Stores projects published to the social gallery.
+- **likes**: Stores likes for .
+- **comments**: Stores comments for .
 
 **All files of reference**
-*   : Contains all business logic, including new endpoints for the chart analyzer, video streaming, and data cleanup.
-*   : The UI for the new blueprint analyzer feature.
-*   : The redesigned homepage with the new video and feature sections.
-*   : The UI for displaying and managing subscription tiers.
-*   : The page for the public project gallery.
-*   : Contains the final logo with subtitle and updated navigation.
-*   : The AI-generated video file.
+*   : The main application file, which needs further refactoring but contains the  endpoint to be modified.
+*   : Contains all Pydantic models.
+*   : Contains shared configuration.
+*   : The frontend for the feature being rebuilt.
+*   : The fully redesigned homepage.
+*   : The new social gallery.
 
 **Areas that need refactoring**:
-- **:** This is a critical refactoring candidate. It has become very large and should be modularized into a standard FastAPI project structure (e.g., , , ).
-- **AI Feature Consolidation:** With the introduction of the 3D Multi-Angle Scanner, the agent should plan to deprecate or remove the old  and its associated logic to avoid code duplication and confusion.
+- **:** This is the top priority for refactoring. While models and config have been extracted, all API routes remain in this single 3000+ line file. It should be broken down into a  directory structure.
 
 **key api endpoints**
-- : (POST) Analyzes a drawing and returns materials/contract data.
-- : (POST) Deletes all test data from the database.
-- : (GET) Serves the  file.
-- : (GET) Returns the current subscription plans and pricing.
-- : (POST) Publishes a project to the gallery.
-- : (GET) Retrieves all published projects.
-- : (GET) Generates a PDF of project images.
-- : (GET) Generates a PDF of project materials.
+- : (POST) **NEEDS REIMPLEMENTATION.** The target for the new CV/OCR pipeline.
+- : (GET/POST) Endpoints for the new social gallery.
+- : (POST) Endpoint for liking a project.
+- : (POST) Endpoint for commenting on a project.
+- : (GET) Provides a unique link for a user to connect their Telegram account.
+- : (GET) Checks if a user has connected their Telegram account.
+- : (POST) Saves a 3D project.
+- : (GET) Loads a saved 3D project.
+- : (GET) Returns the current subscription plans.
 
 **Critical Info for New Agent**
-- **Highest Priority is the 3D Scanner:** The user's latest request for a 3D Multi-Angle Scanner is a major pivot and MUST be the first task. This feature is intended to replace the previous AI designer. You must use  to research and implement the 3D modeling/reconstruction part.
-- **Communicate in Bulgarian:** All responses and questions to the user must be in Bulgarian.
-- ** is Mocked:** The core analysis logic in the  endpoint is currently hardcoded for a single example (). The full AI implementation is a future task.
-- **Final Launch State:** The user considers the project close to launch. All new features must be production-quality, and all test data has been cleared. Do not introduce new test data unless it's cleaned up afterward.
+- **Priority #1 is the CV/OCR Pipeline:** Your entire focus must be on replacing the logic in the  endpoint. The user has provided a very specific, technical blueprint: use OpenCV and Tesseract, do not use a generative LLM, and be geometrically precise.
+- **The Application Has Pivoted:** Ignore previous features like the 3D Multi-Angle Scanner, AI Gallery, and video tutorials. They have been intentionally removed from the user flow. The new core of the application is the  tool and the  social gallery.
+- **Communicate in Bulgarian:** All communication with the user must be in Bulgarian.
 
 **documents and test reports created in this job**
 -  (Continuously updated)
-- Multiple test reports in , with the latest successful run being .
+- Multiple test reports in  (e.g., ).
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (latest):** Requests the new 3D Multi-Angle Scanner feature to replace the current AI designer, providing detailed specifications.
-2.  **Agent:** Acknowledges the new 3D scanner request.
-3.  **User:** Asks for the  analyzer to be built with PDF contract generation, and provides the full HTML/CSS/JS spec for it.
-4.  **User:** Asks to delete all fake ads and posts, and regenerate the video in Bulgarian with the site's logo.
-5.  **Agent:** Confirms the plan for the chart analyzer and video regeneration.
-6.  **User:** Asks to generate an AI video for the site (Sora 2), convert image uploads to JPEG, and update the logo with a text subtitle.
-7.  **Agent:** Presents a plan to implement the AI video, JPEG conversion, and new logo.
-8.  **User:** Reports the blueprint scanner isn't working correctly, prices are too low (+15%), video instructions don't play, and asks to remove AI designer from the Pro plan.
-9.  **Agent:** Presents a plan to fix the reported issues.
-10. **User:** States that the site is ready to go live tomorrow, asks for a 30% discount on EUR prices, removal of the Designers section, and new pricing for standalone PDF contracts.
+1.  **User (latest):** Provided a detailed technical specification for the  feature, requiring a CV/OCR pipeline with OpenCV/Tesseract and strict geometric accuracy.
+2.  **User:** Confirmed the agent should implement the new  functionality on the existing page.
+3.  **User:** Provided a detailed Final Configuration prompt, demanding a major site restructure, new psychological copy, removal of old features (3D scanner, video), and a new Готови проекти social page.
+4.  **Agent:** Presented a plan for the Final Configuration and asked for confirmation.
+5.  **User:** Agreed to the plan.
+6.  **Agent:** Finished the Telegram notification implementation and asked for the next task.
+7.  **User:** Confirmed they wanted option #2 (rich notifications with timing).
+8.  **Agent:** Presented options for the Telegram integration.
+9.  **User:** Agreed to the plan to implement Telegram notifications.
+10. **Agent:** Finished refactoring and the 3D project saving feature, and asked for the next task.
 
 **Project Health Check:**
--   **Broken:** None. The application is stable and has passed comprehensive testing.
--   **Mocked:** The core AI logic for the **AI Chart Analyzer ()** is mocked. It processes a hardcoded example rather than performing real AI analysis on the uploaded drawing.
+-   **Broken:** None. The application is stable.
+-   **Mocked:** The core logic of the  endpoint is effectively a mock, as it uses a generic AI instead of the required, specific CV/OCR pipeline.
 
 **3rd Party Integrations**
--   **OpenAI Sora 2:** Used for video generation. Utilizes the **Emergent LLM Key**.
--   **OpenAI GPT/DALL-E:** Used for text/image generation in previous features (via ). Utilizes the **Emergent LLM Key**.
--    & : Frontend library for PDF generation.
--   : Backend library for PDF generation.
--   **Upcoming:** A 3D modeling/reconstruction service (e.g., **Spline, Kaedim, Luma AI, or a library like Three.js**) will be required for the 3D Multi-Angle Scanner. This will need investigation via .
+-   **OpenCV ():** To be used for image processing and line detection.
+-   **Tesseract ():** To be used for OCR to detect dimensions on drawings.
+-   **Telegram Bot API:** For sending real-time, priority-based notifications to users.
+-   **Emergent LLM Key:** Used for previous AI features, but the new  pipeline will not use it.
+-   **Three.js / React Three Fiber:** Used for rendering 3D models on the frontend.
+-    & : For PDF generation in other parts of the application.
 
 **Testing status**
--   Testing agent used after significant changes: YES. Multiple successful runs with 100% pass rates on both backend and frontend.
--   Troubleshoot agent used after agent stuck in loop: NO
+-   Testing agent used after significant changes: YES. The agent ran  after every major feature merge, consistently achieving 100% pass rates.
+-   Troubleshoot agent used after agent stuck in loop: NO.
 -   Test files created: []
 -   Known regressions: None.
 
@@ -169,4 +166,4 @@ There are no tasks currently in progress.
 - Register a new user on the site via the registration page to test all user-facing features. No default credentials are required.
 
 **What agent forgot to execute**
-- The agent has not forgotten any tasks. The session ended immediately after the user introduced a major new requirement (the 3D Multi-Angle Scanner), which is now the top priority for the next session.</analysis>
+- The backend refactoring of  into a modular router-based structure is only partially complete. This was listed as a task but was superseded by higher-priority user requests. It remains a key technical debt item.</analysis>
