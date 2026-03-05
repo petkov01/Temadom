@@ -34,19 +34,15 @@ import { Chatbot } from '@/components/Chatbot';
 import { FeedbackButton } from '@/components/FeedbackButton';
 import { PageInstructions } from '@/components/PageInstructions';
 
-// TemaDom Logo Component - New Phase 3 logo
+// TemaDom Logo Component - Only image logo
 const TemaDomLogo = ({ className = "h-12" }) => (
-  <div className="flex items-center gap-3" data-testid="temadom-logo">
+  <div className="flex items-center" data-testid="temadom-logo">
     <img 
       src="/logo-temadom.png" 
       alt="TemaDom" 
       className={className}
       style={{ objectFit: 'contain' }}
     />
-    <div className="hidden sm:flex flex-col leading-tight">
-      <span className="text-white font-bold text-lg tracking-wide">TemaDom</span>
-      <span className="text-slate-400 text-[10px] font-medium" style={{ letterSpacing: '0.15em' }}>СТРОИТЕЛСТВО И РЕМОНТ</span>
-    </div>
   </div>
 );
 import { Button } from "@/components/ui/button";
@@ -669,28 +665,33 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ===== VIDEO TUTORIAL ===== */}
+      {/* ===== INFO SECTION ===== */}
       <section className="py-16 border-t border-[#2A3A4C]">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-[#FF8C42]/15 border border-[#FF8C42]/30 rounded-full px-4 py-1.5 mb-4">
-            <Play className="h-4 w-4 text-[#FF8C42]" />
-            <span className="text-xs font-medium text-[#FF8C42]">ВИДЕО ИНСТРУКЦИИ</span>
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Информация за клиенти</h2>
+            <p className="text-slate-400">Всичко, което трябва да знаете преди да започнете</p>
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">Как работи TemaDom?</h2>
-          <div className="rounded-2xl overflow-hidden border border-[#3A4A5C] bg-[#0F1923]" data-testid="video-section">
-            <video
-              controls
-              playsInline
-              preload="metadata"
-              poster=""
-              className="w-full max-h-[480px]"
-              data-testid="tutorial-video"
-            >
-              <source src="/videos/temadom-tutorial.mp4" type="video/mp4" />
-              Браузърът не поддържа видео.
-            </video>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-[#253545] border-[#3A4A5C] p-6">
+              <h3 className="text-[#FF8C42] font-bold text-lg mb-3">Как да започнете?</h3>
+              <ul className="space-y-3 text-sm text-slate-300">
+                <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] mt-0.5 flex-shrink-0" /> Регистрирайте се безплатно като клиент или фирма</li>
+                <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] mt-0.5 flex-shrink-0" /> Използвайте безплатния калкулатор за оценка на разходите</li>
+                <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] mt-0.5 flex-shrink-0" /> Качете чертеж в AI Чертежи за количествена сметка</li>
+                <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] mt-0.5 flex-shrink-0" /> Генерирайте PDF договор и го изпратете на фирмата</li>
+              </ul>
+            </Card>
+            <Card className="bg-[#253545] border-[#3A4A5C] p-6">
+              <h3 className="text-[#4DA6FF] font-bold text-lg mb-3">Защо да ни изберете?</h3>
+              <ul className="space-y-3 text-sm text-slate-300">
+                <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-[#4DA6FF] mt-0.5 flex-shrink-0" /> 95-100% точност на AI анализите</li>
+                <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-[#4DA6FF] mt-0.5 flex-shrink-0" /> Реални цени от 18 български магазина (2025-2026)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-[#4DA6FF] mt-0.5 flex-shrink-0" /> Официален PDF договор за подписване</li>
+                <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-[#4DA6FF] mt-0.5 flex-shrink-0" /> Директна връзка с проверени фирми и майстори</li>
+              </ul>
+            </Card>
           </div>
-          <p className="text-slate-500 text-xs mt-3">Вижте кратко видео представяне на платформата TemaDom</p>
         </div>
       </section>
 

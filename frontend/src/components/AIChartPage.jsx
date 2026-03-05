@@ -3,10 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Upload, FileText, BarChart3, Download, User, Loader2, CheckCircle, AlertCircle, Layers } from 'lucide-react';
+import { Upload, FileText, BarChart3, Download, User, Loader2, CheckCircle, Layers, Star, Send } from 'lucide-react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -43,8 +42,26 @@ export const AIChartPage = () => {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState(null);
   const fileInputRef = useRef(null);
+  const [serviceRating, setServiceRating] = useState(0);
+  const [serviceHover, setServiceHover] = useState(0);
+  const [serviceComment, setServiceComment] = useState('');
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
+
   const [dragActive, setDragActive] = useState(false);
 
+  const submitServiceRating = async () => {
+    if (serviceRating === 0) { toast.error('Моля, изберете оценка'); return; }
+    try {
+      await axios.post(`${API}/feedback`, {
+        rating: serviceRating,
+        text: `[AI Чертежи] ${serviceComment}`,
+        name: clientName || 'Анонимен',
+        service: 'ai-chart'
+      });
+      setRatingSubmitted(true);
+      toast.success('Благодарим за оценката!');
+    } catch { toast.error('Грешка при изпращане'); }
+  };
   const handleFile = useCallback(async (f) => {
     if (!f) return;
     if (!f.type.startsWith('image/')) {
@@ -491,6 +508,56 @@ export const AIChartPage = () => {
                 >
                   <Download className="mr-2 h-5 w-5" /> ИЗТЕГЛИ PDF ДОГОВОР
                 </Button>
+              </CardContent>
+            </Card>
+            {/* Service Rating */}
+            <Card className="bg-[#253545] border-[#3A4A5C]">
+              <CardContent className="p-6">
+                {ratingSubmitted ? (
+                  <div className="text-center py-4" data-testid="rating-thank-you">
+                    <CheckCircle className="h-10 w-10 text-[#28A745] mx-auto mb-3" />
+                    <p className="text-white font-medium">Благодарим за оценката!</p>
+                    <p className="text-slate-400 text-sm mt-1">Вашето мнение ни помага да подобрим услугата</p>
+                  </div>
+                ) : (
+                  <div data-testid="service-rating-section">
+                    <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+                      <Star className="h-5 w-5 text-[#FF8C42]" /> Оценете тази услуга
+                    </h3>
+                    <p className="text-slate-400 text-sm mb-4">Как оценявате AI анализа на чертежи?</p>
+                    <div className="flex gap-1 mb-4">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <button
+                          key={i}
+                          onMouseEnter={() => setServiceHover(i)}
+                          onMouseLeave={() => setServiceHover(0)}
+                          onClick={() => setServiceRating(i)}
+                          className="p-1 transition-transform hover:scale-110"
+                          data-testid={`service-star-${i}`}
+                        >
+                          <Star className={`h-8 w-8 transition-colors ${
+                            i <= (serviceHover || serviceRating) ? 'fill-[#FF8C42] text-[#FF8C42]' : 'text-[#3A4A5C]'
+                          }`} />
+                        </button>
+                      ))}
+                    </div>
+                    <textarea
+                      placeholder="Какво можем да подобрим? (по избор)"
+                      value={serviceComment}
+                      onChange={(e) => setServiceComment(e.target.value)}
+                      rows={2}
+                      className="w-full bg-[#1E2A38] border border-[#3A4A5C] rounded-lg px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:border-[#FF8C42] focus:outline-none resize-none mb-3"
+                      data-testid="service-rating-comment"
+                    />
+                    <Button
+                      onClick={submitServiceRating}
+                      className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white"
+                      data-testid="service-rating-submit"
+                    >
+                      <Send className="mr-2 h-4 w-4" /> Изпрати оценка
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

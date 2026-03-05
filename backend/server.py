@@ -2630,6 +2630,7 @@ async def submit_feedback(data: dict):
         "rating": rating,
         "text": text,
         "name": name,
+        "service": data.get("service", "general"),
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.feedback.insert_one(feedback)
