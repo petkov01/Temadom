@@ -1,36 +1,60 @@
-# TemaDom - PRD
+# TemaDom - PRD (Product Requirements Document)
 
-## Current Phase: PHASE 1 COMPLETE — Production Ready
+## Original Problem Statement
+Build "TemaDom" — a web application that converts hand-drawn construction sketches and room photos into 3D visualizations and renovation designs.
 
-## Site Structure (March 2026)
-- **Главна**: "Ремонт без стрес — БЕЗПЛАТНО" + психологически текстове
-- **AI Sketch** (`/ai-sketch`): Скица → 3D модел 1:1
-- **Помещения** (`/room-scan`): Снимка → 3D модел 1:1
-- **Готови проекти** (`/ready-projects`): Социална зона (харесвания/коментари/споделяне)
-- **Фирми** (`/companies`): Безплатно за клиенти
+## Core Features
 
-## Pricing (EUR)
-- БАЗОВ: 15 EUR/мес | ПРО: 35 EUR/мес | PREMIUM: 75 EUR/мес
-- PREMIUM: 10 мин. предимство за Telegram известия
+### 1. AI Sketch (`/ai-sketch`) — CV/OCR Pipeline
+- Upload hand-drawn sketches/blueprints (JPG, PNG, WebP)
+- Backend pipeline: OpenCV line detection + Tesseract OCR dimension detection
+- Outputs: Vectorized geometry + .glb 3D model
+- Three.js 3D viewer with rotate/zoom/pan
+- STRICT MODE: No hallucination, only geometry from drawing
+- Download .glb file
 
-## Implemented (Phase 1)
-- New homepage with psychological marketing texts
-- New nav: AI Sketch → Помещения → Готови проекти → Фирми
-- Ready Projects social page (likes/comments/sharing)
-- 4-step text instructions (no video)
-- Removed from nav: 3D Scanner, AI Gallery, AI Designer, Video explanations
-- Telegram bot integration with priority timing
-- AI Chart Analyzer with real GPT-4o
-- Backend refactored: config.py + models/__init__.py
+### 2. IA Designer (`/room-scan`) — 1:1 Renovation
+- Upload real room photo (bathroom, kitchen, stairs, facade)
+- Describe renovation in text
+- AI generates the EXACT same space renovated (GPT-4o vision + GPT Image 1)
+- 4 camera angles output
+- Progress bar with elapsed time
+- Strict 1:1 geometry preservation
 
-## Phase 2 (Next)
-- AI Sketch: .glb file export
-- Room Scan: Real photo → 3D reconstruction
-- Delete all fake data
-- Colorful design (not white/dark only)
+### 3. Social Gallery (`/ready-projects`)
+- Users publish finished renovation projects
+- Like, comment, share functionality
 
-## Phase 3 (Future)
-- Social profiles full functionality
-- Certificates + testimonials
-- Contacts for subscribers only
-- Mobile app + Stripe payments
+### 4. Subscriptions
+- 3 tiers: БАЗОВ, ПРО, PREMIUM
+- Telegram notifications (priority-based)
+
+## Architecture
+- **Backend:** FastAPI + MongoDB (motor) + OpenCV + Tesseract + Emergent LLM
+- **Frontend:** React + TailwindCSS + Three.js/R3F + Shadcn/UI
+- **Language:** Bulgarian (Български)
+
+## What's Been Implemented (as of March 5, 2026)
+- [x] AI Sketch: Full CV/OCR pipeline (OpenCV + Tesseract → .glb → Three.js)
+- [x] IA Designer: Strict 1:1 renovation UI with progress bar, 4 angles, room types, styles
+- [x] Social Gallery (Ready Projects page)
+- [x] Homepage with psychological copy
+- [x] Subscription system (3 tiers)
+- [x] Telegram notifications (priority-based)
+- [x] Navigation restructured (AI Sketch, IA Designer, Готови проекти, Фирми)
+- [x] Backend partial refactoring (config.py, models.py extracted)
+
+## Prioritized Backlog
+- **P1:** Complete backend refactoring — split server.py into routers/
+- **P2:** Monetization (Stripe payments, feature locking by subscription)
+- **P3:** Save AI Sketch projects to DB with shareable links
+- **P4:** Mobile app + advanced features
+
+## Key Files
+- `/app/backend/cv_pipeline.py` — OpenCV/Tesseract pipeline
+- `/app/backend/server.py` — Main FastAPI app
+- `/app/backend/config.py` — Shared configuration
+- `/app/backend/models.py` — Pydantic models
+- `/app/frontend/src/components/AISketchPage.jsx` — AI Sketch page with Three.js
+- `/app/frontend/src/components/AIDesignerPage.jsx` — IA Designer page
+- `/app/frontend/src/App.js` — Routes & navigation
