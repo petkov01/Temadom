@@ -46,7 +46,10 @@ function getDimensions(el, scale) {
     return { length: +diam.toFixed(2), height: (el.circleThickness || 15) / 100 };
   }
   if (t === 'column') {
-    return { diameter: (el.columnDiameter || 30), height: el.columnHeight || 3 };
+    if (el.columnShape === 'rect') {
+      return { shape: 'rect', width: (el.columnWidth || 30), length: (el.columnLength || 30), height: el.columnHeight || 3 };
+    }
+    return { shape: 'round', diameter: (el.columnDiameter || 30), height: el.columnHeight || 3 };
   }
   if (t === 'slab') {
     const w = Math.abs((el.x2 || 0) - (el.x1 || 0)) / GRID * scale;
@@ -93,8 +96,29 @@ function ObjectCard({ el, i, isSel, scale, onSelect, onDelete, onUpdate, onUpdat
         <div className="flex gap-1.5">
           {t === 'column' ? (
             <>
-              <DimInput label="D (диаметър)" val={dims.diameter} unit="см"
-                onChange={v => onUpdate(i, 'columnDiameter', Math.max(10, v))} step={1} color="#9b59b6" />
+              {/* Shape toggle */}
+              <div className="flex-none">
+                <Label className="text-[9px] block mb-0.5 text-slate-500">Форма</Label>
+                <div className="flex gap-0.5">
+                  <button onClick={e => { e.stopPropagation(); onUpdate(i, 'columnShape', 'round'); }}
+                    className={`text-[9px] px-2 py-1 rounded border ${(el.columnShape || 'round') === 'round' ? 'border-[#9b59b6] bg-[#9b59b6]/15 text-[#9b59b6]' : 'border-[#2A3A4C] text-slate-600'}`}
+                    data-testid={`col-shape-round-${i}`}>O</button>
+                  <button onClick={e => { e.stopPropagation(); onUpdate(i, 'columnShape', 'rect'); }}
+                    className={`text-[9px] px-2 py-1 rounded border ${el.columnShape === 'rect' ? 'border-[#9b59b6] bg-[#9b59b6]/15 text-[#9b59b6]' : 'border-[#2A3A4C] text-slate-600'}`}
+                    data-testid={`col-shape-rect-${i}`}>▭</button>
+                </div>
+              </div>
+              {el.columnShape === 'rect' ? (
+                <>
+                  <DimInput label="W (ширина)" val={dims.width} unit="см"
+                    onChange={v => onUpdate(i, 'columnWidth', Math.max(10, v))} step={1} color="#9b59b6" />
+                  <DimInput label="L (дължина)" val={dims.length} unit="см"
+                    onChange={v => onUpdate(i, 'columnLength', Math.max(10, v))} step={1} color="#FF8C42" />
+                </>
+              ) : (
+                <DimInput label="D (диаметър)" val={dims.diameter} unit="см"
+                  onChange={v => onUpdate(i, 'columnDiameter', Math.max(10, v))} step={1} color="#9b59b6" />
+              )}
               <DimInput label="H (височина)" val={dims.height}
                 onChange={v => onUpdate(i, 'columnHeight', Math.max(0.5, v))} color="#28A745" />
             </>

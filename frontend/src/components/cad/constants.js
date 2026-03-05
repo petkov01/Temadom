@@ -39,7 +39,7 @@ export const DEFAULTS = {
   stairs: { steps: 8, rise: 0.17, run: 0.30, stairWidth: 1.2 },
   door: { doorWidth: 0.9, doorHeight: 2.1 },
   window: { windowWidth: 1.2, windowHeight: 1.5, windowSill: 0.9 },
-  column: { columnDiameter: 30, columnHeight: 3 },
+  column: { columnShape: 'round', columnDiameter: 30, columnWidth: 30, columnLength: 30, columnHeight: 3 },
   beam: { beamWidth: 25, beamHeight: 45, beamElevation: 2.7 },
   circle: { circleThickness: 15 },
 };

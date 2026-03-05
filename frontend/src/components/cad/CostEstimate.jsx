@@ -1,10 +1,12 @@
-// TemaDom IA CAD v5.1 — Auto Cost Estimate
+// TemaDom IA CAD v5.1 — Auto Cost Estimate with Regional Pricing
 import React from 'react';
 import { EUR_TO_BGN } from './constants';
-import { calculateCosts } from './utils';
+import { calculateCosts, REGIONS } from './utils';
 
-export const CostEstimate = ({ els, scale }) => {
-  const { items, totalEur, totalBgn } = calculateCosts(els, scale);
+export const CostEstimate = ({ els, scale, region, onRegionChange }) => {
+  const { items, totalEur, totalBgn } = calculateCosts(els, scale, region);
+  const currentRegion = REGIONS.find(r => r.id === region) || REGIONS[1];
+
   if (!items.length) return null;
 
   return (
@@ -13,6 +15,23 @@ export const CostEstimate = ({ els, scale }) => {
         <span className="text-white text-sm font-medium">Авто-сметка</span>
         <span className="text-[#28A745] text-xs font-bold">{totalEur.toLocaleString()} EUR / {totalBgn.toLocaleString()} BGN</span>
       </div>
+
+      {/* Region selector */}
+      <div className="mb-3 flex items-center gap-2">
+        <span className="text-slate-500 text-[10px]">Регион:</span>
+        <select
+          value={region}
+          onChange={e => onRegionChange(e.target.value)}
+          className="bg-[#1E2A38] border border-[#3A4A5C] text-white text-[10px] rounded px-2 py-1 outline-none"
+          data-testid="region-select"
+        >
+          {REGIONS.map(r => (
+            <option key={r.id} value={r.id}>{r.name} ({r.multiplier > 1 ? '+' : ''}{((r.multiplier - 1) * 100).toFixed(0)}%)</option>
+          ))}
+        </select>
+        <span className="text-slate-600 text-[9px]">x{currentRegion.multiplier}</span>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full text-[10px]">
           <thead>

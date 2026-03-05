@@ -503,7 +503,22 @@ export const AIDesignerPage = () => {
             <div className="grid grid-cols-2 gap-3">
               <Button
                 className="h-12 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold"
-                onClick={() => toast.info('PDF експорт — скоро!')}
+                onClick={async () => {
+                  try {
+                    const payload = {
+                      materials: results.materials,
+                      dimensions: results.dimensions,
+                      style: results.style,
+                      room_analysis: results.room_analysis,
+                      image_base64: angles[activeAngle]?.image_base64 || '',
+                    };
+                    const res = await axios.post(`${API}/ai-designer/video-pdf`, payload, { responseType: 'blob' });
+                    const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+                    const a = document.createElement('a'); a.href = url; a.download = 'temadom-video-project.pdf'; a.click();
+                    URL.revokeObjectURL(url);
+                    toast.success('PDF проект изтеглен!');
+                  } catch { toast.error('Грешка при генериране на PDF'); }
+                }}
                 data-testid="download-pdf-btn"
               >
                 <FileText className="mr-2 h-4 w-4" /> PDF проект

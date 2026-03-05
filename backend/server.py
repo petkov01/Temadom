@@ -2407,6 +2407,255 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting.
             pass
 
 
+@api_router.post("/ai-designer/video-pdf")
+async def generate_video_pdf(request: Request):
+    """Generate PDF for Video Designer result."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.units import mm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    import io
+
+    data = await request.json()
+    materials = data.get("materials", {})
+    dimensions = data.get("dimensions", {})
+    style_name = data.get("style", "modern")
+    room_analysis = data.get("room_analysis", {})
+    image_b64 = data.get("image_base64", "")
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=20*mm, bottomMargin=20*mm)
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('Title_BG', parent=styles['Title'], fontSize=18, spaceAfter=12)
+    body_style = ParagraphStyle('Body_BG', parent=styles['Normal'], fontSize=10, spaceAfter=6)
+
+    story = []
+    story.append(Paragraph("TEMADOM 3D VIDEO DESIGNER - PROEKT", title_style))
+    story.append(Spacer(1, 10))
+    story.append(Paragraph(f"Razmeri: {dimensions.get('width','?')}m x {dimensions.get('length','?')}m x {dimensions.get('height','?')}m", body_style))
+    story.append(Paragraph(f"Stil: {style_name}", body_style))
+    story.append(Spacer(1, 8))
+
+    # Add image if available
+    if image_b64:
+        try:
+            img_data = base64.b64decode(image_b64)
+            img_io = io.BytesIO(img_data)
+            img = RLImage(img_io, width=160*mm, height=100*mm)
+            story.append(img)
+            story.append(Spacer(1, 10))
+        except Exception:
+            pass
+
+    # Materials table
+    mat_list = materials.get("materials", [])
+    if mat_list:
+        story.append(Paragraph("MATERIALI I CENI", title_style))
+        table_data = [["Poziciya", "Kolichestvo", "Cena/ed.", "Obshto EUR"]]
+        for m in mat_list:
+            table_data.append([
+                str(m.get("name", "")),
+                f"{m.get('quantity', '')} {m.get('unit', '')}",
+                str(m.get("price_per_unit_eur", "")),
+                str(m.get("total_price_eur", ""))
+            ])
+
+        total_row = ["OBSHTO", "", "", str(materials.get("grand_total_eur", "N/A"))]
+        table_data.append(total_row)
+
+        t = Table(table_data, colWidths=[70*mm, 35*mm, 30*mm, 35*mm])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1E2A38')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#3A4A5C')),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#F97316')),
+            ('TEXTCOLOR', (0, -1), (-1, -1), colors.white),
+            ('FONTWEIGHT', (0, -1), (-1, -1), 'BOLD'),
+        ]))
+        story.append(t)
+
+    story.append(Spacer(1, 15))
+    story.append(Paragraph(f"Trud: {materials.get('labor_estimate_eur', 'N/A')} EUR", body_style))
+    story.append(Paragraph(f"OBSHTA SUMA: {materials.get('grand_total_eur', 'N/A')} EUR", ParagraphStyle('Total', parent=styles['Title'], fontSize=14)))
+
+    doc.build(story)
+    buf.seek(0)
+
+    return StreamingResponse(
+        buf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=temadom-video-project.pdf"}
+    )
+
+
+@api_router.post("/ai-sketch/export-pdf")
+async def export_cad_pdf(request: Request):
+    """Generate PDF plan with cost estimate from CAD elements."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.units import mm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+    import io
+
+    data = await request.json()
+    els = data.get("elements", [])
+    scale = data.get("scale", 1)
+    costs = data.get("costs", {})
+    region_name = data.get("region_name", "Plovdiv")
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=20*mm, bottomMargin=20*mm)
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('Title_BG', parent=styles['Title'], fontSize=18, spaceAfter=12)
+    body_style = ParagraphStyle('Body_BG', parent=styles['Normal'], fontSize=10, spaceAfter=6)
+
+    story = []
+    story.append(Paragraph("TEMADOM - IA CAD PLAN", title_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph(f"Mashab: 1:{scale}m | Region: {region_name}", body_style))
+    story.append(Paragraph(f"Elementi: {len(els)}", body_style))
+    story.append(Spacer(1, 8))
+
+    # Element summary
+    type_counts = {}
+    for el in els:
+        t = el.get("_type", el.get("tool", "unknown"))
+        type_counts[t] = type_counts.get(t, 0) + 1
+
+    if type_counts:
+        summary_data = [["Tip element", "Broi"]]
+        for t, c in type_counts.items():
+            summary_data.append([t.capitalize(), str(c)])
+        st = Table(summary_data, colWidths=[80*mm, 40*mm])
+        st.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#253545')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#3A4A5C')),
+        ]))
+        story.append(st)
+        story.append(Spacer(1, 12))
+
+    # Cost table
+    cost_items = costs.get("items", [])
+    if cost_items:
+        story.append(Paragraph("KOLICHESTVENA SMETKA", title_style))
+        table_data = [["Poziciya", "Kol.", "Ed.", "Cena EUR", "Suma EUR"]]
+        for it in cost_items:
+            table_data.append([
+                str(it.get("label", "")),
+                str(it.get("qty", "")),
+                str(it.get("unit", "")),
+                str(it.get("price", "")),
+                str(it.get("total", ""))
+            ])
+        table_data.append(["OBSHTO", "", "", "", f"{costs.get('totalEur', 0)} EUR"])
+
+        t = Table(table_data, colWidths=[55*mm, 20*mm, 15*mm, 30*mm, 35*mm])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1E2A38')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#3A4A5C')),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#FF8C42')),
+            ('TEXTCOLOR', (0, -1), (-1, -1), colors.white),
+        ]))
+        story.append(t)
+
+    story.append(Spacer(1, 15))
+    total_eur = costs.get("totalEur", 0)
+    total_bgn = costs.get("totalBgn", 0)
+    story.append(Paragraph(f"OBSHTO: {total_eur} EUR / {total_bgn} BGN", ParagraphStyle('Tot', parent=styles['Title'], fontSize=14)))
+
+    doc.build(story)
+    buf.seek(0)
+
+    return StreamingResponse(
+        buf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=temadom-cad-plan.pdf"}
+    )
+
+
+@api_router.post("/ai-sketch/export-contract")
+async def export_cad_contract(request: Request):
+    """Generate a contract PDF between company and client."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.units import mm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    import io
+
+    data = await request.json()
+    company_name = data.get("company_name", "_____________________")
+    company_bulstat = data.get("company_bulstat", "_____________________")
+    client_name = data.get("client_name", "_____________________")
+    client_egn = data.get("client_egn", "_____________________")
+    address = data.get("address", "_____________________")
+    total_eur = data.get("total_eur", "___________")
+    total_bgn = data.get("total_bgn", "___________")
+    description = data.get("description", "Izpalnenie na stroitelno-montazhni raboti soglasno prilozhena kolichestvena smetka.")
+    today = datetime.now().strftime("%d.%m.%Y")
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=25*mm, bottomMargin=25*mm, leftMargin=25*mm, rightMargin=25*mm)
+    styles = getSampleStyleSheet()
+    title_s = ParagraphStyle('CTitle', parent=styles['Title'], fontSize=16, spaceAfter=12)
+    h2_s = ParagraphStyle('CH2', parent=styles['Heading2'], fontSize=12, spaceAfter=8, spaceBefore=12)
+    body_s = ParagraphStyle('CBody', parent=styles['Normal'], fontSize=10, spaceAfter=4, leading=14)
+
+    story = []
+    story.append(Paragraph("DOGOVOR ZA STROITELSTVO", title_s))
+    story.append(Paragraph(f"Dnes, {today} g., mezhdu:", body_s))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph(f"<b>IZPALNITEL:</b> {company_name}, BULSTAT: {company_bulstat}", body_s))
+    story.append(Paragraph(f"<b>VAZLOZHITEL:</b> {client_name}, EGN/BULSTAT: {client_egn}", body_s))
+    story.append(Paragraph(f"<b>Adres na obekta:</b> {address}", body_s))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph("se skluchi nastoyashtiyat dogovor za slednoeto:", body_s))
+
+    story.append(Paragraph("I. PREDMET NA DOGOVORA", h2_s))
+    story.append(Paragraph(f"1. Izpalnitelyat se zadulzhava da izvurshi: {description}", body_s))
+    story.append(Paragraph("2. Rabotite se izvurshvat soglasno prilozhena kolichestvena smetka (Prilozhenie 1).", body_s))
+
+    story.append(Paragraph("II. CENA I PLASHTANE", h2_s))
+    story.append(Paragraph(f"3. Obshta stoinost: <b>{total_eur} EUR ({total_bgn} BGN)</b>.", body_s))
+    story.append(Paragraph("4. Plashtaneto se izvurshva na tri chasti: 30% avans, 40% pri 50% gotovnost, 30% pri priemane.", body_s))
+
+    story.append(Paragraph("III. SROK", h2_s))
+    story.append(Paragraph("5. Srokut za izpulnenie e ____________ rabotni dni ot datata na podpisvane.", body_s))
+    story.append(Paragraph("6. Srokut mozhe da bude udulzhen pri loshi vremenni usloviya ili forsmazzhorni obstoyatelstva.", body_s))
+
+    story.append(Paragraph("IV. GARANTSIYA", h2_s))
+    story.append(Paragraph("7. Izpalnitelyat predostavya garantsiya za izvurshenite raboti v srok ot 5 (pet) godini.", body_s))
+
+    story.append(Paragraph("V. OTGOVORNOSTI", h2_s))
+    story.append(Paragraph("8. Izpalnitelyat otgovarya za kachestvoto na materialie i izvurshenite raboti.", body_s))
+    story.append(Paragraph("9. Vazlozhitelyat osiguryava dostap do obekta i neobhodimite razreshitelni.", body_s))
+
+    story.append(Paragraph("VI. PREKLATIAVANE", h2_s))
+    story.append(Paragraph("10. Dogovorat mozhe da bude preklaten ot vsyaka strana s 14-dnevno pismenno uvedomlenie.", body_s))
+
+    story.append(Spacer(1, 25))
+    story.append(Paragraph("IZPALNITEL: ________________________       VAZLOZHITEL: ________________________", body_s))
+    story.append(Spacer(1, 10))
+    story.append(Paragraph(f"Data: {today}", body_s))
+
+    doc.build(story)
+    buf.seek(0)
+
+    return StreamingResponse(
+        buf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=temadom-contract.pdf"}
+    )
+
+
 @api_router.post("/ai-designer/generate")
 async def generate_ai_design(request: Request):
     """IA Designer: 1:1 renovation — strict geometry preservation.
@@ -2683,7 +2932,7 @@ async def check_review_content(data: dict):
     
     # Simple profanity/abuse check
     abuse_patterns = [
-        re.compile(r'\b(идиот|глупак|мамка|дебил|простак|измамник|крадец)\b', re.IGNORECASE),
+        re_module.compile(r'\b(идиот|глупак|мамка|дебил|простак|измамник|крадец)\b', re_module.IGNORECASE),
     ]
     for pattern in abuse_patterns:
         if pattern.search(comment):

@@ -109,8 +109,15 @@ function buildMesh(scene, el, i, sc, selIdx) {
 
   else if (t === 'column') {
     const cx = el.x1 / GRID * sc, cz = el.y1 / GRID * sc;
-    const r = (el.columnDiameter || 30) / 200, h = el.columnHeight || 3;
-    const geo = new THREE.CylinderGeometry(r, r, h, 16);
+    const h = el.columnHeight || 3;
+    let geo;
+    if (el.columnShape === 'rect') {
+      const cw = (el.columnWidth || 30) / 100, cl = (el.columnLength || 30) / 100;
+      geo = new THREE.BoxGeometry(cw, h, cl);
+    } else {
+      const r = (el.columnDiameter || 30) / 200;
+      geo = new THREE.CylinderGeometry(r, r, h, 16);
+    }
     const mat = new THREE.MeshStandardMaterial({ color: isSel ? SEL_COLOR : 0x808080, roughness: 0.5 });
     addObj(scene, geo, mat, { x: cx, y: floorY + h / 2, z: cz });
   }

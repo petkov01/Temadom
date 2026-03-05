@@ -27,14 +27,31 @@ function drawElement(ctx, el, sel, sc) {
     return;
   }
   if (el.tool === 'column') {
-    const r = ((el.columnDiameter || 30) / 100) / sc * GRID / 2;
-    ctx.lineWidth = 2; ctx.beginPath();
-    ctx.arc(el.x1, el.y1, Math.max(r, 6), 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(el.x1, el.y1, 2, 0, Math.PI * 2); ctx.fill();
-    ctx.setLineDash([2, 2]);
-    ctx.beginPath(); ctx.moveTo(el.x1 - Math.max(r, 6), el.y1); ctx.lineTo(el.x1 + Math.max(r, 6), el.y1); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(el.x1, el.y1 - Math.max(r, 6)); ctx.lineTo(el.x1, el.y1 + Math.max(r, 6)); ctx.stroke();
-    ctx.setLineDash([]);
+    if (el.columnShape === 'rect') {
+      // Rectangular column
+      const cw = ((el.columnWidth || 30) / 100) / sc * GRID;
+      const cl = ((el.columnLength || 30) / 100) / sc * GRID;
+      const hw = Math.max(cw, 6), hl = Math.max(cl, 6);
+      ctx.lineWidth = 2;
+      ctx.strokeRect(el.x1 - hw / 2, el.y1 - hl / 2, hw, hl);
+      ctx.fillStyle = sel ? '#FF8C4240' : '#9b59b620';
+      ctx.fillRect(el.x1 - hw / 2, el.y1 - hl / 2, hw, hl);
+      // Cross
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath(); ctx.moveTo(el.x1 - hw / 2, el.y1 - hl / 2); ctx.lineTo(el.x1 + hw / 2, el.y1 + hl / 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(el.x1 + hw / 2, el.y1 - hl / 2); ctx.lineTo(el.x1 - hw / 2, el.y1 + hl / 2); ctx.stroke();
+      ctx.setLineDash([]);
+    } else {
+      // Round column
+      const r = ((el.columnDiameter || 30) / 100) / sc * GRID / 2;
+      ctx.lineWidth = 2; ctx.beginPath();
+      ctx.arc(el.x1, el.y1, Math.max(r, 6), 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(el.x1, el.y1, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath(); ctx.moveTo(el.x1 - Math.max(r, 6), el.y1); ctx.lineTo(el.x1 + Math.max(r, 6), el.y1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(el.x1, el.y1 - Math.max(r, 6)); ctx.lineTo(el.x1, el.y1 + Math.max(r, 6)); ctx.stroke();
+      ctx.setLineDash([]);
+    }
     return;
   }
 
@@ -160,7 +177,7 @@ function renderAll(ctx, els, draft, selIdx, sc, distLines) {
   }
 }
 
-export const CADCanvas = ({ els, selIdx, tool, scale, draft, distLines, onDown, onMove, onUp, onSelect }) => {
+export const CADCanvas = ({ els, selIdx, tool, scale, draft, distLines, isDragging, onDown, onMove, onUp, onSelect }) => {
   const canvasRef = useRef(null);
   const [canvasSize, setCanvasSize] = useState({ w: CW, h: CH });
   const containerRef = useRef(null);
@@ -188,10 +205,11 @@ export const CADCanvas = ({ els, selIdx, tool, scale, draft, distLines, onDown, 
     return () => cancelAnimationFrame(raf);
   }, [els, draft, selIdx, scale, distLines]);
 
-  const getPos = useCallback((clientX, clientY) => {
+  const getPos = useCallback((clientX, clientY, raw = false) => {
     const r = canvasRef.current.getBoundingClientRect();
     const x = (clientX - r.left) * (CW / r.width);
     const y = (clientY - r.top) * (CH / r.height);
+    if (raw) return [Math.round(x), Math.round(y)];
     return snapEndpoint(x, y, els);
   }, [els]);
 
@@ -202,9 +220,9 @@ export const CADCanvas = ({ els, selIdx, tool, scale, draft, distLines, onDown, 
   }, [getPos, onDown]);
 
   const handleMouseMove = useCallback((e) => {
-    const [x, y] = getPos(e.clientX, e.clientY);
+    const [x, y] = getPos(e.clientX, e.clientY, isDragging);
     onMove(x, y);
-  }, [getPos, onMove]);
+  }, [getPos, onMove, isDragging]);
 
   const handleMouseUp = useCallback(() => { onUp(); }, [onUp]);
 
@@ -219,9 +237,9 @@ export const CADCanvas = ({ els, selIdx, tool, scale, draft, distLines, onDown, 
   const handleTouchMove = useCallback((e) => {
     e.preventDefault();
     const t = e.touches[0];
-    const [x, y] = getPos(t.clientX, t.clientY);
+    const [x, y] = getPos(t.clientX, t.clientY, isDragging);
     onMove(x, y);
-  }, [getPos, onMove]);
+  }, [getPos, onMove, isDragging]);
 
   const handleTouchEnd = useCallback((e) => {
     e.preventDefault();

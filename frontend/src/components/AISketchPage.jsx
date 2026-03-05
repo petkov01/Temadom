@@ -1,6 +1,6 @@
 // TemaDom IA CAD v5.1 — Main Page (Orchestrator)
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { Upload, Loader2, X, Download, Ruler, RotateCcw, Eye, Share2,
+import { Upload, Loader2, X, Download, Ruler, RotateCcw, Eye, Share2, FileText,
   MousePointer, Square, Triangle, Layers, Circle, ArrowUpRight,
   Minus, Eraser, DoorOpen, PanelTop, Cylinder, Fence } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +16,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { useSearchParams } from 'react-router-dom';
 
 import { TOOLS, GRID, CW, CH, DEFAULTS } from './cad/constants';
-import { snapEndpoint, distSeg, distCircle, autoType, getDefaults, elLength } from './cad/utils';
+import { snapEndpoint, distSeg, distCircle, autoType, getDefaults, elLength, calculateCosts, REGIONS } from './cad/utils';
 import { CADCanvas } from './cad/CADCanvas';
 import { useThreeViewer } from './cad/ThreeDPreview';
 import { StructurePanel } from './cad/StructurePanel';
@@ -67,6 +67,8 @@ export const AISketchPage = () => {
   const [els, setEls] = useState([]);
   const [selIdx, setSelIdx] = useState(-1);
   const [tool, setTool] = useState('wall');
+  const [colShape, setColShape] = useState('round');
+  const [region, setRegion] = useState('plovdiv');
   const [draft, setDraft] = useState(null);
   const [dragInfo, setDragInfo] = useState(null);
   const [distLines, setDistLines] = useState([]);
@@ -119,7 +121,13 @@ export const AISketchPage = () => {
         if (el.tool === 'circle') {
           if (distCircle(x, y, el.cx, el.cy, el.r || 0) < 12) found = i;
         } else if (el.tool === 'column') {
-          if (Math.hypot(x - el.x1, y - el.y1) < 15) found = i;
+          if (el.columnShape === 'rect') {
+            const hw = Math.max((el.columnWidth || 30) / 100 / scale * GRID, 6) / 2 + 6;
+            const hl = Math.max((el.columnLength || 30) / 100 / scale * GRID, 6) / 2 + 6;
+            if (Math.abs(x - el.x1) < hw && Math.abs(y - el.y1) < hl) found = i;
+          } else {
+            if (Math.hypot(x - el.x1, y - el.y1) < 15) found = i;
+          }
         } else if (distSeg(x, y, el.x1, el.y1, el.x2, el.y2) < 12) found = i;
       });
       setSelIdx(found);
@@ -135,6 +143,14 @@ export const AISketchPage = () => {
       els.forEach((el, i) => {
         if (el.tool === 'circle') {
           if (distCircle(x, y, el.cx, el.cy, el.r || 0) < 12) found = i;
+        } else if (el.tool === 'column') {
+          if (el.columnShape === 'rect') {
+            const hw = Math.max((el.columnWidth || 30) / 100 / scale * GRID, 6) / 2 + 6;
+            const hl = Math.max((el.columnLength || 30) / 100 / scale * GRID, 6) / 2 + 6;
+            if (Math.abs(x - el.x1) < hw && Math.abs(y - el.y1) < hl) found = i;
+          } else {
+            if (Math.hypot(x - el.x1, y - el.y1) < 15) found = i;
+          }
         } else if (distSeg(x, y, el.x1, el.y1, el.x2, el.y2) < 12) found = i;
       });
       if (found >= 0) setEls(p => p.filter((_, i) => i !== found));
@@ -142,7 +158,8 @@ export const AISketchPage = () => {
       return;
     }
     if (tool === 'column') {
-      const newEl = { tool: 'column', x1: x, y1: y, x2: x, y2: y, _type: 'column', floor: currentFloor, ...getDefaults('column') };
+      const defs = getDefaults('column');
+      const newEl = { tool: 'column', x1: x, y1: y, x2: x, y2: y, _type: 'column', floor: currentFloor, ...defs, columnShape: colShape };
       setEls(p => [...p, newEl]);
       return;
     }
@@ -233,7 +250,7 @@ export const AISketchPage = () => {
       return;
     }
     if (type === 'column') {
-      const newEl = { tool: 'column', x1: 300, y1: 300, x2: 300, y2: 300, _type: 'column', floor: currentFloor, ...getDefaults('column') };
+      const newEl = { tool: 'column', x1: 300, y1: 300, x2: 300, y2: 300, _type: 'column', floor: currentFloor, ...getDefaults('column'), columnShape: colShape };
       setEls(p => [...p, newEl]);
       return;
     }
@@ -285,6 +302,44 @@ export const AISketchPage = () => {
     navigator.clipboard.writeText(`${window.location.origin}/ai-sketch?id=${uploadRes.id}`).then(() => toast.success('Линк копиран!'));
   };
 
+  // PDF Export: Plan + Cost Estimate
+  const exportPlanPdf = async () => {
+    const costs = calculateCosts(els, scale, region);
+    const regionObj = REGIONS.find(r => r.id === region) || REGIONS[1];
+    try {
+      const res = await axios.post(`${API}/ai-sketch/export-pdf`, {
+        elements: els, scale, costs, region_name: regionObj.name
+      }, { responseType: 'blob' });
+      const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const a = document.createElement('a'); a.href = url; a.download = 'temadom-plan.pdf'; a.click();
+      URL.revokeObjectURL(url);
+      toast.success('PDF план изтеглен!');
+    } catch { toast.error('Грешка при генериране на PDF'); }
+  };
+
+  // PDF Export: Contract
+  const [showContract, setShowContract] = useState(false);
+  const [contractData, setContractData] = useState({
+    company_name: '', company_bulstat: '', client_name: '', client_egn: '', address: '', description: ''
+  });
+
+  const exportContract = async () => {
+    const costs = calculateCosts(els, scale, region);
+    try {
+      const res = await axios.post(`${API}/ai-sketch/export-contract`, {
+        ...contractData,
+        total_eur: costs.totalEur,
+        total_bgn: costs.totalBgn,
+        description: contractData.description || 'Stroitelno-montazhni raboti soglasno prilozhena smetka.'
+      }, { responseType: 'blob' });
+      const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const a = document.createElement('a'); a.href = url; a.download = 'temadom-contract.pdf'; a.click();
+      URL.revokeObjectURL(url);
+      setShowContract(false);
+      toast.success('Договор изтеглен!');
+    } catch { toast.error('Грешка при генериране на договор'); }
+  };
+
   return (
     <div className="min-h-screen bg-[#1E2A38] py-3 px-2 md:px-4" data-testid="ai-sketch-page">
       <div className="max-w-[1600px] mx-auto">
@@ -323,6 +378,16 @@ export const AISketchPage = () => {
                         </button>
                       );
                     })}
+                    {tool === 'column' && (
+                      <div className="flex items-center gap-1 ml-1 pl-2 border-l border-[#3A4A5C]">
+                        <button onClick={() => setColShape('round')}
+                          className={`px-2 py-1 rounded text-[10px] font-bold ${colShape === 'round' ? 'bg-[#9b59b6] text-white' : 'bg-[#1E2A38] text-slate-400'}`}
+                          data-testid="col-shape-round" title="Кръгла колона">O</button>
+                        <button onClick={() => setColShape('rect')}
+                          className={`px-2 py-1 rounded text-[10px] font-bold ${colShape === 'rect' ? 'bg-[#9b59b6] text-white' : 'bg-[#1E2A38] text-slate-400'}`}
+                          data-testid="col-shape-rect" title="Правоъгълна колона">&#9645;</button>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1.5">
@@ -354,7 +419,7 @@ export const AISketchPage = () => {
                 </CardHeader>
                 <CardContent className="p-2">
                   <CADCanvas els={els} selIdx={selIdx} tool={tool} scale={scale} draft={draft}
-                    distLines={distLines}
+                    distLines={distLines} isDragging={!!dragInfo}
                     onDown={onDown} onMove={onMove} onUp={onUp} onSelect={setSelIdx} />
                 </CardContent>
               </Card>
@@ -387,7 +452,63 @@ export const AISketchPage = () => {
             {objCount > 0 && (
               <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
                 <CardContent className="px-3 py-3">
-                  <CostEstimate els={els} scale={scale} />
+                  <CostEstimate els={els} scale={scale} region={region} onRegionChange={setRegion} />
+                  {/* Export buttons */}
+                  <div className="flex gap-2 mt-3 pt-3 border-t border-[#3A4A5C]">
+                    <Button size="sm" className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white text-xs h-8"
+                      onClick={exportPlanPdf} data-testid="export-plan-pdf">
+                      <FileText className="mr-1.5 h-3.5 w-3.5" /> PDF План + Сметка
+                    </Button>
+                    <Button size="sm" className="flex-1 bg-[#4DA6FF] hover:bg-[#3B8FE0] text-white text-xs h-8"
+                      onClick={() => setShowContract(true)} data-testid="export-contract-btn">
+                      <FileText className="mr-1.5 h-3.5 w-3.5" /> Договор
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Contract Dialog */}
+            {showContract && (
+              <Card className="bg-[#253545] border-[#FF8C42]/30 mb-3">
+                <CardHeader className="pb-2 pt-3 px-3">
+                  <CardTitle className="text-white text-sm flex items-center justify-between">
+                    <span>Договор за строителство</span>
+                    <button onClick={() => setShowContract(false)} className="text-slate-500 hover:text-white"><X className="h-4 w-4" /></button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-3 pb-3">
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div>
+                      <label className="text-[9px] text-slate-500 block mb-0.5">Изпълнител (фирма)</label>
+                      <Input value={contractData.company_name} onChange={e => setContractData(p => ({ ...p, company_name: e.target.value }))}
+                        placeholder="Име на фирма" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-company" />
+                    </div>
+                    <div>
+                      <label className="text-[9px] text-slate-500 block mb-0.5">БУЛСТАТ</label>
+                      <Input value={contractData.company_bulstat} onChange={e => setContractData(p => ({ ...p, company_bulstat: e.target.value }))}
+                        placeholder="БУЛСТАТ" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-bulstat" />
+                    </div>
+                    <div>
+                      <label className="text-[9px] text-slate-500 block mb-0.5">Възложител (клиент)</label>
+                      <Input value={contractData.client_name} onChange={e => setContractData(p => ({ ...p, client_name: e.target.value }))}
+                        placeholder="Име на клиент" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-client" />
+                    </div>
+                    <div>
+                      <label className="text-[9px] text-slate-500 block mb-0.5">ЕГН/БУЛСТАТ</label>
+                      <Input value={contractData.client_egn} onChange={e => setContractData(p => ({ ...p, client_egn: e.target.value }))}
+                        placeholder="ЕГН/БУЛСТАТ" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-egn" />
+                    </div>
+                  </div>
+                  <div className="mb-3">
+                    <label className="text-[9px] text-slate-500 block mb-0.5">Адрес на обекта</label>
+                    <Input value={contractData.address} onChange={e => setContractData(p => ({ ...p, address: e.target.value }))}
+                      placeholder="Адрес на обекта" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-address" />
+                  </div>
+                  <Button className="w-full bg-[#4DA6FF] hover:bg-[#3B8FE0] text-white h-8 text-xs"
+                    onClick={exportContract} data-testid="generate-contract-pdf">
+                    <Download className="mr-1.5 h-3.5 w-3.5" /> Генерирай PDF договор
+                  </Button>
                 </CardContent>
               </Card>
             )}

@@ -58,8 +58,22 @@ export function smartHint(el, sc) {
   return null;
 }
 
+// Regional price multipliers
+export const REGIONS = [
+  { id: 'sofia', name: 'София', multiplier: 1.15 },
+  { id: 'plovdiv', name: 'Пловдив', multiplier: 1.0 },
+  { id: 'varna', name: 'Варна', multiplier: 1.05 },
+  { id: 'burgas', name: 'Бургас', multiplier: 1.02 },
+  { id: 'stara_zagora', name: 'Стара Загора', multiplier: 0.95 },
+  { id: 'ruse', name: 'Русе', multiplier: 0.92 },
+  { id: 'pleven', name: 'Плевен', multiplier: 0.90 },
+  { id: 'other', name: 'Друг', multiplier: 0.88 },
+];
+
 // Cost calculation
-export function calculateCosts(els, scale) {
+export function calculateCosts(els, scale, regionId = 'plovdiv') {
+  const region = REGIONS.find(r => r.id === regionId) || REGIONS[1];
+  const mult = region.multiplier;
   const items = [];
   let totalEur = 0;
 
@@ -84,10 +98,10 @@ export function calculateCosts(els, scale) {
     });
     const formworkArea = wallArea * 2;
     const rebarKg = wallVolume * 80;
-    items.push({ ...COST_RATES.concrete, qty: +wallVolume.toFixed(2), total: +(wallVolume * COST_RATES.concrete.price).toFixed(0) });
-    items.push({ ...COST_RATES.formwork, qty: +formworkArea.toFixed(1), total: +(formworkArea * COST_RATES.formwork.price).toFixed(0) });
-    items.push({ ...COST_RATES.rebar, qty: +rebarKg.toFixed(0), total: +(rebarKg * COST_RATES.rebar.price).toFixed(0) });
-    items.push({ ...COST_RATES.plaster, qty: +wallArea.toFixed(1), total: +(wallArea * COST_RATES.plaster.price).toFixed(0) });
+    items.push({ ...COST_RATES.concrete, qty: +wallVolume.toFixed(2), total: +(wallVolume * COST_RATES.concrete.price * mult).toFixed(0) });
+    items.push({ ...COST_RATES.formwork, qty: +formworkArea.toFixed(1), total: +(formworkArea * COST_RATES.formwork.price * mult).toFixed(0) });
+    items.push({ ...COST_RATES.rebar, qty: +rebarKg.toFixed(0), total: +(rebarKg * COST_RATES.rebar.price * mult).toFixed(0) });
+    items.push({ ...COST_RATES.plaster, qty: +wallArea.toFixed(1), total: +(wallArea * COST_RATES.plaster.price * mult).toFixed(0) });
   }
 
   // Slabs
@@ -100,9 +114,9 @@ export function calculateCosts(els, scale) {
       slabArea += w * d;
       slabVol += w * d * t;
     });
-    items.push({ ...COST_RATES.concrete, label: 'Бетон (плочи)', qty: +slabVol.toFixed(2), total: +(slabVol * COST_RATES.concrete.price).toFixed(0) });
-    items.push({ ...COST_RATES.formwork, label: 'Кофраж (плочи)', qty: +slabArea.toFixed(1), total: +(slabArea * COST_RATES.formwork.price).toFixed(0) });
-    items.push({ ...COST_RATES.rebar, label: 'Арматура (плочи)', qty: +(slabVol * 100).toFixed(0), total: +(slabVol * 100 * COST_RATES.rebar.price).toFixed(0) });
+    items.push({ ...COST_RATES.concrete, label: 'Бетон (плочи)', qty: +slabVol.toFixed(2), total: +(slabVol * COST_RATES.concrete.price * mult).toFixed(0) });
+    items.push({ ...COST_RATES.formwork, label: 'Кофраж (плочи)', qty: +slabArea.toFixed(1), total: +(slabArea * COST_RATES.formwork.price * mult).toFixed(0) });
+    items.push({ ...COST_RATES.rebar, label: 'Арматура (плочи)', qty: +(slabVol * 100).toFixed(0), total: +(slabVol * 100 * COST_RATES.rebar.price * mult).toFixed(0) });
   }
 
   // Roofs
@@ -114,38 +128,44 @@ export function calculateCosts(els, scale) {
       const angle = (r.roofAngle || 30) * Math.PI / 180;
       roofArea += len * (w / Math.cos(angle));
     });
-    items.push({ ...COST_RATES.tiles, qty: +roofArea.toFixed(1), total: +(roofArea * COST_RATES.tiles.price).toFixed(0) });
-    items.push({ ...COST_RATES.roofStruct, qty: +roofArea.toFixed(1), total: +(roofArea * COST_RATES.roofStruct.price).toFixed(0) });
+    items.push({ ...COST_RATES.tiles, qty: +roofArea.toFixed(1), total: +(roofArea * COST_RATES.tiles.price * mult).toFixed(0) });
+    items.push({ ...COST_RATES.roofStruct, qty: +roofArea.toFixed(1), total: +(roofArea * COST_RATES.roofStruct.price * mult).toFixed(0) });
   }
 
   // Stairs
   if (stairsList.length) {
     let totalSteps = 0;
     stairsList.forEach(s => { totalSteps += s.steps || 8; });
-    items.push({ ...COST_RATES.stairStep, qty: totalSteps, total: +(totalSteps * COST_RATES.stairStep.price).toFixed(0) });
+    items.push({ ...COST_RATES.stairStep, qty: totalSteps, total: +(totalSteps * COST_RATES.stairStep.price * mult).toFixed(0) });
   }
 
   // Doors
   if (doorsList.length) {
-    items.push({ ...COST_RATES.doors, qty: doorsList.length, total: +(doorsList.length * COST_RATES.doors.price).toFixed(0) });
+    items.push({ ...COST_RATES.doors, qty: doorsList.length, total: +(doorsList.length * COST_RATES.doors.price * mult).toFixed(0) });
   }
 
   // Windows
   if (windowsList.length) {
     let winArea = 0;
     windowsList.forEach(w => { winArea += (w.windowWidth || 1.2) * (w.windowHeight || 1.5); });
-    items.push({ ...COST_RATES.windows, qty: +winArea.toFixed(1), total: +(winArea * COST_RATES.windows.price).toFixed(0) });
+    items.push({ ...COST_RATES.windows, qty: +winArea.toFixed(1), total: +(winArea * COST_RATES.windows.price * mult).toFixed(0) });
   }
 
   // Columns
   if (columns.length) {
     let colVol = 0;
     columns.forEach(c => {
-      const r = (c.columnDiameter || 30) / 200;
       const h = c.columnHeight || 3;
-      colVol += Math.PI * r * r * h;
+      if (c.columnShape === 'rect') {
+        const cw = (c.columnWidth || 30) / 100;
+        const cl = (c.columnLength || 30) / 100;
+        colVol += cw * cl * h;
+      } else {
+        const r = (c.columnDiameter || 30) / 200;
+        colVol += Math.PI * r * r * h;
+      }
     });
-    items.push({ ...COST_RATES.concrete, label: 'Бетон (колони)', qty: +colVol.toFixed(2), total: +(colVol * 120).toFixed(0) });
+    items.push({ ...COST_RATES.concrete, label: 'Бетон (колони)', qty: +colVol.toFixed(2), total: +(colVol * 120 * mult).toFixed(0) });
   }
 
   // Beams
@@ -157,7 +177,7 @@ export function calculateCosts(els, scale) {
       const h = (b.beamHeight || 45) / 100;
       beamVol += len * w * h;
     });
-    items.push({ ...COST_RATES.concrete, label: 'Бетон (греди)', qty: +beamVol.toFixed(2), total: +(beamVol * 110).toFixed(0) });
+    items.push({ ...COST_RATES.concrete, label: 'Бетон (греди)', qty: +beamVol.toFixed(2), total: +(beamVol * 110 * mult).toFixed(0) });
   }
 
   items.forEach(it => { totalEur += it.total; });

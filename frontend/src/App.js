@@ -353,6 +353,7 @@ const Navbar = () => {
           </div>
 
           <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
             <div className="relative" ref={mobileLangRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
