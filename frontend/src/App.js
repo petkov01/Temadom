@@ -179,10 +179,6 @@ const Navbar = () => {
               <Building2 className="h-3.5 w-3.5" />
               Фирми
             </Link>
-            <Link to="/find-master" className="text-slate-300 hover:text-[#FF8C42] text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-find-master">
-              <Wrench className="h-3.5 w-3.5" />
-              Дизайнери
-            </Link>
             <Link to="/ads" className="text-slate-300 hover:text-[#FF8C42] text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-ads">
               <Megaphone className="h-3.5 w-3.5" />
               Обяви
@@ -347,9 +343,6 @@ const Navbar = () => {
             <Link to="/projects" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <FolderSearch className="h-4 w-4" /> {t('nav_projects')}
             </Link>
-            <Link to="/find-master" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-find-master">
-              <Wrench className="h-4 w-4" /> {t('nav_find_master')}
-            </Link>
             <Link to="/companies" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <Building2 className="h-4 w-4" /> {t('nav_companies')}
             </Link>
@@ -488,63 +481,46 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, total_reviews: 0 });
-  const [demoProjects, setDemoProjects] = useState([]);
-  const [topCompanies, setTopCompanies] = useState([]);
 
   useEffect(() => {
-    axios.get(`${API}/stats`).then(res => setStats(res.data));
-    axios.get(`${API}/demo-projects`).then(res => setDemoProjects(res.data.projects));
-    axios.get(`${API}/top-companies`).then(res => setTopCompanies(res.data.companies));
+    axios.get(`${API}/stats`).then(res => setStats(res.data)).catch(() => {});
   }, []);
 
   return (
     <div className="min-h-screen bg-[#1E2A38]" data-testid="landing-page">
-      {/* ===== HERO SECTION ===== */}
+      {/* ===== HERO ===== */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#FF8C42]/10 rounded-full blur-[100px] -translate-y-1/4 translate-x-1/4" />
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#4DA6FF]/10 rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4" />
-          <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-[#8C56FF]/5 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24">
           <div className="text-center text-white">
-            {/* Promo banner */}
-            <div className="inline-flex items-center gap-2 bg-[#FF8C42]/15 border border-[#FF8C42]/30 rounded-full px-5 py-2.5 mb-8 animate-glow" data-testid="hero-promo">
-              <Award className="h-5 w-5 text-[#FF8C42]" />
-              <span className="text-[#FF8C42] font-bold text-sm tracking-wide">
-                ТЕСТОВ РЕЖИМ — ВСИЧКИ ФУНКЦИИ БЕЗПЛАТНИ
-              </span>
-            </div>
-            
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-              Строителство и ремонти<br/>
-              <span className="gradient-text">с AI технологии</span>
+              Вашият строителен проект<br/>
+              <span className="gradient-text">без непредвидени разходи</span>
             </h1>
-            
-            <p className="text-xl text-slate-300 mb-10 max-w-3xl mx-auto">
-              Калкулатор за цени, AI дизайнер, количествени сметки и свързване с проверени фирми — всичко на едно място.
+            <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-3xl mx-auto">
+              TemaDom свързва клиенти, фирми и майстори на едно място. AI технологии за дизайн, точни количествени сметки и готови PDF договори — всичко, от което се нуждаете за успешен ремонт или строителство.
             </p>
-            
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button size="lg" className="bg-[#FF8C42] hover:bg-[#e67a30] text-white text-lg px-8 h-14 shadow-lg shadow-[#FF8C42]/20" onClick={() => navigate('/calculator')} data-testid="hero-calc-btn">
-                <Calculator className="mr-2 h-6 w-6" /> Калкулатор
+                <Calculator className="mr-2 h-6 w-6" /> Безплатен калкулатор
               </Button>
-              <Button size="lg" className="bg-transparent border-2 border-[#4DA6FF] text-[#4DA6FF] hover:bg-[#4DA6FF]/10 text-lg px-8 h-14" onClick={() => navigate('/register')}>
-                Регистрация
+              <Button size="lg" className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white text-lg px-8 h-14 shadow-lg shadow-[#8C56FF]/20" onClick={() => navigate('/ai-designer')} data-testid="hero-ai-btn">
+                <Sparkles className="mr-2 h-6 w-6" /> AI Дизайнер
               </Button>
             </div>
-            
-            {/* Stats row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               {[
-                { value: `${stats.total_companies}+`, label: 'Фирми', color: '#FF8C42' },
-                { value: `${stats.total_projects}+`, label: 'Проекти', color: '#4DA6FF' },
-                { value: '28', label: 'Области', color: '#28A745' },
-                { value: `${stats.total_reviews}+`, label: 'Отзиви', color: '#8C56FF' }
+                { value: `${stats.total_companies || 0}+`, label: 'Регистрирани фирми', color: '#FF8C42' },
+                { value: '28', label: 'Области в България', color: '#4DA6FF' },
+                { value: '18', label: 'Магазина за цени', color: '#28A745' },
+                { value: '95-100%', label: 'Точност на AI', color: '#8C56FF' }
               ].map((stat, i) => (
                 <div key={i} className="glass rounded-xl p-4">
-                  <p className="text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
-                  <p className="text-sm text-slate-400">{stat.label}</p>
+                  <p className="text-2xl md:text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
+                  <p className="text-xs md:text-sm text-slate-400">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -552,124 +528,232 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ===== AI DESIGNER PROMO ===== */}
-      <section className="bg-gradient-to-r from-[#8C56FF]/20 to-[#4DA6FF]/20 border-y border-[#3A4A5C] py-12">
-        <div className="max-w-5xl mx-auto px-4 text-center text-white">
-          <div className="inline-flex items-center gap-2 bg-[#8C56FF]/20 border border-[#8C56FF]/30 rounded-full px-4 py-2 mb-4">
-            <Sparkles className="h-5 w-5 text-[#8C56FF]" />
-            <span className="font-medium text-sm text-[#8C56FF]">AI ДИЗАЙНЕР</span>
+      {/* ===== WHAT IS TEMADOM ===== */}
+      <section className="py-16 border-t border-[#2A3A4C]">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Защо TemaDom?</h2>
+            <p className="text-slate-400 max-w-3xl mx-auto text-base">
+              TemaDom е създаден, за да улесни процеса на строителство и ремонти за всички страни. Нашата мисия е да помогнем на хората да реализират мечтания си проект без непредвидени разходи, с пълна прозрачност и достъп до най-добрите специалисти и AI технологии.
+            </p>
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">
-            AI дизайна — БЕЗПЛАТНИ в тестов режим
-          </h2>
-          <p className="text-slate-400 mb-6 max-w-2xl mx-auto">
-            Генерирайте 2D визуализации и 3D модели за вашия проект. Изберете стил, бюджет и получете PDF + GLB файл.
-          </p>
-          <Button size="lg" className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white shadow-lg shadow-[#8C56FF]/20" onClick={() => navigate('/ai-designer')} data-testid="ai-designer-cta">
-            Опитай AI Дизайнер
-          </Button>
-        </div>
-      </section>
-
-      {/* ===== 4 DEMO PROJECTS ===== */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-3">Демо проекти</h2>
-            <p className="text-slate-400">Вижте примерни проекти и оценки от калкулатора</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {demoProjects.map((project, i) => (
-              <Card key={project.id} className="group hover:shadow-lg hover:shadow-[#FF8C42]/5 transition-all duration-300 cursor-pointer overflow-hidden bg-[#253545] border-[#3A4A5C]" data-testid={`demo-project-${i}`}>
-                <div className="h-40 bg-gradient-to-br from-[#1E2A38] to-[#253545] flex items-center justify-center">
-                  <Building2 className="h-12 w-12 text-[#4DA6FF]/40" />
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { icon: <Users className="h-7 w-7" />, title: "За клиенти", desc: "Получете точна оценка на разходите, AI визуализации и намерете проверени фирми за вашия проект. Без изненади в бюджета.", color: '#4DA6FF' },
+              { icon: <Building2 className="h-7 w-7" />, title: "За фирми", desc: "Достъп до нови клиенти, AI инструменти за визуализация и готови PDF договори с количествени сметки за по-бързо затваряне на сделки.", color: '#FF8C42' },
+              { icon: <Hammer className="h-7 w-7" />, title: "За майстори", desc: "Покажете портфолиото си, получавайте запитвания директно и използвайте AI за точни сметки на материали и труд.", color: '#28A745' }
+            ].map((item, i) => (
+              <Card key={i} className="bg-[#253545] border-[#3A4A5C] p-6 text-center hover:border-[#FF8C42]/30 transition-colors">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${item.color}15`, color: item.color }}>
+                  {item.icon}
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-white mb-1 text-sm">{project.title}</h3>
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
-                    <MapPin className="h-3 w-3" /> {project.city}
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-[#FF8C42] font-bold">{project.budget}</span>
-                    <Badge variant="outline" className="text-xs border-[#3A4A5C] text-slate-400">Демо</Badge>
-                  </div>
-                </CardContent>
+                <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-slate-400">{item.desc}</p>
               </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== HOW IT WORKS ===== */}
-      <section className="py-16 border-y border-[#2A3A4C]">
-        <div className="max-w-5xl mx-auto px-4">
+      {/* ===== TOP FEATURES ===== */}
+      <section className="py-16 bg-[#0F1923] border-y border-[#2A3A4C]">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-3">Как работи TemaDom?</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Топ функции на TemaDom</h2>
+            <p className="text-slate-400">Всичко, от което се нуждаете за успешен строителен проект</p>
           </div>
+
+          {/* Feature 1: AI Designer */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-[#8C56FF]/15 border border-[#8C56FF]/30 rounded-full px-4 py-1.5 mb-4">
+                <Sparkles className="h-4 w-4 text-[#8C56FF]" />
+                <span className="text-xs font-medium text-[#8C56FF]">AI ДИЗАЙНЕР</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Визуализирайте мечтания интериор</h3>
+              <p className="text-slate-400 mb-4 text-sm">Качете снимки на помещението, изберете стил и материали — AI генерира фотореалистични визуализации с точен списък материали и цени от 18 български магазина.</p>
+              <ul className="space-y-2 text-sm text-slate-300 mb-6">
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> До 5 варианта дизайн с различни стилове</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> Преди/След сравнение + PDF експорт</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> Споделяне в социални мрежи</li>
+              </ul>
+              <Button className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white" onClick={() => navigate('/ai-designer')} data-testid="feature-ai-designer-btn">
+                <Sparkles className="mr-2 h-4 w-4" /> Опитай AI Дизайнер
+              </Button>
+            </div>
+            <div className="bg-gradient-to-br from-[#8C56FF]/20 to-[#4DA6FF]/10 rounded-2xl p-8 border border-[#8C56FF]/20 text-center">
+              <Sparkles className="h-16 w-16 text-[#8C56FF]/60 mx-auto mb-4" />
+              <p className="text-white font-medium">1-3 снимки &rarr; AI анализ &rarr; Фотореалистичен дизайн</p>
+              <p className="text-slate-500 text-sm mt-2">от 10 EUR на генерация</p>
+            </div>
+          </div>
+
+          {/* Feature 2: AI Sketch */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12 items-center">
+            <div className="bg-gradient-to-br from-[#FF8C42]/20 to-[#DC3545]/10 rounded-2xl p-8 border border-[#FF8C42]/20 text-center order-2 md:order-1">
+              <FileText className="h-16 w-16 text-[#FF8C42]/60 mx-auto mb-4" />
+              <p className="text-white font-medium">Скица/Чертеж &rarr; AI анализ &rarr; 2D план + 3D визуализация</p>
+              <p className="text-slate-500 text-sm mt-2">95-100% точност на количествената сметка</p>
+            </div>
+            <div className="order-1 md:order-2">
+              <div className="inline-flex items-center gap-2 bg-[#FF8C42]/15 border border-[#FF8C42]/30 rounded-full px-4 py-1.5 mb-4">
+                <FileText className="h-4 w-4 text-[#FF8C42]" />
+                <span className="text-xs font-medium text-[#FF8C42]">AI SKETCH</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Скица &rarr; Точен чертеж + количествена сметка</h3>
+              <p className="text-slate-400 mb-4 text-sm">Качете скици, ръчни чертежи или снимки на строеж. AI разпознава колони, греди, стълби, фундаменти и покрив с 95-100% точност и генерира количествена сметка.</p>
+              <ul className="space-y-2 text-sm text-slate-300 mb-6">
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" /> Структурен анализ: колони, греди, стълби, фундаменти</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" /> 2D план + 3D визуализация</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" /> PDF договор с количествена сметка</li>
+              </ul>
+              <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={() => navigate('/ai-sketch')} data-testid="feature-ai-sketch-btn">
+                <FileText className="mr-2 h-4 w-4" /> Опитай AI Sketch
+              </Button>
+            </div>
+          </div>
+
+          {/* Feature 3: Calculator + PDF Contracts */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-[#28A745]/15 border border-[#28A745]/30 rounded-full px-4 py-1.5 mb-4">
+                <Calculator className="h-4 w-4 text-[#28A745]" />
+                <span className="text-xs font-medium text-[#28A745]">КАЛКУЛАТОР + PDF</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Точна калкулация + готов PDF договор</h3>
+              <p className="text-slate-400 mb-4 text-sm">Безплатен калкулатор за 28 области в България. Изчислете точна цена за ремонт и генерирайте PDF договор с количествена сметка, готов за подписване.</p>
+              <ul className="space-y-2 text-sm text-slate-300 mb-6">
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> Безплатен калкулатор за всички области</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> PDF договор + количествена сметка: 5 EUR</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> AI чертеж + PDF договор: 15 EUR</li>
+              </ul>
+              <Button className="bg-[#28A745] hover:bg-[#22943e] text-white" onClick={() => navigate('/calculator')} data-testid="feature-calc-btn">
+                <Calculator className="mr-2 h-4 w-4" /> Безплатен калкулатор
+              </Button>
+            </div>
+            <div className="bg-gradient-to-br from-[#28A745]/20 to-[#4DA6FF]/10 rounded-2xl p-8 border border-[#28A745]/20 text-center">
+              <Calculator className="h-16 w-16 text-[#28A745]/60 mx-auto mb-4" />
+              <p className="text-white font-medium">Калкулация &rarr; Количествена сметка &rarr; PDF договор</p>
+              <p className="text-slate-500 text-sm mt-2">28 области, реални цени от 2025-2026</p>
+            </div>
+          </div>
+
+          {/* Feature 4: Gallery */}
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="bg-gradient-to-br from-[#4DA6FF]/20 to-[#8C56FF]/10 rounded-2xl p-8 border border-[#4DA6FF]/20 text-center order-2 md:order-1">
+              <Image className="h-16 w-16 text-[#4DA6FF]/60 mx-auto mb-4" />
+              <p className="text-white font-medium">Публикувайте проекти &rarr; Споделяйте &rarr; Намерете изпълнител</p>
+              <p className="text-slate-500 text-sm mt-2">Facebook, Viber, WhatsApp, Telegram</p>
+            </div>
+            <div className="order-1 md:order-2">
+              <div className="inline-flex items-center gap-2 bg-[#4DA6FF]/15 border border-[#4DA6FF]/30 rounded-full px-4 py-1.5 mb-4">
+                <Image className="h-4 w-4 text-[#4DA6FF]" />
+                <span className="text-xs font-medium text-[#4DA6FF]">AI ГАЛЕРИЯ</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Галерия с AI проекти</h3>
+              <p className="text-slate-400 mb-4 text-sm">Публикувайте генерираните проекти в галерията. Фирми и майстори виждат "преди" и "след" снимки. Изтеглете PDF с изображения или количествена сметка.</p>
+              <ul className="space-y-2 text-sm text-slate-300 mb-6">
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#4DA6FF] flex-shrink-0" /> Преди/След сравнение</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#4DA6FF] flex-shrink-0" /> Два отделни PDF-а (изображения + материали)</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#4DA6FF] flex-shrink-0" /> Споделяне в социални мрежи</li>
+              </ul>
+              <Button className="bg-[#4DA6FF] hover:bg-[#3d96ef] text-white" onClick={() => navigate('/ai-gallery')} data-testid="feature-gallery-btn">
+                <Image className="mr-2 h-4 w-4" /> Разгледай галерията
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== PRICING OVERVIEW ===== */}
+      <section className="py-16">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Цени</h2>
+            <p className="text-slate-400">Достъпни планове за всеки</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {[
+              { name: 'Starter', price: '17', features: ['До 2 проекта', 'Основен профил', 'Email известия'], color: '#4DA6FF', popular: false },
+              { name: 'Pro', price: '35', features: ['Неограничени проекти', 'AI Designer: 1 вариант', 'Приоритетно показване'], color: '#FF8C42', popular: true },
+              { name: 'Premium', price: '69', features: ['AI Designer: 5 варианта', 'AI Sketch анализ', 'PDF договори включени', 'Персонален мениджър'], color: '#8C56FF', popular: false },
+            ].map((plan, i) => (
+              <Card key={i} className={`bg-[#253545] border-[#3A4A5C] p-6 text-center ${plan.popular ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20 scale-[1.03]' : ''}`}>
+                {plan.popular && <div className="bg-[#FF8C42] text-white text-[10px] font-bold rounded-full px-3 py-1 inline-block mb-3">ПРЕПОРЪЧАН</div>}
+                <h3 className="text-lg font-bold text-white">{plan.name}</h3>
+                <p className="text-3xl font-bold mt-2 mb-1" style={{ color: plan.color }}>{plan.price} <span className="text-base font-normal text-slate-400">EUR/мес</span></p>
+                <div className="space-y-2 mt-4 text-left">
+                  {plan.features.map((f, fi) => (
+                    <div key={fi} className="flex items-center gap-2 text-sm text-slate-300">
+                      <CheckCircle className="h-3.5 w-3.5 flex-shrink-0" style={{ color: plan.color }} /> {f}
+                    </div>
+                  ))}
+                </div>
+                <Button className="w-full mt-6 text-white" style={{ backgroundColor: plan.color }} onClick={() => navigate('/subscriptions')} data-testid={`pricing-${plan.name.toLowerCase()}`}>
+                  Избери {plan.name}
+                </Button>
+              </Card>
+            ))}
+          </div>
+          <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <Card className="bg-[#253545]/50 border-[#3A4A5C] p-4 text-center">
+              <p className="text-white font-medium text-sm">PDF договор + количествена сметка</p>
+              <p className="text-[#28A745] text-2xl font-bold">5 EUR</p>
+              <p className="text-slate-500 text-xs">По данни от калкулатора</p>
+            </Card>
+            <Card className="bg-[#253545]/50 border-[#3A4A5C] p-4 text-center">
+              <p className="text-white font-medium text-sm">AI анализ чертежи + PDF договор</p>
+              <p className="text-[#FF8C42] text-2xl font-bold">15 EUR</p>
+              <p className="text-slate-500 text-xs">95-100% точност</p>
+            </Card>
+          </div>
+          <div className="text-center mt-6">
+            <Button variant="outline" className="border-[#3A4A5C] text-slate-300 hover:bg-[#253545]" onClick={() => navigate('/subscriptions')}>
+              Виж всички абонаменти <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== HOW IT WORKS ===== */}
+      <section className="py-16 border-y border-[#2A3A4C] bg-[#0F1923]">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">Как работи?</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { icon: <Calculator className="h-8 w-8" />, title: "Калкулатор", desc: "Изчислете цена с реални данни за 28 области", color: '#FF8C42' },
-              { icon: <Sparkles className="h-8 w-8" />, title: "AI Дизайнер", desc: "Визуализирайте проекта си с AI технологии", color: '#8C56FF' },
-              { icon: <Users className="h-8 w-8" />, title: "Намери фирма", desc: "Свържете се с проверени фирми и майстори", color: '#4DA6FF' },
-              { icon: <Star className="h-8 w-8" />, title: "Оценка", desc: "Оценявайте и четете реални отзиви", color: '#28A745' }
-            ].map((step, i) => (
-              <div key={i} className="text-center">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${step.color}15`, color: step.color }}>
-                  {step.icon}
+              { step: '1', icon: <Calculator className="h-7 w-7" />, title: "Калкулация", desc: "Въведете данни за проекта и получете точна оценка на разходите", color: '#FF8C42' },
+              { step: '2', icon: <Sparkles className="h-7 w-7" />, title: "AI визуализация", desc: "Качете снимки и получете фотореалистичен дизайн от AI", color: '#8C56FF' },
+              { step: '3', icon: <FileText className="h-7 w-7" />, title: "PDF документи", desc: "Генерирайте договор с количествена сметка за подписване", color: '#28A745' },
+              { step: '4', icon: <Users className="h-7 w-7" />, title: "Изпълнение", desc: "Свържете се с проверени фирми и майстори за изпълнение", color: '#4DA6FF' }
+            ].map((s, i) => (
+              <div key={i} className="text-center relative">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${s.color}15`, color: s.color }}>
+                  {s.icon}
                 </div>
-                <h3 className="font-semibold mb-2 text-white">{step.title}</h3>
-                <p className="text-sm text-slate-400">{step.desc}</p>
+                <div className="absolute -top-2 -left-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: s.color }}>
+                  {s.step}
+                </div>
+                <h3 className="font-semibold text-white mb-2">{s.title}</h3>
+                <p className="text-sm text-slate-400">{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== TOP COMPANIES ===== */}
-      {topCompanies.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-white">Топ фирми</h2>
-              <Button variant="ghost" className="text-[#FF8C42] hover:text-[#e67a30] hover:bg-[#FF8C42]/10" onClick={() => navigate('/companies')}>
-                Виж всички <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
-            </div>
-            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {topCompanies.slice(0, 4).map(comp => (
-                <Card key={comp.id} className="hover:shadow-lg hover:shadow-[#4DA6FF]/5 transition-shadow cursor-pointer bg-[#253545] border-[#3A4A5C]" onClick={() => navigate(`/company/${comp.id}`)}>
-                  <CardContent className="p-5 text-center">
-                    <div className="w-16 h-16 bg-[#FF8C42]/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Building2 className="h-8 w-8 text-[#FF8C42]" />
-                    </div>
-                    <h4 className="font-semibold text-white">{comp.company_name}</h4>
-                    <div className="flex items-center justify-center gap-1 mt-2">
-                      <Star className="h-4 w-4 text-[#FF8C42] fill-[#FF8C42]" />
-                      <span className="font-medium text-white">{comp.rating?.toFixed(1) || '0.0'}</span>
-                      <span className="text-sm text-slate-400">({comp.review_count || 0})</span>
-                    </div>
-                    <p className="text-xs text-slate-400 mt-1">{comp.city}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ===== SUBSCRIPTION CTA ===== */}
-      <section className="py-16 bg-gradient-to-r from-[#FF8C42]/20 to-[#FF8C42]/5 border-y border-[#FF8C42]/20">
+      {/* ===== CTA ===== */}
+      <section className="py-16 bg-gradient-to-r from-[#FF8C42]/20 to-[#8C56FF]/10">
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h2 className="text-3xl font-bold mb-4">Готови ли сте да започнете?</h2>
-          <p className="text-slate-300 mb-8 text-lg">
-            Регистрирайте се безплатно — Всички функции в тестов режим
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Готови ли сте да започнете?</h2>
+          <p className="text-slate-300 mb-8 text-base md:text-lg">
+            Регистрирайте се и реализирайте мечтания проект без непредвидени разходи.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-[#FF8C42] hover:bg-[#e67a30] text-white text-lg px-8 shadow-lg shadow-[#FF8C42]/20" onClick={() => navigate('/register')} data-testid="cta-register">
               Регистрирай се
             </Button>
-            <Button size="lg" className="bg-transparent border-2 border-[#4DA6FF] text-[#4DA6FF] hover:bg-[#4DA6FF]/10 text-lg px-8" onClick={() => navigate('/companies')}>
-              Виж фирми
+            <Button size="lg" className="bg-transparent border-2 border-white/30 text-white hover:bg-white/10 text-lg px-8" onClick={() => navigate('/calculator')}>
+              Безплатен калкулатор
             </Button>
           </div>
         </div>
@@ -2894,25 +2978,16 @@ const SubscriptionsPage = () => {
   };
 
   const planColors = { starter: '#4DA6FF', pro: '#FF8C42', premium: '#8C56FF' };
-  const planIcons = { starter: '1', pro: '2', premium: '3' };
 
   return (
     <div className="min-h-screen bg-[#1E2A38] py-12" data-testid="subscriptions-page">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Фирмени абонаменти</h1>
-          <p className="text-lg text-slate-400">Изберете план, който отговаря на вашите нужди</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Абонаменти и услуги</h1>
+          <p className="text-lg text-slate-400">Изберете план или еднократна услуга</p>
         </div>
 
-        <PageInstructions
-          title="Абонаментни планове"
-          description="Сравнете плановете и изберете подходящия за вас"
-          steps={['Starter — основни функции, ограничен достъп', 'Pro — AI Builder + визуализация, неограничени проекти', 'Premium — пълен достъп до всички AI функции + персонален мениджър']}
-          benefits={['Цени в лева и евро', 'Без дългосрочен ангажимент', 'Месечен абонамент']}
-          videoUrl="https://temadom.com/videos/subscriptions"
-        />
-
-        {/* Plans for companies */}
+        {/* Subscription plans */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {plans.company && Object.entries(plans.company).map(([key, plan]) => {
             const color = planColors[key] || '#FF8C42';
@@ -2923,16 +2998,8 @@ const SubscriptionsPage = () => {
                 {isPro && <div className="bg-[#FF8C42] text-white text-center text-xs py-1.5 font-bold tracking-wider">ПРЕПОРЪЧАН</div>}
                 {isPremium && <div className="bg-gradient-to-r from-[#8C56FF] to-[#4DA6FF] text-white text-center text-xs py-1.5 font-bold tracking-wider">ПЪЛНА ФУНКЦИОНАЛНОСТ</div>}
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white" style={{ backgroundColor: `${color}20`, color }}>
-                      {planIcons[key]}
-                    </div>
-                    <h3 className="text-xl font-bold text-white">{plan.name}</h3>
-                  </div>
-                  <div className="mb-5">
-                    <p className="text-2xl font-bold" style={{ color }}>{plan.price}</p>
-                    {plan.price_eur && <p className="text-xs text-slate-500">{plan.price_eur}</p>}
-                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                  <p className="text-2xl font-bold mb-5" style={{ color }}>{plan.price}</p>
                   <div className="space-y-2.5 mb-4">
                     {plan.features.map((f, i) => (
                       <div key={i} className="flex items-start gap-2 text-sm text-slate-300">
@@ -2960,10 +3027,35 @@ const SubscriptionsPage = () => {
           })}
         </div>
 
-        {/* AI Designer - separate module */}
+        {/* Standalone services */}
+        <h2 className="text-2xl font-bold text-white mb-2">Еднократни услуги</h2>
+        <p className="text-slate-400 text-sm mb-6">Без абонамент — платете само когато имате нужда</p>
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          {plans.standalone && Object.entries(plans.standalone).map(([key, svc]) => (
+            <Card key={key} className="bg-[#253545] border-[#3A4A5C] overflow-hidden" data-testid={`standalone-${key}`}>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-bold text-white mb-1">{svc.name}</h3>
+                <p className="text-2xl font-bold text-[#28A745] mb-2">{svc.price}</p>
+                <p className="text-sm text-slate-400 mb-4">{svc.description}</p>
+                <div className="space-y-2">
+                  {svc.features.map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm text-slate-300">
+                      <CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> {f}
+                    </div>
+                  ))}
+                </div>
+                <Button className="w-full mt-4 bg-[#28A745] hover:bg-[#22943e] text-white" onClick={() => key.includes('calculator') ? navigate('/calculator') : navigate('/ai-sketch')}>
+                  Поръчай сега
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* AI Designer module */}
         <h2 className="text-2xl font-bold text-white mb-2">AI Дизайнер</h2>
-        <p className="text-slate-400 text-sm mb-6">Еднократна такса или включен в абонамент</p>
-        <div className="grid md:grid-cols-1 gap-6 max-w-lg">
+        <p className="text-slate-400 text-sm mb-6">Включен в Pro (1 вариант) и Premium (5 варианта)</p>
+        <div className="max-w-lg">
           {plans.designer && Object.entries(plans.designer).map(([key, plan]) => (
             <Card key={key} className="bg-gradient-to-r from-[#8C56FF]/20 to-[#4DA6FF]/20 border-[#8C56FF]/30" data-testid={`plan-designer-${key}`}>
               <CardContent className="p-6">
@@ -2971,10 +3063,7 @@ const SubscriptionsPage = () => {
                   <Sparkles className="h-6 w-6 text-[#8C56FF]" />
                   <h3 className="text-xl font-bold text-white">{plan.name}</h3>
                 </div>
-                <div className="mb-4">
-                  <p className="text-lg font-bold text-[#8C56FF]">{plan.price}</p>
-                  {plan.price_eur && <p className="text-xs text-slate-500">{plan.price_eur}</p>}
-                </div>
+                <p className="text-lg font-bold text-[#8C56FF] mb-4">{plan.price}</p>
                 {plan.note && (
                   <div className="bg-[#8C56FF]/10 border border-[#8C56FF]/20 rounded-lg p-3 mb-4">
                     <p className="text-xs text-[#8C56FF]">{plan.note}</p>

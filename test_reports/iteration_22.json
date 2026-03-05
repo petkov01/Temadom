@@ -1,0 +1,119 @@
+{
+  "summary": "TemaDom Iteration 22 - Homepage redesign & EUR pricing. All 19 backend tests passed. All frontend UI tests passed. EUR pricing verified: Starter 17, Pro 35, Premium 69. Standalone services: PDF contract 5 EUR, AI blueprint 15 EUR. Homepage redesigned with hero text 'без непредвидени разходи', 'Защо TemaDom?' section with 3 cards, 'Топ функции' section with AI Дизайнер/Sketch/Calculator/Gallery features, 'Как работи?' 4 steps. 'Дизайнери' section correctly removed from navbar.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend (19/19):",
+    "✅ GET /api/subscriptions/plans returns 200",
+    "✅ Starter plan: 17 EUR/мес",
+    "✅ Pro plan: 35 EUR/мес",
+    "✅ Premium plan: 69 EUR/мес",
+    "✅ Standalone PDF contract: 5 EUR",
+    "✅ Standalone AI blueprint: 15 EUR",
+    "✅ AI Designer module: 10 EUR/генерация",
+    "✅ AI Designer bundle prices: 3 variants = 25 EUR, 5 variants = 39 EUR",
+    "✅ Starter has limitations (Ограничен, Без AI, Без приоритетно показване)",
+    "✅ Pro has AI Designer 1 variant limitation",
+    "✅ Homepage loads (200)",
+    "✅ AI Designer page /ai-designer loads (200)",
+    "✅ AI Sketch page /ai-sketch loads (200)",
+    "✅ AI Gallery page /ai-gallery loads (200)",
+    "✅ Calculator page /calculator loads (200)",
+    "✅ Subscriptions page /subscriptions loads (200)",
+    "✅ GET /api/stats returns valid data",
+    "✅ GET /api/categories returns categories list",
+    "✅ GET /api/ai-designer/published returns 200",
+    "Frontend UI:",
+    "✅ Hero text: 'Вашият строителен проект без непредвидени разходи'",
+    "✅ 'Защо TemaDom?' section with 3 cards (За клиенти, За фирми, За майстори)",
+    "✅ 'Топ функции на TemaDom' section with AI ДИЗАЙНЕР, AI SKETCH, КАЛКУЛАТОР + PDF, AI ГАЛЕРИЯ",
+    "✅ Feature buttons navigate correctly: AI Дизайнер -> /ai-designer, AI Sketch -> /ai-sketch, Калкулатор -> /calculator, AI Галерия -> /ai-gallery",
+    "✅ Pricing overview: Starter 17, Pro 35, Premium 69 EUR/мес",
+    "✅ Standalone prices: PDF договор 5 EUR, AI анализ чертежи 15 EUR",
+    "✅ 'Как работи?' section with 4 steps (Калкулация, AI визуализация, PDF документи, Изпълнение)",
+    "✅ Navbar dropdown 'Още' opened with AI Дизайнер, AI Sketch, AI Галерия, Абонаменти links",
+    "✅ 'Дизайнери' link correctly REMOVED from navbar",
+    "✅ Logo visible in navbar (238x72px)",
+    "✅ Subscriptions page shows 3 plans with EUR pricing and limitations",
+    "✅ 'Еднократни услуги' section shows PDF contract (5 EUR) and AI blueprint (15 EUR)",
+    "✅ AI Designer module shows 10 EUR/генерация with bundle prices 25/39 EUR"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration22_homepage_pricing.py",
+    "/app/test_reports/pytest/pytest_results_iter22.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All requested features verified and working correctly:",
+    "1. Homepage redesign complete with hero text, 'Защо TemaDom?', 'Топ функции', 'Как работи?' sections",
+    "2. EUR pricing updated: Starter 17, Pro 35, Premium 69 (30% reduction from previous BGN prices)",
+    "3. New standalone services: PDF contract 5 EUR, AI blueprint 15 EUR",
+    "4. 'Дизайнери' section correctly removed from navbar",
+    "5. AI Designer 10 EUR/gen with bundle prices (25 EUR/3 variants, 39 EUR/5 variants)",
+    "6. Plan limitations properly shown for Starter and Pro"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration22_homepage_pricing.py"
+  ],
+  "success_rate": {
+    "backend": "100% (19/19 tests passed)",
+    "frontend": "100% (All UI checks passed)"
+  },
+  "seed_data_creation": "None - used existing test data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "TemaDom Iteration 22 fully tested. Major updates verified: 1) Homepage redesign with hero text 'Вашият строителен проект без непредвидени разходи', 'Защо TemaDom?' section (3 cards), 'Топ функции' section (AI Дизайнер, AI Sketch, Калкулатор+PDF, AI Галерия), 'Как работи?' (4 steps), 2) EUR pricing: Starter 17 EUR, Pro 35 EUR, Premium 69 EUR, 3) Standalone services: PDF договор 5 EUR, AI анализ чертежи 15 EUR, 4) 'Дизайнери' section removed from navbar, 5) AI Designer 10 EUR/gen with bundles 25/39 EUR. All navigation and feature buttons working correctly.",
+  "features_tested": {
+    "homepage_hero": {
+      "status": "PASS",
+      "details": "Hero text 'Вашият строителен проект без непредвидени разходи' displayed correctly"
+    },
+    "zasho_temadom_section": {
+      "status": "PASS",
+      "details": "3 cards: За клиенти, За фирми, За майстори with proper descriptions"
+    },
+    "top_features_section": {
+      "status": "PASS",
+      "details": "AI ДИЗАЙНЕР, AI SKETCH, КАЛКУЛАТОР + PDF, AI ГАЛЕРИЯ displayed with correct navigation"
+    },
+    "pricing_overview_homepage": {
+      "status": "PASS",
+      "details": "Starter 17 EUR, Pro 35 EUR, Premium 69 EUR with plan features"
+    },
+    "standalone_prices_homepage": {
+      "status": "PASS",
+      "details": "PDF договор 5 EUR, AI анализ чертежи 15 EUR cards shown"
+    },
+    "kak_raboti_section": {
+      "status": "PASS",
+      "details": "4 steps: Калкулация, AI визуализация, PDF документи, Изпълнение"
+    },
+    "navbar_dizaineri_removed": {
+      "status": "PASS",
+      "details": "'Дизайнери' link correctly removed from navbar dropdown"
+    },
+    "subscriptions_eur_pricing": {
+      "status": "PASS",
+      "details": "API returns 17/35/69 EUR, UI shows same prices"
+    },
+    "subscriptions_standalone_services": {
+      "status": "PASS",
+      "details": "'Еднократни услуги' section with PDF 5 EUR, AI blueprint 15 EUR"
+    },
+    "ai_designer_module": {
+      "status": "PASS",
+      "details": "10 EUR/генерация, bundles: 3 variants = 25 EUR, 5 variants = 39 EUR"
+    },
+    "logo_visibility": {
+      "status": "PASS",
+      "details": "Logo 238x72px in navbar left corner, fully visible"
+    }
+  }
+}
