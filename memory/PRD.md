@@ -40,6 +40,8 @@ Build "TemaDom" — a web application that converts hand-drawn construction sket
 ## Implemented (March 5, 2026)
 - [x] AI CAD Sketch: Full parametric builder (Draw + Upload modes)
 - [x] IA Designer: 1:1 renovation + Before/After slider
+- [x] IA Designer: Variant selector (1/2/3 variants x 4 angles)
+- [x] IA Designer: Bug fix - room_type_name + generated_images response mapping
 - [x] Live Counter with online users tracking
 - [x] Logo cleanup
 - [x] Social Gallery, Subscriptions, Telegram
