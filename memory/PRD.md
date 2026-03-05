@@ -5,72 +5,52 @@ Build "TemaDom" — a web application that converts hand-drawn construction sket
 
 ## Core Features
 
-### 1. AI Sketch (`/ai-sketch`) — CV/OCR Pipeline
-- Upload hand-drawn sketches/blueprints (JPG, PNG, WebP)
-- Backend: OpenCV line detection + Tesseract OCR dimension detection
-- Outputs: Vectorized geometry + .glb 3D model
-- Three.js 3D viewer with rotate/zoom/pan
-- STRICT MODE: No hallucination, only geometry from drawing
-- Download .glb file
-- **Save & Share:** Projects saved to DB, shareable via `/ai-sketch?id=xxx`
+### 1. AI CAD Sketch (`/ai-sketch`) — Parametric 3D
+**Two modes:**
+- **Draw (CAD):** Interactive canvas with grid, snap-to-grid, snap-to-endpoints, measurement labels
+  - Tools: Wall, Line, Rectangle, Stairs, Dimension, Erase, Select
+  - 4-step flow: Draw → Dimensions → Description → Review → 3D
+  - AI shape detection (suggests wall/staircase/slab)
+  - Live dimension editing per element
+  - Structure panel showing all objects
+  - Parametric 3D generation (createWall, createStairs, createSlab)
+- **Upload (CV/OCR):** Upload sketches → OpenCV line detection + Tesseract OCR → .glb
 
 ### 2. IA Designer (`/room-scan`) — 1:1 Renovation
-- Upload real room photo (bathroom, kitchen, stairs, facade)
-- Describe renovation in text
-- AI generates the EXACT same space renovated (GPT-4o vision + GPT Image 1)
-- 4 camera angles output
-- **Before/After comparison slider** (draggable)
-- Progress bar with elapsed time
-- Strict 1:1 geometry preservation
+- Upload photo + describe renovation → 4-angle renovated views
+- Before/After comparison slider
+- 9 room types, 5 styles
+- Progress bar
 
 ### 3. Live Counter Widget
-- Fixed position top-right corner
-- Shows: clients, companies, masters, free slots remaining
-- Real-time updates every 30 seconds
+- Fixed top-right: online users, clients, companies, masters, FREE slots
+- Online users tracked via heartbeat API (25s interval, 60s timeout)
 - Pulse animation on new registrations
-- Mobile: displays in hamburger menu as 4-column grid
+- Mobile: in hamburger menu
 
 ### 4. Social Gallery (`/ready-projects`)
-- Users publish finished renovation projects
-- Like, comment, share functionality
-
-### 5. Subscriptions
-- 3 tiers: БАЗОВ, ПРО, PREMIUM
-- Telegram notifications (priority-based)
+### 5. Subscriptions (3 tiers)
+### 6. Telegram notifications (priority-based)
 
 ## Architecture
-- **Backend:** FastAPI + MongoDB (motor) + OpenCV + Tesseract + Emergent LLM
-- **Frontend:** React + TailwindCSS + Three.js/R3F + Shadcn/UI
-- **Language:** Bulgarian (Български)
+- **Backend:** FastAPI + MongoDB + OpenCV + Tesseract + Emergent LLM
+- **Frontend:** React + TailwindCSS + Three.js/R3F + Shadcn/UI + HTML5 Canvas (CAD)
+- **Language:** Bulgarian
 
-## What's Been Implemented
-- [x] AI Sketch: Full CV/OCR pipeline (OpenCV + Tesseract → .glb → Three.js)
-- [x] AI Sketch: Save projects to DB + shareable links (?id=xxx)
-- [x] IA Designer: Strict 1:1 renovation UI with progress bar, 4 angles
-- [x] IA Designer: Before/After comparison slider
-- [x] Live Counter widget (desktop fixed + mobile hamburger)
-- [x] Logo cleanup (removed duplicate white text)
-- [x] Social Gallery (Ready Projects page)
-- [x] Homepage with psychological copy
-- [x] Subscription system (3 tiers)
-- [x] Telegram notifications (priority-based)
-- [x] Navigation restructured
-- [x] Backend partial refactoring (config.py, models.py extracted)
+## Implemented (March 5, 2026)
+- [x] AI CAD Sketch: Full parametric builder (Draw + Upload modes)
+- [x] IA Designer: 1:1 renovation + Before/After slider
+- [x] Live Counter with online users tracking
+- [x] Logo cleanup
+- [x] Social Gallery, Subscriptions, Telegram
+- [x] Save & share AI Sketch projects
 
-## Prioritized Backlog
-- **P1:** Complete backend refactoring — split server.py into routers/
-- **P2:** Monetization (Stripe payments, feature locking by subscription)
-- **P3:** Mobile app + advanced features
-
-## Key Files
-- `/app/backend/cv_pipeline.py` — OpenCV/Tesseract pipeline
-- `/app/backend/server.py` — Main FastAPI app (3500+ lines)
-- `/app/backend/config.py` — Shared configuration
-- `/app/backend/models.py` — Pydantic models
-- `/app/frontend/src/components/AISketchPage.jsx` — AI Sketch + Three.js + share
-- `/app/frontend/src/components/AIDesignerPage.jsx` — IA Designer + Before/After slider
-- `/app/frontend/src/App.js` — Routes, navigation, LiveCounter, layout
+## Backlog
+- **P1:** Refactor server.py → routers/
+- **P2:** Monetization (Stripe)
+- **P3:** Mobile app
 
 ## Test Reports
-- `/app/test_reports/iteration_29.json` — AI Sketch + IA Designer core features
-- `/app/test_reports/iteration_30.json` — Live Counter + Share + Slider + Logo fix
+- iteration_29: CV/OCR pipeline core
+- iteration_30: Counter + Slider + Share
+- iteration_31: CAD system + Online users (100% all)
