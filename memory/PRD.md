@@ -15,28 +15,28 @@ Marketplace app "TemaDom" for construction project leads. Connects clients with 
 
 ### Visual Identity
 - Dark theme: #1E2A38, #2B2B2B, accents #FF8C42, #28A745, #DC3545, #4DA6FF, #8C56FF
-- TemaDom logo - bigger (90px desktop, 65px mobile) and left-aligned in navbar
+- TemaDom logo - h-[72px] desktop / h-[58px] mobile, left-corner aligned with pt-1, no cutoff
 - Gradient text, glass morphism effects
 
 ### AI Designer (COMPLETE)
 - 3 photo upload from 3 different angles
-- Room type selection (9 types)
-- Dimensions input + 5 styles + 3 material classes + 1/3/5 variants
+- Room type selection (9 types), dimensions, 5 styles, 3 material classes, 1/3/5 variants
 - GPT-4o room analysis + GPT Image 1 design generation
 - Materials list with prices in BGN + EUR from 18 Bulgarian stores
 - Before/After comparison with 2 angles per variant
-- **NEW: Publish to Gallery button**
-- **NEW: Dual PDF download (images + materials separately)**
+- Publish to Gallery button + social sharing after publish
+- Dual PDF download (images PDF + materials PDF separately)
 
-### AI Gallery (NEW - March 5, 2026)
+### AI Gallery (March 5, 2026)
 - Public gallery of published AI design projects at /ai-gallery
 - Card grid with thumbnails, style badges, views counter
-- Click to open modal with full before/after comparison
-- PDF download buttons in modal (images PDF + materials PDF)
+- Click modal with full before/after comparison
+- PDF download + Social sharing (Facebook, Viber, WhatsApp, Telegram, Copy Link)
+- Auto-open from shared URL (?project=ID)
 - Pagination support
 
-### AI Sketch (NEW - March 5, 2026)
-- New page at /ai-sketch for blueprint/sketch analysis
+### AI Sketch (March 5, 2026)
+- Page at /ai-sketch for blueprint/sketch analysis
 - Upload 1-3 sketches/blueprints/photos
 - 5 building types: residential, commercial, industrial, renovation, other
 - AI structural analysis: columns, beams, stairs, foundations, roof, walls
@@ -44,40 +44,37 @@ Marketplace app "TemaDom" for construction project leads. Connects clients with 
 - Quantity survey with 95-100% accuracy in BGN + EUR
 - Meshy.ai 3D model integration marked as "Coming Soon"
 
-### Subscription Plans
-- Base/Pro/Premium for companies (no AI Designer included)
-- AI Designer as separate paid module (free in test mode)
+### Social Sharing (March 5, 2026)
+- Facebook, Viber, WhatsApp, Telegram, Copy Link buttons
+- Available on: Gallery modal, Gallery cards, AI Designer after publish
+- Direct share URLs with project deep linking
 
-### Feedback System
-- Dedicated /feedback page with star rating + reviews
-- Floating feedback button
+### Subscription Plans (Updated March 5, 2026)
+- **Starter/Basic**: Project management, test 3D renders, demo materials/budgets
+- **Pro**: + AI Builder (sketches/photos to 3D), multi-upload, video instructions, material tables
+- **Premium**: + Structural drawings (PDF/Excel, 95-100%), columns/beams/roofs/foundations tables, personal manager
+- AI Designer: Separate paid module (free in test mode)
 
 ### Other Features
-- PageInstructions on all major pages
-- Registration: 3 tabs + Company/Master dropdown + dynamic Bulstat
-- Price Calculator for 28 regions
-- AI Chatbot (dark theme)
-- Full BG/EN translation
-- Navbar "Още" dropdown with AI Дизайнер, AI Sketch, AI Галерия links
+- PageInstructions, Feedback system, Registration (multi-role)
+- Price Calculator (28 regions), AI Chatbot, Full BG/EN translation
+- Navbar "Още" dropdown: AI Дизайнер, AI Sketch, AI Галерия
 
 ## API Endpoints
-- POST /api/ai-designer/generate - Generate AI design from 1-3 photos
+- POST /api/ai-designer/generate - Generate AI design
 - POST /api/ai-designer/publish - Publish project to gallery
-- GET /api/ai-designer/published - List published projects (paginated)
-- GET /api/ai-designer/published/{id} - Get project details
-- GET /api/ai-designer/published/{id}/pdf/images - Download images PDF
-- GET /api/ai-designer/published/{id}/pdf/materials - Download materials PDF
-- POST /api/ai-sketch/analyze - Analyze sketches for structural elements
+- GET /api/ai-designer/published - List published projects
+- GET /api/ai-designer/published/{id} - Project details
+- GET /api/ai-designer/published/{id}/pdf/images - Images PDF
+- GET /api/ai-designer/published/{id}/pdf/materials - Materials PDF
+- POST /api/ai-sketch/analyze - Analyze sketches
 - POST /api/feedback - Submit feedback
-- GET /api/feedback - Get all feedback
-- GET /api/subscriptions/plans - Subscription plans
-
-## P0 Remaining
-- None currently - all major features implemented
+- GET /api/feedback - Get feedback
+- GET /api/subscriptions/plans - Subscription plans (starter/pro/premium)
 
 ## P1 Backlog
+- Meshy.ai integration for real 3D model generation (needs API key)
 - AI Blueprint Analysis (Phase 4) - advanced PDF/DWG parsing
-- Meshy.ai integration for real 3D model generation
 - server.py refactoring into routers/services/models
 
 ## P2 Backlog
