@@ -2602,6 +2602,510 @@ async def get_feedback():
         avg_rating = sum(f["rating"] for f in feedback_list) / len(feedback_list)
     return {"feedback": feedback_list, "avg_rating": round(avg_rating, 1), "total": len(feedback_list)}
 
+# ============== PUBLISH AI PROJECT + GALLERY + PDF ==============
+
+@api_router.post("/ai-designer/publish")
+async def publish_ai_project(data: dict):
+    """Publish an AI design project to the public gallery"""
+    design_id = data.get("design_id", str(uuid.uuid4()))
+    before_images = data.get("before_images", [])  # base64 list
+    generated_images = data.get("generated_images", [])
+    materials = data.get("materials", {})
+    room_type = data.get("room_type", "")
+    style = data.get("style", "")
+    material_class = data.get("material_class", "")
+    dimensions = data.get("dimensions", {})
+    room_analysis = data.get("room_analysis", {})
+    author_name = data.get("author_name", "Анонимен")
+    
+    if not generated_images:
+        raise HTTPException(status_code=400, detail="Няма генерирани изображения за публикуване")
+    
+    project = {
+        "id": str(uuid.uuid4()),
+        "design_id": design_id,
+        "before_images": before_images[:3],
+        "generated_images": generated_images,
+        "materials": materials,
+        "room_type": room_type,
+        "style": style,
+        "material_class": material_class,
+        "dimensions": dimensions,
+        "room_analysis": room_analysis,
+        "author_name": author_name,
+        "views": 0,
+        "status": "published",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.published_projects.insert_one(project)
+    return {"status": "ok", "project_id": project["id"], "message": "Проектът е публикуван успешно!"}
+
+
+@api_router.get("/ai-designer/published")
+async def get_published_projects(page: int = 1, limit: int = 12):
+    """Get all published AI design projects for the public gallery"""
+    skip = (page - 1) * limit
+    total = await db.published_projects.count_documents({"status": "published"})
+    projects = await db.published_projects.find(
+        {"status": "published"},
+        {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Strip large base64 for listing (keep only first image thumbnail)
+    for p in projects:
+        # Keep only first before image for thumbnail
+        if p.get("before_images"):
+            p["before_thumb"] = p["before_images"][0][:200] + "..." if len(p["before_images"][0]) > 200 else p["before_images"][0]
+        # Keep only first generated image for thumbnail
+        if p.get("generated_images") and len(p["generated_images"]) > 0:
+            first_gen = p["generated_images"][0]
+            if isinstance(first_gen, dict) and first_gen.get("image_base64"):
+                p["gen_thumb"] = first_gen["image_base64"][:200] + "..."
+    
+    return {"projects": projects, "total": total, "pages": max(1, (total + limit - 1) // limit)}
+
+
+@api_router.get("/ai-designer/published/{project_id}")
+async def get_published_project(project_id: str):
+    """Get a single published project with full data"""
+    project = await db.published_projects.find_one(
+        {"id": project_id, "status": "published"}, {"_id": 0}
+    )
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    
+    # Increment views
+    await db.published_projects.update_one({"id": project_id}, {"$inc": {"views": 1}})
+    project["views"] = project.get("views", 0) + 1
+    return project
+
+
+@api_router.get("/ai-designer/published/{project_id}/pdf/images")
+async def download_project_images_pdf(project_id: str):
+    """Generate PDF with only the project images (before/after)"""
+    from fpdf import FPDF
+    import io
+    
+    project = await db.published_projects.find_one({"id": project_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    
+    pdf = FPDF()
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    bold_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    
+    try:
+        pdf.add_font("DejaVu", "", font_path, uni=True)
+        pdf.add_font("DejaVu", "B", bold_font_path, uni=True)
+        fn = "DejaVu"
+    except Exception:
+        fn = "Helvetica"
+    
+    # Cover page
+    pdf.add_page()
+    pdf.set_fill_color(30, 42, 56)
+    pdf.rect(0, 0, 210, 297, 'F')
+    pdf.set_text_color(255, 140, 66)
+    pdf.set_font(fn, 'B', 28)
+    pdf.set_y(60)
+    pdf.cell(0, 15, "TemaDom AI Designer", ln=True, align='C')
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, '', 14)
+    pdf.cell(0, 10, "Визуализации на проект", ln=True, align='C')
+    pdf.ln(10)
+    pdf.set_font(fn, '', 11)
+    room_type = project.get("room_type", "Помещение")
+    style_name = project.get("style", "")
+    dims = project.get("dimensions", {})
+    pdf.cell(0, 8, f"Помещение: {room_type}", ln=True, align='C')
+    pdf.cell(0, 8, f"Стил: {style_name}", ln=True, align='C')
+    if dims:
+        pdf.cell(0, 8, f"Размери: {dims.get('width','')}m x {dims.get('length','')}m x {dims.get('height','')}m", ln=True, align='C')
+    pdf.cell(0, 8, f"Дата: {datetime.now(timezone.utc).strftime('%d.%m.%Y')}", ln=True, align='C')
+    
+    import tempfile
+    
+    # Before images
+    before_images = project.get("before_images", [])
+    if before_images:
+        pdf.add_page()
+        pdf.set_fill_color(255, 255, 255)
+        pdf.rect(0, 0, 210, 297, 'F')
+        pdf.set_text_color(30, 42, 56)
+        pdf.set_font(fn, 'B', 18)
+        pdf.cell(0, 12, "ПРЕДИ (Оригинални снимки)", ln=True, align='C')
+        pdf.ln(5)
+        
+        for idx, b64_img in enumerate(before_images):
+            try:
+                if "," in b64_img:
+                    b64_img = b64_img.split(",")[1]
+                img_data = base64.b64decode(b64_img)
+                with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+                    tmp.write(img_data)
+                    tmp_path = tmp.name
+                y_pos = pdf.get_y()
+                if y_pos > 220:
+                    pdf.add_page()
+                    pdf.set_fill_color(255, 255, 255)
+                    pdf.rect(0, 0, 210, 297, 'F')
+                pdf.set_font(fn, '', 10)
+                pdf.set_text_color(100, 100, 100)
+                pdf.cell(0, 6, f"Ъгъл {idx+1}", ln=True, align='C')
+                pdf.image(tmp_path, x=25, w=160)
+                pdf.ln(5)
+                os.unlink(tmp_path)
+            except Exception:
+                pass
+    
+    # Generated images (after)
+    gen_images = project.get("generated_images", [])
+    for v_idx, variant in enumerate(gen_images):
+        pdf.add_page()
+        pdf.set_fill_color(255, 255, 255)
+        pdf.rect(0, 0, 210, 297, 'F')
+        pdf.set_text_color(255, 140, 66)
+        pdf.set_font(fn, 'B', 18)
+        pdf.cell(0, 12, f"СЛЕД - Вариант {v_idx + 1}", ln=True, align='C')
+        pdf.ln(5)
+        
+        angles = variant.get("angles", [])
+        if angles:
+            for ang in angles:
+                try:
+                    b64 = ang.get("image_base64", "")
+                    if not b64:
+                        continue
+                    img_data = base64.b64decode(b64)
+                    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+                        tmp.write(img_data)
+                        tmp_path = tmp.name
+                    pdf.set_font(fn, '', 10)
+                    pdf.set_text_color(100, 100, 100)
+                    pdf.cell(0, 6, ang.get("angle_label", ""), ln=True, align='C')
+                    y_pos = pdf.get_y()
+                    if y_pos > 180:
+                        pdf.add_page()
+                        pdf.set_fill_color(255, 255, 255)
+                        pdf.rect(0, 0, 210, 297, 'F')
+                    pdf.image(tmp_path, x=15, w=180)
+                    pdf.ln(5)
+                    os.unlink(tmp_path)
+                except Exception:
+                    pass
+        elif variant.get("image_base64"):
+            try:
+                img_data = base64.b64decode(variant["image_base64"])
+                with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+                    tmp.write(img_data)
+                    tmp_path = tmp.name
+                pdf.image(tmp_path, x=15, w=180)
+                pdf.ln(5)
+                os.unlink(tmp_path)
+            except Exception:
+                pass
+    
+    # Footer
+    pdf.add_page()
+    pdf.set_fill_color(30, 42, 56)
+    pdf.rect(0, 0, 210, 297, 'F')
+    pdf.set_text_color(255, 140, 66)
+    pdf.set_font(fn, 'B', 16)
+    pdf.set_y(120)
+    pdf.cell(0, 10, "Генерирано от TemaDom AI Designer", ln=True, align='C')
+    pdf.set_text_color(200, 200, 200)
+    pdf.set_font(fn, '', 10)
+    pdf.cell(0, 8, "https://temadom.com", ln=True, align='C')
+    
+    pdf_bytes = pdf.output()
+    buf = io.BytesIO(pdf_bytes)
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=temadom_project_{project_id}_images.pdf"})
+
+
+@api_router.get("/ai-designer/published/{project_id}/pdf/materials")
+async def download_project_materials_pdf(project_id: str):
+    """Generate PDF with only the quantity survey (materials list)"""
+    from fpdf import FPDF
+    import io
+    
+    project = await db.published_projects.find_one({"id": project_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    
+    materials_data = project.get("materials", {})
+    materials_list = materials_data.get("materials", [])
+    
+    pdf = FPDF()
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    bold_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    
+    try:
+        pdf.add_font("DejaVu", "", font_path, uni=True)
+        pdf.add_font("DejaVu", "B", bold_font_path, uni=True)
+        fn = "DejaVu"
+    except Exception:
+        fn = "Helvetica"
+    
+    pdf.add_page()
+    
+    # Header
+    pdf.set_fill_color(255, 140, 66)
+    pdf.rect(0, 0, 210, 35, 'F')
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, 'B', 20)
+    pdf.set_y(6)
+    pdf.cell(0, 12, "TemaDom - Количествена сметка", ln=True, align='C')
+    pdf.set_font(fn, '', 9)
+    pdf.cell(0, 7, "AI Designer - Списък с материали и цени", ln=True, align='C')
+    
+    # Project info
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_y(42)
+    pdf.set_font(fn, '', 10)
+    room_type = project.get("room_type", "")
+    style_name = project.get("style", "")
+    dims = project.get("dimensions", {})
+    mat_class = project.get("material_class", "")
+    pdf.cell(0, 6, f"Помещение: {room_type}   |   Стил: {style_name}   |   Клас: {mat_class}", ln=True)
+    if dims:
+        pdf.cell(0, 6, f"Размери: {dims.get('width','')}m x {dims.get('length','')}m x {dims.get('height','')}m   |   Дата: {datetime.now(timezone.utc).strftime('%d.%m.%Y')}", ln=True)
+    pdf.ln(5)
+    
+    # Table
+    w = [55, 18, 25, 30, 30, 32]  # name, qty, unit_price, total_bgn, total_eur, store
+    
+    pdf.set_fill_color(30, 42, 56)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, 'B', 8)
+    pdf.cell(w[0], 7, "Материал", 1, 0, 'L', True)
+    pdf.cell(w[1], 7, "Кол-во", 1, 0, 'C', True)
+    pdf.cell(w[2], 7, "Ед. цена", 1, 0, 'C', True)
+    pdf.cell(w[3], 7, "Общо (лв)", 1, 0, 'C', True)
+    pdf.cell(w[4], 7, "Общо (EUR)", 1, 0, 'C', True)
+    pdf.cell(w[5], 7, "Магазин", 1, 1, 'C', True)
+    
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font(fn, '', 7)
+    fill = False
+    for m in materials_list:
+        if fill:
+            pdf.set_fill_color(245, 245, 245)
+        else:
+            pdf.set_fill_color(255, 255, 255)
+        
+        name = str(m.get("name", ""))[:30]
+        qty = f"{m.get('quantity', '')} {m.get('unit', '')}"
+        unit_p = str(m.get("price_per_unit_bgn", m.get("price_per_unit", "-")))
+        total_bgn = str(m.get("total_price_bgn", m.get("total_price", "-")))
+        total_eur = str(m.get("total_price_eur", "-"))
+        store = str(m.get("store", "-"))[:18]
+        
+        pdf.cell(w[0], 6, name, 1, 0, 'L', fill)
+        pdf.cell(w[1], 6, qty[:12], 1, 0, 'C', fill)
+        pdf.cell(w[2], 6, unit_p[:10], 1, 0, 'C', fill)
+        pdf.cell(w[3], 6, total_bgn[:12], 1, 0, 'C', fill)
+        pdf.cell(w[4], 6, total_eur[:12], 1, 0, 'C', fill)
+        pdf.cell(w[5], 6, store, 1, 1, 'C', fill)
+        fill = not fill
+        
+        if pdf.get_y() > 270:
+            pdf.add_page()
+            pdf.set_fill_color(30, 42, 56)
+            pdf.set_text_color(255, 255, 255)
+            pdf.set_font(fn, 'B', 8)
+            pdf.cell(w[0], 7, "Материал", 1, 0, 'L', True)
+            pdf.cell(w[1], 7, "Кол-во", 1, 0, 'C', True)
+            pdf.cell(w[2], 7, "Ед. цена", 1, 0, 'C', True)
+            pdf.cell(w[3], 7, "Общо (лв)", 1, 0, 'C', True)
+            pdf.cell(w[4], 7, "Общо (EUR)", 1, 0, 'C', True)
+            pdf.cell(w[5], 7, "Магазин", 1, 1, 'C', True)
+            pdf.set_text_color(0, 0, 0)
+            pdf.set_font(fn, '', 7)
+    
+    # Totals
+    pdf.ln(3)
+    pdf.set_font(fn, 'B', 9)
+    tot_bgn = materials_data.get("total_estimate_bgn", materials_data.get("total_estimate", "N/A"))
+    tot_eur = materials_data.get("total_estimate_eur", "N/A")
+    labor_bgn = materials_data.get("labor_estimate_bgn", materials_data.get("labor_estimate", ""))
+    labor_eur = materials_data.get("labor_estimate_eur", "")
+    grand_bgn = materials_data.get("grand_total_bgn", materials_data.get("grand_total", "N/A"))
+    grand_eur = materials_data.get("grand_total_eur", "N/A")
+    
+    pdf.cell(0, 7, f"Материали: {tot_bgn} лв / {tot_eur} EUR", ln=True)
+    if labor_bgn:
+        pdf.cell(0, 7, f"Труд: {labor_bgn} лв / {labor_eur} EUR", ln=True)
+    
+    pdf.ln(2)
+    pdf.set_fill_color(255, 140, 66)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, 'B', 12)
+    pdf.cell(0, 10, f"ОБЩА СТОЙНОСТ: {grand_bgn} лв / {grand_eur} EUR", 0, 1, 'C', True)
+    
+    # Footer
+    pdf.ln(10)
+    pdf.set_text_color(120, 120, 120)
+    pdf.set_font(fn, '', 7)
+    pdf.multi_cell(0, 4,
+        "* Цените са ориентировъчни, базирани на средни пазарни цени за 2025-2026 г.\n"
+        "* Генерирано от TemaDom AI Designer - https://temadom.com")
+    
+    pdf_bytes = pdf.output()
+    buf = io.BytesIO(pdf_bytes)
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=temadom_project_{project_id}_materials.pdf"})
+
+
+# ============== AI SKETCH ANALYSIS ==============
+
+@api_router.post("/ai-sketch/analyze")
+async def analyze_sketch(request: Request):
+    """Analyze uploaded sketches/blueprints and generate structural analysis + visualization"""
+    data = await request.json()
+    
+    sketches = data.get("sketches", [])
+    if not sketches:
+        raise HTTPException(status_code=400, detail="Качете поне 1 скица или чертеж")
+    
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+    
+    building_type = data.get("building_type", "residential")
+    notes = data.get("notes", "")
+    
+    # Clean base64
+    cleaned = []
+    for s in sketches[:3]:
+        if s and "," in s:
+            cleaned.append(s.split(",")[1])
+        elif s:
+            cleaned.append(s)
+    
+    if not cleaned:
+        raise HTTPException(status_code=400, detail="Невалидни файлове")
+    
+    try:
+        # Step 1: AI Analysis - identify structural elements
+        analysis_chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"sketch-{uuid.uuid4()}",
+            system_message="""Ти си експерт строителен инженер и архитект с 30 години опит. Анализираш скици, чертежи и снимки на сгради/помещения.
+
+Трябва да разпознаеш и опишеш с 95-100% точност:
+- Колони (размери, позиции, тип - стоманобетонни, метални)
+- Греди (размери, натоварвания, тип)
+- Стълби (ширина, стъпала, наклон, тип)
+- Фундаменти (тип - ленточен, плочест, единични, размери)
+- Покрив (тип - двускатен, четирискатен, плосък, наклон, материал)
+- Стени (носещи/неносещи, дебелина, материал)
+- Отвори (врати, прозорци - размери и позиции)
+- Инсталации (ВиК, електро - ако са видими)
+
+Отговори в JSON:
+{
+  "building_type": "тип сграда",
+  "structural_elements": {
+    "columns": [{"id": "C1", "type": "стоманобетонна", "dimensions": "30x30cm", "position": "описание", "height": "3.0m"}],
+    "beams": [{"id": "B1", "type": "стоманобетонна", "dimensions": "30x50cm", "span": "6.0m", "load": "описание"}],
+    "stairs": [{"type": "прав марш", "width": "1.2m", "steps": 18, "rise": "17cm", "tread": "28cm"}],
+    "foundations": [{"type": "ленточен", "width": "0.6m", "depth": "1.2m", "material": "стоманобетон"}],
+    "roof": {"type": "двускатен", "slope": "30 градуса", "material": "керемиди", "area": "120 m²"},
+    "walls": [{"type": "носеща", "thickness": "25cm", "material": "тухла", "length": "6m"}],
+    "openings": [{"type": "прозорец", "dimensions": "1.2x1.5m", "position": "южна стена"}]
+  },
+  "dimensions_summary": {"length": "12m", "width": "8m", "height": "6m", "floors": 2, "total_area": "192 m²"},
+  "description_en": "detailed English description of the building structure for image generation",
+  "materials_estimate": [
+    {"name": "Бетон C25/30", "quantity": "15", "unit": "m³", "price_per_unit_bgn": "180", "price_per_unit_eur": "92", "total_bgn": "2700", "total_eur": "1380", "store": "Bricoman"},
+    {"name": "Арматура B500", "quantity": "2000", "unit": "kg", "price_per_unit_bgn": "2.20", "price_per_unit_eur": "1.12", "total_bgn": "4400", "total_eur": "2250", "store": "Bauhaus"}
+  ],
+  "total_materials_bgn": "...",
+  "total_materials_eur": "...",
+  "labor_bgn": "...",
+  "labor_eur": "...",
+  "grand_total_bgn": "...",
+  "grand_total_eur": "...",
+  "accuracy_note": "95-100% точност за стандартни конструкции"
+}"""
+        ).with_model("openai", "gpt-4o")
+        
+        image_contents = [ImageContent(image_base64=img) for img in cleaned]
+        analysis_msg = UserMessage(
+            text=f"""Анализирай тези {len(cleaned)} скици/чертежи/снимки на {building_type} строеж.
+Разпознай ВСИЧКИ структурни елементи: колони, греди, стълби, фундаменти, покрив.
+Генерирай количествена сметка с цени в лева и евро.
+{f'Допълнителни бележки: {notes}' if notes else ''}
+Дай максимално точен анализ (95-100%).""",
+            file_contents=image_contents
+        )
+        
+        analysis_response = await analysis_chat.send_message(analysis_msg)
+        
+        # Parse analysis
+        analysis_data = {}
+        try:
+            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', analysis_response)
+            if json_match:
+                analysis_data = json_module.loads(json_match.group(1))
+            else:
+                analysis_data = json_module.loads(analysis_response)
+        except Exception:
+            analysis_data = {"error": "Не може да се парсне анализа", "raw": analysis_response[:2000]}
+        
+        desc_en = analysis_data.get("description_en", "a building structure with columns, beams and foundations")
+        
+        # Step 2: Generate structural visualization
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        
+        generated_views = []
+        view_prompts = [
+            f"Professional architectural blueprint drawing, clean technical 2D plan view from above showing: {desc_en}. Show all columns marked as dots, walls as thick lines, dimensions annotated, room labels. White background, precise engineering drawing style, CAD-quality.",
+            f"Professional 3D architectural rendering of: {desc_en}. Cutaway isometric view showing structural elements - columns, beams, floors, roof structure. Clean visualization with labeled structural members, photorealistic materials. Architecture magazine quality."
+        ]
+        view_labels = ["План (2D чертеж)", "3D визуализация"]
+        
+        for i, prompt in enumerate(view_prompts):
+            try:
+                img_result = await image_gen.generate_images(
+                    prompt=prompt,
+                    model="gpt-image-1",
+                    number_of_images=1
+                )
+                if img_result and len(img_result) > 0:
+                    img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
+                    generated_views.append({
+                        "label": view_labels[i],
+                        "image_base64": img_b64
+                    })
+            except Exception as e:
+                logger.error(f"Sketch image gen error: {e}")
+        
+        # Save to DB
+        sketch_id = str(uuid.uuid4())
+        await db.ai_sketches.insert_one({
+            "id": sketch_id,
+            "building_type": building_type,
+            "notes": notes,
+            "sketches_count": len(cleaned),
+            "views_count": len(generated_views),
+            "analysis_summary": analysis_data.get("dimensions_summary", {}),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        return {
+            "id": sketch_id,
+            "analysis": analysis_data,
+            "generated_views": generated_views,
+            "test_mode": True
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Грешка при анализ: {str(e)}")
+
+
 # Include router - MUST be after all route definitions
 app.include_router(api_router)
 

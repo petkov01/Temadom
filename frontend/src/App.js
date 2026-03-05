@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { AIDesignerPage } from '@/components/AIDesignerPage';
 import { FeedbackPage } from '@/components/FeedbackPage';
+import { PublishedGalleryPage } from '@/components/PublishedGalleryPage';
+import { AISketchPage } from '@/components/AISketchPage';
 import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 import ProjectEstimator from '@/components/ProjectEstimator';
@@ -33,13 +35,13 @@ import { FeedbackButton } from '@/components/FeedbackButton';
 import { PageInstructions } from '@/components/PageInstructions';
 
 // TemaDom Logo Component - New Phase 3 logo
-const TemaDomLogo = ({ className = "h-12", showSubtitle = false }) => (
-  <div className="flex flex-col items-center" data-testid="temadom-logo">
+const TemaDomLogo = ({ className = "h-12" }) => (
+  <div className="flex items-center" data-testid="temadom-logo">
     <img 
       src="/logo-temadom.png" 
       alt="TemaDom" 
       className={className}
-      style={{ objectFit: 'contain', maxHeight: '100%', padding: '4px 0' }}
+      style={{ objectFit: 'contain' }}
     />
   </div>
 );
@@ -156,11 +158,11 @@ const Navbar = () => {
   return (
     <nav className="bg-[#0F1923] border-b border-[#2A3A4C] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-[90px]">
-          {/* Left: Big Logo */}
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
-              <TemaDomLogo className="h-[70px] w-auto" />
+        <div className="flex justify-between h-[80px]">
+          {/* Left: Logo - prominent and left-aligned */}
+          <div className="flex items-center -ml-1">
+            <Link to="/" className="flex items-center" data-testid="logo-link">
+              <TemaDomLogo className="h-[65px] md:h-[90px] w-auto" />
             </Link>
           </div>
 
@@ -200,6 +202,12 @@ const Navbar = () => {
                 <div className="absolute top-full right-0 mt-2 w-52 bg-[#1E2A38] border border-[#3A4A5C] rounded-lg shadow-2xl py-1 z-50" data-testid="nav-more-dropdown">
                   <Link to="/ai-designer" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-designer">
                     <Sparkles className="h-4 w-4" /> AI Дизайнер
+                  </Link>
+                  <Link to="/ai-sketch" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-sketch">
+                    <FileText className="h-4 w-4" /> AI Sketch
+                  </Link>
+                  <Link to="/ai-gallery" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-gallery">
+                    <Image className="h-4 w-4" /> AI Галерия
                   </Link>
                   <Link to="/projects" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-projects">
                     <FolderSearch className="h-4 w-4" /> Проекти
@@ -351,6 +359,12 @@ const Navbar = () => {
             <Link to="/ai-designer" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <Sparkles className="h-4 w-4" /> AI Дизайнер
             </Link>
+            <Link to="/ai-sketch" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-sketch">
+              <FileText className="h-4 w-4" /> AI Sketch
+            </Link>
+            <Link to="/ai-gallery" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-gallery">
+              <Image className="h-4 w-4" /> AI Галерия
+            </Link>
             <Link to="/ads" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <Megaphone className="h-4 w-4" /> Обяви
             </Link>
@@ -428,6 +442,8 @@ const Footer = () => {
             <li><Link to="/projects" className="hover:text-[#FF8C42] transition-colors">{t('footer_view_projects')}</Link></li>
             <li><Link to="/subscriptions" className="hover:text-[#FF8C42] transition-colors">Абонаменти</Link></li>
             <li><Link to="/ai-designer" className="hover:text-[#FF8C42] transition-colors">AI Дизайнер</Link></li>
+            <li><Link to="/ai-sketch" className="hover:text-[#FF8C42] transition-colors">AI Sketch</Link></li>
+            <li><Link to="/ai-gallery" className="hover:text-[#FF8C42] transition-colors">AI Галерия</Link></li>
           </ul>
         </div>
         <div>
@@ -3008,6 +3024,8 @@ function App() {
                 <Route path="/payment/cancel" element={<PaymentCancelPage />} />
                 <Route path="/ads" element={<AdsPage />} />
                 <Route path="/ai-designer" element={<AIDesignerPage />} />
+                <Route path="/ai-sketch" element={<AISketchPage />} />
+                <Route path="/ai-gallery" element={<PublishedGalleryPage />} />
                 <Route path="/subscriptions" element={<SubscriptionsPage />} />
                 <Route path="/feedback" element={<FeedbackPage />} />
               </Routes>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Camera, Upload, Sparkles, Download, RefreshCw, ExternalLink, Star, Play, Image, Loader2, X, CheckCircle, FileText, ChevronRight } from 'lucide-react';
+import { Camera, Upload, Sparkles, Download, RefreshCw, ExternalLink, Star, Play, Image, Loader2, X, CheckCircle, FileText, ChevronRight, Share2, FileImage } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -99,6 +99,8 @@ export const AIDesignerPage = () => {
   const [results, setResults] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [activeVideo, setActiveVideo] = useState(null);
+  const [publishing, setPublishing] = useState(false);
+  const [published, setPublished] = useState(false);
   const fileRef0 = useRef(null);
   const fileRef1 = useRef(null);
   const fileRef2 = useRef(null);
@@ -171,6 +173,59 @@ export const AIDesignerPage = () => {
     setPreviews([null, null, null]);
     setResults(null);
     setActiveImage(0);
+    setPublished(false);
+    setPublishing(false);
+  };
+
+  const handlePublish = async () => {
+    if (!results) return;
+    setPublishing(true);
+    try {
+      const res = await axios.post(`${API}/ai-designer/publish`, {
+        design_id: results.id,
+        before_images: previews.filter(Boolean),
+        generated_images: results.generated_images,
+        materials: results.materials,
+        room_type: ROOM_TYPES.find(r => r.id === roomType)?.name || roomType,
+        style: STYLES.find(s => s.id === style)?.name || style,
+        material_class: MATERIAL_CLASSES.find(m => m.id === materialClass)?.name || materialClass,
+        dimensions: results.dimensions || dimensions,
+        room_analysis: results.room_analysis,
+        author_name: "TemaDom потребител"
+      });
+      setPublished(true);
+      toast.success(res.data.message || 'Публикувано успешно!');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при публикуване');
+    }
+    setPublishing(false);
+  };
+
+  const handleDownloadPDF = async (type) => {
+    if (!published && !results?.id) {
+      // Publish first, then download
+      toast.info('Първо публикувайте проекта, за да изтеглите PDF');
+      return;
+    }
+    // If not published yet, publish first
+    if (!published) {
+      await handlePublish();
+    }
+    // Now find the project id from publish response or results
+    try {
+      // Get the latest published project
+      const listRes = await axios.get(`${API}/ai-designer/published?limit=1`);
+      const latestProject = listRes.data.projects?.[0];
+      if (!latestProject) {
+        toast.error('Проектът не е намерен');
+        return;
+      }
+      const pdfUrl = `${API}/ai-designer/published/${latestProject.id}/pdf/${type}`;
+      window.open(pdfUrl, '_blank');
+      toast.success(`PDF ${type === 'images' ? 'с изображения' : 'с количествена сметка'} се изтегля...`);
+    } catch (err) {
+      toast.error('Грешка при изтегляне на PDF');
+    }
   };
 
   return (
@@ -799,11 +854,37 @@ export const AIDesignerPage = () => {
 
                 {/* CTA buttons */}
                 <div className="flex flex-wrap gap-3 justify-center">
+                  {!published ? (
+                    <Button 
+                      className="bg-[#28A745] hover:bg-[#22943e] text-white" 
+                      onClick={handlePublish} 
+                      disabled={publishing}
+                      data-testid="publish-btn"
+                    >
+                      {publishing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
+                      {publishing ? 'Публикуване...' : 'Публикувай в галерията'}
+                    </Button>
+                  ) : (
+                    <Button className="bg-[#28A745]/20 text-[#28A745] cursor-default border border-[#28A745]/30" disabled data-testid="published-badge">
+                      <CheckCircle className="mr-2 h-4 w-4" /> Публикуван
+                    </Button>
+                  )}
+                  <Button 
+                    className="bg-[#4DA6FF] hover:bg-[#3d96ef] text-white" 
+                    onClick={() => handleDownloadPDF('images')}
+                    data-testid="pdf-images-btn"
+                  >
+                    <FileImage className="mr-2 h-4 w-4" /> PDF с изображения
+                  </Button>
+                  <Button 
+                    className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white" 
+                    onClick={() => handleDownloadPDF('materials')}
+                    data-testid="pdf-materials-btn"
+                  >
+                    <FileText className="mr-2 h-4 w-4" /> PDF количествена сметка
+                  </Button>
                   <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={resetDesigner} data-testid="new-design-btn">
                     <RefreshCw className="mr-2 h-4 w-4" /> Нов дизайн
-                  </Button>
-                  <Button className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white" onClick={() => setStep(3)}>
-                    <Sparkles className="mr-2 h-4 w-4" /> Редактирай параметри
                   </Button>
                 </div>
               </div>
