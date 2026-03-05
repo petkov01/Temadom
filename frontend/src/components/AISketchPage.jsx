@@ -18,7 +18,6 @@ import { useSearchParams } from 'react-router-dom';
 import { TOOLS, GRID, CW, CH, DEFAULTS } from './cad/constants';
 import { snapEndpoint, distSeg, distCircle, autoType, getDefaults, elLength } from './cad/utils';
 import { CADCanvas } from './cad/CADCanvas';
-import { useThreeViewer } from './cad/ThreeDPreview';
 import { StructurePanel } from './cad/StructurePanel';
 import { CostEstimate } from './cad/CostEstimate';
 
@@ -68,9 +67,6 @@ export const AISketchPage = () => {
   const [selIdx, setSelIdx] = useState(-1);
   const [tool, setTool] = useState('wall');
   const [draft, setDraft] = useState(null);
-  const viewerRef = useRef(null);
-
-  // Upload state
   const [sketches, setSketches] = useState([null, null, null]);
   const [previews, setPreviews] = useState([null, null, null]);
   const [notes, setNotes] = useState('');
@@ -86,8 +82,7 @@ export const AISketchPage = () => {
     if (id) { setMode('upload'); axios.get(`${API}/ai-sketch/${id}`).then(r => setUploadRes(r.data)).catch(() => toast.error('Не е намерен')); }
   }, [searchParams]);
 
-  // Live 3D
-  useThreeViewer(viewerRef, els, scale, selIdx);
+  // GLB viewer for upload mode only
   useGlbViewer(glbViewerRef, uploadRes?.glb_base64);
 
   const objCount = useMemo(() => els.filter(e => e.tool !== 'dimension' && (e._type || autoType(e)) !== 'ignore').length, [els]);
@@ -299,34 +294,20 @@ export const AISketchPage = () => {
               </CardContent>
             </Card>
 
-            {/* Canvas + 3D side by side */}
-            <div className="grid lg:grid-cols-[1fr_1fr] gap-3 mb-3">
-              <Card className="bg-[#253545] border-[#3A4A5C]">
-                <CardHeader className="pb-1 pt-2 px-3">
-                  <CardTitle className="text-white text-sm flex items-center gap-2">
-                    <Ruler className="h-4 w-4 text-[#FF8C42]" /> 2D Чертеж
-                    <Badge className="bg-[#28A745]/15 text-[#28A745] text-[9px] ml-auto">Ет. {currentFloor}</Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-2">
-                  <CADCanvas els={els} selIdx={selIdx} tool={tool} scale={scale} draft={draft}
-                    onDown={onDown} onMove={onMove} onUp={onUp} onSelect={setSelIdx} />
-                </CardContent>
-              </Card>
-
-              <Card className="bg-[#253545] border-[#3A4A5C]">
-                <CardHeader className="pb-1 pt-2 px-3">
-                  <CardTitle className="text-white text-sm flex items-center gap-2">
-                    <Eye className="h-4 w-4 text-[#4DA6FF]" /> 360 Live Preview
-                    {objCount > 0 && <Badge className="bg-[#28A745]/15 text-[#28A745] text-[9px] ml-auto">{objCount}</Badge>}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-2">
-                  <div ref={viewerRef} className="w-full h-[350px] lg:h-[420px] bg-[#0F1923] rounded-lg overflow-hidden border border-[#2A3A4C]" data-testid="3d-viewer" />
-                  <p className="text-slate-600 text-[9px] mt-1 text-center">Въртене | Zoom | Преместване</p>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Canvas — full width */}
+            <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
+              <CardHeader className="pb-1 pt-2 px-3">
+                <CardTitle className="text-white text-sm flex items-center gap-2">
+                  <Ruler className="h-4 w-4 text-[#FF8C42]" /> 2D Чертеж
+                  <Badge className="bg-[#28A745]/15 text-[#28A745] text-[9px] ml-auto">Ет. {currentFloor}</Badge>
+                  {objCount > 0 && <Badge className="bg-[#FF8C42]/15 text-[#FF8C42] text-[9px]">{objCount} обекта</Badge>}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-2">
+                <CADCanvas els={els} selIdx={selIdx} tool={tool} scale={scale} draft={draft}
+                  onDown={onDown} onMove={onMove} onUp={onUp} onSelect={setSelIdx} />
+              </CardContent>
+            </Card>
 
             {/* Structure Panel */}
             <Card className="bg-[#253545] border-[#3A4A5C] mb-3">

@@ -47,8 +47,14 @@ body {
   font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #1E2A38;
-  color: #FFFFFF;
+  background-color: #0F172A;
+  color: #F8FAFC;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.light-mode body {
+  background-color: #F8FAFC;
+  color: #0F172A;
 }
 
 h1, h2, h3, h4, h5, h6 {

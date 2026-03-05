@@ -23,11 +23,16 @@ const ROOM_TYPES = [
 ];
 
 const STYLES = [
-  { id: 'modern', name: 'Модерен', color: '#FF8C42' },
-  { id: 'scandinavian', name: 'Скандинавски', color: '#4DA6FF' },
-  { id: 'loft', name: 'Лофт', color: '#DC3545' },
-  { id: 'classic', name: 'Класически', color: '#8C56FF' },
-  { id: 'minimalist', name: 'Минималистичен', color: '#28A745' },
+  { id: 'modern', name: 'Модерен', color: '#F97316' },
+  { id: 'scandinavian', name: 'Скандинавски', color: '#3B82F6' },
+  { id: 'loft', name: 'Лофт', color: '#78716C' },
+  { id: 'classic', name: 'Класически', color: '#D97706' },
+  { id: 'minimalist', name: 'Минималистичен', color: '#6B7280' },
+  { id: 'boho', name: 'Бохо', color: '#EC4899' },
+  { id: 'industrial', name: 'Индустриален', color: '#374151' },
+  { id: 'artdeco', name: 'Арт Деко', color: '#A855F7' },
+  { id: 'rustic', name: 'Рустик', color: '#92400E' },
+  { id: 'hitech', name: 'Хай-тек', color: '#06B6D4' },
 ];
 
 // Before/After Comparison Slider
@@ -89,8 +94,8 @@ const ProgressBar = ({ elapsed, total }) => {
   return (
     <div className="w-full" data-testid="progress-bar">
       <div className="flex justify-between text-xs text-slate-400 mb-1">
-        <span>Генериране: {elapsed} сек</span>
-        <span>{Math.round(pct)}%</span>
+        <span>AI генерира проекта...</span>
+        <span className="text-[#F97316] font-bold">{Math.round(pct)}%</span>
       </div>
       <div className="h-2.5 bg-[#1E2A38] rounded-full overflow-hidden">
         <div className="h-full bg-gradient-to-r from-[#FF8C42] to-[#28A745] rounded-full transition-all duration-500"
@@ -158,8 +163,8 @@ export const AIDesignerPage = () => {
         renovation_text: renovationText,
         notes: renovationText,
         variants: variants,
-        width: '4',
-        length: '5',
+        width: '2',
+        length: '4',
         height: '2.6',
       }, { timeout: 600000 });
 
@@ -236,6 +241,19 @@ export const AIDesignerPage = () => {
 
         {!results ? (
           <div className="space-y-6">
+            {/* Pricing info */}
+            <div className="flex gap-3 justify-center flex-wrap" data-testid="pricing-info">
+              {[
+                { rooms: '1 пом.', price: '69 EUR', color: '#F97316' },
+                { rooms: '2-3 пом.', price: '129 EUR', color: '#10B981' },
+                { rooms: '4-5 пом.', price: '220 EUR', color: '#8B5CF6' },
+              ].map((p, i) => (
+                <div key={i} className="flex items-center gap-2 rounded-full px-4 py-1.5 border" style={{ borderColor: `${p.color}30`, background: `${p.color}10` }}>
+                  <span className="text-xs font-medium" style={{ color: p.color }}>{p.rooms}</span>
+                  <span className="text-xs font-bold text-white">{p.price}</span>
+                </div>
+              ))}
+            </div>
             {/* Upload Photo */}
             <Card className="bg-[#253545] border-[#3A4A5C]">
               <CardHeader>
@@ -287,9 +305,9 @@ export const AIDesignerPage = () => {
                 </CardContent>
               </Card>
               <Card className="bg-[#253545] border-[#3A4A5C]">
-                <CardHeader><CardTitle className="text-white text-sm">Стил</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-white text-sm">Стил (10)</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-5 gap-2">
                     {STYLES.map(s => (
                       <button key={s.id} onClick={() => setStyle(s.id)}
                         className={`p-2 rounded-lg border text-xs font-medium transition-all ${

@@ -1,0 +1,139 @@
+{
+  "summary": "Iteration 35: Complete v6.5 redesign testing. ALL features verified: Landing page with counter [0/50], pricing 69/129/220, 10 styles, dark/light toggle, demo projects, CTA, mobile sticky CTA. AI Sketch: CAD canvas, 13 tools, NO 3D viewer in draw mode (CORRECT), upload mode has GLB viewer. IA Designer: 10 styles, pricing badges, percentage progress bar.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "=== LANDING PAGE TESTS ===",
+    "✅ Landing page loaded (data-testid='landing-page')",
+    "✅ Hero counter found showing: 9/50 ПЪРВИ 50 ФИРМИ = 1 ГОДИНА ПРЕМИУМ 0 EUR",
+    "✅ Hero CTA buttons: 'IA Проект помещение' (hero-room-btn) and 'CAD Скица' (hero-sketch-btn)",
+    "✅ Theme toggle (data-testid='theme-toggle') found and clickable - dark/light switch works",
+    "✅ Demo scroll section found (data-testid='demo-scroll')",
+    "✅ All 6 demo cards found: demo-card-0 through demo-card-5",
+    "✅ Pricing section found (data-testid='pricing-section')",
+    "✅ All 3 pricing cards found with correct prices: 69/129/220 EUR",
+    "✅ Style tiles container found (data-testid='style-tiles')",
+    "✅ All 10 style tiles found: style-tile-0 through style-tile-9",
+    "✅ CTA register button found with text: 'РЕГИСТРИРАЙ ФИРМАТА'",
+    "✅ Mobile sticky CTA visible with text: 'РЕГИСТРИРАЙ ФИРМАТА (41 места)'",
+    "",
+    "=== AI SKETCH PAGE TESTS ===",
+    "✅ AI Sketch page loaded (data-testid='ai-sketch-page')",
+    "✅ Draw mode tab found: 'CAD'",
+    "✅ Upload mode tab found: 'Качи'",
+    "✅ CAD canvas found (data-testid='cad-canvas')",
+    "✅ NO 3D viewer in draw mode (CORRECT - removed per v6.5)",
+    "✅ All 13 tools present in toolbar: select, wall, roof, slab, rect, circle, stairs, door, window, column, beam, dimension, erase",
+    "✅ Structure panel works after adding objects",
+    "✅ Cost estimate with EUR visible after adding objects",
+    "✅ Upload mode shows 3 sketch upload buttons",
+    "✅ GLB viewer kept in upload mode (appears after analysis)",
+    "",
+    "=== IA DESIGNER PAGE TESTS ===",
+    "✅ IA Designer page loaded (data-testid='ia-designer-page')",
+    "✅ Pricing info badges found: '1 пом. 69 EUR | 2-3 пом. 129 EUR | 4-5 пом. 220 EUR'",
+    "✅ All 10 styles visible: modern, scandinavian, loft, classic, minimalist, boho, industrial, artdeco, rustic, hitech",
+    "✅ Progress bar shows percentage ({Math.round(pct)}%), not seconds",
+    "",
+    "=== BACKEND API TESTS ===",
+    "✅ /api/stats/live returns 200 OK",
+    "✅ /api/stats/live returns valid JSON with free_slots (used/total)",
+    "✅ free_slots structure valid: used=9, total=50",
+    "✅ /api/stats returns 200 OK"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_stats_live.py",
+    "/app/test_reports/pytest/pytest_results_iter35.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "1. v6.5 redesign implemented correctly - all new features working",
+    "2. 3D viewer removed from CAD draw mode as expected (kept in upload mode)",
+    "3. Landing page counter pulls from /api/stats/live endpoint correctly",
+    "4. Progress bar in IA Designer shows percentage, not seconds (line 98)"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_stats_live.py"
+  ],
+  "success_rate": {
+    "backend": "100% - 5/5 tests passed",
+    "frontend": "100% - All v6.5 features verified"
+  },
+  "seed_data_creation": "None required - tests use existing API data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 35 verified ALL v6.5 redesign features. Landing page has new hero section with counter [0/50], pricing cards (69/129/220 EUR), 6 demo projects, 10 style tiles, CTA 'РЕГИСТРИРАЙ ФИРМАТА', and mobile sticky CTA. AI Sketch page has CAD canvas with all 13 tools, NO 3D viewer in draw mode (removed per v6.5), upload mode still has GLB viewer. IA Designer has 10 styles, pricing info badges at top, and progress bar shows percentage. Backend /api/stats/live returns valid JSON with free_slots.",
+  "features_tested": {
+    "landing_page_hero": {
+      "status": "PASS",
+      "details": "Counter shows 9/50, text 'ПЪРВИ 50 ФИРМИ = 1 ГОДИНА ПРЕМИУМ 0 EUR'"
+    },
+    "landing_page_cta_buttons": {
+      "status": "PASS",
+      "details": "hero-room-btn='IA Проект помещение', hero-sketch-btn='CAD Скица'"
+    },
+    "theme_toggle": {
+      "status": "PASS",
+      "details": "data-testid='theme-toggle' - dark/light mode toggle works"
+    },
+    "demo_projects": {
+      "status": "PASS",
+      "details": "6 demo cards (demo-card-0 to demo-card-5) in horizontal scroll"
+    },
+    "pricing_section": {
+      "status": "PASS",
+      "details": "3 pricing cards: 69/129/220 EUR for 1/2-3/4-5 rooms"
+    },
+    "style_tiles": {
+      "status": "PASS",
+      "details": "10 style tiles (style-tile-0 to style-tile-9)"
+    },
+    "cta_register_button": {
+      "status": "PASS",
+      "details": "data-testid='cta-register' with text 'РЕГИСТРИРАЙ ФИРМАТА'"
+    },
+    "mobile_sticky_cta": {
+      "status": "PASS",
+      "details": "data-testid='sticky-cta' visible on mobile viewport (390x844)"
+    },
+    "ai_sketch_cad_canvas": {
+      "status": "PASS",
+      "details": "data-testid='cad-canvas' present in draw mode"
+    },
+    "ai_sketch_13_tools": {
+      "status": "PASS",
+      "details": "All 13 tools found: select, wall, roof, slab, rect, circle, stairs, door, window, column, beam, dimension, erase"
+    },
+    "ai_sketch_no_3d_viewer_draw_mode": {
+      "status": "PASS",
+      "details": "3D viewer removed from draw mode (CORRECT per v6.5)"
+    },
+    "ai_sketch_upload_mode_glb": {
+      "status": "PASS",
+      "details": "Upload mode has GLB viewer (appears after analysis)"
+    },
+    "ia_designer_10_styles": {
+      "status": "PASS",
+      "details": "All 10 styles: modern, scandinavian, loft, classic, minimalist, boho, industrial, artdeco, rustic, hitech"
+    },
+    "ia_designer_pricing_badges": {
+      "status": "PASS",
+      "details": "data-testid='pricing-info' shows 69/129/220 EUR badges"
+    },
+    "ia_designer_percentage_progress": {
+      "status": "PASS",
+      "details": "Progress bar shows percentage ({Math.round(pct)}%), not seconds"
+    },
+    "backend_stats_live": {
+      "status": "PASS",
+      "details": "/api/stats/live returns valid JSON with free_slots (used=9, total=50)"
+    }
+  }
+}

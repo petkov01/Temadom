@@ -36,6 +36,7 @@ import { LANGUAGES } from '@/i18n/translations';
 import { Chatbot } from '@/components/Chatbot';
 import { FeedbackButton } from '@/components/FeedbackButton';
 import { PageInstructions } from '@/components/PageInstructions';
+import { ThemeProvider, useTheme } from '@/components/ThemeContext';
 
 // TemaDom Logo Component - New Phase 3 logo
 const TemaDomLogo = ({ className = "h-12" }) => (
@@ -134,6 +135,19 @@ const ICON_MAP = {
   'Grid3x3': Grid3x3, 'LayoutGrid': LayoutGrid, 'Square': Square, 'Home': Home,
   'AppWindow': AppWindow, 'Thermometer': Thermometer, 'Layers': Layers,
   'Hammer': Hammer, 'BrickWall': BrickWall, 'Axe': Axe, 'Building2': Building2
+};
+
+// ============== THEME TOGGLE ==============
+const ThemeToggle = () => {
+  const theme = useTheme();
+  if (!theme) return null;
+  return (
+    <button onClick={theme.toggle}
+      className="p-2 rounded-lg text-slate-400 hover:text-[#F97316] transition-colors hover:bg-white/5"
+      data-testid="theme-toggle" title={theme.dark ? 'Светъл режим' : 'Тъмен режим'}>
+      {theme.dark ? <span className="text-sm">☀️</span> : <span className="text-sm">🌙</span>}
+    </button>
+  );
 };
 
 // ============== NAVBAR ==============
@@ -267,6 +281,9 @@ const Navbar = () => {
 
             {/* Separator */}
             <div className="h-5 w-px bg-[#3A4A5C] mx-1"></div>
+
+            {/* Theme toggle */}
+            <ThemeToggle />
 
             {/* Language switcher */}
             <div className="relative" ref={langRef}>
@@ -606,229 +623,217 @@ const StarRating = ({ rating, size = 'sm' }) => {
 // ============== LANDING PAGE ==============
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, total_reviews: 0 });
+  const theme = useTheme();
+  const dark = theme?.dark ?? true;
+  const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, free_slots: { used: 0, total: 50 } });
+  const [liveStats, setLiveStats] = useState({ clients: 0, companies: 0, free_slots: { used: 0, total: 50 } });
 
   useEffect(() => {
-    axios.get(`${API}/stats`).then(res => setStats(res.data)).catch(() => {});
+    axios.get(`${API}/stats`).then(r => setStats(r.data)).catch(() => {});
+    axios.get(`${API}/stats/live`).then(r => setLiveStats(r.data)).catch(() => {});
   }, []);
 
-  return (
-    <div className="min-h-screen bg-[#1E2A38]" data-testid="landing-page">
-      {/* ===== HERO ===== */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#FF8C42]/10 rounded-full blur-[100px] -translate-y-1/4 translate-x-1/4" />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#28A745]/10 rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4" />
-        </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24">
-          <div className="text-center text-white">
-            <div className="inline-flex items-center gap-2 bg-[#28A745]/15 border border-[#28A745]/30 rounded-full px-5 py-2 mb-6">
-              <Zap className="h-4 w-4 text-[#28A745]" />
-              <span className="text-xs font-bold text-[#28A745] tracking-wider">ПЪРВИ 1000 КЛИЕНТИ = БЕЗПЛАТНО</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-              Ремонт без стрес —<br/>
-              <span className="text-[#FF8C42]">БЕЗПЛАТНО</span>
-            </h1>
-            <p className="text-lg md:text-xl text-slate-300 mb-4 max-w-3xl mx-auto">
-              Виж ремонта преди да започнеш. Качи скица или снимка — получи 3D модел 1:1 за 30 секунди.
-            </p>
-            <p className="text-base text-[#FF8C42] font-medium mb-10">
-              Спести 20+ часа търсене на майстори. Намери най-добрата фирма за 30 секунди.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button size="lg" className="bg-[#FF8C42] hover:bg-[#e67a30] text-white text-lg px-8 h-14 shadow-lg shadow-[#FF8C42]/20" onClick={() => navigate('/ai-sketch')} data-testid="hero-sketch-btn">
-                <FileText className="mr-2 h-6 w-6" /> AI Sketch (скици)
-              </Button>
-              <Button size="lg" className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white text-lg px-8 h-14 shadow-lg shadow-[#8C56FF]/20" onClick={() => navigate('/room-scan')} data-testid="hero-room-btn">
-                <Camera className="mr-2 h-6 w-6" /> IA Designer (ремонт 1:1)
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              {[
-                { value: `${stats.total_companies || '300'}+`, label: 'Майстори чакат твоя проект', color: '#FF8C42' },
-                { value: '30сек', label: '3D модел готов', color: '#8C56FF' },
-                { value: '1:1', label: 'Точен мащаб', color: '#28A745' },
-                { value: 'БЕЗПЛАТНО', label: 'За клиенти сега', color: '#4DA6FF' }
-              ].map((stat, i) => (
-                <div key={i} className="glass rounded-xl p-4">
-                  <p className="text-2xl md:text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
-                  <p className="text-xs md:text-sm text-slate-400">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+  const slotsUsed = liveStats.free_slots?.used || 0;
+  const slotsTotal = liveStats.free_slots?.total || 50;
+  const slotsLeft = Math.max(0, slotsTotal - slotsUsed);
 
-      {/* ===== PROBLEM → SOLUTION ===== */}
-      <section className="py-16 border-t border-[#2A3A4C]">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Какъв проблем решаваме?</h2>
+  const bg = dark ? '#0F172A' : '#F8FAFC';
+  const bgCard = dark ? '#1E293B' : '#FFFFFF';
+  const border = dark ? '#334155' : '#E2E8F0';
+  const text = dark ? '#F8FAFC' : '#0F172A';
+  const muted = dark ? '#94A3B8' : '#64748B';
+  const accent = '#F97316';
+
+  return (
+    <div style={{ background: bg, color: text }} data-testid="landing-page">
+      {/* ===== HERO ===== */}
+      <section className="relative overflow-hidden" style={{ minHeight: '85vh' }}>
+        <div className="absolute inset-0">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] -translate-y-1/4 translate-x-1/4" style={{ background: `${accent}15` }} />
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4" style={{ background: '#10B98115' }} />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24 flex flex-col items-center">
+          {/* Counter [0/50] pulse */}
+          <div className="mb-8 animate-pulse" data-testid="hero-counter">
+            <div className="inline-flex items-center gap-3 rounded-full px-6 py-3 border-2" 
+              style={{ borderColor: accent, background: dark ? '#F9731615' : '#FFF7ED' }}>
+              <span className="text-4xl font-black tabular-nums" style={{ color: accent }}>{slotsUsed}</span>
+              <span style={{ color: muted }} className="text-lg">/</span>
+              <span className="text-4xl font-black tabular-nums" style={{ color: accent }}>{slotsTotal}</span>
+              <div className="h-8 w-px mx-1" style={{ background: border }} />
+              <div className="text-left">
+                <p style={{ color: accent }} className="text-sm font-bold leading-tight">ПЪРВИ 50 ФИРМИ</p>
+                <p style={{ color: dark ? '#FCD34D' : '#D97706' }} className="text-xs font-bold">= 1 ГОДИНА ПРЕМИУМ 0 EUR</p>
+              </div>
+            </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-center mb-6 leading-tight max-w-4xl">
+            Ремонт без стрес —{' '}
+            <span style={{ color: accent }} className="relative">
+              AI проектиране
+              <span className="absolute -bottom-1 left-0 w-full h-1 rounded-full" style={{ background: accent, opacity: 0.5 }} />
+            </span>
+          </h1>
+
+          <p className="text-base md:text-lg text-center mb-10 max-w-2xl" style={{ color: muted }}>
+            Качи снимка на помещение — получи реалистичен 1:1 ремонтиран проект. 
+            Виж точно как ще изглежда ПРЕДИ да платиш.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <button onClick={() => navigate('/room-scan')} data-testid="hero-room-btn"
+              className="group relative px-8 py-4 rounded-xl text-white text-lg font-bold overflow-hidden transition-all hover:scale-105 active:scale-95"
+              style={{ background: accent, boxShadow: `0 0 30px ${accent}40` }}>
+              <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Camera className="mr-2 h-6 w-6 inline" /> IA Проект помещение
+            </button>
+            <button onClick={() => navigate('/ai-sketch')} data-testid="hero-sketch-btn"
+              className="px-8 py-4 rounded-xl text-lg font-bold border-2 transition-all hover:scale-105 active:scale-95"
+              style={{ borderColor: accent, color: accent, background: dark ? '#F9731610' : '#FFF7ED' }}>
+              <FileText className="mr-2 h-5 w-5 inline" /> CAD Скица
+            </button>
+          </div>
+
+          {/* Stats row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl w-full">
             {[
-              { icon: <Search className="h-7 w-7" />, title: "Лутане по магазини", desc: "Не знаеш какви материали ти трябват, колко и от къде да ги купиш.", color: '#DC3545', solution: "AI анализира и показва точно какво ти трябва" },
-              { icon: <Users className="h-7 w-7" />, title: "Търсене на майстори", desc: "Питаш приятели, обикаляш интернета — и пак не си сигурен.", color: '#FF8C42', solution: "300+ проверени фирми на едно място" },
-              { icon: <AlertCircle className="h-7 w-7" />, title: "Неясни проекти", desc: "Не можеш да визуализираш крайния резултат. Започваш на сляпо.", color: '#8C56FF', solution: "3D модел 1:1 — виж ремонта преди да започнеш" },
-            ].map((item, i) => (
-              <Card key={i} className="bg-[#253545] border-[#3A4A5C] p-6 hover:border-[#FF8C42]/30 transition-colors">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: `${item.color}15`, color: item.color }}>
-                  {item.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-slate-500 mb-3">{item.desc}</p>
-                <p className="text-sm font-medium" style={{ color: item.color }}>{item.solution}</p>
-              </Card>
+              { v: `${liveStats.companies || 21}`, l: 'Фирми', c: accent },
+              { v: `${liveStats.clients || 9}`, l: 'Клиенти', c: '#10B981' },
+              { v: '1:1', l: 'Точен мащаб', c: dark ? '#FCD34D' : '#D97706' },
+              { v: `${slotsLeft} FREE`, l: `${slotsUsed}/${slotsTotal} заети`, c: '#10B981' },
+            ].map((s, i) => (
+              <div key={i} className="rounded-xl p-4 text-center backdrop-blur-lg border" 
+                style={{ background: dark ? 'rgba(30,41,59,0.6)' : 'rgba(255,255,255,0.7)', borderColor: border }}>
+                <p className="text-2xl font-black" style={{ color: s.c }}>{s.v}</p>
+                <p className="text-[11px] mt-0.5" style={{ color: muted }}>{s.l}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== TWO MAIN FEATURES ===== */}
-      <section className="py-16 bg-[#0F1923] border-y border-[#2A3A4C]">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Две пътеки към мечтания ремонт</h2>
-          </div>
-
-          {/* Feature 1: AI Sketch */}
-          <div className="grid md:grid-cols-2 gap-8 mb-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-[#FF8C42]/15 border border-[#FF8C42]/30 rounded-full px-4 py-1.5 mb-4">
-                <FileText className="h-4 w-4 text-[#FF8C42]" />
-                <span className="text-xs font-medium text-[#FF8C42]">AI SKETCH</span>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">Скица &rarr; 3D модел 1:1</h3>
-              <p className="text-slate-400 mb-4 text-sm">Нарисувай на хартия с химикал, молив или маркер. Снимай и качи. AI разпознава всички елементи — врати, прозорци, стени — и генерира ТОЧЕН 3D модел с правилен мащаб.</p>
-              <div className="space-y-3 mb-6">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#FF8C42] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
-                  <div><p className="text-white text-sm font-medium">Качете скица/чертеж</p><p className="text-slate-500 text-xs">Химикал, молив или маркер — всичко работи</p></div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#FF8C42] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
-                  <div><p className="text-white text-sm font-medium">AI анализира за 30 сек.</p><p className="text-slate-500 text-xs">Разпознава елементи, размери и мащаб</p></div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#FF8C42] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
-                  <div><p className="text-white text-sm font-medium">360° 3D модел готов</p><p className="text-slate-500 text-xs">Въртете, мащабирайте, изтеглете .glb файл</p></div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#FF8C42] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
-                  <div><p className="text-white text-sm font-medium">Изтегли .glb + Поискай оферта</p><p className="text-slate-500 text-xs">Телефон + десктоп, споделяне с фирми</p></div>
-                </div>
-              </div>
-              <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={() => navigate('/ai-sketch')} data-testid="feature-sketch-btn">
-                <FileText className="mr-2 h-4 w-4" /> Качи скица сега
-              </Button>
-            </div>
-            <div className="bg-gradient-to-br from-[#FF8C42]/20 to-[#DC3545]/10 rounded-2xl p-8 border border-[#FF8C42]/20 text-center">
-              <FileText className="h-20 w-20 text-[#FF8C42]/40 mx-auto mb-4" />
-              <p className="text-white font-bold text-lg mb-2">Скица &rarr; 3D модел</p>
-              <p className="text-slate-400 text-sm">Химикал/молив/маркер &rarr; 360° визуализация</p>
-              <p className="text-[#FF8C42] text-xs mt-3 font-medium">ТОЧНА позиция + мащаб на ВСИЧКИ елементи</p>
-            </div>
-          </div>
-
-          {/* Feature 2: Room Scan */}
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="bg-gradient-to-br from-[#8C56FF]/20 to-[#4DA6FF]/10 rounded-2xl p-8 border border-[#8C56FF]/20 text-center order-2 md:order-1">
-              <Camera className="h-20 w-20 text-[#8C56FF]/40 mx-auto mb-4" />
-              <p className="text-white font-bold text-lg mb-2">Снимка &rarr; 3D модел</p>
-              <p className="text-slate-400 text-sm">Вашето помещение ТОЧНО както е</p>
-              <p className="text-[#8C56FF] text-xs mt-3 font-medium">Врати/прозорци/разпределение = ФИКСИРАНИ</p>
-            </div>
-            <div className="order-1 md:order-2">
-              <div className="inline-flex items-center gap-2 bg-[#8C56FF]/15 border border-[#8C56FF]/30 rounded-full px-4 py-1.5 mb-4">
-                <Camera className="h-4 w-4 text-[#8C56FF]" />
-                <span className="text-xs font-medium text-[#8C56FF]">ПРОЕКТ ПОМЕЩЕНИЯ</span>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">Снимка &rarr; 3D модел 1:1 без промени</h3>
-              <p className="text-slate-400 mb-4 text-sm">Снимайте помещението. AI създава 3D модел 1:1 — врати, прозорци и разпределение остават ФИКСИРАНИ. Клиентът вижда СВОЯ обект точно както е.</p>
-              <ul className="space-y-2 text-sm text-slate-300 mb-6">
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> 1:1 мащаб — реални размери</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> Врати/прозорци = фиксирани позиции</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#8C56FF] flex-shrink-0" /> 360° въртене + .glb файл</li>
-              </ul>
-              <Button className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white" onClick={() => navigate('/room-scan')} data-testid="feature-room-btn">
-                <Camera className="mr-2 h-4 w-4" /> Снимай помещение
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== SOCIAL PROOF ===== */}
-      <section className="py-16 border-b border-[#2A3A4C]">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-10">Готови проекти от общността</h2>
-          <p className="text-slate-400 mb-8">Клиенти споделят своите проекти. Харесвай, коментирай и намери вдъхновение.</p>
-          <Button size="lg" className="bg-[#28A745] hover:bg-[#22943e] text-white px-8" onClick={() => navigate('/ready-projects')} data-testid="see-projects-btn">
-            <FolderSearch className="mr-2 h-5 w-5" /> Виж готови проекти
-          </Button>
-        </div>
-      </section>
-
-      {/* ===== PRICING ===== */}
-      <section className="py-16 border-b border-[#2A3A4C]">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center gap-2 bg-[#28A745]/15 border border-[#28A745]/30 rounded-full px-5 py-2 mb-4">
-              <Zap className="h-4 w-4 text-[#28A745]" />
-              <span className="text-xs font-bold text-[#28A745]">БЕЗПЛАТНО СЕГА — ПЛАТЕНО ПО-КЪСНО</span>
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Цени за фирми</h2>
-            <p className="text-slate-400">За клиенти — БЕЗПЛАТНО. За фирми — достъпни планове.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+      {/* ===== DEMO: TikTok scroll 6 projects ===== */}
+      <section className="py-16 border-t" style={{ borderColor: border }}>
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">AI Демо Проекти</h2>
+          <p className="text-center mb-8 text-sm" style={{ color: muted }}>Примери за 1:1 реалистични ремонти</p>
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none' }} data-testid="demo-scroll">
             {[
-              { name: 'БАЗОВ', price: '15', stars: 1, features: ['Профил + портфолио', '5 оферти/месец', 'Основен профил'], color: '#4DA6FF', popular: false },
-              { name: 'ПРО', price: '35', stars: 2, features: ['Telegram известия', 'PDF договори + AI скици', 'Неограничени оферти'], color: '#FF8C42', popular: true },
-              { name: 'PREMIUM', price: '75', stars: 3, features: ['10 мин. предимство!', 'Персонализирани PDF', 'Екип до 5 + API'], color: '#8C56FF', popular: false },
-            ].map((plan, i) => (
-              <Card key={i} className={`bg-[#253545] border-[#3A4A5C] p-6 text-center ${plan.popular ? 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20 scale-[1.03]' : ''}`}>
-                {plan.popular && <div className="bg-[#FF8C42] text-white text-[10px] font-bold rounded-full px-3 py-1 inline-block mb-3">90% ИЗБИРАТ!</div>}
-                <div className="flex gap-0.5 justify-center mb-2">
-                  {Array.from({ length: plan.stars }, (_, si) => (
-                    <Star key={si} className="h-4 w-4 fill-current" style={{ color: plan.color }} />
-                  ))}
+              { title: 'Модерна баня', style: 'Модерен', price: '69 EUR', rooms: 1, color: '#F97316' },
+              { title: 'Скандинавска кухня', style: 'Скандинавски', price: '69 EUR', rooms: 1, color: '#10B981' },
+              { title: 'Лофт хол + спалня', style: 'Лофт', price: '129 EUR', rooms: 2, color: '#3B82F6' },
+              { title: 'Класически апартамент', style: 'Класически', price: '129 EUR', rooms: 3, color: '#8B5CF6' },
+              { title: 'Минимал. офис', style: 'Минималистичен', price: '220 EUR', rooms: 4, color: '#EC4899' },
+              { title: 'Пълен етаж', style: 'Модерен', price: '220 EUR', rooms: 5, color: '#F97316' },
+            ].map((p, i) => (
+              <div key={i} className="snap-start flex-shrink-0 w-64 rounded-2xl overflow-hidden border transition-transform hover:scale-105 cursor-pointer"
+                style={{ background: bgCard, borderColor: border }} onClick={() => navigate('/room-scan')} data-testid={`demo-card-${i}`}>
+                <div className="h-36 flex items-center justify-center" style={{ background: `${p.color}15` }}>
+                  <Camera className="h-12 w-12" style={{ color: `${p.color}60` }} />
                 </div>
-                <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-                <p className="text-3xl font-bold mt-2 mb-1" style={{ color: plan.color }}>{plan.price} <span className="text-base font-normal text-slate-400">EUR/мес</span></p>
-                <div className="space-y-2 mt-4 text-left">
+                <div className="p-4">
+                  <p className="font-bold text-sm mb-1">{p.title}</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full border" style={{ borderColor: `${p.color}30`, color: p.color }}>{p.style}</span>
+                    <span className="text-[10px]" style={{ color: muted }}>{p.rooms} пом.</span>
+                  </div>
+                  <p className="text-lg font-black" style={{ color: accent }}>{p.price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== PRICING: 3 glassmorphism cards ===== */}
+      <section className="py-16 border-t" style={{ borderColor: border }} data-testid="pricing-section">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">IA Дизайн — Цени</h2>
+          <p className="text-center mb-10 text-sm" style={{ color: muted }}>Реалистичен 1:1 проект на вашето помещение</p>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['4 снимки от ъглите', 'Размери 2x4x2.6м', '10 стила', 'Пред/След рендер', 'Процент прогрес'], color: accent, popular: false },
+              { name: '2-3 ПОМЕЩЕНИЯ', price: '129', rooms: '2-3', features: ['До 3 помещения', '4 снимки на помещение', '10 стила за всяко', 'Пред/След рендер', '360 визуализация'], color: '#10B981', popular: true },
+              { name: '4-5 ПОМЕЩЕНИЯ', price: '220', rooms: '4-5', features: ['До 5 помещения', '4 снимки на помещение', 'Пълна калкулация', 'Всички стилове', 'Приоритетна обработка'], color: '#8B5CF6', popular: false },
+            ].map((plan, i) => (
+              <div key={i} className={`rounded-2xl p-6 text-center border backdrop-blur-lg relative transition-transform hover:scale-105 ${plan.popular ? 'ring-2' : ''}`}
+                style={{ background: dark ? 'rgba(30,41,59,0.6)' : 'rgba(255,255,255,0.8)', borderColor: plan.popular ? plan.color : border, ...(plan.popular ? { boxShadow: `0 0 40px ${plan.color}20` } : {}) }}
+                data-testid={`pricing-card-${i}`}>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-[10px] font-bold rounded-full px-4 py-1" style={{ background: plan.color }}>ПОПУЛЯРЕН</div>
+                )}
+                <h3 className="text-lg font-bold mt-2">{plan.name}</h3>
+                <p className="text-sm mt-1" style={{ color: muted }}>{plan.rooms} помещения</p>
+                <p className="text-4xl font-black my-4" style={{ color: plan.color }}>{plan.price}<span className="text-base font-normal" style={{ color: muted }}> EUR</span></p>
+                <div className="space-y-2.5 text-left mb-6">
                   {plan.features.map((f, fi) => (
-                    <div key={fi} className="flex items-center gap-2 text-sm text-slate-300">
-                      <CheckCircle className="h-3.5 w-3.5 flex-shrink-0" style={{ color: plan.color }} /> {f}
+                    <div key={fi} className="flex items-center gap-2 text-sm" style={{ color: muted }}>
+                      <Check className="h-4 w-4 flex-shrink-0" style={{ color: plan.color }} /> {f}
                     </div>
                   ))}
                 </div>
-                <Button className="w-full mt-6 text-white" style={{ backgroundColor: plan.color }} onClick={() => navigate('/subscriptions')}>
-                  Избери {plan.name}
-                </Button>
-              </Card>
+                <button onClick={() => navigate('/room-scan')} className="w-full py-3 rounded-xl text-white font-bold transition-all hover:opacity-90"
+                  style={{ background: plan.color }}>
+                  Избери {plan.price} EUR
+                </button>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== CTA ===== */}
-      <section className="py-16 bg-gradient-to-r from-[#FF8C42]/20 to-[#28A745]/10">
-        <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Виж ремонта преди да започнеш</h2>
-          <p className="text-slate-300 mb-4 text-base md:text-lg">Намери най-добрата фирма за 30 секунди. 300+ майстори чакат твоя проект.</p>
-          <p className="text-[#28A745] font-bold mb-8">ПЪРВИ 1000 клиенти = БЕЗПЛАТНО</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-[#FF8C42] hover:bg-[#e67a30] text-white text-lg px-8 shadow-lg" onClick={() => navigate('/register')} data-testid="cta-register">
-              Започни безплатно
-            </Button>
-            <Button size="lg" className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white text-lg px-8 shadow-lg" onClick={() => navigate('/companies')}>
-              Виж фирми
-            </Button>
+      {/* ===== IA DESIGN: 10 style tiles ===== */}
+      <section className="py-16 border-t" style={{ borderColor: border }}>
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">10 Стила за всяко помещение</h2>
+          <p className="text-center mb-8 text-sm" style={{ color: muted }}>Избери стил — AI генерира реалистичен рендер</p>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3" data-testid="style-tiles">
+            {[
+              { name: 'Модерен', c: '#F97316' }, { name: 'Скандинавски', c: '#3B82F6' },
+              { name: 'Лофт', c: '#78716C' }, { name: 'Класически', c: '#D97706' },
+              { name: 'Минималистичен', c: '#6B7280' }, { name: 'Бохо', c: '#EC4899' },
+              { name: 'Индустриален', c: '#374151' }, { name: 'Арт Деко', c: '#A855F7' },
+              { name: 'Рустик', c: '#92400E' }, { name: 'Хай-тек', c: '#06B6D4' },
+            ].map((s, i) => (
+              <button key={i} onClick={() => navigate('/room-scan')}
+                className="rounded-xl p-4 border text-center transition-all hover:scale-105 group"
+                style={{ borderColor: `${s.c}30`, background: dark ? `${s.c}10` : `${s.c}08` }} data-testid={`style-tile-${i}`}>
+                <div className="w-10 h-10 rounded-full mx-auto mb-2 group-hover:scale-110 transition-transform" style={{ background: `${s.c}25` }} />
+                <p className="text-sm font-medium" style={{ color: s.c }}>{s.name}</p>
+              </button>
+            ))}
           </div>
         </div>
       </section>
+
+      {/* ===== CTA: РЕГИСТРИРАЙ ФИРМАТА ===== */}
+      <section className="py-16 relative overflow-hidden" style={{ background: dark ? '#1E293B' : '#FFF7ED' }}>
+        <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${accent}15, ${accent}05)` }} />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full px-5 py-2 mb-6 border" style={{ borderColor: `${accent}40`, background: `${accent}10` }}>
+            <Zap className="h-4 w-4" style={{ color: accent }} />
+            <span className="text-xs font-bold" style={{ color: accent }}>ОСТАВАТ {slotsLeft} МЕСТА</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-black mb-4">
+            Първи <span style={{ color: accent }}>50 фирми</span> = 1 година ПРЕМИУМ
+          </h2>
+          <p className="text-lg mb-8" style={{ color: muted }}>Регистрирай фирмата си и получи достъп до всички AI функции безплатно за 12 месеца.</p>
+          <button onClick={() => navigate('/register')} data-testid="cta-register"
+            className="px-10 py-5 rounded-xl text-white text-xl font-black transition-all hover:scale-105 active:scale-95"
+            style={{ background: `linear-gradient(135deg, ${accent}, #EA580C)`, boxShadow: `0 0 40px ${accent}40` }}>
+            РЕГИСТРИРАЙ ФИРМАТА
+          </button>
+        </div>
+      </section>
+
+      {/* Sticky bottom CTA (mobile) */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden p-3" style={{ background: dark ? '#0F172AEE' : '#F8FAFCEE', backdropFilter: 'blur(12px)', borderTop: `1px solid ${border}` }} data-testid="sticky-cta">
+        <button onClick={() => navigate('/register')} className="w-full py-3.5 rounded-xl text-white font-bold text-base"
+          style={{ background: `linear-gradient(135deg, ${accent}, #EA580C)` }}>
+          РЕГИСТРИРАЙ ФИРМАТА ({slotsLeft} места)
+        </button>
+      </div>
     </div>
   );
 };
@@ -3293,6 +3298,7 @@ export const trackEvent = (eventName, metadata = {}) => {
 
 function App() {
   return (
+    <ThemeProvider>
     <LanguageProvider>
       <AuthProvider>
         <div className="App min-h-screen flex flex-col">
@@ -3346,6 +3352,7 @@ function App() {
         </div>
       </AuthProvider>
     </LanguageProvider>
+    </ThemeProvider>
   );
 }
 
