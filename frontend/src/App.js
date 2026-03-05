@@ -442,11 +442,15 @@ const Navbar = () => {
 
 // ============== LIVE COUNTER (fixed top-right) ==============
 const LiveCounter = () => {
-  const [stats, setStats] = useState({ clients: 0, companies: 0, masters: 0, free_slots: { used: 0, total: 50 } });
+  const [stats, setStats] = useState({ clients: 0, companies: 0, masters: 0, online: 1, free_slots: { used: 0, total: 50 } });
   const [show, setShow] = useState(true);
   const [pulse, setPulse] = useState(false);
+  const sessionRef = useRef(null);
 
   useEffect(() => {
+    // Generate session ID once
+    if (!sessionRef.current) sessionRef.current = Math.random().toString(36).slice(2);
+
     const fetchStats = () => {
       axios.get(`${API}/stats/live`).then(res => {
         setStats(prev => {
@@ -455,9 +459,16 @@ const LiveCounter = () => {
         });
       }).catch(() => {});
     };
+
+    const sendHeartbeat = () => {
+      axios.post(`${API}/heartbeat`, { session_id: sessionRef.current }).catch(() => {});
+    };
+
     fetchStats();
-    const interval = setInterval(fetchStats, 30000);
-    return () => clearInterval(interval);
+    sendHeartbeat();
+    const statsInterval = setInterval(fetchStats, 30000);
+    const heartbeatInterval = setInterval(sendHeartbeat, 25000);
+    return () => { clearInterval(statsInterval); clearInterval(heartbeatInterval); };
   }, []);
 
   useEffect(() => {
@@ -476,6 +487,13 @@ const LiveCounter = () => {
       </button>
       <div className={`bg-[#0F1923]/95 backdrop-blur-lg border border-[#2A3A4C] rounded-xl p-3 min-w-[160px] shadow-xl ${pulse ? 'ring-2 ring-[#28A745]/50' : ''}`} style={{ transition: 'box-shadow 0.5s' }}>
         <div className="space-y-2">
+          {/* Online now */}
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28A745] opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#28A745]"></span></span>
+            <span className="text-[#28A745] text-xs font-bold tabular-nums">{stats.online || 1}</span>
+            <span className="text-slate-500 text-[10px]">онлайн</span>
+          </div>
+          <div className="h-px bg-[#2A3A4C] my-0.5" />
           <div className="flex items-center gap-2">
             <Users className="h-3.5 w-3.5 text-[#A8D5BA]" />
             <span className={`text-white text-xs font-bold tabular-nums ${pulse ? 'text-[#A8D5BA]' : ''}`} style={{ transition: 'color 0.5s' }}>{(stats.clients || 0).toLocaleString()}</span>
@@ -491,7 +509,7 @@ const LiveCounter = () => {
             <span className="text-white text-xs font-bold tabular-nums">{stats.masters || 0}</span>
             <span className="text-slate-500 text-[10px]">майстори</span>
           </div>
-          <div className="h-px bg-[#2A3A4C] my-1" />
+          <div className="h-px bg-[#2A3A4C] my-0.5" />
           <div className="flex items-center gap-2">
             <Zap className="h-3.5 w-3.5 text-[#28A745]" />
             <div className="flex-1">

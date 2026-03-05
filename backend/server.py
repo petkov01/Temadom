@@ -1163,6 +1163,23 @@ async def get_stats():
         "total_reviews": total_reviews
     }
 
+# Online users tracking (in-memory)
+_online_sessions = {}
+
+@api_router.post("/heartbeat")
+async def heartbeat(request: Request):
+    """Track online users via heartbeat."""
+    data = await request.json()
+    sid = data.get("session_id", "")
+    if sid:
+        _online_sessions[sid] = datetime.now(timezone.utc)
+    # Cleanup stale sessions (>60s old)
+    cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
+    stale = [k for k, v in _online_sessions.items() if v < cutoff]
+    for k in stale:
+        del _online_sessions[k]
+    return {"ok": True}
+
 @api_router.get("/stats/live")
 async def get_live_stats():
     """Live counter stats for the floating widget."""
@@ -1171,12 +1188,16 @@ async def get_live_stats():
     total_masters = await db.users.count_documents({"role": "company"})
     total_projects = await db.projects.count_documents({"status": "active"})
     free_used = min(total_clients, 50)
+    # Count online users (sessions active in last 60s)
+    cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
+    online = sum(1 for v in _online_sessions.values() if v >= cutoff)
     return {
         "clients": total_clients,
         "companies": total_companies,
         "masters": total_masters,
         "projects": total_projects,
-        "free_slots": {"used": free_used, "total": 50}
+        "free_slots": {"used": free_used, "total": 50},
+        "online": max(1, online)
     }
 
 # ============== ROOT ROUTE ==============
