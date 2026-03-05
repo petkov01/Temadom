@@ -1,0 +1,109 @@
+{
+  "summary": "Iteration 27: Telegram Bot Integration with priority-based notification timing. All backend tests pass (12/12), frontend tests pass. Features tested: Telegram webhook (/start command), /api/telegram/status endpoint, /api/telegram/link endpoint, TelegramConnectCard component with tier timing display (PREMIUM 0min, PRO 10min, BASIC manual), regression tests for scanner3d/pdf and ai-chart/pdf-contract, subscription plans API.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend API Tests (12/12 pass):",
+    "✅ POST /api/telegram/webhook with /start returns 200",
+    "✅ POST /api/telegram/webhook with /start user_id returns 200",
+    "✅ POST /api/telegram/webhook with empty message returns 200",
+    "✅ GET /api/telegram/status returns linked status for authenticated user",
+    "✅ GET /api/telegram/status requires authentication (401/403 for unauthenticated)",
+    "✅ POST /api/telegram/link requires authentication",
+    "✅ POST /api/telegram/link with auth links chat_id successfully",
+    "✅ POST /api/scanner3d/pdf returns valid PDF (regression)",
+    "✅ POST /api/ai-chart/pdf-contract returns valid PDF (regression)",
+    "✅ GET /api/subscriptions/plans returns БАЗОВ (15), ПРО (35), PREMIUM (75) with notification_delay info",
+    "✅ GET /api/ returns 200 (health check)",
+    "✅ GET /api/categories returns categories",
+    "",
+    "Frontend Tests:",
+    "✅ Homepage loads at /",
+    "✅ AI Chart page loads at /ai-chart",
+    "✅ Subscriptions page loads at /subscriptions with 3 tier cards",
+    "✅ Register page loads with company registration form",
+    "✅ Company dashboard loads at /dashboard after registration",
+    "✅ TelegramConnectCard displayed in company dashboard",
+    "✅ TelegramConnectCard shows 'Telegram известия' header",
+    "✅ TelegramConnectCard shows PREMIUM: 0 мин. (instant notifications)",
+    "✅ TelegramConnectCard shows ПРО: +10 мін. (10 minute delay)",
+    "✅ TelegramConnectCard shows БАЗОВ: ръчно (manual search)",
+    "✅ 'Свържи Telegram' button present linking to @TemaDomBot",
+    "✅ Subscriptions page shows notification timing info (PREMIUM 10:00ч., ПРО 10:10ч.)"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration27_telegram.py",
+    "/app/test_reports/pytest/pytest_results_iter27.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "1. TelegramConnectCard component correctly implements tier-based display with color-coded dots for PREMIUM/PRO/BASIC",
+    "2. notify_companies_new_project() uses asyncio.create_task for delayed PRO notifications (10 min)",
+    "3. Telegram webhook correctly handles /start command with optional user_id parameter",
+    "4. /api/telegram/status returns linked boolean and chat_id for authenticated users",
+    "5. /api/telegram/link updates user document with telegram_chat_id and sends confirmation message",
+    "6. send_telegram_message() supports both text and photo+caption format for rich notifications",
+    "7. Subscription plans include notification_delay field showing timing for each tier",
+    "8. All data-testid attributes properly implemented: telegram-connect-card, link-telegram-btn"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration27_telegram.py"
+  ],
+  "success_rate": {
+    "backend": "100% (12/12 tests)",
+    "frontend": "100%"
+  },
+  "seed_data_creation": "Company users created via /api/auth/register for Telegram status/link testing",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 27 complete. Telegram bot integration fully working: /api/telegram/webhook handles /start, /api/telegram/status returns linked status, /api/telegram/link requires auth and links chat_id. TelegramConnectCard component displays in company dashboard with tier timing info (PREMIUM 0min, PRO 10min, BASIC manual). notify_companies_new_project uses asyncio.create_task for 10-minute delayed PRO notifications. Bot name is @TemaDomBot.",
+  "features_tested": {
+    "telegram_webhook": {
+      "status": "PASS",
+      "details": "POST /api/telegram/webhook returns 200 for /start command, handles user_id parameter"
+    },
+    "telegram_status": {
+      "status": "PASS",
+      "details": "GET /api/telegram/status returns {linked: boolean, chat_id: string|null}"
+    },
+    "telegram_link": {
+      "status": "PASS",
+      "details": "POST /api/telegram/link requires auth, links chat_id to user, sends confirmation"
+    },
+    "telegram_connect_card": {
+      "status": "PASS",
+      "details": "TelegramConnectCard shows in company dashboard with tier timing (PREMIUM 0min, PRO +10min, BASIC manual)"
+    },
+    "scanner3d_pdf_regression": {
+      "status": "PASS",
+      "details": "POST /api/scanner3d/pdf returns valid PDF"
+    },
+    "ai_chart_pdf_regression": {
+      "status": "PASS",
+      "details": "POST /api/ai-chart/pdf-contract returns valid PDF"
+    },
+    "subscription_plans": {
+      "status": "PASS",
+      "details": "GET /api/subscriptions/plans returns БАЗОВ/ПРО/PREMIUM with notification_delay info"
+    }
+  },
+  "telegram_integration_details": {
+    "bot_name": "@TemaDomBot",
+    "webhook_endpoint": "/api/telegram/webhook",
+    "status_endpoint": "/api/telegram/status",
+    "link_endpoint": "/api/telegram/link",
+    "notification_timing": {
+      "premium": "Instant (0 minutes)",
+      "pro": "10 minute delay",
+      "basic": "No notifications (manual search)"
+    },
+    "rich_notifications": "Photo support via send_telegram_message with photo_url parameter"
+  }
+}

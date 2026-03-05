@@ -1393,53 +1393,139 @@ async def analyze_blueprint(data: dict):
         raise HTTPException(status_code=500, detail=f"Грешка при анализ: {str(e)}")
 
 # ============== TELEGRAM BOT ROUTES ==============
+import asyncio as aio
 
-async def send_telegram_message(chat_id: int, text: str):
-    """Send a message via Telegram Bot API"""
+async def send_telegram_message(chat_id: int, text: str, photo_url: str = None):
+    """Send a message or photo via Telegram Bot API"""
     if not TELEGRAM_BOT_TOKEN:
         return False
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     try:
         async with httpx.AsyncClient() as client_http:
-            resp = await client_http.post(url, json={
-                "chat_id": chat_id,
-                "text": text,
-                "parse_mode": "HTML"
-            }, timeout=10)
+            if photo_url:
+                url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
+                resp = await client_http.post(url, json={
+                    "chat_id": chat_id,
+                    "photo": photo_url,
+                    "caption": text,
+                    "parse_mode": "HTML"
+                }, timeout=15)
+            else:
+                url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+                resp = await client_http.post(url, json={
+                    "chat_id": chat_id,
+                    "text": text,
+                    "parse_mode": "HTML"
+                }, timeout=10)
             return resp.status_code == 200
     except Exception as e:
         logging.error(f"Telegram send error: {e}")
         return False
 
+
+async def _send_notifications_to_tier(users, message, photo_url):
+    """Send notifications to a list of users"""
+    sent = 0
+    for u in users:
+        chat_id = u.get("telegram_chat_id")
+        if chat_id:
+            try:
+                success = await send_telegram_message(int(chat_id), message, photo_url)
+                if success:
+                    sent += 1
+            except Exception:
+                pass
+    return sent
+
+
 async def notify_companies_new_project(project_dict: dict):
-    """Notify companies via Telegram about a new project in their area"""
+    """Notify companies via Telegram with priority-based timing:
+    - PREMIUM: instant (0 min)
+    - PRO: after 10 minutes
+    - BASIC: no notification (search manually)
+    """
     if not TELEGRAM_BOT_TOKEN:
         return
-    
+
     project_city = project_dict.get("city", "").lower().strip()
     cat = next((c for c in CATEGORIES if c["id"] == project_dict.get("category")), None)
     cat_name = cat["name"] if cat else project_dict.get("category", "")
-    
-    # Find companies/masters with matching city and telegram_chat_id
-    query = {"user_type": {"$in": ["company", "master"]}, "telegram_chat_id": {"$exists": True, "$ne": None}}
-    if project_city:
-        query["city"] = {"$regex": project_city, "$options": "i"}
-    
-    companies = await db.users.find(query, {"_id": 0}).to_list(500)
-    
+
+    # Budget info
+    budget_min = project_dict.get("budget_min")
+    budget_max = project_dict.get("budget_max")
+    estimated = project_dict.get("estimated_budget")
+    budget_text = ""
+    if budget_min and budget_max:
+        budget_text = f"Бюджет: {budget_min:.0f} - {budget_max:.0f} EUR"
+    elif estimated:
+        budget_text = f"Бюджет (ориент.): {estimated:.0f} EUR"
+
+    # First image as photo
+    images = project_dict.get("images", [])
+    photo_url = None
+    if images:
+        first_img = images[0]
+        if first_img.startswith("http"):
+            photo_url = first_img
+
+    # Rich notification message
+    description = project_dict.get("description", "")
+    if len(description) > 250:
+        description = description[:250] + "..."
+
     message = (
         f"<b>Нов проект в TemaDom!</b>\n\n"
         f"<b>{project_dict.get('title', '')}</b>\n"
         f"Категория: {cat_name}\n"
         f"Град: {project_dict.get('city', '')}\n"
-        f"Описание: {project_dict.get('description', '')[:200]}...\n\n"
-        f"Влезте в платформата, за да видите детайлите и да се свържете с клиента."
     )
-    
-    for company in companies:
-        chat_id = company.get("telegram_chat_id")
-        if chat_id:
-            await send_telegram_message(int(chat_id), message)
+    if budget_text:
+        message += f"{budget_text}\n"
+    if project_dict.get("deadline"):
+        message += f"Срок: {project_dict.get('deadline')}\n"
+    message += (
+        f"\n{description}\n\n"
+        f"<a href='https://temadom.com/projects/{project_dict.get('id', '')}'>Виж проекта</a>"
+    )
+
+    # City filter
+    city_query = {}
+    if project_city:
+        city_query = {"$or": [
+            {"city": {"$regex": project_city, "$options": "i"}},
+            {"city": {"$exists": False}},
+            {"city": ""}
+        ]}
+
+    base_query = {
+        "user_type": {"$in": ["company", "master"]},
+        "telegram_chat_id": {"$exists": True, "$ne": None}
+    }
+
+    # --- PREMIUM: Send INSTANTLY ---
+    premium_query = {**base_query, "subscription_plan": "premium"}
+    if city_query:
+        premium_query.update(city_query)
+    premium_users = await db.users.find(premium_query, {"_id": 0}).to_list(500)
+
+    premium_msg = f"<b>PREMIUM ПРЕДИМСТВО</b>\n\n{message}"
+    premium_sent = await _send_notifications_to_tier(premium_users, premium_msg, photo_url)
+
+    logging.info(f"Telegram: PREMIUM notified {premium_sent} users instantly")
+
+    # --- PRO: Send after 10 minutes (background task) ---
+    pro_query = {**base_query, "subscription_plan": "pro"}
+    if city_query:
+        pro_query.update(city_query)
+
+    async def _delayed_pro_notification():
+        await aio.sleep(600)  # 10 minutes
+        pro_users = await db.users.find(pro_query, {"_id": 0}).to_list(500)
+        pro_msg = f"<b>ПРО ИЗВЕСТИЕ</b>\n\n{message}"
+        pro_sent = await _send_notifications_to_tier(pro_users, pro_msg, photo_url)
+        logging.info(f"Telegram: PRO notified {pro_sent} users after 10 min delay")
+
+    aio.create_task(_delayed_pro_notification())
 
 @api_router.post("/telegram/link")
 async def link_telegram(data: dict, user: dict = Depends(get_current_user)):
@@ -1452,7 +1538,30 @@ async def link_telegram(data: dict, user: dict = Depends(get_current_user)):
         {"id": user["id"]},
         {"$set": {"telegram_chat_id": str(chat_id)}}
     )
-    return {"message": "Telegram акаунтът е свързан успешно"}
+    
+    # Send confirmation based on subscription tier
+    sub = await db.subscriptions.find_one({"user_id": user["id"], "status": "active"}, {"_id": 0})
+    plan = sub.get("plan", "basic") if sub else "basic"
+    
+    tier_msg = {
+        "premium": "PREMIUM: Ще получавате известия ПЪРВИ — 10 мин. преди ПРО!",
+        "pro": "ПРО: Ще получавате известия за нови проекти (с 10 мин. закъснение след PREMIUM).",
+        "basic": "БАЗОВ план: За да получавате Telegram известия, надградете до ПРО или PREMIUM."
+    }
+    
+    await send_telegram_message(int(chat_id),
+        f"Telegram е свързан с TemaDom!\n\n{tier_msg.get(plan, tier_msg['basic'])}"
+    )
+    
+    return {"message": "Telegram акаунтът е свързан успешно", "plan": plan}
+
+
+@api_router.get("/telegram/status")
+async def telegram_status(user: dict = Depends(get_current_user)):
+    """Check if user has linked Telegram"""
+    u = await db.users.find_one({"id": user["id"]}, {"_id": 0, "telegram_chat_id": 1, "id": 1})
+    linked = bool(u and u.get("telegram_chat_id"))
+    return {"linked": linked, "chat_id": u.get("telegram_chat_id") if linked else None}
 
 @api_router.post("/telegram/broadcast")
 async def broadcast_telegram(data: dict, request: Request):
@@ -1500,19 +1609,27 @@ async def telegram_webhook(request: Request):
             return {"ok": True}
         
         if text.startswith("/start"):
-            # Extract user token from /start command if present
             parts = text.split()
             if len(parts) > 1:
                 user_id = parts[1]
-                # Link this chat_id to the user
                 result = await db.users.update_one(
                     {"id": user_id},
                     {"$set": {"telegram_chat_id": str(chat_id)}}
                 )
                 if result.modified_count > 0:
-                    await send_telegram_message(chat_id, 
-                        "Акаунтът ви е свързан с TemaDom! "
-                        "Ще получавате известия за нови проекти във вашата област."
+                    # Check subscription tier
+                    sub = await db.subscriptions.find_one({"user_id": user_id, "status": "active"}, {"_id": 0})
+                    plan = sub.get("plan", "basic") if sub else "basic"
+                    
+                    tier_info = {
+                        "premium": "\nВашият план: PREMIUM\nЩе получавате известия ПЪРВИ — 10 мин. преди всички!",
+                        "pro": "\nВашият план: ПРО\nЩе получавате известия за нови проекти (10 мин. след PREMIUM).",
+                        "basic": "\nВашият план: БАЗОВ\nНадградете до ПРО или PREMIUM за Telegram известия."
+                    }
+                    
+                    await send_telegram_message(chat_id,
+                        f"Акаунтът ви е свързан с TemaDom!"
+                        f"{tier_info.get(plan, tier_info['basic'])}"
                     )
                 else:
                     await send_telegram_message(chat_id,
@@ -1522,12 +1639,15 @@ async def telegram_webhook(request: Request):
                     )
             else:
                 await send_telegram_message(chat_id,
-                    "Добре дошли в TemaDom бот!\n\n"
-                    "За да получавате известия за нови проекти:\n"
+                    "Добре дошли в <b>TemaDom</b> бот!\n\n"
+                    "Известия за нови строителни проекти:\n\n"
+                    "<b>PREMIUM</b>: Получавате ПЪРВИ (10 мин. преди ПРО)\n"
+                    "<b>ПРО</b>: Получавате известия (след 10 мин.)\n"
+                    "<b>БАЗОВ</b>: Без автоматични известия\n\n"
+                    "За да се свържете:\n"
                     "1. Регистрирайте се на temadom.com\n"
                     "2. Влезте в профила си\n"
-                    "3. Натиснете 'Свържи Telegram'\n\n"
-                    "Платформата е БЕЗПЛАТНА за ограничен период!"
+                    "3. Натиснете 'Свържи Telegram'"
                 )
         
         return {"ok": True}

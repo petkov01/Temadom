@@ -2238,6 +2238,87 @@ const RegisterPage = () => {
 };
 
 // ============== DASHBOARD PAGES ==============
+// ============== TELEGRAM CONNECT CARD ==============
+const TelegramConnectCard = ({ user, token }) => {
+  const [telegramLinked, setTelegramLinked] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    if (!token) { setChecking(false); return; }
+    axios.get(`${API}/telegram/status`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => setTelegramLinked(res.data.linked))
+      .catch(() => {})
+      .finally(() => setChecking(false));
+  }, [token]);
+
+  const plan = user?.subscription_plan || 'basic';
+  const tierInfo = {
+    premium: { label: 'PREMIUM', color: '#8C56FF', desc: 'Получавате известия ПЪРВИ — 10 мин. преди ПРО!', stars: 3 },
+    pro: { label: 'ПРО', color: '#FF8C42', desc: 'Известия за нови проекти (10 мин. след PREMIUM)', stars: 2 },
+    basic: { label: 'БАЗОВ', color: '#4DA6FF', desc: 'Надградете до ПРО или PREMIUM за Telegram известия', stars: 1 },
+  };
+  const tier = tierInfo[plan] || tierInfo.basic;
+
+  return (
+    <Card className="mb-8 overflow-hidden" data-testid="telegram-connect-card">
+      <div className="p-5" style={{ backgroundColor: `${tier.color}10`, borderColor: `${tier.color}30`, borderWidth: 1, borderStyle: 'solid' }}>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <svg className="h-6 w-6" style={{ color: tier.color }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.13l-1.97 9.28c-.15.66-.54.82-1.09.51l-3.01-2.22-1.45 1.4c-.16.16-.3.3-.61.3l.22-3.06 5.55-5.01c.24-.22-.05-.33-.37-.13l-6.86 4.32-2.95-.92c-.64-.2-.66-.64.14-.95l11.54-4.45c.53-.2 1-.05.86.93z"/></svg>
+              <h2 className="text-lg font-semibold text-white">Telegram известия</h2>
+              {telegramLinked && (
+                <Badge className="bg-[#28A745]/20 text-[#28A745] border-[#28A745]/30 text-xs">
+                  <CheckCircle className="h-3 w-3 mr-1" /> Свързан
+                </Badge>
+              )}
+            </div>
+            <p className="text-sm" style={{ color: tier.color }}>{tier.desc}</p>
+            {/* Timer visualization */}
+            <div className="flex items-center gap-3 mt-3">
+              <div className="flex items-center gap-1 text-xs">
+                <span className="inline-block w-2 h-2 rounded-full bg-[#8C56FF]" />
+                <span className="text-slate-400">PREMIUM: 0 мин.</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs">
+                <span className="inline-block w-2 h-2 rounded-full bg-[#FF8C42]" />
+                <span className="text-slate-400">ПРО: +10 мин.</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs">
+                <span className="inline-block w-2 h-2 rounded-full bg-[#4DA6FF]" />
+                <span className="text-slate-400">БАЗОВ: ръчно</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            {!telegramLinked ? (
+              <a
+                href={`https://t.me/TemaDomBot?start=${user?.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button style={{ backgroundColor: tier.color }} className="text-white w-full" data-testid="link-telegram-btn">
+                  Свържи Telegram
+                </Button>
+              </a>
+            ) : (
+              <Button variant="outline" className="border-[#28A745]/30 text-[#28A745] cursor-default" disabled>
+                <CheckCircle className="mr-1 h-4 w-4" /> Telegram свързан
+              </Button>
+            )}
+            {plan === 'basic' && (
+              <a href="/subscriptions" className="text-xs text-center" style={{ color: tier.color }}>
+                Надградете за известия &rarr;
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+// ============== COMPANY DASHBOARD ==============
 const CompanyDashboard = () => {
   const { user, token, refreshUser } = useAuth();
   const navigate = useNavigate();
@@ -2353,31 +2434,7 @@ const CompanyDashboard = () => {
         </Card>
 
         {/* Telegram Link Section */}
-        <Card className="mb-8 overflow-hidden">
-          <div className="p-6 bg-[#4DA6FF]/10 border border-[#4DA6FF]/20">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <svg className="h-6 w-6 text-[#4DA6FF]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.13l-1.97 9.28c-.15.66-.54.82-1.09.51l-3.01-2.22-1.45 1.4c-.16.16-.3.3-.61.3l.22-3.06 5.55-5.01c.24-.22-.05-.33-.37-.13l-6.86 4.32-2.95-.92c-.64-.2-.66-.64.14-.95l11.54-4.45c.53-.2 1-.05.86.93z"/></svg>
-                  <h2 className="text-lg font-semibold text-[#4DA6FF]">{t('dash_telegram')}</h2>
-                </div>
-                <p className="text-sm text-[#4DA6FF]">
-                  {t('dash_telegram_desc')}
-                </p>
-              </div>
-              <a 
-                href={`https://t.me/TemaDomBot?start=${user.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex"
-              >
-                <Button className="bg-[#4DA6FF]/100 hover:bg-blue-600 flex-shrink-0" data-testid="link-telegram-btn">
-                  {t('dash_telegram_link')}
-                </Button>
-              </a>
-            </div>
-          </div>
-        </Card>
+        <TelegramConnectCard user={user} token={token} />
 
         {/* Tabs for Leads and Portfolio */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
