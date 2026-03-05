@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request, UploadFile, File, Form
 from fastapi.responses import StreamingResponse, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
@@ -20,6 +20,9 @@ from emergentintegrations.llm.openai.image_generation import OpenAIImageGenerati
 import json as json_module
 import re as re_module
 import base64
+import cv2
+import tempfile
+import numpy as np
 
 # Import shared config
 from config import (
@@ -2161,6 +2164,248 @@ AI_MATERIAL_CLASS = {
     "standard": "стандартен клас материали - добро качество, средна ценова гама",
     "premium": "премиум клас материали - висококачествени, луксозни"
 }
+
+@api_router.post("/ai-designer/video-generate")
+async def generate_video_design(
+    video: UploadFile = File(...),
+    width: str = Form("4"),
+    length: str = Form("5"),
+    height: str = Form("2.6"),
+    style: str = Form("modern"),
+    room_type: str = Form("living_room"),
+    notes: str = Form("")
+):
+    """Video Designer v6: Upload 15s video → AI extracts frames → 360° renovation."""
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+
+    # Validate video
+    if not video.content_type or not video.content_type.startswith("video/"):
+        raise HTTPException(status_code=400, detail="Моля, качете видео файл")
+
+    # Save video to temp file
+    video_bytes = await video.read()
+    if len(video_bytes) > 100 * 1024 * 1024:  # 100MB limit
+        raise HTTPException(status_code=400, detail="Видеото е твърде голямо (макс. 100MB)")
+
+    with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
+        tmp.write(video_bytes)
+        tmp_path = tmp.name
+
+    try:
+        # Extract key frames using OpenCV
+        cap = cv2.VideoCapture(tmp_path)
+        if not cap.isOpened():
+            raise HTTPException(status_code=400, detail="Невалиден видео файл")
+
+        fps = cap.get(cv2.CAP_PROP_FPS) or 30
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        duration = total_frames / fps if fps > 0 else 0
+
+        if duration > 30:
+            cap.release()
+            raise HTTPException(status_code=400, detail="Видеото е твърде дълго (макс. 15 секунди)")
+
+        # Extract 4 evenly-spaced frames
+        frame_indices = [int(total_frames * i / 4) for i in range(4)] if total_frames > 4 else list(range(total_frames))
+        extracted_frames = []
+        for idx in frame_indices:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
+            ret, frame = cap.read()
+            if ret:
+                # Resize if too large
+                h, w = frame.shape[:2]
+                if max(h, w) > 1280:
+                    scale_factor = 1280 / max(h, w)
+                    frame = cv2.resize(frame, (int(w * scale_factor), int(h * scale_factor)))
+                _, buf = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+                extracted_frames.append(base64.b64encode(buf).decode('utf-8'))
+        cap.release()
+
+        if not extracted_frames:
+            raise HTTPException(status_code=400, detail="Не можаха да се извлекат кадри от видеото")
+
+        logging.info(f"Video Designer: extracted {len(extracted_frames)} frames from {duration:.1f}s video")
+
+        style_desc = AI_STYLES.get(style, AI_STYLES.get("modern", "modern style"))
+        ROOM_TYPE_NAMES = {
+            "bathroom": "баня", "kitchen": "кухня", "living_room": "хол",
+            "bedroom": "спалня", "corridor": "коридор", "balcony": "балкон",
+            "stairs": "стълбище", "facade": "фасада", "other": "помещение"
+        }
+        room_type_name = ROOM_TYPE_NAMES.get(room_type, "помещение")
+
+        # Step 1: Analyze video frames
+        analysis_chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"video-designer-{uuid.uuid4()}",
+            system_message=f"""Ти си експерт интериорен дизайнер. Получаваш {len(extracted_frames)} кадъра от видео на {room_type_name}.
+
+СТРИКТЕН РЕЖИМ 1:1 — анализирай ТОЧНО какво виждаш:
+- САМО елементи от кадрите (плочки, стени, мебели, осветление, прозорци, врати)
+- НЕ добавяй нови елементи
+- Опиши ТОЧНАТА геометрия, пропорции и позиции
+
+Отговори в JSON:
+{{"room_type": "{room_type_name}", "current_state": "детайлно описание", "elements": ["списък"], "lighting": "тип", "colors": ["цветове"], "furniture": ["мебели"], "layout": "разпределение", "description": "VERY DETAILED English description of the EXACT room visible — include every fixture, wall position, floor area, window/door positions, lighting."}}"""
+        ).with_model("openai", "gpt-4o")
+
+        image_contents = [ImageContent(image_base64=f) for f in extracted_frames]
+        analysis_msg = UserMessage(
+            text=f"Анализирай ТОЧНО тези {len(extracted_frames)} кадъра от видео на {room_type_name}. Размери: {width}м x {length}м x {height}м. Опиши 1:1 какво виждаш.",
+            file_contents=image_contents
+        )
+        analysis_response = await analysis_chat.send_message(analysis_msg)
+
+        room_analysis = {}
+        try:
+            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', analysis_response)
+            if json_match:
+                room_analysis = json_module.loads(json_match.group(1))
+            else:
+                room_analysis = json_module.loads(analysis_response)
+        except Exception:
+            room_analysis = {"room_type": room_type_name, "description": f"a {room_type_name} interior", "current_state": "needs renovation"}
+
+        room_desc = room_analysis.get("description", f"a {room_type_name} interior")
+
+        # Step 2: Generate 4 angles of renovated room
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        reno_instruction = notes or "complete renovation with modern finishes"
+
+        camera_angles = [
+            ("photographed from the entrance/door looking inward, full room visible", "Фронтален"),
+            ("photographed from the left wall at 45 degrees showing depth", "Ляв ъгъл"),
+            ("photographed from the right wall at 45 degrees showing depth", "Десен ъгъл"),
+            ("photographed from the far corner looking back towards entrance", "Обратен ъгъл"),
+        ]
+
+        generated_images = []
+        variant_angles = []
+        for angle_idx, (angle_desc, angle_label) in enumerate(camera_angles):
+            try:
+                strict_prompt = f"""STRICT 1:1 RENOVATION of the EXACT room described below. {angle_desc}.
+
+ROOM DESCRIPTION (keep EXACT layout): {room_desc}
+Dimensions: {width}m x {length}m, height {height}m.
+
+RENOVATION REQUEST: {reno_instruction}
+
+STRICT RULES:
+1. Keep the EXACT same room geometry, proportions, and layout
+2. Do NOT add new objects/elements that aren't in the original
+3. Apply ONLY the requested renovation changes
+4. Preserve 1:1 scale and proportions
+
+Style: {style_desc}.
+Ultra-realistic professional interior photography, 8K quality, perfect lighting."""
+
+                img_result = await image_gen.generate_images(
+                    prompt=strict_prompt,
+                    model="gpt-image-1",
+                    number_of_images=1
+                )
+
+                if img_result and len(img_result) > 0:
+                    img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
+                    variant_angles.append({
+                        "angle": angle_idx + 1,
+                        "label": angle_label,
+                        "image_base64": img_b64
+                    })
+            except Exception as img_err:
+                logging.error(f"Video Designer image gen error angle {angle_idx+1}: {img_err}")
+                continue
+
+        if variant_angles:
+            generated_images.append({
+                "variant": 1,
+                "angles": variant_angles,
+                "image_base64": variant_angles[0]["image_base64"] if variant_angles else "",
+            })
+
+        # Step 3: Materials list
+        materials_chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"video-materials-{uuid.uuid4()}",
+            system_message="""Ти си експерт по строителни материали и интериорен дизайн в България.
+Генерирай ДЕТАЙЛЕН списък с материали и цени за ремонт.
+
+Отговори САМО в JSON формат:
+{
+  "materials": [
+    {"name": "...", "quantity": "...", "unit": "...", "price_per_unit_eur": "...", "total_price_eur": "..."}
+  ],
+  "total_estimate_eur": "...",
+  "labor_estimate_eur": "...",
+  "grand_total_eur": "..."
+}"""
+        ).with_model("openai", "gpt-4o")
+
+        materials_msg = UserMessage(
+            text=f"""Материали за ремонт на {room_type_name} ({width}м x {length}м x {height}м).
+Стил: {style_desc}
+{f'Бележки: {notes}' if notes else ''}
+Състояние: {room_analysis.get('current_state', 'нуждае се от ремонт')}"""
+        )
+        materials_response = await materials_chat.send_message(materials_msg)
+
+        materials_data = {}
+        try:
+            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', materials_response)
+            if json_match:
+                materials_data = json_module.loads(json_match.group(1))
+            else:
+                materials_data = json_module.loads(materials_response)
+        except:
+            materials_data = {"materials": [], "grand_total_eur": "N/A"}
+
+        # Save to DB
+        design_id = str(uuid.uuid4())
+        design_record = {
+            "id": design_id,
+            "type": "video",
+            "room_type": room_type_name,
+            "room_type_id": room_type,
+            "room_analysis": room_analysis,
+            "style": style,
+            "dimensions": {"width": width, "length": length, "height": height},
+            "video_duration": round(duration, 1),
+            "frames_extracted": len(extracted_frames),
+            "generated_count": len(variant_angles),
+            "materials_count": len(materials_data.get("materials", [])),
+            "notes": notes,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.ai_designs.insert_one(design_record)
+
+        # Return first frame as "before" for comparison
+        before_frame = extracted_frames[0] if extracted_frames else None
+
+        return {
+            "id": design_id,
+            "room_analysis": room_analysis,
+            "generated_images": generated_images,
+            "materials": materials_data,
+            "before_frame": before_frame,
+            "style": style,
+            "dimensions": {"width": width, "length": length, "height": height},
+            "video_duration": round(duration, 1),
+            "frames_extracted": len(extracted_frames),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Video Designer error: {e}")
+        raise HTTPException(status_code=500, detail=f"Грешка при обработка: {str(e)}")
+    finally:
+        # Cleanup temp file
+        try:
+            os.unlink(tmp_path)
+        except:
+            pass
+
 
 @api_router.post("/ai-designer/generate")
 async def generate_ai_design(request: Request):

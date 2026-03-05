@@ -132,7 +132,7 @@ function drawElement(ctx, el, sel, sc) {
   }
 }
 
-function renderAll(ctx, els, draft, selIdx, sc) {
+function renderAll(ctx, els, draft, selIdx, sc, distLines) {
   renderGrid(ctx, ctx.canvas.width, ctx.canvas.height);
   els.forEach((el, i) => drawElement(ctx, el, i === selIdx, sc));
   if (draft) {
@@ -146,9 +146,21 @@ function renderAll(ctx, els, draft, selIdx, sc) {
     }
     ctx.restore();
   }
+  // Distance indicator lines
+  if (distLines && distLines.length) {
+    ctx.save();
+    distLines.forEach(dl => {
+      ctx.strokeStyle = '#FF4444'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(dl.x1, dl.y1); ctx.lineTo(dl.x2, dl.y2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#FF4444'; ctx.font = 'bold 11px monospace';
+      ctx.fillText(`${dl.dist}м`, (dl.x1 + dl.x2) / 2 + 4, (dl.y1 + dl.y2) / 2 - 6);
+    });
+    ctx.restore();
+  }
 }
 
-export const CADCanvas = ({ els, selIdx, tool, scale, draft, onDown, onMove, onUp, onSelect }) => {
+export const CADCanvas = ({ els, selIdx, tool, scale, draft, distLines, onDown, onMove, onUp, onSelect }) => {
   const canvasRef = useRef(null);
   const [canvasSize, setCanvasSize] = useState({ w: CW, h: CH });
   const containerRef = useRef(null);
@@ -171,10 +183,10 @@ export const CADCanvas = ({ els, selIdx, tool, scale, draft, onDown, onMove, onU
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
     let raf;
-    const frame = () => { renderAll(ctx, els, draft, selIdx, scale); raf = requestAnimationFrame(frame); };
+    const frame = () => { renderAll(ctx, els, draft, selIdx, scale, distLines); raf = requestAnimationFrame(frame); };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [els, draft, selIdx, scale]);
+  }, [els, draft, selIdx, scale, distLines]);
 
   const getPos = useCallback((clientX, clientY) => {
     const r = canvasRef.current.getBoundingClientRect();

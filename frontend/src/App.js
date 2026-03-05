@@ -249,7 +249,7 @@ const Navbar = () => {
                     <FileText className="h-4 w-4" /> AI Sketch (скици)
                   </Link>
                   <Link to="/room-scan" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#8C56FF] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-room-scan">
-                    <Camera className="h-4 w-4" /> IA Designer (ремонт 1:1)
+                    <Camera className="h-4 w-4" /> 3D Video Designer
                   </Link>
                   <Link to="/ready-projects" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#28A745] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ready-projects">
                     <FolderSearch className="h-4 w-4" /> Готови проекти
@@ -408,7 +408,7 @@ const Navbar = () => {
               <FileText className="h-4 w-4" /> AI Sketch (скици)
             </Link>
             <Link to="/room-scan" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#8C56FF]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-room-scan">
-              <Camera className="h-4 w-4" /> IA Designer (ремонт 1:1)
+              <Camera className="h-4 w-4" /> 3D Video Designer
             </Link>
             <Link to="/ready-projects" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#28A745]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ready-projects">
               <FolderSearch className="h-4 w-4" /> Готови проекти
@@ -676,7 +676,7 @@ const LandingPage = () => {
           </h1>
 
           <p className="text-base md:text-lg text-center mb-10 max-w-2xl" style={{ color: muted }}>
-            Качи снимка на помещение — получи реалистичен 1:1 ремонтиран проект. 
+            Заснеми 15-секундно видео → получи реалистичен 3D ремонт с 360° панорама.
             Виж точно как ще изглежда ПРЕДИ да платиш.
           </p>
 
@@ -685,7 +685,7 @@ const LandingPage = () => {
               className="group relative px-8 py-4 rounded-xl text-white text-lg font-bold overflow-hidden transition-all hover:scale-105 active:scale-95"
               style={{ background: accent, boxShadow: `0 0 30px ${accent}40` }}>
               <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Camera className="mr-2 h-6 w-6 inline" /> IA Проект помещение
+              <Camera className="mr-2 h-6 w-6 inline" /> 3D Video Designer
             </button>
             <button onClick={() => navigate('/ai-sketch')} data-testid="hero-sketch-btn"
               className="px-8 py-4 rounded-xl text-lg font-bold border-2 transition-all hover:scale-105 active:scale-95"

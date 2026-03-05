@@ -1,76 +1,68 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Camera, Upload, Loader2, X, Download, ArrowLeft, ArrowRight, Plus, Trash2, Check } from 'lucide-react';
+import { Video, Loader2, X, Download, ArrowLeft, ArrowRight, Ruler, FileText, Upload, Play, Pause } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
 const ROOM_TYPES = [
-  { id: 'bathroom', name: 'Баня' }, { id: 'kitchen', name: 'Кухня' },
-  { id: 'living_room', name: 'Хол' }, { id: 'bedroom', name: 'Спалня' },
-  { id: 'corridor', name: 'Коридор' }, { id: 'balcony', name: 'Балкон' },
-  { id: 'stairs', name: 'Стълбище' }, { id: 'facade', name: 'Фасада' },
+  { id: 'bathroom', name: 'Баня' },
+  { id: 'kitchen', name: 'Кухня' },
+  { id: 'living_room', name: 'Хол' },
+  { id: 'bedroom', name: 'Спалня' },
+  { id: 'corridor', name: 'Коридор' },
+  { id: 'balcony', name: 'Балкон' },
+  { id: 'stairs', name: 'Стълбище' },
+  { id: 'facade', name: 'Фасада' },
   { id: 'other', name: 'Друго' },
 ];
 
 const STYLES = [
-  { id: 'modern', name: 'Модерен', color: '#F97316' },
-  { id: 'scandinavian', name: 'Сканди', color: '#3B82F6' },
-  { id: 'loft', name: 'Лофт', color: '#78716C' },
-  { id: 'classic', name: 'Класика', color: '#D97706' },
-  { id: 'minimalist', name: 'Минимал', color: '#6B7280' },
-  { id: 'boho', name: 'Бохо', color: '#EC4899' },
-  { id: 'industrial', name: 'Индустр.', color: '#374151' },
-  { id: 'artdeco', name: 'Арт Деко', color: '#A855F7' },
-  { id: 'rustic', name: 'Рустик', color: '#92400E' },
-  { id: 'hitech', name: 'Хай-тек', color: '#06B6D4' },
+  { id: 'modern', name: 'Модерен' },
+  { id: 'scandinavian', name: 'Скандинавски' },
+  { id: 'loft', name: 'Лофт' },
+  { id: 'classic', name: 'Класика' },
+  { id: 'minimalist', name: 'Минималистичен' },
+  { id: 'boho', name: 'Бохо' },
+  { id: 'industrial', name: 'Индустриален' },
+  { id: 'artdeco', name: 'Арт Деко' },
+  { id: 'rustic', name: 'Рустик' },
+  { id: 'hitech', name: 'Хай-тек' },
 ];
-
-const PLANS = [
-  { id: 1, label: '1 помещение', price: 69, maxRooms: 1, color: '#F97316' },
-  { id: 2, label: '2-3 помещения', price: 129, maxRooms: 3, color: '#10B981' },
-  { id: 3, label: '4-5 помещения', price: 220, maxRooms: 5, color: '#8B5CF6' },
-];
-
-const EMPTY_ROOM = () => ({ photos: [null, null, null, null], previews: [null, null, null, null], roomType: 'bathroom' });
 
 const ProgressBar = ({ elapsed, total }) => {
   const pct = Math.min(100, (elapsed / total) * 100);
   return (
     <div className="w-full" data-testid="progress-bar">
-      <div className="flex justify-between text-xs text-slate-400 mb-1">
-        <span>AI генерира проекта...</span>
-        <span className="text-[#F97316] font-bold">{Math.round(pct)}%</span>
+      <div className="flex justify-between text-xs mb-2">
+        <span className="text-slate-400">AI обработва видеото...</span>
+        <span className="text-[#F97316] font-bold text-base">{Math.round(pct)}%</span>
       </div>
-      <div className="h-2.5 bg-[#1E2A38] rounded-full overflow-hidden">
-        <div className="h-full bg-gradient-to-r from-[#F97316] to-[#10B981] rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+      <div className="h-3 bg-[#1E2A38] rounded-full overflow-hidden border border-[#2A3A4C]">
+        <div
+          className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{
+            width: `${pct}%`,
+            background: 'linear-gradient(90deg, #F97316, #10B981)',
+          }}
+        />
+      </div>
+      <div className="flex justify-between text-[10px] text-slate-600 mt-1">
+        <span>0%</span>
+        <span>Видео → 360° → 3D ремонт</span>
+        <span>100%</span>
       </div>
     </div>
   );
 };
 
-// Compress image to max 1MB for API
-function compressImage(dataUrl, maxWidth = 1200) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > maxWidth) { h = (maxWidth / w) * h; w = maxWidth; }
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', 0.8));
-    };
-    img.src = dataUrl;
-  });
-}
-
-// Before/After slider
 const BeforeAfterSlider = ({ before, after }) => {
   const [pos, setPos] = useState(50);
   const ref = useRef(null);
@@ -80,276 +72,382 @@ const BeforeAfterSlider = ({ before, after }) => {
     setPos(Math.max(0, Math.min(100, ((clientX - r.left) / r.width) * 100)));
   }, []);
   return (
-    <div ref={ref} className="relative w-full aspect-video rounded-lg overflow-hidden cursor-col-resize select-none"
-      onMouseMove={e => e.buttons && handleMove(e.clientX)}
-      onTouchMove={e => handleMove(e.touches[0].clientX)} data-testid="before-after-slider">
+    <div
+      ref={ref}
+      className="relative w-full aspect-video rounded-xl overflow-hidden cursor-col-resize select-none border border-[#2A3A4C]"
+      onMouseMove={(e) => e.buttons && handleMove(e.clientX)}
+      onTouchMove={(e) => handleMove(e.touches[0].clientX)}
+      data-testid="before-after-slider"
+    >
       <img src={after} alt="After" className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 overflow-hidden" style={{ width: `${pos}%` }}>
-        <img src={before} alt="Before" className="w-full h-full object-cover" style={{ width: `${100 * 100 / pos}%`, maxWidth: 'none' }} />
+        <img
+          src={before}
+          alt="Before"
+          className="w-full h-full object-cover"
+          style={{ width: `${(100 * 100) / pos}%`, maxWidth: 'none' }}
+        />
       </div>
       <div className="absolute top-0 bottom-0" style={{ left: `${pos}%` }}>
         <div className="w-0.5 h-full bg-white shadow-lg" />
-        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center">
-          <ArrowLeft className="h-3 w-3 text-slate-700" /><ArrowRight className="h-3 w-3 text-slate-700" />
+        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center">
+          <ArrowLeft className="h-3.5 w-3.5 text-slate-700" />
+          <ArrowRight className="h-3.5 w-3.5 text-slate-700" />
         </div>
       </div>
-      <div className="absolute top-2 left-2 bg-black/50 text-white text-[10px] px-2 py-0.5 rounded">ПРЕДИ</div>
-      <div className="absolute top-2 right-2 bg-[#F97316]/80 text-white text-[10px] px-2 py-0.5 rounded">СЛЕД</div>
+      <div className="absolute top-3 left-3 bg-black/60 text-white text-[11px] font-bold px-3 py-1 rounded-lg backdrop-blur-sm">
+        ПРЕДИ
+      </div>
+      <div className="absolute top-3 right-3 bg-[#F97316]/90 text-white text-[11px] font-bold px-3 py-1 rounded-lg backdrop-blur-sm">
+        СЛЕД
+      </div>
     </div>
   );
 };
 
-// Room upload card (4 photos per room)
-const RoomCard = ({ room, roomIndex, totalRooms, onUpdatePhoto, onUpdateType, onRemove }) => (
-  <Card className="bg-[#253545] border-[#3A4A5C]" data-testid={`room-card-${roomIndex}`}>
-    <CardHeader className="pb-2 pt-3 px-4">
-      <div className="flex items-center justify-between">
-        <CardTitle className="text-white text-sm">Помещение {roomIndex + 1}</CardTitle>
-        {totalRooms > 1 && (
-          <button onClick={() => onRemove(roomIndex)} className="text-red-400 hover:text-red-300" data-testid={`remove-room-${roomIndex}`}>
-            <Trash2 className="h-4 w-4" />
-          </button>
-        )}
-      </div>
-    </CardHeader>
-    <CardContent className="px-4 pb-4">
-      {/* Room type */}
-      <div className="flex flex-wrap gap-1 mb-3">
-        {ROOM_TYPES.map(rt => (
-          <button key={rt.id} onClick={() => onUpdateType(roomIndex, rt.id)}
-            className={`text-[10px] px-2 py-1 rounded border transition-all ${
-              room.roomType === rt.id ? 'border-[#F97316] bg-[#F97316]/10 text-[#F97316]' : 'border-[#3A4A5C] text-slate-400 hover:border-[#F97316]/30'
-            }`} data-testid={`room-${roomIndex}-type-${rt.id}`}>
-            {rt.name}
-          </button>
-        ))}
-      </div>
-      {/* 4 photo upload slots */}
-      <div className="grid grid-cols-4 gap-2">
-        {[0, 1, 2, 3].map(pi => (
-          <div key={pi}>
-            <input type="file" accept="image/*" className="hidden" id={`photo-${roomIndex}-${pi}`}
-              onChange={e => onUpdatePhoto(roomIndex, pi, e)} data-testid={`photo-input-${roomIndex}-${pi}`} />
-            {room.previews[pi] ? (
-              <div className="relative group aspect-square rounded-lg overflow-hidden border border-[#F97316]/30">
-                <img src={room.previews[pi]} alt="" className="w-full h-full object-cover" />
-                <button onClick={() => onUpdatePhoto(roomIndex, pi, null)}
-                  className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <X className="h-2.5 w-2.5" />
-                </button>
-                <div className="absolute bottom-0.5 left-0.5 bg-black/50 text-white text-[8px] px-1 rounded">#{pi + 1}</div>
-              </div>
-            ) : (
-              <label htmlFor={`photo-${roomIndex}-${pi}`}
-                className="aspect-square w-full rounded-lg border-2 border-dashed border-[#3A4A5C] hover:border-[#F97316]/40 flex flex-col items-center justify-center gap-0.5 bg-[#1E2A38]/50 cursor-pointer transition-colors"
-                data-testid={`photo-upload-${roomIndex}-${pi}`}>
-                <Camera className="h-4 w-4 text-slate-600" />
-                <span className="text-slate-600 text-[8px]">#{pi + 1}</span>
-              </label>
-            )}
-          </div>
-        ))}
-      </div>
-      <p className="text-slate-600 text-[9px] mt-1.5">4 снимки от различни ъгли за по-добра визуализация</p>
-    </CardContent>
-  </Card>
-);
-
 export const AIDesignerPage = () => {
-  const [plan, setPlan] = useState(PLANS[0]);
-  const [rooms, setRooms] = useState([EMPTY_ROOM()]);
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
+  const [width, setWidth] = useState('4');
+  const [length, setLength] = useState('5');
+  const [height, setHeight] = useState('2.6');
   const [style, setStyle] = useState('modern');
-  const [renovationText, setRenovationText] = useState('');
+  const [roomType, setRoomType] = useState('living_room');
+  const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [results, setResults] = useState(null);
-  const [activeVariant, setActiveVariant] = useState(0);
   const [activeAngle, setActiveAngle] = useState(0);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef(null);
   const timerRef = useRef(null);
+  const videoRef = useRef(null);
 
-  useEffect(() => {
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, []);
+  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
 
-  // When plan changes, adjust rooms count
-  useEffect(() => {
-    setRooms(prev => {
-      if (prev.length > plan.maxRooms) return prev.slice(0, plan.maxRooms);
-      return prev;
-    });
-  }, [plan]);
-
-  const updatePhoto = useCallback(async (roomIdx, photoIdx, e) => {
-    if (e === null) {
-      setRooms(prev => prev.map((r, ri) => {
-        if (ri !== roomIdx) return r;
-        const photos = [...r.photos]; photos[photoIdx] = null;
-        const previews = [...r.previews]; previews[photoIdx] = null;
-        return { ...r, photos, previews };
-      }));
+  const handleVideoSelect = useCallback((file) => {
+    if (!file) return;
+    if (!file.type.startsWith('video/')) {
+      toast.error('Моля, изберете видео файл');
       return;
     }
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 15e6) { toast.error('Макс. 15MB'); return; }
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const compressed = await compressImage(ev.target.result);
-      setRooms(prev => prev.map((r, ri) => {
-        if (ri !== roomIdx) return r;
-        const photos = [...r.photos]; photos[photoIdx] = compressed;
-        const previews = [...r.previews]; previews[photoIdx] = ev.target.result;
-        return { ...r, photos, previews };
-      }));
-      toast.success(`Снимка ${photoIdx + 1} качена`);
-    };
-    reader.readAsDataURL(file);
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error('Видеото е твърде голямо (макс. 100MB)');
+      return;
+    }
+    setVideoFile(file);
+    setVideoPreviewUrl(URL.createObjectURL(file));
   }, []);
 
-  const updateRoomType = (roomIdx, type) => {
-    setRooms(prev => prev.map((r, i) => i === roomIdx ? { ...r, roomType: type } : r));
-  };
+  const handleDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+      setIsDragOver(false);
+      const file = e.dataTransfer.files?.[0];
+      handleVideoSelect(file);
+    },
+    [handleVideoSelect]
+  );
 
-  const addRoom = () => {
-    if (rooms.length >= plan.maxRooms) { toast.error(`Макс. ${plan.maxRooms} помещения за ${plan.label}`); return; }
-    setRooms(prev => [...prev, EMPTY_ROOM()]);
-  };
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
 
-  const removeRoom = (idx) => {
-    if (rooms.length <= 1) return;
-    setRooms(prev => prev.filter((_, i) => i !== idx));
+  const handleDragLeave = useCallback(() => setIsDragOver(false), []);
+
+  const removeVideo = () => {
+    setVideoFile(null);
+    if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
+    setVideoPreviewUrl(null);
   };
 
   const handleGenerate = async () => {
-    const allPhotos = rooms.flatMap(r => r.photos.filter(Boolean));
-    if (!allPhotos.length) { toast.error('Качете поне 1 снимка'); return; }
-    if (!renovationText.trim()) { toast.error('Опишете желания ремонт'); return; }
+    if (!videoFile) { toast.error('Качете видео'); return; }
+    if (!width || !length || !height) { toast.error('Попълнете размерите на помещението'); return; }
 
-    setLoading(true); setElapsed(0);
-    timerRef.current = setInterval(() => setElapsed(p => p + 1), 1000);
+    setLoading(true);
+    setElapsed(0);
+    timerRef.current = setInterval(() => setElapsed((p) => p + 1), 1000);
+
+    const formData = new FormData();
+    formData.append('video', videoFile);
+    formData.append('width', width);
+    formData.append('length', length);
+    formData.append('height', height);
+    formData.append('style', style);
+    formData.append('room_type', roomType);
+    formData.append('notes', notes);
 
     try {
-      const res = await axios.post(`${API}/ai-designer/generate`, {
-        images: allPhotos,
-        room_type: rooms[0].roomType,
-        style,
-        material_class: 'standard',
-        renovation_text: renovationText,
-        notes: renovationText,
-        variants: rooms.length,
-        width: '2', length: '4', height: '2.6',
-        rooms: rooms.map(r => ({ room_type: r.roomType, photo_count: r.photos.filter(Boolean).length })),
-      }, { timeout: 600000 });
+      const res = await axios.post(`${API}/ai-designer/video-generate`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 600000,
+      });
       setResults(res.data);
-      setActiveVariant(0); setActiveAngle(0);
-      toast.success('Проект генериран!');
+      setActiveAngle(0);
+      toast.success('3D проект генериран!');
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка при генериране');
     }
-    clearInterval(timerRef.current); setLoading(false);
+    clearInterval(timerRef.current);
+    setLoading(false);
   };
 
-  const reset = () => { setRooms([EMPTY_ROOM()]); setResults(null); setRenovationText(''); setElapsed(0); setActiveVariant(0); setActiveAngle(0); };
+  const reset = () => {
+    removeVideo();
+    setResults(null);
+    setNotes('');
+    setElapsed(0);
+    setActiveAngle(0);
+  };
 
-  const totalPhotos = rooms.reduce((sum, r) => sum + r.photos.filter(Boolean).length, 0);
-  const currentVariant = results?.generated_images?.[activeVariant];
-  const angles = currentVariant?.angles || [];
-  const totalVariants = results?.generated_images?.length || 0;
+  const angles = results?.generated_images?.[0]?.angles || [];
+  const beforeImg = results?.before_frame ? `data:image/jpeg;base64,${results.before_frame}` : null;
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-4 px-2 md:px-4" data-testid="ia-designer-page">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-xl md:text-2xl font-bold text-white mb-1">IA Дизайн на помещения</h1>
-          <p className="text-slate-500 text-sm">Реалистичен 1:1 ремонтиран проект от вашите снимки</p>
+    <div className="min-h-screen bg-[#0F1923] py-6 px-3 md:px-6" data-testid="ia-designer-page">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 mb-3">
+            <Video className="h-6 w-6 text-[#F97316]" />
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+              TEMADOM <span className="text-[#F97316]">3D VIDEO</span> DESIGNER
+            </h1>
+            <Badge className="bg-[#F97316]/15 text-[#F97316] text-[10px] font-bold">v6</Badge>
+          </div>
+          <p className="text-slate-500 text-sm">
+            Drag&Drop видео 15s → AI → 360° панорама → 3D ремонт
+          </p>
         </div>
 
         {!results ? (
-          <div className="space-y-4">
-            {/* Plan selector */}
-            <div className="flex gap-3 justify-center" data-testid="plan-selector">
-              {PLANS.map(p => (
-                <button key={p.id} onClick={() => setPlan(p)}
-                  className={`rounded-xl px-5 py-3 border-2 text-center transition-all hover:scale-105 ${
-                    plan.id === p.id ? 'scale-105 shadow-lg' : 'opacity-70'
-                  }`}
-                  style={{ borderColor: plan.id === p.id ? p.color : '#334155', background: plan.id === p.id ? `${p.color}15` : '#1E293B' }}
-                  data-testid={`plan-${p.id}`}>
-                  <p className="text-white text-sm font-bold">{p.label}</p>
-                  <p className="text-2xl font-black mt-0.5" style={{ color: p.color }}>{p.price} EUR</p>
-                  <p className="text-slate-500 text-[10px] mt-0.5">до {p.maxRooms * 4} снимки</p>
-                </button>
-              ))}
-            </div>
-
-            {/* Rooms */}
-            <div className="space-y-3">
-              {rooms.map((room, i) => (
-                <RoomCard key={i} room={room} roomIndex={i} totalRooms={rooms.length}
-                  onUpdatePhoto={updatePhoto} onUpdateType={updateRoomType} onRemove={removeRoom} />
-              ))}
-              {rooms.length < plan.maxRooms && (
-                <button onClick={addRoom} data-testid="add-room-btn"
-                  className="w-full rounded-xl border-2 border-dashed border-[#3A4A5C] hover:border-[#F97316]/40 p-4 text-center transition-colors">
-                  <Plus className="h-5 w-5 mx-auto text-slate-500 mb-1" />
-                  <span className="text-slate-500 text-sm">Добави помещение ({rooms.length}/{plan.maxRooms})</span>
-                </button>
-              )}
-            </div>
-
-            {/* Style + Description */}
-            <Card className="bg-[#253545] border-[#3A4A5C]">
-              <CardHeader className="pb-2"><CardTitle className="text-white text-sm">Стил</CardTitle></CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-5 md:grid-cols-10 gap-2 mb-4" data-testid="style-selector">
-                  {STYLES.map(s => (
-                    <button key={s.id} onClick={() => setStyle(s.id)}
-                      className={`p-2 rounded-lg border text-center transition-all ${
-                        style === s.id ? 'ring-2 scale-105' : 'opacity-60 hover:opacity-80'
-                      }`}
-                      style={style === s.id ? { borderColor: s.color, background: `${s.color}15`, ringColor: s.color } : { borderColor: '#3A4A5C' }}
-                      data-testid={`style-${s.id}`}>
-                      <div className="w-6 h-6 rounded-full mx-auto mb-1" style={{ background: `${s.color}35` }} />
-                      <span className="text-[9px] font-medium block truncate" style={{ color: style === s.id ? s.color : '#94A3B8' }}>{s.name}</span>
+          <div className="space-y-5">
+            {/* Video Upload Area */}
+            <Card className="bg-[#1E2A38] border-[#2A3A4C] overflow-hidden">
+              <CardContent className="p-0">
+                {!videoFile ? (
+                  <div
+                    className={`relative p-8 md:p-12 text-center transition-all duration-300 cursor-pointer ${
+                      isDragOver
+                        ? 'bg-[#F97316]/10 border-2 border-dashed border-[#F97316]'
+                        : 'border-2 border-dashed border-[#2A3A4C] hover:border-[#F97316]/40 hover:bg-[#F97316]/5'
+                    }`}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onClick={() => fileInputRef.current?.click()}
+                    data-testid="video-drop-zone"
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="video/*"
+                      className="hidden"
+                      onChange={(e) => handleVideoSelect(e.target.files?.[0])}
+                      data-testid="video-input"
+                    />
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-20 h-20 rounded-2xl bg-[#F97316]/10 flex items-center justify-center">
+                        <Upload className="h-10 w-10 text-[#F97316]" />
+                      </div>
+                      <div>
+                        <p className="text-white text-lg font-bold mb-1">
+                          Drag & Drop видео тук
+                        </p>
+                        <p className="text-slate-500 text-sm">
+                          или кликнете за избор — макс. 15 секунди
+                        </p>
+                      </div>
+                      <Badge className="bg-[#253545] text-slate-400 text-xs">
+                        MP4, MOV, WebM — до 100MB
+                      </Badge>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <video
+                      ref={videoRef}
+                      src={videoPreviewUrl}
+                      className="w-full max-h-[300px] object-contain bg-black"
+                      controls
+                      data-testid="video-preview"
+                    />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); removeVideo(); }}
+                      className="absolute top-3 right-3 bg-red-500/90 hover:bg-red-600 text-white rounded-full p-1.5 transition-colors"
+                      data-testid="remove-video-btn"
+                    >
+                      <X className="h-4 w-4" />
                     </button>
-                  ))}
-                </div>
-                <Textarea value={renovationText} onChange={e => setRenovationText(e.target.value)}
-                  placeholder="Опишете желания ремонт: нов под, стени, мебели, осветление..."
-                  className="bg-[#1E2A38] border-[#3A4A5C] text-white min-h-[80px] text-sm" data-testid="renovation-text" />
+                    <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-lg">
+                      {videoFile.name} — {(videoFile.size / 1024 / 1024).toFixed(1)}MB
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
-            {/* Generate */}
-            {loading ? (
-              <div className="space-y-4 py-4">
-                <ProgressBar elapsed={elapsed} total={60 * rooms.length} />
-                <div className="flex items-center justify-center gap-3 text-slate-300">
-                  <Loader2 className="h-6 w-6 animate-spin text-[#F97316]" />
-                  <span>{rooms.length} помещения x 4 ъгъла...</span>
+            {/* Dimensions */}
+            <Card className="bg-[#1E2A38] border-[#2A3A4C]">
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Ruler className="h-4 w-4 text-[#F97316]" />
+                  <span className="text-[#F97316] text-xs font-bold tracking-wider">
+                    РАЗМЕРИ (задължителни)
+                  </span>
                 </div>
-              </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Label className="text-[10px] text-slate-500 mb-1 block">Ширина (м)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min="0.5"
+                      value={width}
+                      onChange={(e) => setWidth(e.target.value)}
+                      className="h-10 bg-[#0F1923] border-[#F97316]/30 text-white text-center text-lg font-bold"
+                      data-testid="dimension-width"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[10px] text-slate-500 mb-1 block">Дължина (м)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min="0.5"
+                      value={length}
+                      onChange={(e) => setLength(e.target.value)}
+                      className="h-10 bg-[#0F1923] border-[#F97316]/30 text-white text-center text-lg font-bold"
+                      data-testid="dimension-length"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[10px] text-slate-500 mb-1 block">Височина (м)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min="1"
+                      value={height}
+                      onChange={(e) => setHeight(e.target.value)}
+                      className="h-10 bg-[#0F1923] border-[#F97316]/30 text-white text-center text-lg font-bold"
+                      data-testid="dimension-height"
+                    />
+                  </div>
+                </div>
+                <p className="text-center text-slate-600 text-[10px] mt-2">
+                  {width} x {length} x {height} м
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Style + Room Type */}
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="bg-[#1E2A38] border-[#2A3A4C]">
+                <CardContent className="pt-4 pb-4">
+                  <Label className="text-[10px] text-slate-500 mb-2 block">Тип помещение</Label>
+                  <Select value={roomType} onValueChange={setRoomType}>
+                    <SelectTrigger
+                      className="bg-[#0F1923] border-[#2A3A4C] text-white h-10"
+                      data-testid="room-type-select"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1E2A38] border-[#2A3A4C]">
+                      {ROOM_TYPES.map((rt) => (
+                        <SelectItem key={rt.id} value={rt.id} className="text-white hover:bg-[#253545]">
+                          {rt.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-[#1E2A38] border-[#2A3A4C]">
+                <CardContent className="pt-4 pb-4">
+                  <Label className="text-[10px] text-slate-500 mb-2 block">Стил (1-10)</Label>
+                  <Select value={style} onValueChange={setStyle}>
+                    <SelectTrigger
+                      className="bg-[#0F1923] border-[#2A3A4C] text-white h-10"
+                      data-testid="style-select"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1E2A38] border-[#2A3A4C]">
+                      {STYLES.map((s, i) => (
+                        <SelectItem key={s.id} value={s.id} className="text-white hover:bg-[#253545]">
+                          {i + 1}. {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Notes */}
+            <Card className="bg-[#1E2A38] border-[#2A3A4C]">
+              <CardContent className="pt-4 pb-4">
+                <Label className="text-[10px] text-slate-500 mb-2 block">Бележки (по желание)</Label>
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Напр: нов под, бели стени, LED осветление..."
+                  className="bg-[#0F1923] border-[#2A3A4C] text-white min-h-[60px] text-sm"
+                  data-testid="notes-input"
+                />
+              </CardContent>
+            </Card>
+
+            {/* Generate or Progress */}
+            {loading ? (
+              <Card className="bg-[#1E2A38] border-[#2A3A4C]">
+                <CardContent className="py-8 px-6">
+                  <ProgressBar elapsed={elapsed} total={120} />
+                  <div className="flex items-center justify-center gap-3 mt-6 text-slate-300">
+                    <Loader2 className="h-6 w-6 animate-spin text-[#F97316]" />
+                    <span className="text-sm">Видео → AI анализ → 360° рендер...</span>
+                  </div>
+                </CardContent>
+              </Card>
             ) : (
-              <Button className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white text-lg h-14 shadow-lg shadow-[#F97316]/20"
-                onClick={handleGenerate} disabled={!totalPhotos || !renovationText.trim()} data-testid="generate-btn">
-                <Camera className="mr-2 h-5 w-5" /> Генерирай проект ({plan.price} EUR) — {totalPhotos} снимки
+              <Button
+                className="w-full h-16 text-lg font-black shadow-xl rounded-xl"
+                style={{
+                  background: videoFile ? 'linear-gradient(135deg, #F97316, #EA580C)' : '#253545',
+                  boxShadow: videoFile ? '0 0 40px rgba(249,115,22,0.25)' : 'none',
+                }}
+                onClick={handleGenerate}
+                disabled={!videoFile}
+                data-testid="generate-btn"
+              >
+                <Video className="mr-3 h-6 w-6" />
+                Генерирай 3D проект — 69 EUR
               </Button>
             )}
           </div>
         ) : (
-          <div className="space-y-4">
-            {/* Variant tabs */}
-            {totalVariants > 1 && (
-              <Card className="bg-[#253545] border-[#3A4A5C]">
-                <CardContent className="pt-4 pb-3">
-                  <p className="text-slate-400 text-xs mb-2">Варианти:</p>
-                  <div className="flex gap-2" data-testid="variant-tabs">
-                    {results.generated_images.map((_, i) => (
-                      <button key={i} onClick={() => { setActiveVariant(i); setActiveAngle(0); }}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                          activeVariant === i ? 'bg-[#F97316] text-white' : 'bg-[#1E2A38] text-slate-400 hover:text-white border border-[#3A4A5C]'
-                        }`} data-testid={`variant-tab-${i}`}>
-                        Вариант {i + 1}
+          /* ===== RESULTS ===== */
+          <div className="space-y-5">
+            {/* Angle Tabs */}
+            {angles.length > 1 && (
+              <Card className="bg-[#1E2A38] border-[#2A3A4C]">
+                <CardContent className="py-3 px-4">
+                  <div className="flex gap-2 overflow-x-auto" data-testid="angle-tabs">
+                    {angles.map((a, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveAngle(i)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                          activeAngle === i
+                            ? 'bg-[#F97316] text-white shadow-lg'
+                            : 'bg-[#0F1923] text-slate-400 border border-[#2A3A4C] hover:border-[#F97316]/30'
+                        }`}
+                        data-testid={`angle-tab-${i}`}
+                      >
+                        {a.label || `Ъгъл ${i + 1}`}
                       </button>
                     ))}
                   </div>
@@ -357,49 +455,85 @@ export const AIDesignerPage = () => {
               </Card>
             )}
 
-            {/* Before / After */}
-            <Card className="bg-[#253545] border-[#3A4A5C]">
+            {/* Before/After */}
+            <Card className="bg-[#1E2A38] border-[#2A3A4C]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-white text-sm flex items-center gap-2">
-                  <Camera className="h-4 w-4 text-[#F97316]" /> Резултат
+                  360° ПРЕД / СЛЕД
+                  <Badge className="bg-[#10B981]/15 text-[#10B981] text-[10px] ml-auto">
+                    {angles.length} ъгъла
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {angles.length > 0 && (
-                  <div className="flex gap-2 mb-3 overflow-x-auto">
-                    {angles.map((a, i) => (
-                      <button key={i} onClick={() => setActiveAngle(i)}
-                        className={`px-3 py-1.5 rounded-lg text-xs whitespace-nowrap ${
-                          activeAngle === i ? 'bg-[#F97316] text-white' : 'bg-[#1E2A38] text-slate-400 border border-[#3A4A5C]'
-                        }`}>{a.label || `Ъгъл ${i + 1}`}</button>
-                    ))}
-                  </div>
-                )}
                 {(() => {
-                  const afterImg = angles[activeAngle]
+                  const afterImg = angles[activeAngle]?.image_base64
                     ? `data:image/png;base64,${angles[activeAngle].image_base64}`
-                    : currentVariant?.image_base64
-                      ? `data:image/png;base64,${currentVariant.image_base64}`
-                      : null;
-                  const beforeImg = rooms[0]?.previews?.find(Boolean);
+                    : null;
                   if (!afterImg) return <p className="text-slate-500 text-center py-8">Няма генерирано изображение</p>;
                   if (beforeImg) return <BeforeAfterSlider before={beforeImg} after={afterImg} />;
-                  return <img src={afterImg} alt="Renovation" className="w-full rounded-lg" />;
+                  return <img src={afterImg} alt="Renovation" className="w-full rounded-xl" />;
                 })()}
-                {angles[activeAngle]?.image_base64 && (
-                  <Button className="mt-3 w-full bg-[#10B981] text-white" onClick={() => {
-                    const b64 = angles[activeAngle].image_base64;
-                    const link = document.createElement('a'); link.href = `data:image/png;base64,${b64}`;
-                    link.download = `temadom-${activeAngle + 1}.png`; link.click();
-                  }} data-testid="download-render-btn">
-                  <Download className="mr-2 h-4 w-4" /> Изтегли рендер
-                  </Button>
-                )}
               </CardContent>
             </Card>
 
-            <div className="flex justify-center">
-              <Button className="bg-[#F97316] text-white" onClick={reset} data-testid="new-project-btn">Нов проект</Button>
+            {/* Materials summary */}
+            {results.materials?.grand_total_eur && (
+              <Card className="bg-[#1E2A38] border-[#2A3A4C]">
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-slate-500 text-xs">Обща оценка на ремонта</p>
+                      <p className="text-2xl font-black text-[#F97316]">
+                        {results.materials.grand_total_eur} EUR
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-slate-500 text-xs">Материали</p>
+                      <p className="text-white text-sm font-bold">
+                        {results.materials.materials?.length || 0} позиции
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Download buttons */}
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                className="h-12 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold"
+                onClick={() => toast.info('PDF експорт — скоро!')}
+                data-testid="download-pdf-btn"
+              >
+                <FileText className="mr-2 h-4 w-4" /> PDF проект
+              </Button>
+              <Button
+                className="h-12 bg-[#10B981] hover:bg-[#059669] text-white font-bold"
+                onClick={() => toast.info('GLB файл — скоро!')}
+                data-testid="download-glb-btn"
+              >
+                <Download className="mr-2 h-4 w-4" /> 3D GLB файл
+              </Button>
+            </div>
+
+            {/* Price tag */}
+            <div className="text-center">
+              <Badge className="bg-[#F97316]/15 text-[#F97316] text-lg px-6 py-2 font-black">
+                69 EUR → PDF + 3D GLB
+              </Badge>
+            </div>
+
+            {/* New project button */}
+            <div className="flex justify-center pt-2">
+              <Button
+                variant="outline"
+                className="border-[#2A3A4C] text-slate-400 hover:text-white hover:border-[#F97316]/40"
+                onClick={reset}
+                data-testid="new-project-btn"
+              >
+                Нов проект
+              </Button>
             </div>
           </div>
         )}

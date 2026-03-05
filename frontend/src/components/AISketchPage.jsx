@@ -18,6 +18,7 @@ import { useSearchParams } from 'react-router-dom';
 import { TOOLS, GRID, CW, CH, DEFAULTS } from './cad/constants';
 import { snapEndpoint, distSeg, distCircle, autoType, getDefaults, elLength } from './cad/utils';
 import { CADCanvas } from './cad/CADCanvas';
+import { useThreeViewer } from './cad/ThreeDPreview';
 import { StructurePanel } from './cad/StructurePanel';
 import { CostEstimate } from './cad/CostEstimate';
 
@@ -67,8 +68,11 @@ export const AISketchPage = () => {
   const [selIdx, setSelIdx] = useState(-1);
   const [tool, setTool] = useState('wall');
   const [draft, setDraft] = useState(null);
+  const [dragInfo, setDragInfo] = useState(null);
+  const [distLines, setDistLines] = useState([]);
   const [sketches, setSketches] = useState([null, null, null]);
   const [previews, setPreviews] = useState([null, null, null]);
+  const viewerRef = useRef(null);
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploadRes, setUploadRes] = useState(null);
@@ -82,21 +86,48 @@ export const AISketchPage = () => {
     if (id) { setMode('upload'); axios.get(`${API}/ai-sketch/${id}`).then(r => setUploadRes(r.data)).catch(() => toast.error('Не е намерен')); }
   }, [searchParams]);
 
-  // GLB viewer for upload mode only
+  // Live 3D + GLB viewer
+  useThreeViewer(viewerRef, els, scale, selIdx);
   useGlbViewer(glbViewerRef, uploadRes?.glb_base64);
 
   const objCount = useMemo(() => els.filter(e => e.tool !== 'dimension' && (e._type || autoType(e)) !== 'ignore').length, [els]);
 
   // ===== DRAWING HANDLERS =====
+  // Calculate distance from a point to nearest wall/column edges
+  const calcDistances = useCallback((el, allEls) => {
+    const lines = [];
+    const cx = el.tool === 'circle' ? el.cx : (el.x1 + (el.x2 || el.x1)) / 2;
+    const cy = el.tool === 'circle' ? el.cy : (el.y1 + (el.y2 || el.y1)) / 2;
+    allEls.forEach((other, oi) => {
+      if (other === el || other.tool === 'dimension') return;
+      const t = other._type || autoType(other);
+      if (!['wall', 'column', 'slab'].includes(t)) return;
+      const ox = other.tool === 'circle' ? other.cx : (other.x1 + (other.x2 || other.x1)) / 2;
+      const oy = other.tool === 'circle' ? other.cy : (other.y1 + (other.y2 || other.y1)) / 2;
+      const d = Math.hypot(cx - ox, cy - oy);
+      if (d < 400 && d > 5) {
+        lines.push({ x1: cx, y1: cy, x2: ox, y2: oy, dist: (d / GRID * scale).toFixed(2) });
+      }
+    });
+    return lines.slice(0, 3);
+  }, [scale]);
+
   const onDown = useCallback((x, y) => {
     if (tool === 'select') {
       let found = -1;
       els.forEach((el, i) => {
         if (el.tool === 'circle') {
           if (distCircle(x, y, el.cx, el.cy, el.r || 0) < 12) found = i;
+        } else if (el.tool === 'column') {
+          if (Math.hypot(x - el.x1, y - el.y1) < 15) found = i;
         } else if (distSeg(x, y, el.x1, el.y1, el.x2, el.y2) < 12) found = i;
       });
       setSelIdx(found);
+      if (found >= 0) {
+        const el = els[found];
+        setDragInfo({ idx: found, startX: x, startY: y, origEl: { ...el } });
+        setDistLines(calcDistances(el, els));
+      }
       return;
     }
     if (tool === 'erase') {
@@ -123,15 +154,32 @@ export const AISketchPage = () => {
   }, [tool, els, currentFloor]);
 
   const onMove = useCallback((x, y) => {
+    // Dragging element in select mode
+    if (dragInfo) {
+      const dx = x - dragInfo.startX, dy = y - dragInfo.startY;
+      const orig = dragInfo.origEl;
+      setEls(p => p.map((e, j) => {
+        if (j !== dragInfo.idx) return e;
+        if (e.tool === 'circle') return { ...e, cx: orig.cx + dx, cy: orig.cy + dy };
+        if (e.tool === 'column') return { ...e, x1: orig.x1 + dx, y1: orig.y1 + dy, x2: orig.x1 + dx, y2: orig.y1 + dy };
+        return { ...e, x1: orig.x1 + dx, y1: orig.y1 + dy, x2: (orig.x2 || orig.x1) + dx, y2: (orig.y2 || orig.y1) + dy };
+      }));
+      const movedEl = { ...dragInfo.origEl };
+      if (movedEl.tool === 'circle') { movedEl.cx += dx; movedEl.cy += dy; }
+      else { movedEl.x1 += dx; movedEl.y1 += dy; movedEl.x2 = (movedEl.x2 || movedEl.x1) + dx; movedEl.y2 = (movedEl.y2 || movedEl.y1) + dy; }
+      setDistLines(calcDistances(movedEl, els));
+      return;
+    }
     if (!draft) return;
     if (draft.tool === 'circle') {
       setDraft(p => ({ ...p, r: Math.hypot(x - p.cx, y - p.cy) }));
     } else {
       setDraft(p => ({ ...p, x2: x, y2: y }));
     }
-  }, [draft]);
+  }, [draft, dragInfo, els, calcDistances]);
 
   const onUp = useCallback(() => {
+    if (dragInfo) { setDragInfo(null); setDistLines([]); return; }
     if (!draft) return;
     if (draft.tool === 'circle') {
       if ((draft.r || 0) > 5) {
@@ -294,20 +342,36 @@ export const AISketchPage = () => {
               </CardContent>
             </Card>
 
-            {/* Canvas — full width */}
-            <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
-              <CardHeader className="pb-1 pt-2 px-3">
-                <CardTitle className="text-white text-sm flex items-center gap-2">
-                  <Ruler className="h-4 w-4 text-[#FF8C42]" /> 2D Чертеж
-                  <Badge className="bg-[#28A745]/15 text-[#28A745] text-[9px] ml-auto">Ет. {currentFloor}</Badge>
-                  {objCount > 0 && <Badge className="bg-[#FF8C42]/15 text-[#FF8C42] text-[9px]">{objCount} обекта</Badge>}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-2">
-                <CADCanvas els={els} selIdx={selIdx} tool={tool} scale={scale} draft={draft}
-                  onDown={onDown} onMove={onMove} onUp={onUp} onSelect={setSelIdx} />
-              </CardContent>
-            </Card>
+            {/* Canvas + 3D side by side */}
+            <div className="grid lg:grid-cols-[1fr_1fr] gap-3 mb-3">
+              <Card className="bg-[#253545] border-[#3A4A5C]">
+                <CardHeader className="pb-1 pt-2 px-3">
+                  <CardTitle className="text-white text-sm flex items-center gap-2">
+                    <Ruler className="h-4 w-4 text-[#FF8C42]" /> 2D Чертеж
+                    <Badge className="bg-[#28A745]/15 text-[#28A745] text-[9px] ml-auto">Ет. {currentFloor}</Badge>
+                    {objCount > 0 && <Badge className="bg-[#FF8C42]/15 text-[#FF8C42] text-[9px]">{objCount} обекта</Badge>}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-2">
+                  <CADCanvas els={els} selIdx={selIdx} tool={tool} scale={scale} draft={draft}
+                    distLines={distLines}
+                    onDown={onDown} onMove={onMove} onUp={onUp} onSelect={setSelIdx} />
+                </CardContent>
+              </Card>
+
+              <Card className="bg-[#253545] border-[#3A4A5C]">
+                <CardHeader className="pb-1 pt-2 px-3">
+                  <CardTitle className="text-white text-sm flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-[#4DA6FF]" /> 360° Live Preview
+                    {objCount > 0 && <Badge className="bg-[#28A745]/15 text-[#28A745] text-[9px] ml-auto">{objCount}</Badge>}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-2">
+                  <div ref={viewerRef} className="w-full h-[350px] lg:h-[420px] bg-[#0F1923] rounded-lg overflow-hidden border border-[#2A3A4C]" data-testid="3d-viewer" />
+                  <p className="text-slate-600 text-[9px] mt-1 text-center">Въртене | Zoom | Pan</p>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Structure Panel */}
             <Card className="bg-[#253545] border-[#3A4A5C] mb-3">

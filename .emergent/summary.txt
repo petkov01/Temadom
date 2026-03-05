@@ -1,146 +1,119 @@
 <analysis>**original_problem_statement:**
-The user's primary goal is to build TemaDom, a web application that transforms construction sketches into 3D models. The core of the application has evolved into a sophisticated, AI-assisted CAD tool on the  page.
+The user wants to build TemaDom, a multifaceted web application for construction and interior design. The primary goals have evolved into two main products:
 
-**LATEST PRODUCT REQUIREMENTS (Synthesized from user's prompts):**
+1.  **AI-Assisted CAD System ():** A sophisticated tool for architects and builders. Users can draw 2D construction plans with tools like walls, roofs, windows, etc. The system provides a live 3D preview, calculates distances, and generates a cost estimate. The user has recently requested PDF export for the plan and a corresponding contract.
+2.  **IA Designer ():** An interior design tool. The user's latest request is for this tool to accept image URLs (instead of direct uploads) and mandatory room dimensions to generate realistic, 1:1 renovated versions of a user's room photo based on selected styles.
 
-1.  **AI-Assisted CAD System () (HIGHEST PRIORITY):**
-    *   **Layout:** A side-by-side interface with a 2D drawing canvas on the left and a live, real-time 3D preview on the right. A Structure Panel below lists all objects in the scene.
-    *   **2D Canvas (CAD-like):**
-        *   Must have a grid with snap-to-grid/endpoints functionality.
-        *   Tools: Wall, Line, Rectangle, Stairs, Dimension, Erase.
-        *   Users can draw simple construction shapes.
-    *   **Parametric & Live Editing:**
-        *   Every drawn element is a parametric object (e.g., ).
-        *   Users can click any object (on canvas or in the panel) to edit its dimensions, with the 2D and 3D views updating instantly.
-    *   **AI Assistance & Interpretation:**
-        *   For uploaded sketches/photos: The system must vectorize the image, detect shapes (rectangles, parallel lines), and classify them as structural objects (walls, stairs, slabs).
-        *   For drawn sketches: The system should analyze the drawing and suggest object types (e.g., Detected staircase - apply geometry?).
-        *   **AI Safety:** The AI must NEVER invent architectural elements. All 3D geometry must be strictly based on user-drawn or user-confirmed objects and parameters.
-    *   **3D Live Preview:**
-        *   Uses  to render the model.
-        *   Updates in real-time as the user draws or edits objects in the 2D canvas or structure panel.
-        *   Standard controls: rotate, zoom, pan.
-    *   **Online User Counter:** A live counter, always visible in the top-right corner, showing the number of online users, registered clients, companies, and available free slots.
-
-2.  **IA Designer ():**
-    *   Allows users to upload a photo of a room and describe a desired renovation.
-    *   An AI model generates a 1:1 renovated version of the exact same room.
-    *   The result page should feature a before/after comparison slider.
+The overall application has also undergone a major design overhaul (v6.5), featuring a dark/light mode, a new landing page structure, and updated pricing models.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-The application has a React frontend and a monolithic FastAPI backend. The  has been completely rewritten to feature a side-by-side layout with a Konva.js 2D CAD canvas on the left and a plain Three.js live 3D preview on the right. A structure panel allows for manually adding objects. The  includes a before/after slider. A new  component is integrated globally, showing real-time site statistics, including online users, powered by a new  backend endpoint. The agent was in the process of implementing the full interactivity of the new CAD page.
+The application has a React frontend with a new component-based architecture for the CAD system and a monolithic FastAPI backend. The UI reflects the new v6.5 design with a theme toggle, a dynamic landing page, and updated pricing sections. The phone number has been removed application-wide. The agent was in the middle of a large, multi-part task to restore and enhance the CAD system while simultaneously refactoring the IA Designer page.
 
 **Last working item**:
-*   Last item agent was working: The agent had just finished a major rewrite of  to implement the live CAD system with a 2D canvas and 3D preview. The UI was rendering correctly, but automated tests using  were failing to interact with the canvas and buttons. The agent was debugging this interactivity issue, suspecting a z-index or event propagation problem, when the user urged them to continue.
+*   Last item agent was working: The agent was executing a complex, multi-feature user request that involved simultaneously modifying both the CAD system () and the IA Designer ().
+    *   **CAD System ():** Restoring the side-by-side 3D viewer that was previously removed. The layout is being adjusted, and logic for dragging elements with real-time distance indicators is being implemented in the  hook.
+    *   **IA Designer ():** Rewriting the page to replace the file upload component with input fields for image URLs, as requested by the user.
 *   Status: IN PROGRESS
 *   Agent Testing Done: N
 *   Which testing method agent to use? Frontend testing agent
 *   User Testing Done: N
 
 **All Pending/In progress Issue list**:
-*   **Issue 1:  Interactivity is Unverified/Broken (P0)**
-    *   **Description:** The core functionality of the new CAD interface—drawing on the canvas and clicking buttons in the structure panel—could not be verified. Automated  clicks were not registering, preventing confirmation that the state management and 3D updates are working.
+*   **Issue 1: Application in Mid-Refactor State (P0)**
+    *   **Description:** The application is currently unstable as several core features ( and ) are in the middle of a significant refactoring. The work is spread across multiple files (, , , ) and is not yet complete.
     *   **Status:** IN PROGRESS
+    *   **Next debug checklist:**
+        1.  Complete the 3D viewer restoration in .
+        2.  Finish the drag-and-drop and distance line logic in  and ensure it renders in .
+        3.  Finalize the rewrite of  to use URL inputs instead of file uploads.
+        4.  Run the testing agent to verify both pages' functionality.
 
 **In progress Task List**:
-*   **Task 1: Debug and Fix  Interactivity (P0)**
-    *   **Where to resume:** In . The UI is built, but the event handlers for Konva.js canvas drawing and the Add Object buttons in the structure panel are not working under test automation.
-    *   **What will be achieved with this?** A functional CAD interface where users can draw objects and add them to the scene, with changes reflected in the state and the 3D preview. This is a blocker for all other CAD features.
+*   **Task 1: Complete the Multi-Feature Refactor (P0)**
+    *   **Where to resume:** The implementation is spread across several files.
+        *   In : Complete the , , and  handlers to support element dragging and distance line () calculation.
+        *   In : Implement the rendering logic for the  array.
+        *   In : Ensure the side-by-side layout with the 3D viewer is correctly restored and functional.
+        *   In : Finish replacing the file upload logic with URL input fields and mandatory dimension inputs.
+    *   **What will be achieved with this?** The CAD tool will have a functional 3D preview and element dragging. The IA Designer will accept image URLs. This will complete the user's most recent core requests and stabilize the application.
     *   **Status:** IN PROGRESS
-    *   **Should Test frontend/backend/both after fix?** Frontend
+    *   **Should Test frontend/backend/both after fix?** Both
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   **P0: Implement Full AI-Assisted CAD Logic:** Once interactivity is fixed, implement the remaining core features from the user's prompt:
-        *   Live editing of object dimensions (on canvas and in the panel).
-        *   AI-powered shape detection and object suggestions.
-        *   Vectorization of uploaded images.
-        *   Real-time synchronization between the 2D canvas and the 3D preview.
-    *   **P1: Refactor :** The file is over 500 lines and should be broken into smaller components (, , ).
+    *   **P0: PDF Plan & Contract Export:** Implement functionality in the  page to generate two PDFs: one with the 2D plan and quantitative cost estimate, and another with an editable boilerplate contract between a company and a client.
+    *   **P0: Regional Pricing for Cost Estimates:** Add a dropdown/selector in the cost estimate panel of the CAD tool to allow users to choose a geographical region, which should then adjust the unit prices for materials (e.g., concrete, steel).
+    *   **P1: Add Video Demo Section:** Add a new section to the landing page to embed a short, animated promotional video that shows the Sketch → AI → Render → Bill workflow.
 *   **Future Tasks:**
-    *   **P1: Complete Backend Refactoring:** Split the monolithic  into a modular structure using .
-    *   **P2: Save AI Sketch Projects:** Implement saving/loading the CAD scene data to the database, accessible via a shareable link.
-    *   **P3: Implement Monetization:** Integrate a payment provider like Stripe to manage access to premium features.
+    *   **P1: Backend Refactoring:** The monolithic  needs to be split into a modular structure using  for improved maintainability.
+    *   **P2: Stripe Monetization:** Integrate Stripe to handle payments for the IA Designer services and the PRO/PREMIUM subscription plans.
 
 **Completed work in this session**
-- **AI-Assisted CAD System (UI Foundation):**
-  - Completely rewrote  with a side-by-side layout for the 2D CAD canvas () and a live 3D preview ().
-  - Added a structure panel for manually adding walls, stairs, and slabs.
-- **Live Stats & User Counter:**
-  - Implemented a backend endpoint () and a frontend component () to display a site-wide, real-time counter for online users, clients, companies, and free slots.
-- ** Enhancement:**
-  - Added a before/after image comparison slider () to the .
-- **Critical Bug Fix:**
-  - Resolved a persistent app crash (Span is not part of the THREE namespace) by removing  and implementing the 3D viewer with plain , stabilizing the .
-- **UI Fix:**
-  - Removed extraneous text appearing next to the site logo in the navigation bar.
-
-**Earlier issues found/mentioned but not fixed**
-- None.
-
-**Known issue recurrence from previous fork**
-- None.
+- **Full UI/UX Overhaul (v6.5):**
+  - Implemented a new landing page with dark/light modes, a First 50 Companies counter, glassmorphism pricing cards, and a TikTok-style project scroller.
+  - The entire site's CSS was updated to support the new theme.
+- **IA Designer Refinements:**
+  - Implemented multi-room upload logic (allowing up to 5 rooms with 4 photos each).
+  - Fixed a critical image generation bug by adding server-side image compression in .
+  - Updated frontend and backend configurations to match new pricing tiers (69/129/220 EUR).
+- **Advanced CAD Functionality (v5.1):**
+  - Modularized the  into smaller components (, , , , ).
+  - Added parametric dimension inputs (Length/Width/Height) for all drawn elements, with changes reflecting in the 2D canvas and 3D preview.
+- **Application-Wide Cleanup:**
+  - Removed all references to the user's phone number from the frontend and backend.
+  - The testing agent was used successfully multiple times to validate these changes.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend:** FastAPI, MongoDB ().
-- **Frontend:** React, TailwindCSS.
-- **2D Canvas:** , .
-- **3D Rendering:**  (direct implementation, **not** React Three Fiber).
-
-**key DB schema**
-- **users**: Now includes a  field to track online status.
-- **ai_sketch_projects**: Exists but needs adaptation for the new CAD data structure.
+- **Frontend:** React (Hooks: , , ), Konva.js (for 2D canvas), Three.js (for 3D rendering), TailwindCSS (for dynamic dark/light theme styling).
+- **Backend:** FastAPI, Pillow (for image compression).
 
 **All files of reference**
-*   : The main file for the CAD system. It's large and contains the logic for the canvas, 3D preview, and structure panel.
-*   : Contains all backend routes, including the new endpoints for live stats and user heartbeats.
-*   : The new component for displaying real-time site statistics.
-*   : Integrates the  into the main application layout.
+*   : The central logic for the entire CAD system. **Currently being modified.**
+*   : The main page for the CAD tool. **Currently being modified.**
+*   : The 2D drawing canvas. **Currently being modified.**
+*   : The interior design tool page. **Currently being modified.**
+*   : Contains the new landing page and root application structure.
+*   : Contains all backend API endpoints.
 
 **Areas that need refactoring**:
-- **:** This file has become extremely large and complex. It urgently needs to be broken down into smaller, reusable components (e.g., , , ).
-- **:** This file remains a large monolith and is a prime candidate for being split into a  directory for better maintainability.
-
-**key api endpoints**
--  (GET): **NEW.** Returns live counts for clients, companies, free slots, and online users.
--  (POST): **NEW.** Allows the frontend to signal that a user is still active, updating their  timestamp.
+- **:** This remains a large monolith and is the highest priority for refactoring into a  structure.
 
 **Critical Info for New Agent**
-- **Priority #1 is Fixing Interactivity:** Your immediate and sole focus must be on debugging the . The UI is built, but the drawing canvas and buttons are not responding to test automation. You must solve this before adding any new features. Use the frontend testing agent or manual JS evaluation to diagnose the issue (it's likely a z-index, overlay, or event propagation problem).
-- **Tech Stack Constraint:** Do NOT re-introduce  or  on the . They were removed to fix a critical stability issue. The live 3D preview must continue to use plain .
-- **Communicate in Bulgarian:** All user-facing communication MUST be in Bulgarian.
-- **Component Refactoring:** After fixing the interactivity, the next logical step is to break down the massive  into smaller, more manageable components.
+- **Resume the In-Progress Task:** Your immediate priority is to finish the complex task the previous agent started. Do not start any new features until the CAD system's 3D view and dragging are restored, and the IA Designer's URL input is functional.
+- **Work Systematically:** The user has requested many features at once. Complete the current set of changes, test them thoroughly, and then move to the next item on the Upcoming Tasks list (e.g., PDF export).
+- **Strict Adherence to Prompts:** The user is very detail-oriented. Follow the requirements from the latest prompts precisely.
+- **IA Designer URL Fetching:** The backend will need to be adapted to fetch images from user-provided URLs (e.g., from ImgBB.com) instead of processing uploaded files.
 
 **documents and test reports created in this job**
--  (Continuously updated)
-- Multiple test reports in .
+-  (Updated)
+- Multiple test reports in , with the latest being .
 
 **Last 10 User Messages and any pending HUMAN messages**
-The user has provided a series of detailed prompts to build an AI-assisted CAD tool, including a live counter and other UI enhancements. The last message was Продължи с промпта (Continue with the prompt), indicating that the agent should proceed with the implementation despite hitting a testing roadblock.
+The user provided a series of large, overlapping prompts. Key takeaways:
+1.  A request for a major design overhaul (v6.5), which was implemented.
+2.  A request to remove the 3D viewer, which was implemented.
+3.  A subsequent request to **restore all 2D, 3D, and 360°  functionalities**, effectively reverting the previous removal.
+4.  New feature requests for the CAD tool: element dragging with distance indicators, PDF plan/contract export, and regional pricing.
+5.  A new requirement for the IA Designer: change from file uploads to URL-based inputs.
+6.  The user confirmed that the IA Designer should allow 1 to 4 image URLs per room and that dimensions are mandatory.
 
 **Project Health Check:**
-*   **Broken:** The core interactivity of the new  (drawing on canvas, clicking buttons) is unverified and likely not working. This is a **critical bug**.
-*   **Mocked:** The AI assistance (shape detection from drawings/uploads) and backend logic for processing the CAD data are not yet implemented. The page currently relies on local state management.
+*   **Broken:** The  and  pages are in a mid-refactor state and are not fully functional. This is the highest priority to fix.
 
 **3rd Party Integrations**
-- **Konva.js / react-konva:** Used for the 2D CAD drawing canvas.
-- **Three.js:** Used directly for the live 3D preview.
-- **OpenCV / Tesseract:** Installed but deprioritized in favor of the manual CAD tool.
-- **Telegram Bot API:** For user notifications.
+- **Konva.js / react-konva:** For the 2D CAD canvas.
+- **Three.js:** For the 3D preview.
+- **ImgBB.com (Implicit):** The user specified this as the method for getting image URLs for the IA Designer. The backend must be able to fetch images from public URLs.
 
 **Testing status**
 - Testing agent used after significant changes: YES
-- Troubleshoot agent used after agent stuck in loop: NO
-- Test files created: []
-- Known regressions: The primary functionality of  is non-functional in tests.
-
-**Credentials to test flow:**
-- Register a new user via the application's registration page.
+- Test files created: None.
+- Known regressions: The  3D viewer and the  file upload are intentionally broken while being refactored.
 
 **What agent forgot to execute**
-The agent correctly identified that the CAD page's interactivity was broken in tests but was prompted by the user to continue before a fix could be implemented. The task of fixing this critical bug was therefore not completed.</analysis>
+The agent is in the middle of executing a very large set of user requests. Nothing has been forgotten, but the work is incomplete and must be resumed.</analysis>
