@@ -1,58 +1,57 @@
 # TemaDom - PRD (Product Requirements Document)
 
 ## Original Problem Statement
-Marketplace "TemaDom" for construction project leads. Connects clients with companies/masters in Bulgaria. AI-powered design, price calculator, project management.
+Marketplace "TemaDom" for construction project leads in Bulgaria. AI-powered design, quantity surveys, PDF contracts.
 
-## Current Phase: Production Launch Preparation
+## Current Phase: PRODUCTION LAUNCH
 
 ## Tech Stack
 - Frontend: React.js, TailwindCSS, Shadcn/UI, Lucide React
 - Backend: FastAPI, Python, MongoDB
-- AI: OpenAI GPT-4o (analysis) + GPT Image 1 (generation) via Emergent LLM Key
+- AI: OpenAI GPT-4o + GPT Image 1 via Emergent LLM Key
 
-## What's Been Implemented
+## Implemented Features
 
-### Visual Identity
-- Dark theme: #1E2A38 with accent colors
-- Logo: h-[72px] desktop / h-[58px] mobile, left-corner, fully visible
+### Homepage (Redesigned March 5, 2026)
+- Hero: "Вашият строителен проект без непредвидени разходи"
+- "Защо TemaDom?" — 3 cards (клиенти, фирми, майстори)
+- "Топ функции" — AI Designer, AI Sketch, Calculator+PDF, Gallery
+- Pricing overview: 17/35/69 EUR + standalone 5/15 EUR
+- "Как работи?" — 4 steps
+- CTA section
 
 ### AI Designer
-- 3 photo upload, 9 room types, 5 styles, 3 material classes
-- 1 variant: 2 angles (frontal + side); 3/5 variants: 1 angle each (optimized)
-- Materials list in BGN + EUR from 18 Bulgarian stores
-- Publish to Gallery + Social sharing + Dual PDF
-
-### AI Gallery (/ai-gallery)
-- Public gallery of published projects with before/after
-- Social sharing: Facebook, Viber, WhatsApp, Telegram, Copy Link
-- Deep linking from shared URLs
+- Upload 1-3 photos, 9 rooms, 5 styles, 3 material classes
+- 1 variant: 2 angles; 3/5 variants: 1 angle each (optimized)
+- Materials in EUR + Publish to Gallery + Social sharing + Dual PDF
 
 ### AI Sketch (/ai-sketch)
-- Upload 1-3 sketches/blueprints, 5 building types
+- Upload 1-3 sketches, 5 building types
 - AI structural analysis (95-100%): columns, beams, stairs, foundations, roof
-- 2D plan + 3D visualization + quantity survey
+- 2D plan + 3D visualization + quantity survey in EUR
 
-### Subscription Plans (Production Pricing)
-- Starter/Basic: 49 лв/мес (25 EUR) — до 2 проекта, без AI
-- Pro: 99 лв/мес (50 EUR) — неограничени проекти, AI Builder 1 вариант
-- Premium: 199 лв/мес (102 EUR) — пълен достъп, 5 варианта, чертежи
-- AI Дизайнер: 29 лв/генерация (15 EUR), пакети: 3 варианта=69лв, 5=99лв
+### AI Gallery (/ai-gallery)
+- Published projects with before/after + Social sharing
+- PDF download (images + materials separately)
 
-### Admin
-- POST /api/admin/clean-test-data — изтриване на тестови данни (key: temadom-clean-2026)
-- Test data cleaned: 21 users, 7 AI designs, 1 published project removed
+### Pricing (EUR, Production)
+- Starter: 17 EUR/мес — до 2 проекта, без AI
+- Pro: 35 EUR/мес — неограничени проекти, AI Designer 1 вариант
+- Premium: 69 EUR/мес — пълен достъп, 5 варианта, чертежи, PDF договори
+- AI Designer: 10 EUR/gen (bundles: 25 EUR/3, 39 EUR/5)
+- Standalone: PDF contract 5 EUR, AI blueprint+contract 15 EUR
 
-### Other Features
-- Feedback system, PageInstructions, Registration (multi-role)
-- Price Calculator (28 regions), AI Chatbot
-- Social sharing (Facebook, Viber, WhatsApp, Telegram)
+### Other
+- Feedback system, Price Calculator (28 regions)
+- Registration (multi-role), Social sharing
+- "Дизайнери" section REMOVED from nav
 
 ## P1 Backlog
-- Meshy.ai for real 3D models (needs API key)
+- Meshy.ai for 3D models (needs API key)
 - AI Blueprint Analysis (PDF/DWG)
 - server.py refactoring
 
 ## P2 Backlog
 - Mobile app (PWA/React Native)
-- Real payments (Stripe/EasyPay)
+- Real payment processing (Stripe)
 - Admin dashboard
