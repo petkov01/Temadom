@@ -3,7 +3,6 @@ import { Camera, Upload, Sparkles, Download, RefreshCw, ExternalLink, Star, Play
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { PageInstructions } from './PageInstructions';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -271,31 +270,25 @@ export const AIDesignerPage = () => {
           </p>
         </div>
 
-        <PageInstructions
-          title="Как да използвате AI Дизайнера"
-          description="Пълно ръководство стъпка по стъпка — от снимка до готов проект"
-          steps={[
-            'Снимайте помещението от 3 различни ъгъла (JPG/PNG, до 10MB)',
-            'Изберете тип помещение и въведете размери (ширина, дължина, височина)',
-            'Изберете стил: Модерен, Скандинавски, Лофт, Класически или Минималистичен',
-            'Изберете клас материали: Икономичен, Стандартен или Премиум',
-            'Изберете колко варианта искате: 1, 3 или 5',
-            'Натиснете "Генерирай" — AI анализира всичките снимки и създава дизайн',
-            'Разгледайте "Преди/След", таблица с материали, цени и линкове към магазини'
-          ]}
-          benefits={[
-            '3 снимки от различни ъгли = по-точен анализ на помещението',
-            'AI генерира дизайн на ВАШЕТО помещение, не на случайна стая',
-            'Списък с материали и реални цени от 18 български магазина',
-            'Безплатно в тестов режим — без ограничения'
-          ]}
-          tips={[
-            'Снимайте с добро осветление за по-точен резултат',
-            'Включете подовата настилка, стените и тавана в снимките',
-            'Добавете бележки ако искате нещо специално (вана, душ-кабина и т.н.)'
-          ]}
-          videoUrl="https://temadom.com/videos/ai-designer"
-        />
+        {/* 4 стъпки инструкции */}
+        <div className="bg-[#0F1923] rounded-xl border border-[#2A3A4C] p-5 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { step: '1', title: 'Качете снимка/скица', desc: 'JPG/PNG, 1-3 файла' },
+              { step: '2', title: 'AI анализира 30сек', desc: 'Разпознава елементи' },
+              { step: '3', title: '360° 3D модел готов', desc: 'Въртете и мащабирайте' },
+              { step: '4', title: 'Изтегли .glb + Оферта', desc: 'Телефон + десктоп' },
+            ].map((s, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#8C56FF] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">{s.step}</div>
+                <div>
+                  <p className="text-white text-xs font-medium">{s.title}</p>
+                  <p className="text-slate-500 text-[10px]">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Test mode banner */}
         <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-xl p-4 mb-8 text-center">

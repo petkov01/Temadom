@@ -3410,6 +3410,80 @@ async def generate_scanner3d_pdf(req: Scanner3DPDFRequest):
         headers={"Content-Disposition": "attachment; filename=temadom-3d-smetka.pdf"})
 
 
+# ============== READY PROJECTS (Social Zone) ==============
+@api_router.get("/ready-projects")
+async def get_ready_projects(request: Request):
+    """Get all published ready projects with likes/comments"""
+    projects = await db.ready_projects.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    # Check if current user liked
+    token_str = None
+    auth_header = request.headers.get("authorization", "")
+    if auth_header.startswith("Bearer "):
+        token_str = auth_header[7:]
+    user_id = None
+    if token_str:
+        try:
+            payload = decode_token(token_str)
+            user_id = payload.get("user_id")
+        except:
+            pass
+    for p in projects:
+        p["liked_by_user"] = user_id in (p.get("liked_by", []) or []) if user_id else False
+        p["likes"] = len(p.get("liked_by", []) or [])
+        p.pop("liked_by", None)
+    return projects
+
+@api_router.post("/ready-projects")
+async def create_ready_project(data: dict, user: dict = Depends(get_current_user)):
+    """Create a ready project for the social feed"""
+    project_id = str(uuid.uuid4())[:8]
+    doc = {
+        "id": project_id,
+        "user_id": user["id"],
+        "author_name": user.get("name", "Анонимен"),
+        "title": data.get("title", "Проект"),
+        "description": data.get("description", ""),
+        "images": data.get("images", [])[:10],
+        "source": data.get("source", "Ръчно"),
+        "liked_by": [],
+        "comments": [],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.ready_projects.insert_one(doc)
+    return {"id": project_id, "message": "Проектът е публикуван"}
+
+@api_router.post("/ready-projects/{project_id}/like")
+async def toggle_like(project_id: str, user: dict = Depends(get_current_user)):
+    project = await db.ready_projects.find_one({"id": project_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    liked_by = project.get("liked_by", []) or []
+    if user["id"] in liked_by:
+        liked_by.remove(user["id"])
+        liked = False
+    else:
+        liked_by.append(user["id"])
+        liked = True
+    await db.ready_projects.update_one({"id": project_id}, {"$set": {"liked_by": liked_by}})
+    return {"likes": len(liked_by), "liked": liked}
+
+@api_router.post("/ready-projects/{project_id}/comment")
+async def add_comment(project_id: str, data: dict, user: dict = Depends(get_current_user)):
+    project = await db.ready_projects.find_one({"id": project_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    comment = {
+        "author": user.get("name", "Анонимен"),
+        "user_id": user["id"],
+        "text": data.get("text", "")[:500],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    comments = project.get("comments", []) or []
+    comments.append(comment)
+    await db.ready_projects.update_one({"id": project_id}, {"$set": {"comments": comments}})
+    return {"comments": comments}
+
+
 # ============== 3D Scanner Project Save/Load ==============
 @api_router.post("/scanner3d/projects")
 async def save_scanner3d_project(req: Scanner3DProjectSave, user: dict = Depends(get_current_user)):

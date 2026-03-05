@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { PageInstructions } from './PageInstructions';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -130,18 +129,25 @@ export const AISketchPage = () => {
           </p>
         </div>
 
-        <PageInstructions
-          title="Как работи AI Sketch?"
-          description="AI анализира вашите скици и чертежи за структурни елементи"
-          steps={[
-            'Качете 1-3 снимки на скици, чертежи или реални обекти',
-            'Изберете тип строеж и добавете бележки',
-            'AI анализира и разпознава: колони, греди, стълби, фундаменти, покрив',
-            'Получавате: 2D чертеж, 3D визуализация и количествена сметка с 95-100% точност'
-          ]}
-          benefits={['Бърз анализ с AI', 'Точна количествена сметка', '2D план + 3D визуализация']}
-          videoUrl="https://temadom.com/videos/sketch"
-        />
+        {/* 4 стъпки инструкции */}
+        <div className="bg-[#0F1923] rounded-xl border border-[#2A3A4C] p-5 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { step: '1', title: 'Качете скица/снимка', desc: 'Химикал, молив или маркер' },
+              { step: '2', title: 'AI анализира 30сек', desc: 'Разпознава елементи и размери' },
+              { step: '3', title: '360° 3D модел готов', desc: 'Въртете и мащабирайте' },
+              { step: '4', title: 'Изтегли .glb + Оферта', desc: 'Телефон + десктоп' },
+            ].map((s, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#FF8C42] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">{s.step}</div>
+                <div>
+                  <p className="text-white text-xs font-medium">{s.title}</p>
+                  <p className="text-slate-500 text-[10px]">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {!results ? (
           <div className="space-y-6">
