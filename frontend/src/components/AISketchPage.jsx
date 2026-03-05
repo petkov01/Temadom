@@ -32,20 +32,47 @@ export const AISketchPage = () => {
   const fileRef2 = useRef(null);
   const fileRefs = [fileRef0, fileRef1, fileRef2];
 
-  const handleUpload = useCallback((index, e) => {
+  // Convert image to JPEG for better compatibility
+  const convertToJpeg = (file) => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => resolve(ev.target.result);
+          reader.readAsDataURL(blob);
+        }, 'image/jpeg', 0.9);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleUpload = useCallback(async (index, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 15 * 1024 * 1024) {
       toast.error('Файлът е твърде голям (макс. 15MB)');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setSketches(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
-      setPreviews(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
-      toast.success(`Файл ${index + 1} качен успешно`);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const jpegDataUrl = await convertToJpeg(file);
+      setSketches(prev => { const n = [...prev]; n[index] = jpegDataUrl; return n; });
+      setPreviews(prev => { const n = [...prev]; n[index] = jpegDataUrl; return n; });
+      toast.success(`Файл ${index + 1} качен и конвертиран`);
+    } catch {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setSketches(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
+        setPreviews(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
+        toast.success(`Файл ${index + 1} качен успешно`);
+      };
+      reader.readAsDataURL(file);
+    }
   }, []);
 
   const removeFile = (index) => {

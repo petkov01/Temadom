@@ -108,7 +108,27 @@ export const AIDesignerPage = () => {
   const fileRef2 = useRef(null);
   const fileRefs = [fileRef0, fileRef1, fileRef2];
 
-  const handleImageUpload = useCallback((index, e) => {
+  // Convert image to JPEG for better compatibility
+  const convertToJpeg = (file) => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => resolve(ev.target.result);
+          reader.readAsDataURL(blob);
+        }, 'image/jpeg', 0.9);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleImageUpload = useCallback(async (index, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
@@ -119,16 +139,21 @@ export const AIDesignerPage = () => {
       toast.error('Моля, качете изображение');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setImages(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
-      setPreviews(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
-      toast.success(`Снимка ${index + 1} качена успешно`);
-    };
-    reader.onerror = () => {
-      toast.error('Грешка при четене на файла');
-    };
-    reader.readAsDataURL(file);
+    try {
+      const jpegDataUrl = await convertToJpeg(file);
+      setImages(prev => { const n = [...prev]; n[index] = jpegDataUrl; return n; });
+      setPreviews(prev => { const n = [...prev]; n[index] = jpegDataUrl; return n; });
+      toast.success(`Снимка ${index + 1} качена и конвертирана`);
+    } catch {
+      // Fallback to original
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setImages(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
+        setPreviews(prev => { const n = [...prev]; n[index] = ev.target.result; return n; });
+        toast.success(`Снимка ${index + 1} качена успешно`);
+      };
+      reader.readAsDataURL(file);
+    }
   }, []);
 
   const removeImage = (index) => {
