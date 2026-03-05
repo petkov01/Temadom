@@ -1,78 +1,81 @@
 <analysis>**original_problem_statement:**
-The user's primary goal is to build a web application, TemaDom, that converts hand-drawn construction sketches or structural drawings into a precise 3D visualization. This is a significant pivot from previous features.
+The user's primary goal is to build TemaDom, a web application that transforms construction sketches into 3D models. The core of the application has evolved into a sophisticated, AI-assisted CAD tool on the  page.
 
 **LATEST PRODUCT REQUIREMENTS (Synthesized from user's prompts):**
 
-*   **AI Sketch () - STRICT GEOMETRIC CONVERSION (HIGHEST PRIORITY):**
-    *   The user uploads a hand-drawn sketch, scanned drawing, or architectural plan (JPG, PNG, PDF).
-    *   A backend pipeline using Computer Vision (OpenCV) and OCR (Tesseract) must analyze the image.
-    *   **Processing Pipeline:**
-        1.  **Image Preprocessing:** Normalize, remove noise, detect edges.
-        2.  **Line Detection (CV):** Extract structural lines (walls, stairs, slabs).
-        3.  **Dimension Detection (OCR):** Extract dimensions written on the drawing (e.g., 10m).
-        4.  **Vectorization:** Convert detected lines into vector geometry (e.g., ).
-        5.  **3D Model Generation:** Convert vector geometry into a 3D model ().
-    *   **STRICT MODE:** The system must NOT hallucinate or invent elements like doors, windows, or roofs. It should only generate geometry present in the drawing. Unclear geometry should be marked unknown.
-    *   **UI:** The result page should render the model using Three.js with rotate/zoom/pan controls. The user should be able to download the  file.
-    *   **Removed Functionality:** All quantity survey (bill of materials) generation should be removed from this flow. It is purely for 3D visualization.
+1.  **AI-Assisted CAD System () (HIGHEST PRIORITY):**
+    *   **Layout:** A side-by-side interface with a 2D drawing canvas on the left and a live, real-time 3D preview on the right. A Structure Panel below lists all objects in the scene.
+    *   **2D Canvas (CAD-like):**
+        *   Must have a grid with snap-to-grid/endpoints functionality.
+        *   Tools: Wall, Line, Rectangle, Stairs, Dimension, Erase.
+        *   Users can draw simple construction shapes.
+    *   **Parametric & Live Editing:**
+        *   Every drawn element is a parametric object (e.g., ).
+        *   Users can click any object (on canvas or in the panel) to edit its dimensions, with the 2D and 3D views updating instantly.
+    *   **AI Assistance & Interpretation:**
+        *   For uploaded sketches/photos: The system must vectorize the image, detect shapes (rectangles, parallel lines), and classify them as structural objects (walls, stairs, slabs).
+        *   For drawn sketches: The system should analyze the drawing and suggest object types (e.g., Detected staircase - apply geometry?).
+        *   **AI Safety:** The AI must NEVER invent architectural elements. All 3D geometry must be strictly based on user-drawn or user-confirmed objects and parameters.
+    *   **3D Live Preview:**
+        *   Uses  to render the model.
+        *   Updates in real-time as the user draws or edits objects in the 2D canvas or structure panel.
+        *   Standard controls: rotate, zoom, pan.
+    *   **Online User Counter:** A live counter, always visible in the top-right corner, showing the number of online users, registered clients, companies, and available free slots.
 
-*   **Site-Wide Final Configuration:**
-    *   **New Structure:** The site is structured around  (drawings to 3D),  (photos to 3D), and  (a social gallery).
-    *   **Psychological Copy:** The homepage and marketing text must use specific, user-centric language provided by the user (e.g., Ремонт без стрес - БЕЗПЛАТНО, Спести 20ч търсене на майстори).
-    *   **Free Model:** All features are currently free for the first 1000 clients, with monetization planned for the future.
-    *   **Social Zone ():** A public gallery where clients upload their finished projects for others to like, comment on, and share. This replaces the old AI Gallery.
-    *   **Deprecated Features:** All video instructions, the 3D Multi-Angle Scanner UI, and the old AI Gallery must be removed.
+2.  **IA Designer ():**
+    *   Allows users to upload a photo of a room and describe a desired renovation.
+    *   An AI model generates a 1:1 renovated version of the exact same room.
+    *   The result page should feature a before/after comparison slider.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-The application is stable and has undergone a major restructuring. The monolith  has been partially refactored, with models and configuration moved to  and . The subscription system is fully implemented with three tiers (БАЗОВ, ПРО, PREMIUM) and integrated with a priority-based Telegram notification system. The frontend features a completely redesigned homepage, a new social gallery page (), and updated navigation reflecting the user's latest final configuration. The  page exists, but its backend logic uses a generic LLM, which does not meet the new, strict CV/OCR pipeline requirements.
+The application has a React frontend and a monolithic FastAPI backend. The  has been completely rewritten to feature a side-by-side layout with a Konva.js 2D CAD canvas on the left and a plain Three.js live 3D preview on the right. A structure panel allows for manually adding objects. The  includes a before/after slider. A new  component is integrated globally, showing real-time site statistics, including online users, powered by a new  backend endpoint. The agent was in the process of implementing the full interactivity of the new CAD page.
 
 **Last working item**:
-*   Last item agent was working: Implementing the new Computer Vision and OCR pipeline for the  feature. The agent correctly identified the user's detailed technical requirements, planned the implementation, and installed the necessary dependencies (, ).
+*   Last item agent was working: The agent had just finished a major rewrite of  to implement the live CAD system with a 2D canvas and 3D preview. The UI was rendering correctly, but automated tests using  were failing to interact with the canvas and buttons. The agent was debugging this interactivity issue, suspecting a z-index or event propagation problem, when the user urged them to continue.
 *   Status: IN PROGRESS
 *   Agent Testing Done: N
-*   Which testing method agent to use? both
+*   Which testing method agent to use? Frontend testing agent
 *   User Testing Done: N
 
 **All Pending/In progress Issue list**:
-*   **Issue 1:  Backend Logic is Incorrect (P0)**
-    *   **Description:** The current  endpoint uses a general-purpose vision LLM. This needs to be completely replaced with the user-specified pipeline using OpenCV for line detection and Tesseract for OCR to achieve precise, rule-based 3D model generation.
+*   **Issue 1:  Interactivity is Unverified/Broken (P0)**
+    *   **Description:** The core functionality of the new CAD interface—drawing on the canvas and clicking buttons in the structure panel—could not be verified. Automated  clicks were not registering, preventing confirmation that the state management and 3D updates are working.
     *   **Status:** IN PROGRESS
 
 **In progress Task List**:
-*   **Task 1: Implement CV/OCR Pipeline for AI Sketch (P0)**
-    *   **Where to resume:** The dependencies (, ) are installed. The next step is to modify the  endpoint in . The new logic should implement the full pipeline: image preprocessing, line/dimension detection, vectorization, and finally, 3D model data generation.
-    *   **What will be achieved with this?** The application will be able to convert technical drawings into accurate 3D models according to the user's strict geometric rules, which is the current highest priority.
+*   **Task 1: Debug and Fix  Interactivity (P0)**
+    *   **Where to resume:** In . The UI is built, but the event handlers for Konva.js canvas drawing and the Add Object buttons in the structure panel are not working under test automation.
+    *   **What will be achieved with this?** A functional CAD interface where users can draw objects and add them to the scene, with changes reflected in the state and the 3D preview. This is a blocker for all other CAD features.
     *   **Status:** IN PROGRESS
-    *   **Should Test frontend/backend/both after fix?** both
+    *   **Should Test frontend/backend/both after fix?** Frontend
 
 **Upcoming and Future Tasks**
+*   **Upcoming Tasks:**
+    *   **P0: Implement Full AI-Assisted CAD Logic:** Once interactivity is fixed, implement the remaining core features from the user's prompt:
+        *   Live editing of object dimensions (on canvas and in the panel).
+        *   AI-powered shape detection and object suggestions.
+        *   Vectorization of uploaded images.
+        *   Real-time synchronization between the 2D canvas and the 3D preview.
+    *   **P1: Refactor :** The file is over 500 lines and should be broken into smaller components (, , ).
 *   **Future Tasks:**
-    *   **P1: Complete Backend Refactoring:** The refactoring of  was started by creating  and . The next step is to split the large  file into a modular structure with separate router files (e.g., , , etc.) to improve maintainability.
-    *   **P2: Implement Monetization:** The user has specified that the service is free for now but will be paid later. This will involve integrating payment processing and locking features based on subscription status.
-    *   **P3: Save AI Sketch Projects:** The user previously approved saving 3D projects to the database with a shareable link. This functionality should be implemented for the new  feature after the core pipeline is working.
+    *   **P1: Complete Backend Refactoring:** Split the monolithic  into a modular structure using .
+    *   **P2: Save AI Sketch Projects:** Implement saving/loading the CAD scene data to the database, accessible via a shareable link.
+    *   **P3: Implement Monetization:** Integrate a payment provider like Stripe to manage access to premium features.
 
 **Completed work in this session**
-- **Major Site-Wide Restructuring:**
-  - Redesigned the  with new psychological copy and a simplified two-button layout.
-  - Updated  with a new navigation structure: IA Sketch, Помещения, Готови проекти, Фирми.
-  - Created the  as a new social zone for users to share projects, with backend support for likes and comments.
-  - Removed all video instruction modals (), the 3D scanner page, and the old AI gallery from the UI.
-- **Advanced Telegram Notifications:**
-  - Implemented a priority-based notification system that sends instant alerts to PREMIUM users and delayed alerts to PRO users.
-  - Notifications are now rich, including project budget, a photo, and a direct link.
-  - Added a Connect Telegram component () to the user dashboard.
-- **Backend Refactoring (Partial):**
-  - Created  to house shared configurations like database connections and secret keys.
-  - Created  to consolidate all Pydantic and database models.
-  - Updated  to import from these new modules, reducing its size.
-- **Feature Implementation & Subscription Overhaul:**
-  - Implemented the full 3D Multi-Angle Scanner feature (frontend & backend), though it was later deprecated from the UI per user request.
-  - Implemented saving/loading of 3D projects to MongoDB with unique shareable links.
-  - Overhauled the subscription plans to a БАЗОВ/ПРО/PREMIUM structure with new pricing and features, updating both  and .
-  - Created the  analyzer page and backend (later superseded by the new  requirements).
-- **Testing:** Consistently used  after every major change, achieving 100% pass rates and resolving all reported issues.
+- **AI-Assisted CAD System (UI Foundation):**
+  - Completely rewrote  with a side-by-side layout for the 2D CAD canvas () and a live 3D preview ().
+  - Added a structure panel for manually adding walls, stairs, and slabs.
+- **Live Stats & User Counter:**
+  - Implemented a backend endpoint () and a frontend component () to display a site-wide, real-time counter for online users, clients, companies, and free slots.
+- ** Enhancement:**
+  - Added a before/after image comparison slider () to the .
+- **Critical Bug Fix:**
+  - Resolved a persistent app crash (Span is not part of the THREE namespace) by removing  and implementing the 3D viewer with plain , stabilizing the .
+- **UI Fix:**
+  - Removed extraneous text appearing next to the site logo in the navigation bar.
 
 **Earlier issues found/mentioned but not fixed**
 - None.
@@ -84,86 +87,60 @@ The application is stable and has undergone a major restructuring. The monolith 
 
 
 **Key Technical Concepts**
-- **Backend:** FastAPI, Pydantic, MongoDB ().
-- **Frontend:** React, TailwindCSS, , , , , .
-- **AI/ML:**
-    - **Current:**  for general LLM vision tasks (to be replaced).
-    - **Upcoming:**  for computer vision (edge/line detection) and  for OCR (dimension detection).
-- **PDF Generation:**  (backend),  (frontend).
-- **Real-time Communication:** Telegram Bot API for notifications.
+- **Backend:** FastAPI, MongoDB ().
+- **Frontend:** React, TailwindCSS.
+- **2D Canvas:** , .
+- **3D Rendering:**  (direct implementation, **not** React Three Fiber).
 
 **key DB schema**
-- **users**: Stores user data, roles, and .
-- **projects**: Stores user-submitted projects.
-- **telegram_chats**: Maps user IDs to Telegram chat IDs and subscription tiers.
-- **scanner3d_projects**: Stores saved 3D scanner projects with image data and unique IDs.
-- **ready_projects**: Stores projects published to the social gallery.
-- **likes**: Stores likes for .
-- **comments**: Stores comments for .
+- **users**: Now includes a  field to track online status.
+- **ai_sketch_projects**: Exists but needs adaptation for the new CAD data structure.
 
 **All files of reference**
-*   : The main application file, which needs further refactoring but contains the  endpoint to be modified.
-*   : Contains all Pydantic models.
-*   : Contains shared configuration.
-*   : The frontend for the feature being rebuilt.
-*   : The fully redesigned homepage.
-*   : The new social gallery.
+*   : The main file for the CAD system. It's large and contains the logic for the canvas, 3D preview, and structure panel.
+*   : Contains all backend routes, including the new endpoints for live stats and user heartbeats.
+*   : The new component for displaying real-time site statistics.
+*   : Integrates the  into the main application layout.
 
 **Areas that need refactoring**:
-- **:** This is the top priority for refactoring. While models and config have been extracted, all API routes remain in this single 3000+ line file. It should be broken down into a  directory structure.
+- **:** This file has become extremely large and complex. It urgently needs to be broken down into smaller, reusable components (e.g., , , ).
+- **:** This file remains a large monolith and is a prime candidate for being split into a  directory for better maintainability.
 
 **key api endpoints**
-- : (POST) **NEEDS REIMPLEMENTATION.** The target for the new CV/OCR pipeline.
-- : (GET/POST) Endpoints for the new social gallery.
-- : (POST) Endpoint for liking a project.
-- : (POST) Endpoint for commenting on a project.
-- : (GET) Provides a unique link for a user to connect their Telegram account.
-- : (GET) Checks if a user has connected their Telegram account.
-- : (POST) Saves a 3D project.
-- : (GET) Loads a saved 3D project.
-- : (GET) Returns the current subscription plans.
+-  (GET): **NEW.** Returns live counts for clients, companies, free slots, and online users.
+-  (POST): **NEW.** Allows the frontend to signal that a user is still active, updating their  timestamp.
 
 **Critical Info for New Agent**
-- **Priority #1 is the CV/OCR Pipeline:** Your entire focus must be on replacing the logic in the  endpoint. The user has provided a very specific, technical blueprint: use OpenCV and Tesseract, do not use a generative LLM, and be geometrically precise.
-- **The Application Has Pivoted:** Ignore previous features like the 3D Multi-Angle Scanner, AI Gallery, and video tutorials. They have been intentionally removed from the user flow. The new core of the application is the  tool and the  social gallery.
-- **Communicate in Bulgarian:** All communication with the user must be in Bulgarian.
+- **Priority #1 is Fixing Interactivity:** Your immediate and sole focus must be on debugging the . The UI is built, but the drawing canvas and buttons are not responding to test automation. You must solve this before adding any new features. Use the frontend testing agent or manual JS evaluation to diagnose the issue (it's likely a z-index, overlay, or event propagation problem).
+- **Tech Stack Constraint:** Do NOT re-introduce  or  on the . They were removed to fix a critical stability issue. The live 3D preview must continue to use plain .
+- **Communicate in Bulgarian:** All user-facing communication MUST be in Bulgarian.
+- **Component Refactoring:** After fixing the interactivity, the next logical step is to break down the massive  into smaller, more manageable components.
 
 **documents and test reports created in this job**
 -  (Continuously updated)
-- Multiple test reports in  (e.g., ).
+- Multiple test reports in .
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (latest):** Provided a detailed technical specification for the  feature, requiring a CV/OCR pipeline with OpenCV/Tesseract and strict geometric accuracy.
-2.  **User:** Confirmed the agent should implement the new  functionality on the existing page.
-3.  **User:** Provided a detailed Final Configuration prompt, demanding a major site restructure, new psychological copy, removal of old features (3D scanner, video), and a new Готови проекти social page.
-4.  **Agent:** Presented a plan for the Final Configuration and asked for confirmation.
-5.  **User:** Agreed to the plan.
-6.  **Agent:** Finished the Telegram notification implementation and asked for the next task.
-7.  **User:** Confirmed they wanted option #2 (rich notifications with timing).
-8.  **Agent:** Presented options for the Telegram integration.
-9.  **User:** Agreed to the plan to implement Telegram notifications.
-10. **Agent:** Finished refactoring and the 3D project saving feature, and asked for the next task.
+The user has provided a series of detailed prompts to build an AI-assisted CAD tool, including a live counter and other UI enhancements. The last message was Продължи с промпта (Continue with the prompt), indicating that the agent should proceed with the implementation despite hitting a testing roadblock.
 
 **Project Health Check:**
--   **Broken:** None. The application is stable.
--   **Mocked:** The core logic of the  endpoint is effectively a mock, as it uses a generic AI instead of the required, specific CV/OCR pipeline.
+*   **Broken:** The core interactivity of the new  (drawing on canvas, clicking buttons) is unverified and likely not working. This is a **critical bug**.
+*   **Mocked:** The AI assistance (shape detection from drawings/uploads) and backend logic for processing the CAD data are not yet implemented. The page currently relies on local state management.
 
 **3rd Party Integrations**
--   **OpenCV ():** To be used for image processing and line detection.
--   **Tesseract ():** To be used for OCR to detect dimensions on drawings.
--   **Telegram Bot API:** For sending real-time, priority-based notifications to users.
--   **Emergent LLM Key:** Used for previous AI features, but the new  pipeline will not use it.
--   **Three.js / React Three Fiber:** Used for rendering 3D models on the frontend.
--    & : For PDF generation in other parts of the application.
+- **Konva.js / react-konva:** Used for the 2D CAD drawing canvas.
+- **Three.js:** Used directly for the live 3D preview.
+- **OpenCV / Tesseract:** Installed but deprioritized in favor of the manual CAD tool.
+- **Telegram Bot API:** For user notifications.
 
 **Testing status**
--   Testing agent used after significant changes: YES. The agent ran  after every major feature merge, consistently achieving 100% pass rates.
--   Troubleshoot agent used after agent stuck in loop: NO.
--   Test files created: []
--   Known regressions: None.
+- Testing agent used after significant changes: YES
+- Troubleshoot agent used after agent stuck in loop: NO
+- Test files created: []
+- Known regressions: The primary functionality of  is non-functional in tests.
 
 **Credentials to test flow:**
-- Register a new user on the site via the registration page to test all user-facing features. No default credentials are required.
+- Register a new user via the application's registration page.
 
 **What agent forgot to execute**
-- The backend refactoring of  into a modular router-based structure is only partially complete. This was listed as a task but was superseded by higher-priority user requests. It remains a key technical debt item.</analysis>
+The agent correctly identified that the CAD page's interactivity was broken in tests but was prompted by the user to continue before a fix could be implemented. The task of fixing this critical bug was therefore not completed.</analysis>

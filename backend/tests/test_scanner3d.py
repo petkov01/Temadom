@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://sketch-to-3d-16.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://ai-cad-tool-1.preview.emergentagent.com')
 
 class TestScanner3DPDF:
     """Tests for 3D Scanner PDF generation endpoint"""
