@@ -3213,6 +3213,90 @@ async def analyze_sketch(request: Request):
         raise HTTPException(status_code=500, detail=f"Грешка при анализ: {str(e)}")
 
 
+# ============== 3D Scanner PDF ==============
+class Scanner3DPDFRequest(BaseModel):
+    items: List[Dict[str, Any]]
+
+@api_router.post("/scanner3d/pdf")
+async def generate_scanner3d_pdf(req: Scanner3DPDFRequest):
+    from fpdf import FPDF
+    import io
+
+    pdf = FPDF()
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    bold_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+
+    try:
+        pdf.add_font("DejaVu", "", font_path, uni=True)
+        pdf.add_font("DejaVu", "B", bold_font_path, uni=True)
+        fn = "DejaVu"
+    except Exception:
+        fn = "Helvetica"
+
+    pdf.add_page()
+
+    # Header
+    pdf.set_fill_color(140, 86, 255)
+    pdf.rect(0, 0, 210, 35, 'F')
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, 'B', 20)
+    pdf.set_y(6)
+    pdf.cell(0, 12, "TemaDom - 3D Скенер", ln=True, align='C')
+    pdf.set_font(fn, '', 9)
+    pdf.cell(0, 7, "Количествена сметка за избрани елементи", ln=True, align='C')
+
+    # Date
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_y(42)
+    pdf.set_font(fn, '', 10)
+    pdf.cell(0, 8, f"Дата: {datetime.now(timezone.utc).strftime('%d.%m.%Y')}", ln=True)
+    pdf.ln(4)
+
+    # Table header
+    pdf.set_fill_color(50, 60, 80)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(fn, 'B', 10)
+    pdf.cell(15, 10, "#", 1, 0, 'C', True)
+    pdf.cell(65, 10, "Категория", 1, 0, 'C', True)
+    pdf.cell(70, 10, "Избран модел", 1, 0, 'C', True)
+    pdf.cell(40, 10, "Цена (лв.)", 1, 1, 'C', True)
+
+    # Table rows
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font(fn, '', 10)
+    total = 0
+    for i, item in enumerate(req.items, 1):
+        price = item.get("price", 0)
+        total += price
+        fill = i % 2 == 0
+        if fill:
+            pdf.set_fill_color(240, 240, 245)
+        pdf.cell(15, 9, str(i), 1, 0, 'C', fill)
+        pdf.cell(65, 9, str(item.get("category", "")), 1, 0, 'L', fill)
+        pdf.cell(70, 9, str(item.get("name", "")), 1, 0, 'L', fill)
+        pdf.cell(40, 9, f"{price:.2f}", 1, 1, 'R', fill)
+
+    # Total
+    pdf.set_font(fn, 'B', 11)
+    pdf.set_fill_color(140, 86, 255)
+    pdf.set_text_color(255, 255, 255)
+    pdf.cell(150, 10, "ОБЩО:", 1, 0, 'R', True)
+    pdf.cell(40, 10, f"{total:.2f} лв.", 1, 1, 'R', True)
+
+    # Footer
+    pdf.set_text_color(120, 120, 120)
+    pdf.set_font(fn, '', 8)
+    pdf.ln(10)
+    pdf.cell(0, 6, "Генерирано от TemaDom 3D Скенер | temadom.com", ln=True, align='C')
+    pdf.cell(0, 6, "Цените са ориентировъчни и могат да варират.", ln=True, align='C')
+
+    pdf_bytes = pdf.output()
+    buf = io.BytesIO(pdf_bytes)
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=temadom-3d-smetka.pdf"})
+
+
 # Include router - MUST be after all route definitions
 app.include_router(api_router)
 

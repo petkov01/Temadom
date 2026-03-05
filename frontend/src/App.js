@@ -15,6 +15,7 @@ import { AIDesignerPage } from '@/components/AIDesignerPage';
 import { FeedbackPage } from '@/components/FeedbackPage';
 import { PublishedGalleryPage } from '@/components/PublishedGalleryPage';
 import { AISketchPage } from '@/components/AISketchPage';
+import { Scanner3DPage } from '@/components/Scanner3DPage';
 import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 import ProjectEstimator from '@/components/ProjectEstimator';
@@ -203,6 +204,9 @@ const Navbar = () => {
                   <Link to="/ai-designer" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-designer">
                     <Sparkles className="h-4 w-4" /> AI Дизайнер
                   </Link>
+                  <Link to="/3d-scanner" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#8C56FF] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-3d-scanner">
+                    <Camera className="h-4 w-4" /> 3D Скенер
+                  </Link>
                   <Link to="/ai-sketch" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-sketch">
                     <FileText className="h-4 w-4" /> AI Sketch
                   </Link>
@@ -355,6 +359,9 @@ const Navbar = () => {
             </Link>
             <Link to="/ai-designer" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <Sparkles className="h-4 w-4" /> AI Дизайнер
+            </Link>
+            <Link to="/3d-scanner" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#8C56FF]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-3d-scanner">
+              <Camera className="h-4 w-4" /> 3D Скенер
             </Link>
             <Link to="/ai-sketch" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-sketch">
               <FileText className="h-4 w-4" /> AI Sketch
@@ -511,8 +518,8 @@ const LandingPage = () => {
               <Button size="lg" className="bg-[#FF8C42] hover:bg-[#e67a30] text-white text-lg px-8 h-14 shadow-lg shadow-[#FF8C42]/20" onClick={() => navigate('/calculator')} data-testid="hero-calc-btn">
                 <Calculator className="mr-2 h-6 w-6" /> Безплатен калкулатор
               </Button>
-              <Button size="lg" className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white text-lg px-8 h-14 shadow-lg shadow-[#8C56FF]/20" onClick={() => navigate('/ai-designer')} data-testid="hero-ai-btn">
-                <Sparkles className="mr-2 h-6 w-6" /> AI Дизайнер
+              <Button size="lg" className="bg-[#8C56FF] hover:bg-[#7a44ee] text-white text-lg px-8 h-14 shadow-lg shadow-[#8C56FF]/20" onClick={() => navigate('/3d-scanner')} data-testid="hero-ai-btn">
+                <Camera className="mr-2 h-6 w-6" /> 3D Скенер
               </Button>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
@@ -3175,6 +3182,7 @@ function App() {
                 <Route path="/ads" element={<AdsPage />} />
                 <Route path="/ai-designer" element={<AIDesignerPage />} />
                 <Route path="/ai-sketch" element={<AISketchPage />} />
+                <Route path="/3d-scanner" element={<Scanner3DPage />} />
                 <Route path="/ai-gallery" element={<PublishedGalleryPage />} />
                 <Route path="/subscriptions" element={<SubscriptionsPage />} />
                 <Route path="/feedback" element={<FeedbackPage />} />
