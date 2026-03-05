@@ -19,11 +19,25 @@
 - Video instructions: Interactive tutorial modals with 4 steps on AI Designer + AI Sketch
 - Subscriptions: 3 tiers + standalone services + AI Designer module
 - "Дизайнери" section REMOVED from nav
+- **3D Multi-Angle Scanner** (NEW - March 2026):
+  - Upload 3 photos (left, front, right) → Three.js 360° sphere panorama
+  - Drag-to-rotate (mouse/touch), zoom with scroll
+  - 5 interactive hotspots: Душ кабина, Тоалетна, Плочки, Мивка, Мебели
+  - Swap panel with options and prices for each element
+  - Results summary with total price calculation
+  - PDF export (backend /api/scanner3d/pdf), Share, Companies buttons
+  - Navigation: desktop More dropdown, mobile menu, homepage hero button
+  - Route: /3d-scanner
 
 ## P1 Backlog
-- Meshy.ai for 3D models
-- AI Blueprint Analysis (PDF/DWG)
-- server.py refactoring
+- AI Blueprint Analysis (PDF/DWG) - real AI integration for /ai-chart (currently mocked)
+- server.py refactoring into routers/services/models
 
 ## P2 Backlog
 - Mobile app, Payments (Stripe), Admin dashboard
+
+## Architecture
+- Frontend: React, TailwindCSS, Three.js (@react-three/fiber, @react-three/drei)
+- Backend: FastAPI (monolithic server.py), MongoDB
+- 3D: Three.js sphere with equirectangular mapped panorama textures
+- PDF: fpdf2 (backend), jspdf (frontend)
