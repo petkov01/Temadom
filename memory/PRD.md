@@ -1,42 +1,124 @@
-# TemaDom - PRD
+# TEMADOM — Product Requirements Document
 
 ## Original Problem Statement
-AI-powered construction/renovation platform:
-1. **AI CAD System (`/ai-sketch`)**: 2D/3D plan drawing, cost estimates, PDF+contract export
-2. **TEMADOM 360° VIDEO 3D v6.1 (`/room-scan`)**: Upload 30-60s video → AI 360° renovation
+TemaDom is a multifaceted web application for construction and interior design with two main products:
+1. **AI-Assisted CAD System (`/ai-sketch`)** — Tool for architects to draw 2D plans with live 3D preview and cost estimation.
+2. **Video 3D Designer (`/room-scan`)** — Interior design tool that processes room videos to generate renovated 360° panorama and 3D models.
 
-## Implemented Features
+The application is in Bulgarian (Български) and targets the Bulgarian construction market.
 
-### TEMADOM 360° VIDEO 3D v6.1 (`/room-scan`)
-- **Filming Guide**: "КАК ДА СНИМАШ ПРАВИЛНО" — 5 steps, collapsible
-- **3 packages**: 69€ (1 помещение), 129€ (2 помещения), 199€ (Апартамент до 5)
-- **Video**: Max 60s MP4 (50MB), Drag&Drop + Gallery + Camera
-- **Upload progress**: 0% → 100%
-- **12 keyframes** extraction (5s interval)
-- **10 styles**: Модерен, Минималист, Класически, Бохо, Хай-тек, Индустриален, Скандинавски, Лофт, Неокласически, Арт Деко
-- **Dimensions**: W×L×H (default 2.7m height), editable
-- **Generation progress**: 0% → 100%
-- **Result**: 360° Before/After slider, КАЛКУЛАЦИЯ cost breakdown
-- **PDF download**, GLB placeholder, Retry button on error
+## User Personas
+- **Architects/Engineers**: Use CAD tool for drawing 2D plans, exporting PDFs and contracts
+- **Interior Designers**: Use Video 3D Designer for room visualization
+- **Construction Companies**: Use cost estimation and contract generation features
+- **Homeowners**: Use platform to find construction professionals and get estimates
 
-### AI CAD Sketch (`/ai-sketch`)
-- 2D+3D side-by-side, 3D pan (right-click)
-- 13 tools, round+rect columns with L/W/H
-- No dimension limits, regional pricing (8 regions)
-- Removable cost items, PDF Plan + Contract always visible
+## Core Requirements
 
-### About Page — Dark theme, readable, 6 problems, 5 solutions, mission, CTA
-### Profile Page (`/profile`) — View/edit user info, account info, logout
-### Auth Gate — All features locked for unregistered (blurred + modal)
-### Landing Page v6.5 — Dark/light mode, HERO, pricing 69/129/199 EUR
+### Authentication & User Management
+- ✅ User registration with email, name, city, user_type
+- ✅ JWT-based authentication
+- ✅ AuthGate component restricting tool access to registered users
+- ✅ Profile page for viewing/updating user information
 
-## Test Reports
-- iteration_37-41: All 100% pass
+### CAD System (v5.2) — `/ai-sketch`
+- ✅ 2D drawing canvas with multiple tools (wall, roof, slab, stairs, door, window, column, beam, dimension, erase)
+- ✅ **Professional Handle Manipulation (v5.2)**:
+  - ✅ Color-coded handles: RED (endpoints), BLUE (center), GREEN (rotation)
+  - ✅ Individual endpoint dragging (only that end moves, other stays fixed)
+  - ✅ Center dragging (whole element moves)
+  - ✅ Rotation via GREEN handle
+  - ✅ Ghost preview during drag (original position shown at 0.2 opacity)
+  - ✅ Live dimension display during drag (golden label)
+  - ✅ Free positioning without grid snap during manipulation
+  - ✅ Shift+Drag = orthogonal constraint
+  - ✅ Ctrl+Drag = precision (0.1m steps)
+  - ✅ Double-click to select element
+  - ✅ Undo/Redo (Ctrl+Z/Y) with history stack
+- ✅ Raw coordinates in select mode (not snapped) for accurate hit detection
+- ✅ Bulgarian dimension labels: Дължина, Широчина, Дебелина, Височина
+- ✅ Live 3D preview with OrbitControls
+- ✅ Multi-floor support
+- ✅ Cost estimation by region (8 Bulgarian regions with price multipliers)
+- ✅ PDF Plan + Cost export
+- ✅ PDF Contract export
+- ✅ Rectangular and round column support
+- ✅ Sketch upload mode with 3D model generation
+- ✅ Project sharing via link
+- ✅ GLB file download
 
-## Backlog
-- P1: Video demo section on landing
-- P1: Backend refactoring (server.py → routers/)
-- P1: GLB file generation (Meshy.ai or trimesh)
-- P2: Stripe monetization
-- P2: E-signature for contracts
-- P2: Luma.ai panorama integration
+### Video 3D Designer (v6.1) — `/room-scan`
+- ✅ Multi-room packages (1, 2, or apartment) at 69/129/199 EUR
+- ✅ 60-second/50MB video processing
+- ✅ 12 keyframe extraction
+- ✅ New UI based on detailed spec
+
+### Landing Page & Navigation
+- ✅ Comprehensive landing page with pricing
+- ✅ Dark/Light mode toggle
+- ✅ Blog system
+- ✅ About page
+- ✅ Services page
+- ✅ Regional pricing page
+- ✅ Portfolio gallery
+
+## Technical Architecture
+```
+/app/
+├── backend/
+│   ├── server.py         # FastAPI app (monolithic)
+│   ├── routes/           # Route modules
+│   ├── models/           # Data models
+│   └── services/         # Business logic
+├── frontend/
+│   └── src/
+│       ├── App.js
+│       ├── components/
+│       │   ├── AISketchPage.jsx    # CAD v5.2 orchestrator
+│       │   ├── AIDesignerPage.jsx  # Video Designer v6.1
+│       │   ├── cad/
+│       │   │   ├── CADCanvas.jsx   # Professional 2D canvas with handles
+│       │   │   ├── StructurePanel.jsx  # Parametric editing panel
+│       │   │   ├── CostEstimate.jsx
+│       │   │   ├── ThreeDPreview.jsx
+│       │   │   ├── constants.js
+│       │   │   └── utils.js
+│       │   └── ...
+│       └── ...
+└── memory/
+    └── PRD.md
+```
+
+## What's Been Implemented (Chronological)
+- Authentication system with AuthGate
+- Landing page, Blog, About, Services pages
+- CAD tool v5.0 (basic drawing)
+- CAD tool v5.1 (columns, cost estimate, PDF export)
+- **CAD tool v5.2** (Feb 2026) — Professional handle manipulation, undo/redo, rotation, ghost preview
+- Video Designer v6.1
+- Profile page
+- Dark/Light mode
+
+## Prioritized Backlog
+
+### P1 — Upcoming Tasks
+- Video Demo Section on landing page
+- GLB File Generation for Video Designer results
+
+### P2 — Future Tasks
+- Backend refactoring: Break `server.py` into modular `routers/` structure
+- Mobile touch context menu (long press → options)
+- Pinch-to-zoom on mobile
+- Mirror/Flip elements (X/Y axis)
+
+## Key API Endpoints
+- `PUT /api/auth/profile` — Update user profile
+- `POST /api/ai-designer/video-generate` — Process uploaded video
+- `POST /api/ai-sketch/export-pdf` — Export CAD plan as PDF
+- `POST /api/ai-sketch/export-contract` — Export contract as PDF
+- `POST /api/ai-designer/video-pdf` — Export Video Designer results as PDF
+
+## Tech Stack
+- **Frontend**: React, TailwindCSS, Shadcn/UI, Canvas 2D API, Three.js
+- **Backend**: FastAPI, MongoDB, OpenCV, fpdf2
+- **Key Libraries**: react-router-dom, axios, lucide-react, three, @react-three/fiber
