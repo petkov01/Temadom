@@ -2182,10 +2182,15 @@ async def get_ai_design_status(user: dict = Depends(get_optional_user)):
 
 AI_STYLES = {
     "modern": "съвременен модерен стил с чисти линии, неутрални цветове и минимализъм",
-    "scandinavian": "скандинавски стил с бели стени, дърво, минимализъм и естествена светлина",
-    "loft": "индустриален лофт стил с тухлени стени, метал, открити тръби и бетон",
+    "minimalist": "минималистичен стил с прости форми, бяло пространство и функционалност",
     "classic": "класически стил с елегантни мебели, богати тъкани и декоративни елементи",
-    "minimalist": "минималистичен стил с прости форми, бяло пространство и функционалност"
+    "boho": "бохо стил с естествени материали, ярки цветове и текстури",
+    "hitech": "хай-тек стил с метал, стъкло, LED осветление и технологични елементи",
+    "industrial": "индустриален стил с тухлени стени, метал, открити тръби и бетон",
+    "scandinavian": "скандинавски стил с бели стени, дърво, минимализъм и естествена светлина",
+    "loft": "индустриален лофт стил с открити тръби, бетон и метални акценти",
+    "neoclassic": "неокласически стил с мрамор, позлата, симетрия и елегантни детайли",
+    "artdeco": "арт деко стил с геометрични шарки, злато, черно и луксозни материали"
 }
 
 AI_MATERIAL_CLASS = {
@@ -2204,18 +2209,18 @@ async def generate_video_design(
     room_type: str = Form("living_room"),
     notes: str = Form("")
 ):
-    """Video Designer v6: Upload 15s video → AI extracts frames → 360° renovation."""
+    """Video Designer v6.1: Upload 60s video → AI extracts 12 keyframes → 360° renovation."""
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
 
     # Validate video
     if not video.content_type or not video.content_type.startswith("video/"):
-        raise HTTPException(status_code=400, detail="Моля, качете видео файл")
+        raise HTTPException(status_code=400, detail="Моля, качете видео файл (MP4)")
 
     # Save video to temp file
     video_bytes = await video.read()
-    if len(video_bytes) > 100 * 1024 * 1024:  # 100MB limit
-        raise HTTPException(status_code=400, detail="Видеото е твърде голямо (макс. 100MB)")
+    if len(video_bytes) > 50 * 1024 * 1024:  # 50MB limit
+        raise HTTPException(status_code=400, detail="Видеото е твърде голямо (макс. 50MB)")
 
     with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
         tmp.write(video_bytes)
@@ -2231,12 +2236,13 @@ async def generate_video_design(
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         duration = total_frames / fps if fps > 0 else 0
 
-        if duration > 30:
+        if duration > 65:
             cap.release()
-            raise HTTPException(status_code=400, detail="Видеото е твърде дълго (макс. 15 секунди)")
+            raise HTTPException(status_code=400, detail="Видеото е твърде дълго (макс. 60 секунди)")
 
-        # Extract 4 evenly-spaced frames
-        frame_indices = [int(total_frames * i / 4) for i in range(4)] if total_frames > 4 else list(range(total_frames))
+        # Extract 12 keyframes (every ~5 seconds)
+        num_frames = min(12, max(4, int(duration / 5)))
+        frame_indices = [int(total_frames * i / num_frames) for i in range(num_frames)] if total_frames > num_frames else list(range(total_frames))
         extracted_frames = []
         for idx in frame_indices:
             cap.set(cv2.CAP_PROP_POS_FRAMES, idx)

@@ -3251,8 +3251,8 @@ const SubscriptionsPage = () => {
         <div className="grid md:grid-cols-3 gap-4 max-w-3xl">
           {[
             { name: '1 помещение', price: '69 EUR', features: ['1 видео → 4 ъгъла', 'PDF проект', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
-            { name: '2-3 помещения', price: '129 EUR', features: ['До 3 видеа → 12 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
-            { name: '4-5 помещения', price: '220 EUR', features: ['До 5 видеа → 20 ъгъла', 'PDF за всяко помещение', 'Пълна сметка', 'Приоритетна обработка'] },
+            { name: '2 помещения', price: '129 EUR', features: ['2 видеа → 8 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
+            { name: 'Апартамент', price: '199 EUR', features: ['До 5 видеа → 20 ъгъла', 'PDF за всяко помещение', 'Пълна сметка + 3D', 'Приоритетна обработка'] },
           ].map((plan, i) => (
             <Card key={i} className={`border ${plan.popular ? 'border-[#F97316] bg-[#F97316]/5' : 'border-[#2A3A4C] bg-[#1E2A38]'} relative`}>
               {plan.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F97316] text-white text-[10px] font-bold px-3 py-0.5 rounded-full">ПОПУЛЯРЕН</div>}
