@@ -2335,7 +2335,7 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting.
         ).with_model("openai", "gpt-4o")
         
         materials_msg = UserMessage(
-            text=f"""Генерирай ПЪЛЕН списък с материали и оборудване за ремонт на {room_type} ({room_width}м x {room_length}м x {room_height}м).
+            text=f"""Генерирай ПЪЛЕН списък с материали и оборудване за ремонт на {room_type_name} ({room_width}м x {room_length}м x {room_height}м).
 Стил: {style_desc}
 Клас материали: {material_desc}
 {f'Специални изисквания: {notes}' if notes else ''}
@@ -2359,7 +2359,7 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting.
         design_id = str(uuid.uuid4())
         design_record = {
             "id": design_id,
-            "room_type": room_type,
+            "room_type": room_type_name,
             "room_type_id": room_type_id,
             "room_analysis": room_analysis,
             "style": style,

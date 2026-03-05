@@ -106,9 +106,11 @@ export const AIDesignerPage = () => {
   const [roomType, setRoomType] = useState('bathroom');
   const [style, setStyle] = useState('modern');
   const [renovationText, setRenovationText] = useState('');
+  const [variants, setVariants] = useState(1);
   const [loading, setLoading] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [results, setResults] = useState(null);
+  const [activeVariant, setActiveVariant] = useState(0);
   const [activeAngle, setActiveAngle] = useState(0);
   const fileRef = useRef(null);
   const timerRef = useRef(null);
@@ -155,13 +157,15 @@ export const AIDesignerPage = () => {
         material_class: 'standard',
         renovation_text: renovationText,
         notes: renovationText,
-        variants: 1,
+        variants: variants,
         width: '4',
         length: '5',
         height: '2.6',
       }, { timeout: 600000 });
 
       setResults(res.data);
+      setActiveVariant(0);
+      setActiveAngle(0);
       toast.success('Ремонт 1:1 генериран!');
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка. Опитайте отново.');
@@ -185,10 +189,13 @@ export const AIDesignerPage = () => {
     setResults(null);
     setRenovationText('');
     setElapsed(0);
+    setActiveVariant(0);
     setActiveAngle(0);
   };
 
-  const angles = results?.images?.[0]?.angles || [];
+  const currentVariant = results?.generated_images?.[activeVariant];
+  const angles = currentVariant?.angles || [];
+  const totalVariants = results?.generated_images?.length || 0;
 
   return (
     <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="ia-designer-page">
@@ -262,8 +269,8 @@ export const AIDesignerPage = () => {
               </CardContent>
             </Card>
 
-            {/* Room Type + Style */}
-            <div className="grid md:grid-cols-2 gap-6">
+            {/* Room Type + Style + Variants */}
+            <div className="grid md:grid-cols-3 gap-6">
               <Card className="bg-[#253545] border-[#3A4A5C]">
                 <CardHeader><CardTitle className="text-white text-sm">Тип обект</CardTitle></CardHeader>
                 <CardContent>
@@ -295,6 +302,24 @@ export const AIDesignerPage = () => {
                   </div>
                 </CardContent>
               </Card>
+              <Card className="bg-[#253545] border-[#3A4A5C]">
+                <CardHeader><CardTitle className="text-white text-sm">Брой варианти</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[1, 2, 3].map(v => (
+                      <button key={v} onClick={() => setVariants(v)}
+                        className={`p-3 rounded-lg border text-sm font-bold transition-all ${
+                          variants === v ? 'border-[#FF8C42] bg-[#FF8C42]/10 text-[#FF8C42]' : 'border-[#3A4A5C] text-slate-300 hover:border-[#FF8C42]/30'
+                        }`} data-testid={`variants-${v}`}>
+                        {v}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-slate-500 text-[10px] mt-2 text-center">
+                    {variants === 1 ? '4 ъгъла x 1 вариант' : `4 ъгъла x ${variants} варианта`}
+                  </p>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Renovation Text */}
@@ -310,22 +335,41 @@ export const AIDesignerPage = () => {
             {/* Generate */}
             {loading ? (
               <div className="space-y-4">
-                <ProgressBar elapsed={elapsed} total={60} />
+                <ProgressBar elapsed={elapsed} total={60 * variants} />
                 <div className="flex items-center justify-center gap-3 text-slate-300">
                   <Loader2 className="h-6 w-6 animate-spin text-[#8C56FF]" />
-                  <span>AI генерира 1:1 ремонт от 4 ъгъла...</span>
+                  <span>AI генерира {variants > 1 ? `${variants} варианта x ` : ''}4 ъгъла...</span>
                 </div>
               </div>
             ) : (
               <Button className="w-full bg-[#8C56FF] hover:bg-[#7a44ee] text-white text-lg h-14 shadow-lg shadow-[#8C56FF]/20"
                 onClick={handleGenerate} disabled={!image || !renovationText.trim()} data-testid="generate-btn">
-                <Camera className="mr-2 h-5 w-5" /> Генерирай ремонт (47 сек)
+                <Camera className="mr-2 h-5 w-5" /> Генерирай {variants > 1 ? `${variants} варианта` : 'ремонт'}
               </Button>
             )}
           </div>
         ) : (
           /* ===== RESULTS ===== */
           <div className="space-y-6">
+            {/* Variant tabs */}
+            {totalVariants > 1 && (
+              <Card className="bg-[#253545] border-[#3A4A5C]">
+                <CardContent className="pt-4 pb-3">
+                  <p className="text-slate-400 text-xs mb-2">Варианти на ремонта:</p>
+                  <div className="flex gap-2" data-testid="variant-tabs">
+                    {results.generated_images.map((v, i) => (
+                      <button key={i} onClick={() => { setActiveVariant(i); setActiveAngle(0); }}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                          activeVariant === i ? 'bg-[#FF8C42] text-white' : 'bg-[#1E2A38] text-slate-400 hover:text-white border border-[#3A4A5C]'
+                        }`} data-testid={`variant-tab-${i}`}>
+                        Вариант {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Before / After */}
             <Card className="bg-[#253545] border-[#3A4A5C]">
               <CardHeader>
@@ -353,8 +397,8 @@ export const AIDesignerPage = () => {
                 {(() => {
                   const afterImg = angles[activeAngle]
                     ? `data:image/png;base64,${angles[activeAngle].image_base64}`
-                    : results?.images?.[0]?.image_base64
-                      ? `data:image/png;base64,${results.images[0].image_base64}`
+                    : currentVariant?.image_base64
+                      ? `data:image/png;base64,${currentVariant.image_base64}`
                       : null;
                   return afterImg ? (
                     <BeforeAfterSlider beforeSrc={preview} afterSrc={afterImg} />
