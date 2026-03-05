@@ -1,71 +1,72 @@
 <analysis>**original_problem_statement:**
-The user wants to build a marketplace application named TemaDom for selling construction project leads. The project has pivoted multiple times and is now in a soft launch phase.
+The user wants to build a marketplace application named TemaDom for selling construction project leads. The project is in a Phase 3 - Soft Launch which involves a complete visual and functional overhaul.
 
-The user's latest and most critical request is to implement **Phase 3 - Soft Launch**, which involves a complete visual and functional overhaul of the application. All features are to be active and free for testing, but the UI should present the structure of future paid plans.
-
-**PRODUCT REQUIREMENTS (Phase 3 - Soft Launch):**
+**PRODUCT REQUIREMENTS (Phase 3 - Soft Launch & Subsequent User Requests):**
 *   **Visual Overhaul:**
-    *   **New Logo:** Replace the old logo site-wide with the new one provided.
-    *   **New Color Scheme:** Implement a specific dark theme:
-        *   Main: Dark Blue (), Dark Gray (), White ()
-        *   Accents: Orange (), Green (), Red ()
-        *   Secondary: Light Blue (), Purple ()
-        *   Gradients for Hero section and cards.
-*   **User Experience:**
-    *   ** Component:** Create and display a detailed instructional component on every major page, explaining the feature's function, steps for use, benefits, and tips.
-    *   **Video Instructions:** Integrate a Watch Video button/popup on each page to show a demo video for that feature.
-    *   **Feedback Section:** Implement a site-wide Give Feedback button allowing users to rate the app (1-5 stars) and provide textual feedback, which should be collected in an admin view.
-    *   **Project Gallery:** Add a gallery to showcase previously generated AI designs to increase user engagement.
-*   **Feature Enhancements (Test Mode - All Free):**
-    *   **Subscription Plans Page:** Create a new  page detailing , ,  (for Companies) and  plans. All features are unlocked, but the page explains what each plan will offer in the future.
-    *   **AI Designer Engine:** All variants (1/3/5) are active without limits. It should work from an uploaded room photo and allow users to select material quality (economy, standard, premium).
-    *   **PDF Generator:** Generate Contracts, Quantity Surveys, and Charters. Contracts should *not* include promotional store links, only legal terms, quantities, and signature fields.
-    *   **Ads System:** Allow up to 5 images per ad, with search and filtering by category/city.
-    *   **Registration Form:** Update the registration for Master and Company with a dropdown. The Bulstat field should only be visible and required for Company.
-    *   **Notifications (Telegram/Email):** Send notifications for subscription events (reminders, expiry) only for users on future , , and  plans.
+    *   **New Logo:** A specific new logo has been provided, and its size and placement in the navbar have been meticulously adjusted to be large, clear, and have a transparent background.
+    *   **New Color Scheme:** A specific dark theme is implemented site-wide: Main: Dark Blue (), Dark Gray (); Accents: Orange ().
+*   **User Experience & Core Features:**
+    *   ** Component:** A detailed instructional component is displayed on every major page.
+    *   **Video Instructions:** A Watch Video button/popup on each page to show a demo video (currently placeholders).
+    *   **Feedback System:** A site-wide Give Feedback button allows users to rate the app (1-5 stars) and provide text feedback. A dedicated  page shows all collected feedback.
+    *   **AI Designer Engine (High Priority):**
+        *   Must be highly precise, using the user's **actual uploaded photos** as the base for the new design.
+        *   The UI supports uploading **3 photos from different angles**.
+        *   The backend generates **2 design images from different angles** (e.g., frontal and side view) for each variant.
+        *   The generated materials list must show prices in both **BGN and EUR**.
+        *   File uploads must work for all common image types ().
+    *   **Project Publishing & PDFs (User's Latest Request):**
+        *   Users must be able to publish their finished AI designs to a public-facing section of the site.
+        *   Companies/Masters should be able to browse these published projects and see both the before (original photos) and after (AI design) images.
+        *   There should be **two separate PDF download** options: one containing only the design images, and another containing only the quantity survey/materials list.
+    *   **Subscription Plans Page:** A  page details , ,  plans. It's clarified that the AI Designer is a separate paid module, but all features are unlocked and free during the soft launch.
+    *   **Registration Form:** Updated for Master and Company roles with a dropdown, and the Bulstat field is now dynamic.
+*   **Future/Ongoing Goals:**
+    *   AI analysis of blueprints should be 95-100% accurate.
+    - Add a gallery of AI-generated projects to the homepage.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-A functional full-stack marketplace (React, FastAPI, MongoDB). The previous session completed a massive full-site translation (BG/EN) and laid the foundation for a v10.8 update. This included adding a 'designer' user type, a new homepage, and backend stubs for subscriptions, ads, and ratings. This v10.8 foundation was successfully tested but is now set to be completely overhauled by the new Phase 3 - Soft Launch requirements.
+The application is a full-stack React/FastAPI/MongoDB project with the Phase 3 visual overhaul largely complete. A dark theme and a new, user-approved logo are implemented site-wide. Core new features like the  component and a comprehensive Feedback system (frontend page and backend endpoint) are functional. The registration form is updated.
+
+The AI Designer has been iteratively built into a sophisticated multi-step wizard. It now supports uploading 3 images, specifying a room type, and the backend prompt is configured to generate 2 design angles and include prices in both BGN and EUR. The file upload functionality has been fixed. The Subscriptions page has been updated to reflect the current business logic. All implemented features have been successfully verified by the testing agent.
 
 **Last working item**:
-*   Last item agent was working: The agent was acknowledging and planning the implementation of the comprehensive Phase 3 - Soft Launch requirements provided by the user. This includes a complete UI/UX redesign (new logo, color scheme), new instructional components, and significant feature enhancements across the entire application.
-*   Status: NOT STARTED
+*   Last item agent was working: The agent acknowledged the user's latest, critical request to create a system for publishing AI-generated projects. This includes allowing users to publish their designs, creating a gallery for companies/masters to view them (with before and after images), and providing two distinct downloadable PDFs (one for images, one for the quantity survey).
+*   Status: **NOT STARTED**
 *   Agent Testing Done: N
-*   Which testing method agent to use? . This is a massive, site-wide change. The agent should test after all Phase 3 features are implemented together.
+*   Which testing method agent to use? **both**. This is a major new feature requiring new frontend pages, backend endpoints, and database schema changes.
 *   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** Fix PDF generation from the price calculator (P1)
-    -   **Status:** RESOLVED. This issue is superseded by the new, more detailed requirements for the PDF generator in the Phase 3 plan, which specifies the generation of different document types (Contracts, Quantity Surveys) with different content rules. The focus should be on implementing the new requirements, not fixing the old format.
+There are no pending bugs or issues. The work queue consists of new feature requests.
 
 **In progress Task List**:
-*   **Task 1: Implement Phase 3 - Soft Launch (P0)**
-
-**Task Detail:**
-*   **Task 1:**
-    *   **Where to resume:** The agent must start from scratch on this task. The first step should be to implement the new visual identity: replace the logo and apply the new dark-themed color scheme across the entire application's CSS or Tailwind configuration. Then, proceed with the feature list from the .
-    *   **What will be achieved with this?** A fully-featured soft launch version of the TemaDom platform with a new, professional UI/UX, ready for user testing and feedback collection. All features will be active and free.
-    *   **Status:** NOT STARTED
-    *   **Should Test frontend/backend/both after fix?** Both.
-    *   **Blocked on something:** No.
+-   None. All previously started tasks have been completed and verified.
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   The entire **Phase 3 - Soft Launch** implementation is the sole upcoming task. It's a very large-scale P0 task.
+    *   **P0: Implement Project Publishing Flow:**
+        -   **Backend:** Create endpoints to publish a design () and to list published designs (). This will require adding a  status to the AI design documents in the database.
+        -   **Frontend:** Add a Publish Project button to the AI Designer results page. Create a new page (e.g., ) for companies to browse published projects, with a detail view showing before and after images.
+    *   **P0: Implement Dual PDF Generation:**
+        -   **Backend:** Refactor the PDF logic to create two distinct functions and endpoints: one for generating a PDF of the design images () and another for the quantity survey ().
+        -   **Frontend:** On the results page and the new project detail page, add two separate buttons: Download Design PDF and Download Survey PDF.
+    *   **P1: Implement Video Instruction Player:** Replace the current placeholder buttons with a functional video player modal to display tutorial videos for each feature.
+    *   **P2: Add Project Gallery to Homepage:** Create a new component on  to display a selection of recently published AI designs to increase user engagement.
 *   **Future Tasks:**
-    *   **Mobile App Development:** Build a mobile app for Android and iOS using React Native/Expo, reusing the existing backend. The user needs to confirm if they want to proceed with this or a PWA.
-    *   **Monetization:** Introduce real pricing and payment gateways (like EasyPay Bulgaria) after the soft launch and feedback period.
+    *   **AI Blueprint Analysis:** Investigate and implement a high-accuracy solution for analyzing construction blueprints, as requested by the user (target 95-100% accuracy).
+    *   **Mobile App Development:** Discuss and potentially start development of a mobile app.
+    *   **Monetization:** Integrate a real payment gateway (e.g., EasyPay Bulgaria) to enable paid subscriptions and features after the soft launch period.
 
 **Completed work in this session**
--   **Full-Site Translation:** Refactored the entire frontend to use  for seamless Bulgarian/English language switching.
--   **v10.8 Foundation:**
-    -   Implemented a new v10.8 homepage design and updated the main navigation.
-    -   Added 'designer' user type to the backend and registration form.
-    -   Created placeholder pages (, , ) and backend endpoints for upcoming features.
--   **Testing:** Successfully ran , which passed all frontend and backend tests for the v10.8 foundation.
--   **Deployment Guidance:** Provided the user with a Health Check summary and instructions on how to deploy the application.
+- **Visual Overhaul:** A complete dark theme has been applied across the entire application, and a new, larger logo with a transparent background has been implemented in the navbar after multiple user-driven revisions.
+- **AI Designer V3:** Built a sophisticated multi-step wizard () that now accepts 3 user images, generates 2 design angles per result, and provides cost estimates in both BGN and EUR. Fixed critical file upload bugs.
+- **Feedback System:** Implemented a site-wide feedback button, a dedicated  page for submitting and viewing reviews, and the corresponding backend API.
+- **Core Components:** Created and integrated the  component on all major pages.
+- **Subscription & Registration:** Updated the  page with the new plan structure and clarified that the AI Designer is a separate add-on. Updated the  with a professional role selector and dynamic Bulstat field.
+- **Testing:** Successfully ran the  multiple times, achieving 100% pass rates after major feature rollouts.
 
 **Earlier issues found/mentioned but not fixed**
 -   None.
@@ -77,79 +78,78 @@ A functional full-stack marketplace (React, FastAPI, MongoDB). The previous sess
 
 
 **Key Technical Concepts**
--   **Backend:** FastAPI, Python, MongoDB. The  file is a large monolith.
--   **Frontend:** React.js, TailwindCSS, .
--   **State Management:** React Context API for Auth () and Language ().
--   **Internationalization (i18n):** A custom React Context and a central  file drive the full-site translation.
--   **Soft Launch Mode:** A core concept where all features are enabled for free to gather user feedback, while the UI communicates the structure of future paid plans.
+-   **Backend:** FastAPI, Python, MongoDB. The  monolith is now significantly larger.
+-   **Frontend:** React.js, TailwindCSS.
+-   **State Management:** React Context API (, ), and component-level state () for wizard flows.
+-   **File Uploads:** Handling multiple file inputs with  to ensure broad compatibility.
+-   **LLM Integration:** Advanced prompt engineering for the AI Designer to request specific outputs like multiple angles and dual-currency pricing in a structured JSON format.
 
 **key DB schema**
--   : Collection updated to support  type 'designer'. New fields for subscription status are needed.
--   : New collection needed for the feedback system.
--   : Schema needs to support up to 5 images.
+-   : New collection created to store user feedback (, , ).
+-    (Implicitly required): A new collection will be needed to store AI design generations for the publishing feature. Schema should include , , , , , .
+
+**changes in tech stack**
+-   None.
 
 **All files of reference**
-*   : Modified to include new routes and inline page components for the v10.8 update. Will need significant changes for Phase 3.
-*   : Heavily modified with new endpoints for subscriptions, ads, and ratings. Will need more changes for Phase 3 logic.
-*   : Completely rewritten with the v10.8 design, but will be changed again for Phase 3's new color scheme and content.
-*   : Updated with the 'Designer' user type. Will need further changes for the dynamic Bulstat field.
-*   : A new, large file containing all text for BG/EN translations.
-*   **Almost all files in ** were modified to implement the translation system.
+*   : Massively updated with the  and  endpoints.
+*   : New, large file containing the entire AI Designer wizard UI and logic.
+*   : New file for the feedback system.
+*   : Key file for the logo implementation and sizing adjustments.
+*   : Refactored to apply the dark theme globally and handle routing for new pages.
+*   : Updated with the dynamic professional registration form.
+*   : The new user-approved logo file.
 
 **Areas that need refactoring**:
--   **:** This is a critical monolith that grows with every feature. It should be broken down into a standard FastAPI structure (routers, services, models) to improve maintainability.
--   **Inline Page Components:** The new pages added in  (, , ) should be extracted into their own files within .
+-   **:** This file's monolithic nature is a growing liability. It urgently needs to be broken down into a standard FastAPI structure (e.g., , , ) to improve maintainability.
+-   **:** This component is very large. The logic for each step of the wizard could be broken down into smaller sub-components.
 
 **key api endpoints**
--   : (NEW) GET endpoint to fetch subscription plans.
--   : (NEW) GET endpoint to check a user's subscription status.
--   : (NEW) GET endpoint for the global AI design counter.
--   : (NEW) POST endpoint for submitting reviews/feedback.
--   : (NEW) POST endpoint for creating ads.
+-   : The core endpoint for the AI designer.
+-   : Submits new feedback.
+-   : Retrieves all feedback for the feedback page.
 
 **Critical Info for New Agent**
--   You MUST discard previous plans and focus exclusively on the user's **Phase 3 - Soft Launch** request. This is your single source of truth.
--   The implementation order should be:
-    1.  **Visuals First:** Implement the new logo and the site-wide dark color scheme.
-    2.  **Core Components:** Create the generic , video instruction popups, and the Give Feedback components.
-    3.  **Feature by Feature:** Implement the detailed functional requirements for Subscriptions, AI Designer, PDF Generator, Ads, Registration, and Notifications as specified in the problem statement.
--   Everything is in **test mode**: all features are free and fully unlocked. The goal is to present the functionality and gather user feedback.
--   All communication must be in **Bulgarian**.
+-   Your highest priority is to implement the user's latest request: the **project publishing flow** and the **dual PDF download system**. This has not been started.
+-   All communication with the user MUST be in **Bulgarian**.
+-   The user is very particular about the UI and provides frequent, specific feedback. Expect iterative development.
+-   The application is in a soft launch test mode: all features are free and fully unlocked.
+-   Do not change the logo. Its current state is the result of many revisions and has been explicitly approved by the user.
+-   All new development must adhere to the established dark theme.
 
 **documents and test reports created in this job**
--    (Updated)
--    (Successful test report for the v10.8 foundation)
+-    (Updated several times)
+-   Multiple test reports in  confirming 100% success after major feature additions.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (latest):** Copy (Providing a massive, detailed prompt for the Phase 3 soft launch, including the new color scheme,  component, video tutorials, and redefined functionality for all major features. Also provided a new logo image).
-2.  **User:** Yes, I'd like to add a gallery of previous projects.
-3.  **User:** Can you start phase 2?
-4.  **User:** Deploy.
-5.  **User:** Call Deployer Agent and Run Health Check to Check for Readiness for Deployment.
-6.  **User:** (Confirms all Phase 1 tests passed and is ready to finalize).
-7.  **User:** (Provides a long, detailed list of requirements for a v10.8 test mode, which was the precursor to the final Phase 3 prompt).
-8.  **User:** (Agrees to the development plan for v10.8).
-9.  **User:** I want the language to change for the entire site, not just the menu. Also, the PDF from the calculator is formatted incorrectly.
-10. **User (oldest):** I want the PDF to show activity type on the left, then prices, and a grand total at the bottom.
+1.  **User (latest):** Confirms that companies/masters should see both the before and after state of a project. (Status: **Pending Implementation**)
+2.  **User:** Requests that finished AI projects can be published to the site for companies to view, and wants two separate PDFs for download (one for images, one for the quantity survey). (Status: **Pending Implementation**)
+3.  **User:** Asks for the AI-generated project to be shown from two different angles. (Status: **Completed**)
+4.  **User:** Asks for the prices in the materials list to be in both EUR and BGN. (Status: **Completed**)
+5.  **User:** Reports that the image upload in the AI designer is not working. (Status: **Completed & Fixed**)
+6.  **User:** Approves the final state of the resized logo with the transparent background. (Status: **Completed**)
+7.  **User:** Reports that the logo is still slightly cut off at the top. (Status: **Completed & Fixed**)
+8.  **User:** Complains that the very large logo is ugly, merges with the background, and asks for it to be made smaller or have its background removed. (Status: **Completed & Fixed**)
+9.  **User:** Provides a new logo image and asks for it to be made 2x larger. (Status: **Completed**)
+10. **User:** Says the AI Designer is working, but prices should be in BGN and EUR. (Status: **Completed**)
 
 **Project Health Check:**
--   **Broken:** None. The app is in a stable, tested state (v10.8 foundation).
--   **Mocked:** The subscription, ads, and ratings features have backend stubs but lack full implementation, which is the goal of the upcoming Phase 3 task.
+-   **Broken:** None. The app is in a stable state and has passed all tests.
+-   **Mocked:**
+    -   The Watch Video buttons are placeholders and do not trigger a video player.
+    -   The AI blueprint analysis feature, while a user goal, is not yet implemented with the high precision requested.
 
 **3rd Party Integrations**
--   **OpenAI GPT-5.2:** Used for blueprint analysis and the AI chatbot. Uses **Emergent LLM Key**.
--   **Telegram:** Used for new project notifications. Requires a user-provided API key.
--   **Stripe (Payments):** Integrated but currently disabled.
+-   **OpenAI GPT models:** Heavily used for the AI chatbot and, most critically, for the AI Designer's image analysis and generation prompts. Uses **Emergent LLM Key**.
+-   **Telegram:** Configured for notifications. Requires a user-provided key.
+-   **Stripe (Payments):** Integrated but currently disabled during the soft launch.
 -   **Google Analytics 4:** Integrated for site analytics.
 
 **Testing status**
--   Testing agent used after significant changes: YES (for the v10.8 foundation)
+-   Testing agent used after significant changes: **YES**. Successfully used multiple times to validate major new features.
 -   Troubleshoot agent used after agent stuck in loop: NO
 -   Test files created: []
 -   Known regressions: None.
 
 **Credentials to test flow:**
--   **User Accounts:** Register a new user on the site to access features.
-
-**What agent forgot to execute**
--   The agent has not forgotten any tasks. The user provided a new, all-encompassing set of requirements (Phase 3) that supersedes all previous in-progress work and redefines the project's immediate goals. The next step is to begin implementing this new, large-scale plan.</analysis>
+-   Register a new user directly on the site to access all features in the current soft launch mode.</analysis>
