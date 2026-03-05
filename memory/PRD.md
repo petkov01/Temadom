@@ -16,78 +16,55 @@ Marketplace app "TemaDom" for construction project leads. Connects clients with 
 ### Visual Identity
 - Dark theme: #1E2A38, #2B2B2B, accents #FF8C42, #28A745, #DC3545, #4DA6FF, #8C56FF
 - TemaDom logo 120px in navbar + logo in footer
-- Gradient text, glass morphism effects
 
 ### AI Designer (COMPLETE)
 - 3 photo upload from 3 different angles
-- Room type selection (9 types)
-- Dimensions input (width, length, height)
-- 5 styles + 3 material classes + 1/3/5 variants
-- GPT-4o room analysis + GPT Image 1 design generation
-- Materials list with prices from 18 Bulgarian stores (BGN + EUR)
-- Before/After comparison, 2 angles per variant
+- Room type selection (9 types), 5 styles + 3 material classes
+- GPT-4o analysis + GPT Image 1 generation, 2 angles per variant
+- Materials list with prices in BGN + EUR from 18 Bulgarian stores
 - **Publish button** to share designs to public gallery
 
-### Published Projects Gallery (NEW - March 5, 2026)
-- **`/gallery` page** - Public gallery of published AI designs
-- Filters by room type, style; sort by newest/popular/top rated
-- **`/gallery/{id}` detail page** with:
-  - Before/After/Compare tabs for image viewing
-  - Like system (toggle, count)
-  - Rating system (1-5 stars, average calculation)
-  - Comments system (with user info, role badge)
-  - Materials/quantity survey table
-  - **Two PDF downloads**: Design images PDF + Quantity survey PDF
+### Published Projects Gallery (March 5, 2026 - REDESIGNED)
+- **Gallery cards redesigned** to match user HTML template:
+  - Header: TemaDom logo + company/user name
+  - Image section with "Преди / Ъгъл / След" label + image count badges
+  - Project info grid: Стил, Площ (м²), Бюджет (лв.), Рейтинг (stars)
+  - Materials preview table with Материал, Кол-во, Цена, Линк (магазин)
+  - CTA buttons: "Генерирай подобен" (green) + "Свали PDF" (orange)
+  - Stats footer: Харесвания, Коментара, Rating/5
+- **Detail page** `/gallery/{id}` redesigned with same template:
+  - Image tabs: ПРЕДИ / СЛЕД / СРАВНЕНИЕ
+  - Full materials table with store links + total row (BGN + EUR)
+  - "Генерирай подобен проект" → links to AI Designer with prefilled params
+  - Dual PDF: "Свали PDF" (survey) + "Дизайн PDF" (images)
+  - Like toggle, Rating stars (1-5), Comments system
+- Filters: room type, style; sort by newest/popular/top rated
 - Visible to ALL users (clients, masters, companies)
-- Navbar + Footer + "More" dropdown links to Gallery
-
-### Subscription Plans
-- Base/Pro/Premium for companies (no AI Designer included)
-- AI Designer as separate paid module (free in test mode)
-
-### Feedback System
-- Dedicated /feedback page with star rating form + reviews
-- Floating feedback button
 
 ### Other Features
+- Subscription Plans (Base/Pro/Premium)
+- Feedback System (/feedback page)
 - PageInstructions on all major pages
-- Registration: 3 tabs + Company/Master dropdown + dynamic Bulstat
-- Price Calculator for 28 regions
-- AI Chatbot (dark theme)
-- Full BG/EN translation
-- Messaging system
-- Portfolio system
-- Analytics dashboard
+- Registration: Company/Master dropdown + dynamic Bulstat
+- Price Calculator, AI Chatbot, Messaging, Portfolio, Analytics
+
+## API Endpoints (Published Projects)
+- POST /api/published-projects - Publish project (auth)
+- GET /api/published-projects - List with filters/pagination (public)
+- GET /api/published-projects/{id} - Full detail (public)
+- POST /api/published-projects/{id}/like - Toggle like (auth)
+- POST /api/published-projects/{id}/comment - Add comment (auth)
+- POST /api/published-projects/{id}/rate - Rate 1-5 (auth)
+- GET /api/published-projects/{id}/pdf/design - Design images PDF
+- GET /api/published-projects/{id}/pdf/survey - Quantity survey PDF
 
 ## P0 Remaining
 - Video instruction player (replace placeholders)
 - Gallery of AI designs on homepage
-- Telegram notifications for test period
 
 ## P1 Backlog
 - AI Blueprint Analysis (95%+ accuracy)
-- Mobile app (React Native/Expo or PWA)
+- Mobile app
 - Real payments (EasyPay Bulgaria)
 - Admin dashboard
 - server.py refactoring into modules
-
-## API Endpoints
-- POST /api/ai-designer/generate - Generate AI design
-- GET /api/ai-designer/gallery - Gallery of previous designs
-- POST /api/published-projects - Publish project to gallery (auth)
-- GET /api/published-projects - List published projects (public)
-- GET /api/published-projects/{id} - Project detail (public)
-- POST /api/published-projects/{id}/like - Toggle like (auth)
-- POST /api/published-projects/{id}/comment - Add comment (auth)
-- POST /api/published-projects/{id}/rate - Rate 1-5 (auth)
-- GET /api/published-projects/{id}/pdf/design - Download design PDF
-- GET /api/published-projects/{id}/pdf/survey - Download survey PDF
-- POST /api/feedback - Submit feedback
-- GET /api/feedback - Get all feedback
-- GET /api/subscriptions/plans - Subscription plans
-
-## DB Collections
-- `users`, `company_profiles`, `projects`, `reviews`, `feedback`
-- `ai_designs` - AI design generation records
-- `published_projects` - Published gallery projects with likes/comments/ratings
-- `messages`, `ads`, `analytics_events`, `payment_transactions`
