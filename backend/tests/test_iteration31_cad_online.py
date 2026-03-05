@@ -15,7 +15,7 @@ import io
 import uuid
 
 # Use public URL from frontend .env
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://cad-sketch-2.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://teemadom-cad.preview.emergentagent.com')
 
 @pytest.fixture(scope="module")
 def api_client():

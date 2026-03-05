@@ -1,4 +1,4 @@
-// TemaDom IA CAD v5.1 — Main Page (Orchestrator)
+// TemaDom IA CAD v5.2 — Main Page (Orchestrator)
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { Upload, Loader2, X, Download, Ruler, RotateCcw, Eye, Share2, FileText,
   MousePointer, Square, Triangle, Layers, Circle, ArrowUpRight,
@@ -17,10 +17,15 @@ import { useSearchParams } from 'react-router-dom';
 
 import { TOOLS, GRID, CW, CH, DEFAULTS } from './cad/constants';
 import { snapEndpoint, distSeg, distCircle, autoType, getDefaults, elLength, calculateCosts, REGIONS } from './cad/utils';
-import { CADCanvas } from './cad/CADCanvas';
+import { CADCanvas, detectHandle } from './cad/CADCanvas';
 import { useThreeViewer } from './cad/ThreeDPreview';
 import { StructurePanel } from './cad/StructurePanel';
 import { CostEstimate } from './cad/CostEstimate';
+
+// Handle detection for selected element (used in onDown)
+function detectElementHandle(x, y, el) {
+  return detectHandle(x, y, el);
+}
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -82,6 +87,39 @@ export const AISketchPage = () => {
   const fileRefs = [useRef(null), useRef(null), useRef(null)];
   const glbViewerRef = useRef(null);
 
+  // Undo/Redo
+  const historyRef = useRef([]);
+  const historyPosRef = useRef(-1);
+  const saveSnapshot = useCallback((snapshot) => {
+    historyRef.current = historyRef.current.slice(0, historyPosRef.current + 1);
+    historyRef.current.push(snapshot.map(e => ({ ...e })));
+    historyPosRef.current = historyRef.current.length - 1;
+  }, []);
+  const undo = useCallback(() => {
+    if (historyPosRef.current > 0) {
+      historyPosRef.current--;
+      setEls(historyRef.current[historyPosRef.current].map(e => ({ ...e })));
+      setSelIdx(-1);
+    }
+  }, []);
+  const redo = useCallback(() => {
+    if (historyPosRef.current < historyRef.current.length - 1) {
+      historyPosRef.current++;
+      setEls(historyRef.current[historyPosRef.current].map(e => ({ ...e })));
+      setSelIdx(-1);
+    }
+  }, []);
+
+  // Keyboard shortcuts (Ctrl+Z/Y, Delete)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); redo(); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
+
   // Load shared project
   useEffect(() => {
     const id = searchParams.get('id');
@@ -114,26 +152,45 @@ export const AISketchPage = () => {
     return lines.slice(0, 3);
   }, [scale]);
 
-  const onDown = useCallback((x, y) => {
+  const onDown = useCallback((x, y, mods = {}) => {
     if (tool === 'select') {
+      // Priority 1: Check handles on currently selected element
+      if (selIdx >= 0 && els[selIdx]) {
+        const handle = detectElementHandle(x, y, els[selIdx]);
+        if (handle) {
+          const mode = handle === 'center' ? 'whole' : handle;
+          setDragInfo({ idx: selIdx, startX: x, startY: y, origEl: { ...els[selIdx] }, mode });
+          setDistLines(calcDistances(els[selIdx], els));
+          return;
+        }
+      }
+      // Priority 2: Find element under cursor (top-first order)
       let found = -1;
-      els.forEach((el, i) => {
+      let dragMode = 'whole';
+      for (let i = els.length - 1; i >= 0; i--) {
+        const el = els[i];
         if (el.tool === 'circle') {
-          if (distCircle(x, y, el.cx, el.cy, el.r || 0) < 12) found = i;
+          if (distCircle(x, y, el.cx, el.cy, el.r || 0) < 12) { found = i; break; }
         } else if (el.tool === 'column') {
           if (el.columnShape === 'rect') {
             const hw = Math.max((el.columnWidth || 30) / 100 / scale * GRID, 6) / 2 + 6;
             const hl = Math.max((el.columnLength || 30) / 100 / scale * GRID, 6) / 2 + 6;
-            if (Math.abs(x - el.x1) < hw && Math.abs(y - el.y1) < hl) found = i;
+            if (Math.abs(x - el.x1) < hw && Math.abs(y - el.y1) < hl) { found = i; break; }
           } else {
-            if (Math.hypot(x - el.x1, y - el.y1) < 15) found = i;
+            if (Math.hypot(x - el.x1, y - el.y1) < 15) { found = i; break; }
           }
-        } else if (distSeg(x, y, el.x1, el.y1, el.x2, el.y2) < 12) found = i;
-      });
+        } else {
+          const d1 = Math.hypot(x - el.x1, y - el.y1);
+          const d2 = Math.hypot(x - (el.x2 || el.x1), y - (el.y2 || el.y1));
+          if (d1 < 14) { found = i; dragMode = 'p1'; break; }
+          else if (d2 < 14) { found = i; dragMode = 'p2'; break; }
+          else if (distSeg(x, y, el.x1, el.y1, el.x2, el.y2) < 12) { found = i; dragMode = 'whole'; break; }
+        }
+      }
       setSelIdx(found);
       if (found >= 0) {
         const el = els[found];
-        setDragInfo({ idx: found, startX: x, startY: y, origEl: { ...el } });
+        setDragInfo({ idx: found, startX: x, startY: y, origEl: { ...el }, mode: dragMode });
         setDistLines(calcDistances(el, els));
       }
       return;
@@ -168,22 +225,63 @@ export const AISketchPage = () => {
       return;
     }
     setDraft({ tool, x1: x, y1: y, x2: x, y2: y, floor: currentFloor });
-  }, [tool, els, currentFloor]);
+  }, [tool, els, currentFloor, selIdx, colShape, scale, calcDistances]);
 
-  const onMove = useCallback((x, y) => {
+  const onMove = useCallback((x, y, mods = {}) => {
     // Dragging element in select mode
     if (dragInfo) {
-      const dx = x - dragInfo.startX, dy = y - dragInfo.startY;
+      let dx = x - dragInfo.startX, dy = y - dragInfo.startY;
       const orig = dragInfo.origEl;
+      const mode = dragInfo.mode || 'whole';
+
+      // Shift: orthogonal constraint
+      if (mods.shift) {
+        if (Math.abs(dx) > Math.abs(dy)) dy = 0; else dx = 0;
+      }
+      // Ctrl: precision snap (0.1m steps)
+      if (mods.ctrl) {
+        const step = GRID * 0.1 / scale;
+        if (step > 0) { dx = Math.round(dx / step) * step; dy = Math.round(dy / step) * step; }
+      }
+
       setEls(p => p.map((e, j) => {
         if (j !== dragInfo.idx) return e;
+
+        // Endpoint P1 only
+        if (mode === 'p1') {
+          return { ...e, x1: orig.x1 + dx, y1: orig.y1 + dy };
+        }
+        // Endpoint P2 only
+        if (mode === 'p2') {
+          return { ...e, x2: (orig.x2 || orig.x1) + dx, y2: (orig.y2 || orig.y1) + dy };
+        }
+        // Rotation around center
+        if (mode === 'rotate') {
+          const cx = (orig.x1 + (orig.x2 || orig.x1)) / 2;
+          const cy = (orig.y1 + (orig.y2 || orig.y1)) / 2;
+          const origAngle = Math.atan2(dragInfo.startY - cy, dragInfo.startX - cx);
+          const newAngle = Math.atan2(y - cy, x - cx);
+          const da = newAngle - origAngle;
+          const cos = Math.cos(da), sin = Math.sin(da);
+          const rp = (px, py) => ({ x: cx + (px - cx) * cos - (py - cy) * sin, y: cy + (px - cx) * sin + (py - cy) * cos });
+          const np1 = rp(orig.x1, orig.y1), np2 = rp(orig.x2 || orig.x1, orig.y2 || orig.y1);
+          return { ...e, x1: np1.x, y1: np1.y, x2: np2.x, y2: np2.y };
+        }
+
+        // Whole element
         if (e.tool === 'circle') return { ...e, cx: orig.cx + dx, cy: orig.cy + dy };
         if (e.tool === 'column') return { ...e, x1: orig.x1 + dx, y1: orig.y1 + dy, x2: orig.x1 + dx, y2: orig.y1 + dy };
         return { ...e, x1: orig.x1 + dx, y1: orig.y1 + dy, x2: (orig.x2 || orig.x1) + dx, y2: (orig.y2 || orig.y1) + dy };
       }));
-      const movedEl = { ...dragInfo.origEl };
-      if (movedEl.tool === 'circle') { movedEl.cx += dx; movedEl.cy += dy; }
-      else { movedEl.x1 += dx; movedEl.y1 += dy; movedEl.x2 = (movedEl.x2 || movedEl.x1) + dx; movedEl.y2 = (movedEl.y2 || movedEl.y1) + dy; }
+
+      // Recalc distances
+      const movedEl = { ...orig };
+      if (mode === 'p1') { movedEl.x1 += dx; movedEl.y1 += dy; }
+      else if (mode === 'p2') { movedEl.x2 = (movedEl.x2 || movedEl.x1) + dx; movedEl.y2 = (movedEl.y2 || movedEl.y1) + dy; }
+      else if (mode !== 'rotate') {
+        if (movedEl.tool === 'circle') { movedEl.cx += dx; movedEl.cy += dy; }
+        else { movedEl.x1 += dx; movedEl.y1 += dy; movedEl.x2 = (movedEl.x2 || movedEl.x1) + dx; movedEl.y2 = (movedEl.y2 || movedEl.y1) + dy; }
+      }
       setDistLines(calcDistances(movedEl, els));
       return;
     }
@@ -191,27 +289,34 @@ export const AISketchPage = () => {
     if (draft.tool === 'circle') {
       setDraft(p => ({ ...p, r: Math.hypot(x - p.cx, y - p.cy) }));
     } else {
-      setDraft(p => ({ ...p, x2: x, y2: y }));
+      let nx = x, ny = y;
+      if (mods.shift) {
+        if (Math.abs(x - draft.x1) > Math.abs(y - draft.y1)) ny = draft.y1; else nx = draft.x1;
+      }
+      setDraft(p => ({ ...p, x2: nx, y2: ny }));
     }
-  }, [draft, dragInfo, els, calcDistances]);
+  }, [draft, dragInfo, els, calcDistances, scale]);
 
   const onUp = useCallback(() => {
-    if (dragInfo) { setDragInfo(null); setDistLines([]); return; }
+    if (dragInfo) {
+      setEls(cur => { saveSnapshot(cur); return cur; });
+      setDragInfo(null); setDistLines([]); return;
+    }
     if (!draft) return;
     if (draft.tool === 'circle') {
       if ((draft.r || 0) > 5) {
         const newEl = { ...draft, _type: 'circle', ...getDefaults('circle') };
-        setEls(p => { const next = [...p, newEl]; setSelIdx(next.length - 1); return next; });
+        setEls(p => { const next = [...p, newEl]; saveSnapshot(next); setSelIdx(next.length - 1); return next; });
       }
     } else {
       const len = Math.hypot(draft.x2 - draft.x1, draft.y2 - draft.y1);
       if (len > 10) {
         const newEl = { ...draft, _type: autoType(draft), ...getDefaults(draft.tool) };
-        setEls(p => { const next = [...p, newEl]; setSelIdx(next.length - 1); return next; });
+        setEls(p => { const next = [...p, newEl]; saveSnapshot(next); setSelIdx(next.length - 1); return next; });
       }
     }
     setDraft(null);
-  }, [draft]);
+  }, [draft, dragInfo, saveSnapshot]);
 
   const updateEl = useCallback((i, f, v) => setEls(p => p.map((e, j) => j === i ? { ...e, [f]: v } : e)), []);
 
@@ -240,7 +345,7 @@ export const AISketchPage = () => {
     }));
   }, [scale]);
 
-  const deleteEl = (i) => { setEls(p => p.filter((_, j) => j !== i)); setSelIdx(-1); };
+  const deleteEl = (i) => { setEls(p => { const next = p.filter((_, j) => j !== i); saveSnapshot(next); return next; }); setSelIdx(-1); };
 
   const addManual = (type) => {
     const toolType = ['slab'].includes(type) ? 'rect' : ['circle'].includes(type) ? 'circle' : type;
@@ -346,8 +451,8 @@ export const AISketchPage = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h1 className="text-lg md:text-xl font-bold text-white">IA CAD v5.1</h1>
-            <p className="text-slate-500 text-[10px]">Скица → 3D → Сметка → Договор | Touch</p>
+            <h1 className="text-lg md:text-xl font-bold text-white">IA CAD v5.2</h1>
+            <p className="text-slate-500 text-[10px]">Handles: Drag Край/Център/Ротация | Shift: Орт | Ctrl+Z/Y</p>
           </div>
           <div className="flex gap-2" data-testid="mode-tabs">
             <button onClick={() => { setMode('draw'); setUploadRes(null); }}
@@ -390,6 +495,8 @@ export const AISketchPage = () => {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
+                    <button onClick={undo} className="px-2 py-1 rounded text-[10px] font-medium bg-[#1E2A38] text-slate-400 hover:text-white hover:bg-[#2A3A4C]" data-testid="undo-btn" title="Ctrl+Z">&#8630;</button>
+                    <button onClick={redo} className="px-2 py-1 rounded text-[10px] font-medium bg-[#1E2A38] text-slate-400 hover:text-white hover:bg-[#2A3A4C]" data-testid="redo-btn" title="Ctrl+Y">&#8631;</button>
                     <div className="flex items-center gap-1.5">
                       <span className="text-slate-500 text-[10px]">Ет:</span>
                       <button onClick={() => setCurrentFloor(p => Math.max(0, p - 1))} className="text-slate-400 hover:text-white text-xs px-1 bg-[#1E2A38] rounded">-</button>
@@ -419,8 +526,16 @@ export const AISketchPage = () => {
                 </CardHeader>
                 <CardContent className="p-2">
                   <CADCanvas els={els} selIdx={selIdx} tool={tool} scale={scale} draft={draft}
-                    distLines={distLines} isDragging={!!dragInfo}
-                    onDown={onDown} onMove={onMove} onUp={onUp} onSelect={setSelIdx} />
+                    distLines={distLines} dragInfo={dragInfo}
+                    onDown={onDown} onMove={onMove} onUp={onUp}
+                    onDoubleClick={(x, y) => {
+                      for (let i = els.length - 1; i >= 0; i--) {
+                        const el = els[i];
+                        if (el.tool === 'circle') { if (distCircle(x, y, el.cx, el.cy, el.r || 0) < 15) { setSelIdx(i); return; } }
+                        else if (el.tool === 'column') { if (Math.hypot(x - el.x1, y - el.y1) < 15) { setSelIdx(i); return; } }
+                        else if (distSeg(x, y, el.x1, el.y1, el.x2 || el.x1, el.y2 || el.y1) < 15) { setSelIdx(i); return; }
+                      }
+                    }} />
                 </CardContent>
               </Card>
 

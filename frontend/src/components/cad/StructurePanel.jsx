@@ -1,4 +1,4 @@
-// TemaDom IA CAD v5.1 — Structure Panel (Object List + Parametric Edit)
+// TemaDom IA CAD v5.2 — Structure Panel (Object List + Parametric Edit)
 import React from 'react';
 import { Trash2, Plus, Maximize2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -110,44 +110,44 @@ function ObjectCard({ el, i, isSel, scale, onSelect, onDelete, onUpdate, onUpdat
               </div>
               {el.columnShape === 'rect' ? (
                 <>
-                  <DimInput label="W (ширина)" val={dims.width} unit="см"
+                  <DimInput label="Широчина" val={dims.width} unit="см"
                     onChange={v => onUpdate(i, 'columnWidth', v)} step={1} color="#9b59b6" />
-                  <DimInput label="L (дължина)" val={dims.length} unit="см"
+                  <DimInput label="Дължина" val={dims.length} unit="см"
                     onChange={v => onUpdate(i, 'columnLength', v)} step={1} color="#FF8C42" />
                 </>
               ) : (
-                <DimInput label="D (диаметър)" val={dims.diameter} unit="см"
+                <DimInput label="Диаметър" val={dims.diameter} unit="см"
                   onChange={v => onUpdate(i, 'columnDiameter', v)} step={1} color="#9b59b6" />
               )}
-              <DimInput label="H (височина)" val={dims.height}
+              <DimInput label="Височина" val={dims.height}
                 onChange={v => onUpdate(i, 'columnHeight', v)} color="#28A745" />
             </>
           ) : t === 'circle' ? (
             <>
-              <DimInput label="D (диаметър)" val={dims.length}
+              <DimInput label="Диаметър" val={dims.length}
                 onChange={v => { const rPx = (v / 2) * GRID / scale; onUpdate(i, 'r', Math.max(5, rPx)); }} color="#1abc9c" />
-              <DimInput label="H (дебелина)" val={dims.height}
+              <DimInput label="Дебелина" val={dims.height}
                 onChange={v => onUpdate(i, 'circleThickness', Math.max(5, v * 100))} color="#28A745" />
             </>
           ) : t === 'slab' ? (
             <>
-              <DimInput label="X (ширина)" val={dims.width}
+              <DimInput label="Широчина" val={dims.width}
                 onChange={v => onUpdateDimension(i, 'width', v)} color="#FF8C42" />
-              <DimInput label="Y (дълбочина)" val={dims.depth}
+              <DimInput label="Дълбочина" val={dims.depth}
                 onChange={v => onUpdateDimension(i, 'depth', v)} color="#4DA6FF" />
-              <DimInput label="Z (дебелина)" val={(el.slabThickness || 15)} unit="см"
+              <DimInput label="Дебелина" val={(el.slabThickness || 15)} unit="см"
                 onChange={v => onUpdate(i, 'slabThickness', v)} step={1} color="#28A745" />
             </>
           ) : (
             <>
-              <DimInput label="L (дължина)" val={dims.length}
+              <DimInput label="Дължина" val={dims.length}
                 onChange={v => onUpdateDimension(i, 'length', v)} color="#FF8C42" />
               {(t === 'wall') && (
-                <DimInput label="W (дебелина)" val={(el.thickness || 25)} unit="см"
+                <DimInput label="Дебелина" val={(el.thickness || 25)} unit="см"
                   onChange={v => onUpdate(i, 'thickness', v)} step={1} color="#4DA6FF" />
               )}
               {(t === 'wall' || t === 'roof' || t === 'beam') && (
-                <DimInput label="H (височина)" val={t === 'beam' ? ((el.beamHeight || 45)) : (el.height ?? 3)} unit={t === 'beam' ? 'см' : 'м'}
+                <DimInput label="Височина" val={t === 'beam' ? ((el.beamHeight || 45)) : (el.height ?? 3)} unit={t === 'beam' ? 'см' : 'м'}
                   onChange={v => t === 'beam' ? onUpdate(i, 'beamHeight', v) : onUpdate(i, 'height', v)}
                   step={t === 'beam' ? 1 : 0.1} color="#28A745" />
               )}
