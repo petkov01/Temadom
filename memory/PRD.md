@@ -10,14 +10,15 @@
 - PDF договор+сметка: 6 EUR, AI чертеж+договор: 17 EUR
 
 ## Implemented
-- Homepage: Hero + Защо TemaDom + Топ функции + Цени + Как работи + CTA
-- AI Designer: 1-3 photos, 1/3/5 variants, materials EUR, publish+share+PDF
-- AI Sketch: Upload sketches, structural analysis 95-100%, 2D+3D visualization
+- Homepage: Hero + Защо TemaDom + Топ функции (4) + Sora 2 видео + Цени + Как работи + CTA
+- Logo: TemaDom image + "TemaDom / СТРОИТЕЛСТВО И РЕМОНТ" text subtitle
+- AI Designer: JPEG auto-convert, 1-3 photos, 1/3/5 variants, publish+share+PDF
+- AI Sketch: JPEG auto-convert, structural analysis 95-100%, improved prompts
 - AI Gallery: Published projects, before/after, social sharing
-- Video instructions: Interactive tutorial modals with 4 steps
+- Video: Sora 2 generated tutorial video on homepage (8sec, 3.6MB)
+- Video instructions: Interactive tutorial modals with 4 steps on AI Designer + AI Sketch
 - Subscriptions: 3 tiers + standalone services + AI Designer module
 - "Дизайнери" section REMOVED from nav
-- Social sharing: Facebook, Viber, WhatsApp, Telegram, Copy Link
 
 ## P1 Backlog
 - Meshy.ai for 3D models
