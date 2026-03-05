@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 class TemaDomAPITester:
-    def __init__(self, base_url="https://lead-builder-3.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://multiangle-3d-model.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.token = None
         self.user_id = None

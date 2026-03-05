@@ -2592,14 +2592,8 @@ async def get_top_companies(limit: int = 10):
 
 @api_router.get("/demo-projects")
 async def get_demo_projects():
-    """Get demo projects for homepage"""
-    demos = [
-        {"id": "demo1", "title": "Ремонт на апартамент 80 м²", "category": "general", "city": "София", "image": "/demo/apartment.jpg", "budget": "8,928 €"},
-        {"id": "demo2", "title": "Вътрешен дизайн на дневна", "category": "design", "city": "Пловдив", "image": "/demo/living.jpg", "budget": "3,500 €"},
-        {"id": "demo3", "title": "Баня от А до Я", "category": "plumbing", "city": "Варна", "image": "/demo/bathroom.jpg", "budget": "5,200 €"},
-        {"id": "demo4", "title": "Кухня по поръчка", "category": "carpentry", "city": "Бургас", "image": "/demo/kitchen.jpg", "budget": "7,100 €"}
-    ]
-    return {"projects": demos}
+    """Returns empty - no demo projects in production"""
+    return {"projects": []}
 
 # ============== REVIEW AI MODERATION ==============
 
