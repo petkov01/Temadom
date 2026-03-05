@@ -14,7 +14,7 @@ import {
 import { AIDesignerPage } from '@/components/AIDesignerPage';
 import { FeedbackPage } from '@/components/FeedbackPage';
 import { PublishedGalleryPage } from '@/components/PublishedGalleryPage';
-import { AISketchPage } from '@/components/AISketchPage';
+import { AIChartPage } from '@/components/AIChartPage';
 import PriceCalculator from '@/components/PriceCalculator';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 import ProjectEstimator from '@/components/ProjectEstimator';
@@ -45,7 +45,7 @@ const TemaDomLogo = ({ className = "h-12" }) => (
     />
     <div className="hidden sm:flex flex-col leading-tight">
       <span className="text-white font-bold text-lg tracking-wide">TemaDom</span>
-      <span className="text-slate-400 text-[10px] font-medium tracking-wider uppercase">Строителство и ремонт</span>
+      <span className="text-slate-400 text-[10px] font-medium" style={{ letterSpacing: '0.15em' }}>СТРОИТЕЛСТВО И РЕМОНТ</span>
     </div>
   </div>
 );
@@ -203,8 +203,8 @@ const Navbar = () => {
                   <Link to="/ai-designer" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-designer">
                     <Sparkles className="h-4 w-4" /> AI Дизайнер
                   </Link>
-                  <Link to="/ai-sketch" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-sketch">
-                    <FileText className="h-4 w-4" /> AI Sketch
+                  <Link to="/ai-chart" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-chart">
+                    <BarChart3 className="h-4 w-4" /> AI Чертежи
                   </Link>
                   <Link to="/ai-gallery" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-gallery">
                     <Image className="h-4 w-4" /> AI Галерия
@@ -356,8 +356,8 @@ const Navbar = () => {
             <Link to="/ai-designer" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
               <Sparkles className="h-4 w-4" /> AI Дизайнер
             </Link>
-            <Link to="/ai-sketch" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-sketch">
-              <FileText className="h-4 w-4" /> AI Sketch
+            <Link to="/ai-chart" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-chart">
+              <BarChart3 className="h-4 w-4" /> AI Чертежи
             </Link>
             <Link to="/ai-gallery" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-gallery">
               <Image className="h-4 w-4" /> AI Галерия
@@ -439,7 +439,7 @@ const Footer = () => {
             <li><Link to="/projects" className="hover:text-[#FF8C42] transition-colors">{t('footer_view_projects')}</Link></li>
             <li><Link to="/subscriptions" className="hover:text-[#FF8C42] transition-colors">Абонаменти</Link></li>
             <li><Link to="/ai-designer" className="hover:text-[#FF8C42] transition-colors">AI Дизайнер</Link></li>
-            <li><Link to="/ai-sketch" className="hover:text-[#FF8C42] transition-colors">AI Sketch</Link></li>
+            <li><Link to="/ai-chart" className="hover:text-[#FF8C42] transition-colors">AI Чертежи</Link></li>
             <li><Link to="/ai-gallery" className="hover:text-[#FF8C42] transition-colors">AI Галерия</Link></li>
           </ul>
         </div>
@@ -592,27 +592,27 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Feature 2: AI Sketch */}
+          {/* Feature 2: AI Chart Analyzer */}
           <div className="grid md:grid-cols-2 gap-8 mb-12 items-center">
             <div className="bg-gradient-to-br from-[#FF8C42]/20 to-[#DC3545]/10 rounded-2xl p-8 border border-[#FF8C42]/20 text-center order-2 md:order-1">
-              <FileText className="h-16 w-16 text-[#FF8C42]/60 mx-auto mb-4" />
-              <p className="text-white font-medium">Скица/Чертеж &rarr; AI анализ &rarr; 2D план + 3D визуализация</p>
+              <BarChart3 className="h-16 w-16 text-[#FF8C42]/60 mx-auto mb-4" />
+              <p className="text-white font-medium">Чертеж &rarr; AI анализ &rarr; Сметка + Договор</p>
               <p className="text-slate-500 text-sm mt-2">95-100% точност на количествената сметка</p>
             </div>
             <div className="order-1 md:order-2">
               <div className="inline-flex items-center gap-2 bg-[#FF8C42]/15 border border-[#FF8C42]/30 rounded-full px-4 py-1.5 mb-4">
-                <FileText className="h-4 w-4 text-[#FF8C42]" />
-                <span className="text-xs font-medium text-[#FF8C42]">AI SKETCH</span>
+                <BarChart3 className="h-4 w-4 text-[#FF8C42]" />
+                <span className="text-xs font-medium text-[#FF8C42]">AI ЧЕРТЕЖИ</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Скица &rarr; Точен чертеж + количествена сметка</h3>
-              <p className="text-slate-400 mb-4 text-sm">Качете скици, ръчни чертежи или снимки на строеж. AI разпознава колони, греди, стълби, фундаменти и покрив с 95-100% точност и генерира количествена сметка.</p>
+              <h3 className="text-xl font-bold text-white mb-3">Чертеж &rarr; Количествена сметка + Договор</h3>
+              <p className="text-slate-400 mb-4 text-sm">Качете чертеж на стълби, фундамент или стени. AI анализира и генерира точна количествена сметка с официален PDF договор за 30 секунди.</p>
               <ul className="space-y-2 text-sm text-slate-300 mb-6">
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" /> Структурен анализ: колони, греди, стълби, фундаменти</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" /> 2D план + 3D визуализация</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" /> PDF договор с количествена сметка</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" /> Автоматичен анализ на чертежи</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" /> Точна количествена сметка с реални цени 2026</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" /> PDF договор с електронни подписи</li>
               </ul>
-              <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={() => navigate('/ai-sketch')} data-testid="feature-ai-sketch-btn">
-                <FileText className="mr-2 h-4 w-4" /> Опитай AI Sketch
+              <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" onClick={() => navigate('/ai-chart')} data-testid="feature-ai-chart-btn">
+                <BarChart3 className="mr-2 h-4 w-4" /> AI Чертежи
               </Button>
             </div>
           </div>
@@ -3073,7 +3073,7 @@ const SubscriptionsPage = () => {
                     </div>
                   ))}
                 </div>
-                <Button className="w-full mt-4 bg-[#28A745] hover:bg-[#22943e] text-white" onClick={() => key.includes('calculator') ? navigate('/calculator') : navigate('/ai-sketch')}>
+                <Button className="w-full mt-4 bg-[#28A745] hover:bg-[#22943e] text-white" onClick={() => key.includes('calculator') ? navigate('/calculator') : navigate('/ai-chart')}>
                   Поръчай сега
                 </Button>
               </CardContent>
@@ -3174,7 +3174,7 @@ function App() {
                 <Route path="/payment/cancel" element={<PaymentCancelPage />} />
                 <Route path="/ads" element={<AdsPage />} />
                 <Route path="/ai-designer" element={<AIDesignerPage />} />
-                <Route path="/ai-sketch" element={<AISketchPage />} />
+                <Route path="/ai-chart" element={<AIChartPage />} />
                 <Route path="/ai-gallery" element={<PublishedGalleryPage />} />
                 <Route path="/subscriptions" element={<SubscriptionsPage />} />
                 <Route path="/feedback" element={<FeedbackPage />} />

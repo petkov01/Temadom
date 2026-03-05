@@ -1,155 +1,175 @@
 <analysis>**original_problem_statement:**
-The user wants to build a marketplace application named TemaDom for selling construction project leads. The project has pivoted multiple times and is now in a soft launch phase.
+The user's goal is to build and launch TemaDom, a full-featured marketplace for construction project leads. The project is in its final stages, focusing on advanced AI features and preparing for a public launch.
 
-The user's latest and most critical request is to implement **Phase 3 - Soft Launch**, which involves a complete visual and functional overhaul of the application. All features are to be active and free for testing, but the UI should present the structure of future paid plans.
+**LATEST PRODUCT REQUIREMENTS (Synthesized from user's prompts):**
 
-**PRODUCT REQUIREMENTS (Phase 3 - Soft Launch):**
-*   **Visual Overhaul:**
-    *   **New Logo:** Replace the old logo site-wide with the new one provided.
-    *   **New Color Scheme:** Implement a specific dark theme:
-        *   Main: Dark Blue (), Dark Gray (), White ()
-        *   Accents: Orange (), Green (), Red ()
-        *   Secondary: Light Blue (), Purple ()
-        *   Gradients for Hero section and cards.
-*   **User Experience:**
-    *   ** Component:** Create and display a detailed instructional component on every major page, explaining the feature's function, steps for use, benefits, and tips.
-    *   **Video Instructions:** Integrate a Watch Video button/popup on each page to show a demo video for that feature.
-    *   **Feedback Section:** Implement a site-wide Give Feedback button allowing users to rate the app (1-5 stars) and provide textual feedback, which should be collected in an admin view.
-    *   **Project Gallery:** Add a gallery to showcase previously generated AI designs to increase user engagement.
-*   **Feature Enhancements (Test Mode - All Free):**
-    *   **Subscription Plans Page:** Create a new  page detailing , ,  (for Companies) and  plans. All features are unlocked, but the page explains what each plan will offer in the future.
-    *   **AI Designer Engine:** All variants (1/3/5) are active without limits. It should work from an uploaded room photo and allow users to select material quality (economy, standard, premium).
-    *   **PDF Generator:** Generate Contracts, Quantity Surveys, and Charters. Contracts should *not* include promotional store links, only legal terms, quantities, and signature fields.
-    *   **Ads System:** Allow up to 5 images per ad, with search and filtering by category/city.
-    *   **Registration Form:** Update the registration for Master and Company with a dropdown. The Bulstat field should only be visible and required for Company.
-    *   **Notifications (Telegram/Email):** Send notifications for subscription events (reminders, expiry) only for users on future , , and  plans.
+*   **AI Blueprint/Chart Analyzer (Phase 4 - HIGHEST PRIORITY):**
+    *   Create a new page at .
+    *   This page should allow users to upload a drawing (e.g., of stairs, foundations).
+    *   An AI backend will analyze the drawing to produce a detailed quantity survey (bill of materials) with 95-100% accuracy.
+    *   The results should be displayed in a table and used to generate a formal PDF contract, including client name, project details, and signature lines.
+    *   This feature is intended to be the final major piece of functionality before launch.
+
+*   **Final Launch Preparations:**
+    *   **Delete Fake Content:** Remove all remaining test/demo projects, fake advertisements, and posts from the site to clean it for production use.
+    *   **Video Enhancement:** Regenerate the main promotional video to include Bulgarian text overlays and incorporate the official site logo.
+
+*   **UI & Feature Finalization:**
+    *   **Logo:** The logo should be a text-based design: TemaDom as the main title and СТРОИТЕЛСТВО И РЕМОНТ as a subtitle below it.
+    *   **Image Uploads:** All image uploads (for AI Designer, AI Sketch/Chart) must be converted to JPEG format on the client-side before being sent to the backend to ensure compatibility and reduce file size.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-A functional full-stack marketplace (React, FastAPI, MongoDB). The previous session completed a massive full-site translation (BG/EN) and laid the foundation for a v10.8 update. This included adding a 'designer' user type, a new homepage, and backend stubs for subscriptions, ads, and ratings. This v10.8 foundation was successfully tested but is now set to be completely overhauled by the new Phase 3 - Soft Launch requirements.
+The application is nearly feature-complete and has undergone multiple iterations of development and bug fixing based on user feedback. Key completed items include:
+*   A full-site dark theme and a final, approved text-based logo.
+*   An AI-generated promotional video (using Sora 2) is integrated into the homepage.
+*   Client-side JPEG conversion for all image uploads is implemented.
+*   A multi-step AI Designer, a public project gallery with social sharing, and a site-wide feedback system.
+*   A multi-tier subscription model priced in EUR, with options for one-off purchases for specific services (e.g., PDF contracts).
+*   Test data (users, projects) has been purged via a dedicated admin endpoint.
+*   The backend has a mocked endpoint for the new AI Chart Analyzer that can generate a PDF contract based on a hardcoded example.
 
 **Last working item**:
-*   Last item agent was working: The agent was acknowledging and planning the implementation of the comprehensive Phase 3 - Soft Launch requirements provided by the user. This includes a complete UI/UX redesign (new logo, color scheme), new instructional components, and significant feature enhancements across the entire application.
-*   Status: NOT STARTED
+*   Last item agent was working: The agent was implementing the final user request: the AI Chart Analyzer feature. It successfully created the backend endpoint  with logic to generate a contract PDF using  and removed an old  endpoint. The next step was to build the corresponding frontend page and clean up remaining demo content.
+*   Status: IN PROGRESS
 *   Agent Testing Done: N
-*   Which testing method agent to use? . This is a massive, site-wide change. The agent should test after all Phase 3 features are implemented together.
+*   Which testing method agent to use? both
 *   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** Fix PDF generation from the price calculator (P1)
-    -   **Status:** RESOLVED. This issue is superseded by the new, more detailed requirements for the PDF generator in the Phase 3 plan, which specifies the generation of different document types (Contracts, Quantity Surveys) with different content rules. The focus should be on implementing the new requirements, not fixing the old format.
+*   **Issue 1: AI Chart Analyzer is not fully implemented (P0)**
+    *   **Attempted fixes:** A backend endpoint () has been created with mock logic that generates a PDF for a specific hardcoded case.
+    *   **Next debug checklist:**
+        1.  Create the new frontend page  based on the user's HTML/CSS/JS specification.
+        2.  Replace all navigation links and references from the old  to the new .
+        3.  Wire the frontend to the new  backend endpoint.
+        4.  Implement the real AI analysis logic in the backend to replace the current hardcoded example.
+    *   **Why fix this issue and what will be achieved with the fix?** This is the final core feature required by the user before launch.
+    *   **Status:** IN PROGRESS
+    *   **Should Test frontend/backend/both after fix?** Both.
 
 **In progress Task List**:
-*   **Task 1: Implement Phase 3 - Soft Launch (P0)**
+*   **Task 1: Complete AI Chart Analyzer (P0)**
+*   **Task 2: Final Content Cleanup (P1)**
+*   **Task 3: Enhance Promotional Video (P2)**
 
 **Task Detail:**
-*   **Task 1:**
-    *   **Where to resume:** The agent must start from scratch on this task. The first step should be to implement the new visual identity: replace the logo and apply the new dark-themed color scheme across the entire application's CSS or Tailwind configuration. Then, proceed with the feature list from the .
-    *   **What will be achieved with this?** A fully-featured soft launch version of the TemaDom platform with a new, professional UI/UX, ready for user testing and feedback collection. All features will be active and free.
-    *   **Status:** NOT STARTED
+*   **Task 1: Complete AI Chart Analyzer**
+    *   **Where to resume:** The backend endpoint  exists but is mocked. The main work is on the frontend. Start by creating the file .
+    *   **What will be achieved with this?** The application's final and most advanced AI feature will be functional.
+    *   **Status:** IN PROGRESS
     *   **Should Test frontend/backend/both after fix?** Both.
-    *   **Blocked on something:** No.
+*   **Task 2: Final Content Cleanup**
+    *   **Where to resume:** The agent identified a  endpoint and removed it. Now, it must inspect frontend pages like the Ads page for any hardcoded demo content and remove it.
+    *   **What will be achieved with this?** The site will be clean of all placeholder and test data, making it ready for real users.
+    *   **Status:** NOT STARTED
+    *   **Should Test frontend/backend/both after fix?** Frontend.
+*   **Task 3: Enhance Promotional Video**
+    *   **Where to resume:** A video exists at . This task requires regenerating it using the Sora 2 integration script () with a new prompt that specifies Bulgarian text overlays and the inclusion of the site logo.
+    *   **What will be achieved with this?** The promotional video will be more professional and aligned with the brand.
+    *   **Status:** NOT STARTED
+    *   **Should Test frontend/backend/both after fix?** Frontend (by viewing the video).
 
 **Upcoming and Future Tasks**
-*   **Upcoming Tasks:**
-    *   The entire **Phase 3 - Soft Launch** implementation is the sole upcoming task. It's a very large-scale P0 task.
 *   **Future Tasks:**
-    *   **Mobile App Development:** Build a mobile app for Android and iOS using React Native/Expo, reusing the existing backend. The user needs to confirm if they want to proceed with this or a PWA.
-    *   **Monetization:** Introduce real pricing and payment gateways (like EasyPay Bulgaria) after the soft launch and feedback period.
+    *   Refactor : Break down the monolithic backend file into a structured FastAPI project (routers, services, models) as originally planned in Phase 4.
 
 **Completed work in this session**
--   **Full-Site Translation:** Refactored the entire frontend to use  for seamless Bulgarian/English language switching.
--   **v10.8 Foundation:**
-    -   Implemented a new v10.8 homepage design and updated the main navigation.
-    -   Added 'designer' user type to the backend and registration form.
-    -   Created placeholder pages (, , ) and backend endpoints for upcoming features.
--   **Testing:** Successfully ran , which passed all frontend and backend tests for the v10.8 foundation.
--   **Deployment Guidance:** Provided the user with a Health Check summary and instructions on how to deploy the application.
+- **AI Chart Analyzer (Backend Started):** Created the  endpoint with PDF contract generation.
+- **Demo Content Removal (Backend):** Deleted the  endpoint.
+- **AI-Generated Video:** Integrated  to generate and display a promotional video on the homepage.
+- **Text-Based Logo:** Implemented a new logo with the title TemaDom and subtitle СТРОИТЕЛСТВО И РЕМОНТ.
+- **Client-Side Image Conversion:** Added a  utility to process all image uploads in the AI Designer and AI Sketch tools.
+- **Major Bug Fixes & Refinements:**
+    - Resolved AI Designer timeouts by optimizing image generation logic for multiple variants.
+    - Fixed non-playing video instructions by implementing a custom multi-step modal.
+    - Corrected AI Sketch prompt logic for more accurate results.
+    - Purged all test user and project data from the database via an admin endpoint.
+- **Pricing & Plan Overhaul:**
+    - Switched all prices to EUR.
+    - Iteratively adjusted prices and feature distribution across , , and  plans based on user feedback.
+    - Removed the AI Designer feature from the  plan.
+- **Homepage Redesign:** Completely redesigned the homepage to showcase top features, the company mission, and the new promotional video.
+- **Social Sharing:** Added comprehensive social sharing functionality to the project gallery and AI Designer results.
 
 **Earlier issues found/mentioned but not fixed**
--   None.
+- None.
 
 **Known issue recurrence from previous fork**
--   None.
+- None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Backend:** FastAPI, Python, MongoDB. The  file is a large monolith.
--   **Frontend:** React.js, TailwindCSS, .
--   **State Management:** React Context API for Auth () and Language ().
--   **Internationalization (i18n):** A custom React Context and a central  file drive the full-site translation.
--   **Soft Launch Mode:** A core concept where all features are enabled for free to gather user feedback, while the UI communicates the structure of future paid plans.
+- **Backend PDF Generation:** Using  library in Python to create PDF contracts dynamically. Requires custom font files ().
+- **AI Video Generation:** Integration with  via  to generate video content from a text prompt.
+- **Client-Side Image Processing:** Using  and  in JavaScript to convert user-uploaded images to JPEG before sending to the server.
+- **Background Tasks:** Running long-running processes (like video generation) in the background using  and checking their status.
 
 **key DB schema**
--   : Collection updated to support  type 'designer'. New fields for subscription status are needed.
--   : New collection needed for the feedback system.
--   : Schema needs to support up to 5 images.
+-   : Supports , ,  roles. Test users have been purged.
+-   : Stores user feedback.
+-   : Stores published AI design projects. Test projects have been purged.
+-   : Defines the pricing plans (, , ) and  one-off purchases.
 
 **All files of reference**
-*   : Modified to include new routes and inline page components for the v10.8 update. Will need significant changes for Phase 3.
-*   : Heavily modified with new endpoints for subscriptions, ads, and ratings. Will need more changes for Phase 3 logic.
-*   : Completely rewritten with the v10.8 design, but will be changed again for Phase 3's new color scheme and content.
-*   : Updated with the 'Designer' user type. Will need further changes for the dynamic Bulstat field.
-*   : A new, large file containing all text for BG/EN translations.
-*   **Almost all files in ** were modified to implement the translation system.
+*   : Contains the new (mocked)  endpoint and the removed  endpoint.
+*   : The newly redesigned homepage.
+*   : Contains the new text-based logo.
+*   : Contains the client-side JPEG conversion logic.
+*   : The script used to generate the promotional video.
+*   User-provided snippet for  feature (in message history): This should be the blueprint for .
 
 **Areas that need refactoring**:
--   **:** This is a critical monolith that grows with every feature. It should be broken down into a standard FastAPI structure (routers, services, models) to improve maintainability.
--   **Inline Page Components:** The new pages added in  (, , ) should be extracted into their own files within .
+-   **:** Still monolithic and very large. The user has previously approved refactoring this as a future task.
 
 **key api endpoints**
--   : (NEW) GET endpoint to fetch subscription plans.
--   : (NEW) GET endpoint to check a user's subscription status.
--   : (NEW) GET endpoint for the global AI design counter.
--   : (NEW) POST endpoint for submitting reviews/feedback.
--   : (NEW) POST endpoint for creating ads.
+-    (POST): New endpoint to analyze drawings and generate a PDF contract. Currently mocked.
+-    (POST): Admin endpoint used to purge test data.
+-    (POST): Endpoint used by the  script.
 
 **Critical Info for New Agent**
--   You MUST discard previous plans and focus exclusively on the user's **Phase 3 - Soft Launch** request. This is your single source of truth.
--   The implementation order should be:
-    1.  **Visuals First:** Implement the new logo and the site-wide dark color scheme.
-    2.  **Core Components:** Create the generic , video instruction popups, and the Give Feedback components.
-    3.  **Feature by Feature:** Implement the detailed functional requirements for Subscriptions, AI Designer, PDF Generator, Ads, Registration, and Notifications as specified in the problem statement.
--   Everything is in **test mode**: all features are free and fully unlocked. The goal is to present the functionality and gather user feedback.
--   All communication must be in **Bulgarian**.
+-   **PRIORITY:** Your top priority is to complete the  feature. The user considers this the final step before launch. Use the user's provided HTML/CSS/JS as a direct guide for the frontend implementation.
+-   **Communication:** All communication MUST be in Bulgarian.
+-   **Cleanup:** After the  feature, focus on the final cleanup tasks: removing fake ads from the frontend and regenerating the video with Bulgarian text and the logo.
+-   **Backend is Mocked:** The current AI Chart backend logic is hardcoded. You need to build the frontend first, and then implement the real AI analysis on the backend, likely by enhancing the prompt sent to the LLM.
 
 **documents and test reports created in this job**
--    (Updated)
--    (Successful test report for the v10.8 foundation)
+-    (Updated after every major feature completion)
+-   Multiple test reports, with the latest being .
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (latest):** Copy (Providing a massive, detailed prompt for the Phase 3 soft launch, including the new color scheme,  component, video tutorials, and redefined functionality for all major features. Also provided a new logo image).
-2.  **User:** Yes, I'd like to add a gallery of previous projects.
-3.  **User:** Can you start phase 2?
-4.  **User:** Deploy.
-5.  **User:** Call Deployer Agent and Run Health Check to Check for Readiness for Deployment.
-6.  **User:** (Confirms all Phase 1 tests passed and is ready to finalize).
-7.  **User:** (Provides a long, detailed list of requirements for a v10.8 test mode, which was the precursor to the final Phase 3 prompt).
-8.  **User:** (Agrees to the development plan for v10.8).
-9.  **User:** I want the language to change for the entire site, not just the menu. Also, the PDF from the calculator is formatted incorrectly.
-10. **User (oldest):** I want the PDF to show activity type on the left, then prices, and a grand total at the bottom.
+1.  **User (latest):** Provides detailed HTML/CSS/JS for the final AI Chart Analyzer feature and asks for its implementation.
+2.  **User:** Requests to delete all fake ads/posts and to regenerate the video with Bulgarian text and the site logo.
+3.  **Agent:** Acknowledges the request.
+4.  **User:** Confirms Да (Yes) to the agent's plan.
+5.  **Agent:** Proposes a plan to implement the chart analyzer, clean up content, and regenerate the video.
+6.  **User:** Provides final requests: AI-generated video via Sora 2, client-side JPEG conversion, and a new text-based logo.
+7.  **Agent:** Acknowledges the request.
+8.  **User:** Confirms Да, 2 да, 3 за логото (Yes, 2 yes, 3 for the logo), approving the plan.
+9.  **Agent:** Proposes a plan to implement the Sora 2 video, JPEG conversion, and text logo.
+10. **User:** Provides a large snippet of code related to logo styling, image upload fixing (JPEG conversion), and video playback, which served as the basis for the agent's last major implementation batch.
 
 **Project Health Check:**
--   **Broken:** None. The app is in a stable, tested state (v10.8 foundation).
--   **Mocked:** The subscription, ads, and ratings features have backend stubs but lack full implementation, which is the goal of the upcoming Phase 3 task.
+-   **Broken:** The  page/feature is now obsolete and needs to be replaced by .
+-   **Mocked:** The core logic of the  endpoint is mocked to return a hardcoded result.
 
 **3rd Party Integrations**
--   **OpenAI GPT-5.2:** Used for blueprint analysis and the AI chatbot. Uses **Emergent LLM Key**.
--   **Telegram:** Used for new project notifications. Requires a user-provided API key.
--   **Stripe (Payments):** Integrated but currently disabled.
--   **Google Analytics 4:** Integrated for site analytics.
+-   **OpenAI GPT-4 (via emergentintegrations):** Used for AI Designer, AI Sketch, and AI Chart analysis. Uses **Emergent LLM Key**.
+-   **Sora 2 (via emergentintegrations):** Used to generate the promotional video. Uses **Emergent LLM Key**.
+-   **fpdf2:** Python library used for backend PDF generation.
+-   **Stripe (Payments):** Integrated.
+-   **Google Analytics 4:** Integrated.
 
 **Testing status**
--   Testing agent used after significant changes: YES (for the v10.8 foundation)
--   Troubleshoot agent used after agent stuck in loop: NO
--   Test files created: []
+-   Testing agent used after significant changes: YES. Multiple runs with 100% success rates after each major feature batch.
+-   Test files created: None.
 -   Known regressions: None.
 
 **Credentials to test flow:**
--   **User Accounts:** Register a new user on the site to access features.
+-   Register a new user on the site via the registration page. The database has been cleaned of test users.
 
 **What agent forgot to execute**
--   The agent has not forgotten any tasks. The user provided a new, all-encompassing set of requirements (Phase 3) that supersedes all previous in-progress work and redefines the project's immediate goals. The next step is to begin implementing this new, large-scale plan.</analysis>
+- The agent correctly planned to replace  with , remove fake ads, and regenerate the video. It was interrupted after creating the initial backend for . The frontend work, content cleanup, and video regeneration are the immediate next steps.</analysis>

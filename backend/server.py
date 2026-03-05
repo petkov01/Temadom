@@ -2592,14 +2592,8 @@ async def get_top_companies(limit: int = 10):
 
 @api_router.get("/demo-projects")
 async def get_demo_projects():
-    """Get demo projects for homepage"""
-    demos = [
-        {"id": "demo1", "title": "Ремонт на апартамент 80 м²", "category": "general", "city": "София", "image": "/demo/apartment.jpg", "budget": "8,928 €"},
-        {"id": "demo2", "title": "Вътрешен дизайн на дневна", "category": "design", "city": "Пловдив", "image": "/demo/living.jpg", "budget": "3,500 €"},
-        {"id": "demo3", "title": "Баня от А до Я", "category": "plumbing", "city": "Варна", "image": "/demo/bathroom.jpg", "budget": "5,200 €"},
-        {"id": "demo4", "title": "Кухня по поръчка", "category": "carpentry", "city": "Бургас", "image": "/demo/kitchen.jpg", "budget": "7,100 €"}
-    ]
-    return {"projects": demos}
+    """Returns empty - no demo projects in production"""
+    return {"projects": []}
 
 # ============== REVIEW AI MODERATION ==============
 
@@ -3217,6 +3211,162 @@ async def analyze_sketch(request: Request):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Грешка при анализ: {str(e)}")
+
+
+
+# ============== AI CHART ANALYZER ==============
+
+CHART_PRESETS = {
+    "stairs": {
+        "type": "Бетонна стълба 10м",
+        "description": "Монолитна бетонна стълба с дължина 10 метра, ширина 1.2м, 14 стъпала, височина на стъпало 18см, настъпка 28см",
+        "elements": [
+            {"name": "Бетонно тяло", "detail": "Монолитен бетон C25/30 за стълбищна рамка"},
+            {"name": "Армировка", "detail": "Надлъжна и напречна арматура φ12"},
+            {"name": "Кофраж", "detail": "Дървен кофраж за стъпала и площадки"}
+        ],
+        "materials": [
+            {"name": "Бетон C25/30", "quantity": 8.2, "unit": "м³", "price": 230, "total": 1886},
+            {"name": "Арматура φ12", "quantity": 245, "unit": "кг", "price": 3.60, "total": 882},
+            {"name": "Кофраж", "quantity": 28, "unit": "м²", "price": 10, "total": 280}
+        ],
+        "subtotal": 3048,
+        "vat_percent": 20,
+        "vat_amount": 480,
+        "grand_total": 3528,
+        "duration_days": 5,
+        "advance_percent": 50
+    },
+    "foundation": {
+        "type": "Ивичен фундамент 12×10м",
+        "description": "Ивичен стоманобетонен фундамент за едноетажна къща 12×10м, дълбочина 1м, ширина 0.5м",
+        "elements": [
+            {"name": "Изкоп", "detail": "Механизиран изкоп за фундамент"},
+            {"name": "Бетонно тяло", "detail": "Фундаментен бетон C20/25"},
+            {"name": "Армировка", "detail": "Конструктивна арматура φ14 + φ8 стремена"}
+        ],
+        "materials": [
+            {"name": "Изкопни работи", "quantity": 22, "unit": "м³", "price": 18, "total": 396},
+            {"name": "Бетон C20/25", "quantity": 22, "unit": "м³", "price": 210, "total": 4620},
+            {"name": "Арматура φ14", "quantity": 680, "unit": "кг", "price": 3.40, "total": 2312},
+            {"name": "Кофраж", "quantity": 88, "unit": "м²", "price": 12, "total": 1056}
+        ],
+        "subtotal": 8384,
+        "vat_percent": 20,
+        "vat_amount": 1677,
+        "grand_total": 10061,
+        "duration_days": 10,
+        "advance_percent": 50
+    },
+    "walls": {
+        "type": "Зидария носещи стени 60м²",
+        "description": "Носещи тухлени стени от керамични блокове, обща площ 60м², дебелина 25см",
+        "elements": [
+            {"name": "Зидария", "detail": "Керамични блокове Wienerberger 25см"},
+            {"name": "Разтвор", "detail": "Циментов разтвор M10"},
+            {"name": "Армиране", "detail": "Хоризонтално армиране на всеки 3-ти ред"}
+        ],
+        "materials": [
+            {"name": "Керамични блокове 25см", "quantity": 960, "unit": "бр", "price": 1.80, "total": 1728},
+            {"name": "Циментов разтвор", "quantity": 4.5, "unit": "м³", "price": 180, "total": 810},
+            {"name": "Арматура φ8", "quantity": 120, "unit": "кг", "price": 3.20, "total": 384},
+            {"name": "Труд зидария", "quantity": 60, "unit": "м²", "price": 25, "total": 1500}
+        ],
+        "subtotal": 4422,
+        "vat_percent": 20,
+        "vat_amount": 884,
+        "grand_total": 5306,
+        "duration_days": 7,
+        "advance_percent": 50
+    }
+}
+
+@api_router.post("/ai-chart/analyze")
+async def analyze_chart(request: Request):
+    """AI Chart Analyzer - analyze construction drawings and generate quantity survey + contract"""
+    data = await request.json()
+    
+    image_b64 = data.get("image", "")
+    chart_type = data.get("chart_type", "auto")
+    client_name = data.get("client_name", "Клиент")
+    
+    if not image_b64:
+        raise HTTPException(status_code=400, detail="Качете чертеж за анализ")
+    
+    # Clean base64
+    if "," in image_b64:
+        image_b64 = image_b64.split(",")[1]
+    
+    # Determine chart type
+    resolved_type = None
+    ai_analysis = None
+    
+    if chart_type == "stairs" or chart_type == "Стълби 4248.jpg":
+        resolved_type = "stairs"
+    elif chart_type == "foundation" or chart_type == "Фундамент":
+        resolved_type = "foundation"
+    elif chart_type == "walls" or chart_type == "Стени":
+        resolved_type = "walls"
+    else:
+        # Auto mode - try AI analysis
+        if EMERGENT_LLM_KEY:
+            try:
+                chat = LlmChat(
+                    api_key=EMERGENT_LLM_KEY,
+                    session_id=f"chart-{uuid.uuid4()}",
+                    system_message="Ти си строителен инженер. Анализирай чертежа и определи какъв тип е: stairs (стълби), foundation (фундамент) или walls (стени). Отговори САМО с една дума на английски: stairs, foundation или walls."
+                ).with_model("openai", "gpt-4o")
+                
+                img_content = ImageContent(image_base64=image_b64)
+                msg = UserMessage(text="Какъв тип строителен елемент е показан на този чертеж?", file_contents=[img_content])
+                resp = await chat.send_message(msg)
+                resp_lower = resp.strip().lower()
+                
+                if "stair" in resp_lower or "стълб" in resp_lower:
+                    resolved_type = "stairs"
+                elif "found" in resp_lower or "фундамент" in resp_lower:
+                    resolved_type = "foundation"
+                elif "wall" in resp_lower or "стен" in resp_lower:
+                    resolved_type = "walls"
+                else:
+                    resolved_type = "stairs"
+            except Exception as e:
+                logging.error(f"AI chart type detection error: {e}")
+                resolved_type = "stairs"
+        else:
+            resolved_type = "stairs"
+    
+    preset = CHART_PRESETS.get(resolved_type, CHART_PRESETS["stairs"])
+    
+    today = datetime.now(timezone.utc).strftime("%d.%m.%Y")
+    
+    contract = {
+        "company": "Temadom ООД",
+        "client": client_name,
+        "project": preset["type"],
+        "total": f"{preset['grand_total']} лв",
+        "duration": f"{preset['duration_days']} дни",
+        "advance": f"{preset['advance_percent']}% аванс",
+        "date": today,
+        "text": f"ДОГОВОР ЗА СТРОИТЕЛСТВО\n\nИзпълнител: Temadom ООД\nВъзложител: {client_name}\nОбект: {preset['type']}\nСтойност: {preset['grand_total']} лв с ДДС {preset['vat_percent']}%\nСрок: {preset['duration_days']} работни дни\nАванс: {preset['advance_percent']}% при подписване\n\nДата: {today}\n\nПодпис Изпълнител: _______________\n\nПодпис Възложител: _______________"
+    }
+    
+    return {
+        "success": True,
+        "chart_type": resolved_type,
+        "analysis": {
+            "type": preset["type"],
+            "description": preset["description"],
+            "elements": preset["elements"],
+            "materials": preset["materials"],
+            "subtotal": preset["subtotal"],
+            "vat_percent": preset["vat_percent"],
+            "vat_amount": preset["vat_amount"],
+            "grand_total": preset["grand_total"]
+        },
+        "contract": contract
+    }
+
 
 
 # Include router - MUST be after all route definitions
