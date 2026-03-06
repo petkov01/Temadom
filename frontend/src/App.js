@@ -35,6 +35,7 @@ import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import CommunityPage from '@/components/CommunityPage';
 import ProductSearchPage from '@/components/ProductSearchPage';
 import LeaderboardPage from '@/components/LeaderboardPage';
+import NotificationBell from '@/components/NotificationBell';
 import { LanguageProvider, useLanguage } from '@/i18n/LanguageContext';
 import { LANGUAGES } from '@/i18n/translations';
 import { Chatbot } from '@/components/Chatbot';
@@ -377,6 +378,7 @@ const Navbar = () => {
                   {t('nav_messages')}
                 </Link>
                 <div className="flex items-center gap-3">
+                  <NotificationBell />
                   <Link to="/profile" className="text-sm hover:text-[#FF8C42] transition-colors flex items-center gap-1" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-profile">
                     <User className="h-3.5 w-3.5" /> {user.name}
                   </Link>

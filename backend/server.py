@@ -55,7 +55,22 @@ ANALYTICS_ADMIN_PASSWORD = os.environ.get("ANALYTICS_PASSWORD", "temadom2026")
 # Payment packages (server-side only - security) - DISABLED while PLATFORM_FREE
 PAYMENT_PACKAGES = {
     "subscription": {"amount": 100.00, "currency": "eur", "type": "subscription", "name": "Месечен абонамент"},
-    "single_lead": {"amount": 25.00, "currency": "eur", "type": "one_time", "name": "Единичен контакт"}
+    "single_lead": {"amount": 25.00, "currency": "eur", "type": "one_time", "name": "Единичен контакт"},
+    "basic_1": {"amount": 15.00, "currency": "eur", "type": "subscription", "name": "БАЗОВ — 1 месец", "months": 1},
+    "basic_3": {"amount": 39.00, "currency": "eur", "type": "subscription", "name": "БАЗОВ — 3 месеца", "months": 3},
+    "basic_6": {"amount": 69.00, "currency": "eur", "type": "subscription", "name": "БАЗОВ — 6 месеца", "months": 6},
+    "basic_12": {"amount": 119.00, "currency": "eur", "type": "subscription", "name": "БАЗОВ — 12 месеца", "months": 12},
+    "pro_1": {"amount": 35.00, "currency": "eur", "type": "subscription", "name": "ПРО — 1 месец", "months": 1},
+    "pro_3": {"amount": 89.00, "currency": "eur", "type": "subscription", "name": "ПРО — 3 месеца", "months": 3},
+    "pro_6": {"amount": 159.00, "currency": "eur", "type": "subscription", "name": "ПРО — 6 месеца", "months": 6},
+    "pro_12": {"amount": 269.00, "currency": "eur", "type": "subscription", "name": "ПРО — 12 месеца", "months": 12},
+    "premium_1": {"amount": 75.00, "currency": "eur", "type": "subscription", "name": "PREMIUM — 1 месец", "months": 1},
+    "premium_3": {"amount": 189.00, "currency": "eur", "type": "subscription", "name": "PREMIUM — 3 месеца", "months": 3},
+    "premium_6": {"amount": 339.00, "currency": "eur", "type": "subscription", "name": "PREMIUM — 6 месеца", "months": 6},
+    "premium_12": {"amount": 569.00, "currency": "eur", "type": "subscription", "name": "PREMIUM — 12 месеца", "months": 12},
+    "design_1room": {"amount": 69.00, "currency": "eur", "type": "one_time", "name": "3D Дизайн — 1 стая"},
+    "design_2room": {"amount": 129.00, "currency": "eur", "type": "one_time", "name": "3D Дизайн — 2 стаи"},
+    "design_5room": {"amount": 199.00, "currency": "eur", "type": "one_time", "name": "3D Дизайн — 5 стаи"},
 }
 
 # Create the main app
@@ -624,7 +639,7 @@ async def create_checkout(
     project_id: Optional[str] = None,
     user: dict = Depends(get_current_user)
 ):
-    if user["user_type"] not in ("company", "master"):
+    if user["user_type"] not in ("company", "master") and package_type in ("single_lead",):
         raise HTTPException(status_code=403, detail="Само фирми и майстори могат да закупуват контакти")
     
     if package_type not in PAYMENT_PACKAGES:
@@ -745,14 +760,20 @@ async def grant_access(transaction: dict):
     package_type = transaction["package_type"]
     project_id = transaction.get("project_id")
     
-    if package_type == "subscription":
-        # Grant subscription for 30 days
-        expires = datetime.now(timezone.utc) + timedelta(days=30)
+    pkg = PAYMENT_PACKAGES.get(package_type, {})
+    months = pkg.get("months", 0)
+
+    if months > 0 or package_type == "subscription":
+        # Grant subscription
+        sub_days = months * 30 if months > 0 else 30
+        expires = datetime.now(timezone.utc) + timedelta(days=sub_days)
         await db.users.update_one(
             {"id": user_id},
             {"$set": {
                 "subscription_active": True,
-                "subscription_expires": expires.isoformat()
+                "subscription_plan": package_type,
+                "subscription_start": datetime.now(timezone.utc).isoformat(),
+                "subscription_expires": expires.isoformat(),
             }}
         )
     elif package_type == "single_lead" and project_id:
@@ -5065,6 +5086,16 @@ async def toggle_like(post_id: str, user: dict = Depends(get_current_user)):
         likes.remove(user["id"])
     else:
         likes.append(user["id"])
+        # Notify post author about the like
+        if post.get("user_id") and post["user_id"] != user["id"]:
+            from routes.notifications import create_notification
+            await create_notification(
+                user_id=post["user_id"],
+                notif_type="like",
+                title="Нов лайк!",
+                message=f"{user.get('name', 'Потребител')} хареса вашата публикация",
+                link="/community",
+            )
 
     await db.community_posts.update_one({"id": post_id}, {"$set": {"likes": likes, "likes_count": len(likes)}})
     return {"liked": user["id"] in likes, "likes_count": len(likes)}
@@ -5210,7 +5241,7 @@ async def create_offer(request: Request, user: dict = Depends(get_current_user))
     if not post_id or not message:
         raise HTTPException(status_code=400, detail="Посочете публикация и съобщение")
 
-    post = await db.community_posts.find_one({"id": post_id}, {"_id": 0, "id": 1})
+    post = await db.community_posts.find_one({"id": post_id}, {"_id": 0, "id": 1, "user_id": 1})
     if not post:
         raise HTTPException(status_code=404, detail="Публикацията не е намерена")
 
@@ -5229,6 +5260,18 @@ async def create_offer(request: Request, user: dict = Depends(get_current_user))
     }
     await db.community_offers.insert_one(offer)
     offer.pop("_id", None)
+
+    # Send notification to post author
+    from routes.notifications import create_notification
+    await create_notification(
+        user_id=post.get("user_id", ""),
+        notif_type="offer",
+        title="Нова оферта!",
+        message=f"{user.get('name', 'Фирма')} направи оферта{f' за {price_eur} EUR' if price_eur else ''} на вашата публикация",
+        link=f"/community",
+        data={"post_id": post_id, "offer_id": offer["id"]}
+    )
+
     return offer
 
 
@@ -5267,6 +5310,10 @@ async def get_public_projects(page: int = 1, limit: int = 12):
 
 # Include router - MUST be after all route definitions
 app.include_router(api_router)
+
+# Include modular routers
+from routes.notifications import router as notifications_router
+app.include_router(notifications_router)
 
 @app.on_event("startup")
 async def start_background_tasks():

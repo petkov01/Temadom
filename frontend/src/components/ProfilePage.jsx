@@ -9,11 +9,100 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useAuth } from '../App';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
+
+const PLAN_DISPLAY = {
+  basic: { name: 'БАЗОВ', color: '#4DA6FF', price: 15 },
+  pro: { name: 'ПРО', color: '#F97316', price: 35 },
+  premium: { name: 'PREMIUM', color: '#8B5CF6', price: 75 },
+};
+
+const PaymentSection = () => {
+  const [loading, setLoading] = useState(null);
+  const [history, setHistory] = useState([]);
+  const token = localStorage.getItem('token');
+  const headers = { Authorization: `Bearer ${token}` };
+
+  useEffect(() => {
+    axios.get(`${API}/payments/history`, { headers }).then(r => setHistory(r.data.transactions)).catch(() => {});
+  }, []);
+
+  const checkout = async (packageId) => {
+    setLoading(packageId);
+    try {
+      const res = await axios.post(`${API}/payments/checkout?package_type=${packageId}`, {}, { headers });
+      if (res.data.checkout_url) window.location.href = res.data.checkout_url;
+    } catch (err) { toast.error(err.response?.data?.detail || 'Грешка'); }
+    setLoading(null);
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Subscription plans */}
+      <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm" style={{ color: 'var(--theme-text)' }}>
+            <CreditCard className="inline h-4 w-4 text-[#F97316] mr-2" /> Абонаментни планове
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {Object.entries(PLAN_DISPLAY).map(([key, plan]) => (
+            <div key={key} className="flex items-center justify-between p-3 rounded-lg"
+              style={{ background: 'var(--theme-bg-surface)', border: `1px solid ${plan.color}20` }}>
+              <div>
+                <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ background: `${plan.color}15`, color: plan.color }}>{plan.name}</span>
+                <span className="text-xs ml-2" style={{ color: 'var(--theme-text-muted)' }}>от {plan.price} EUR/мес</span>
+              </div>
+              <div className="flex gap-1">
+                {[1, 3, 6, 12].map(m => (
+                  <Button key={m} size="sm" className="text-[10px] h-7 px-2"
+                    style={{ background: loading === `${key}_${m}` ? plan.color : `${plan.color}10`, color: loading === `${key}_${m}` ? 'white' : plan.color }}
+                    onClick={() => checkout(`${key}_${m}`)}
+                    disabled={!!loading}
+                    data-testid={`buy-${key}-${m}`}>
+                    {loading === `${key}_${m}` ? <Loader2 className="h-3 w-3 animate-spin" /> : `${m}м`}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Payment history */}
+      {history.length > 0 && (
+        <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm" style={{ color: 'var(--theme-text)' }}>История на плащанията</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {history.map(tx => (
+                <div key={tx.id} className="flex items-center justify-between py-2 px-1" style={{ borderBottom: '1px solid var(--theme-border)' }}>
+                  <div>
+                    <p className="text-xs font-medium" style={{ color: 'var(--theme-text)' }}>{tx.package_name}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>{new Date(tx.created_at).toLocaleDateString('bg-BG')}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-bold" style={{ color: '#F97316' }}>{tx.amount} {tx.currency?.toUpperCase()}</p>
+                    <Badge className={`text-[9px] ${tx.payment_status === 'paid' ? 'bg-[#10B981]/15 text-[#10B981]' : 'bg-yellow-500/15 text-yellow-600'}`}>
+                      {tx.payment_status === 'paid' ? 'Платено' : 'Очаква'}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
 const SITE = process.env.REACT_APP_BACKEND_URL;
 
 const ProfilePage = () => {
@@ -176,12 +265,15 @@ const ProfilePage = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="info" className="w-full">
-          <TabsList className="w-full grid grid-cols-4 mb-4" style={{ background: 'var(--theme-bg-secondary)' }}>
+          <TabsList className="w-full grid grid-cols-5 mb-4" style={{ background: 'var(--theme-bg-secondary)' }}>
             <TabsTrigger value="info" data-testid="tab-info">
               <User className="h-3.5 w-3.5 mr-1.5" /> Профил
             </TabsTrigger>
             <TabsTrigger value="projects" data-testid="tab-projects">
               <Bookmark className="h-3.5 w-3.5 mr-1.5" /> Проекти
+            </TabsTrigger>
+            <TabsTrigger value="payments" data-testid="tab-payments">
+              <CreditCard className="h-3.5 w-3.5 mr-1.5" /> Плащания
             </TabsTrigger>
             <TabsTrigger value="referrals" data-testid="tab-referrals">
               <Gift className="h-3.5 w-3.5 mr-1.5" /> Реферали
@@ -367,6 +459,11 @@ const ProfilePage = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* TAB: Payments */}
+          <TabsContent value="payments">
+            <PaymentSection />
           </TabsContent>
 
           {/* TAB: Referrals */}
