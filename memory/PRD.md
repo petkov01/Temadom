@@ -6,7 +6,8 @@ TemaDom is a web application for construction and interior design targeting the 
 ## Core Products
 1. **AI-Assisted CAD System (`/ai-sketch`)** — 2D plans with 3D preview and cost estimation
 2. **3D Photo Designer v8.0 (`/room-scan`)** — BASIC: Photos → 3D renders → Share. Multi-room packages (1/2/5 rooms)
-3. **Community Feed (`/community`)** — Social feed with posts, likes, comments, filters
+3. **Community Feed (`/community`)** — Social feed with posts, likes, comments, filters, image uploads, project linking
+4. **AI Product Search (`/product-search`)** — Upload photo → AI identifies products → Search 21 Bulgarian stores
 
 ## Implemented Features
 
@@ -20,68 +21,63 @@ TemaDom is a web application for construction and interior design targeting the 
 - PDF export, cost estimation, multi-floor
 - **Fixed**: "Дълбочина" → "Височина" everywhere
 - **Removed**: "Покрив/Roof" element type completely
-- Tools: Стена, Плоча, Правоъгълник, Кръг, Стълби, Врата, Прозорец, Колона, Греда, X/Y/Z, Изтрий
 
 ### 3D Photo Designer v8.0 — `/room-scan` (BASIC)
-- **NO 360°, NO PDF, NO Fullscreen, NO Budget** — чисто базово
-- Multi-room packages: 69EUR (1 стая), 129EUR (2 стаи), 199EUR (до 5 стаи, Апартамент)
-- Всяка стая: собствен room type dropdown + style dropdown + 3 фото слота + бележки
-- Add/remove rooms dynamically, package downgrade trims rooms
+- Multi-room packages: 69EUR (1 стая), 129EUR (2 стаи), 199EUR (до 5 стаи)
 - 3 photos → OpenAI GPT Image 1 → 3 separate 3D renders
-- Before/After slider per render (if original photo available)
-- Share: Facebook, WhatsApp, Viber, Twitter, Email, Copy link
-- Flow: Снимки → 3D рендери → Сподели → КРАЙ
+- Before/After slider, Share (Facebook, WhatsApp, Viber, Twitter, Email)
 
-### Community Feed v1.0 — `/community`
+### Community Feed v2.0 — `/community` ✅ COMPLETED
 - Post types: text, project, question, before_after
-- Like/unlike toggle
-- Comments on posts
-- Post deletion (own posts)
-- Filter by type: Всички, Обсъждане, Проекти, Въпроси, Преди/След
-- Pagination with "Load more"
-- Nav link in "Още" dropdown
+- **NEW**: Image upload (up to 4 images per post, base64)
+- **NEW**: Link 3D designer projects to posts
+- **NEW**: Image-only posts allowed (no text required)
+- Like/unlike toggle, comments, post deletion
+- Filter by type, pagination with "Load more"
+
+### AI Product Search v1.0 — `/product-search` ✅ COMPLETED
+- Upload photo → OpenAI Vision (GPT-4o via Emergent LLM key) analyzes image
+- AI identifies 3-8 product search queries from the photo
+- Parallel search across 21 Bulgarian stores
+- Results grouped by query with EUR/BGN prices and direct store links
+- Room type selector (Баня, Кухня, Спалня, etc.)
+- Text query fallback when no image
+- Technomarket prioritized for appliances
 
 ### Web Scraping API — 21 Bulgarian Stores
-- `/api/scrape/stores` — 21 stores: Praktiker, Jysk, Mr.Bricolage, Bauhaus, HomeMax, Technomarket, Teknoimpex, IKEA, Temax, Maximarket, Toplivo, Marmag, Paros, Praktis, Angro, Rila Online, Baustoff Metall, Atek, Vako, Buildmark, Obijavki
-- Technomarket priority for appliances (бойлер, климатик, хладилник, пералня etc.)
-- `/api/scrape/search?q=...` — Search products across all 21 stores in parallel
+- Praktiker, Jysk, Mr.Bricolage, Bauhaus, HomeMax, Technomarket, Teknoimpex, IKEA, Temax, Maximarket, Toplivo, Marmag, Paros, Praktis, Angro, Rila Online, Baustoff Metall, Atek, Vako, Buildmark, Obijavki
 
 ### Firm Subscription Plans (Landing Page)
 - 3 plans: БАЗОВ (15EUR), ПРО (35EUR), PREMIUM (75EUR)
-- Period toggle: 1/3/6/12 months
-- Discounts: 3mo (-10%), 6mo (-15%), 12mo (-20%)
-- Notification priority explanation
-- Feature comparison with checkmarks/X
-
-### Profile Page (v6.6)
-- Avatar upload/display, personal info editing
-- My Projects, Settings tabs
-
-### Landing Page
-- TemaDom logo, regional breakdown (28 regions), testimonials carousel
-- Firm subscription plans section with period toggle
-- Reviews API, NO 360° references
+- Period toggle: 1/3/6/12 months with discounts
 
 ### Global Theme v6.5
 - Persistent dark/light mode toggle
 
 ## Key API Endpoints
-- `POST /api/ai-designer/photo-generate` — 3 photos + budget -> 3 renders + budget
-- `POST /api/ai-designer/photo-pdf` — PDF with logo + region labor
-- `GET /api/scrape/stores` — Bulgarian stores list
-- `GET /api/scrape/search?q=...` — Product search across stores
-- `POST /api/community/posts` — Create post (auth)
+- `POST /api/scrape/ai-search` — AI photo analysis + 21 store search ✅ NEW
+- `POST /api/community/posts` — Create post with images & project link ✅ UPDATED
 - `GET /api/community/posts` — List posts (public, paginated)
-- `POST /api/community/posts/{id}/like` — Toggle like (auth)
-- `POST /api/community/posts/{id}/comment` — Add comment (auth)
-- `DELETE /api/community/posts/{id}` — Delete own post (auth)
+- `POST /api/community/posts/{id}/like` — Toggle like
+- `POST /api/community/posts/{id}/comment` — Add comment
+- `DELETE /api/community/posts/{id}` — Delete own post
+- `GET /api/scrape/stores` — 21 Bulgarian stores list
+- `GET /api/scrape/search?q=...` — Product search across stores
 
 ## Prioritized Backlog
 
+### P0 — DONE ✅
+- Community Feed: image upload, project sharing ✅
+- AI Product Search: photo → 21 stores ✅
+
 ### P1 — Upcoming
-- Integrate web scraping into 3D Designer budget (replace AI-generated links with real scraped products)
-- Community Feed: image upload, project sharing from designer
+- FB Pixel/Google Analytics tracking
+- Referral rewards (automatic)
+- Mobile fullscreen + download
+- PDF export (site design)
+- Profile Page functionality (My Projects, Payment, Settings)
+- Leaderboard System (clients & firms)
 
 ### P2 — Future
-- Leaderboard System (clients & firms)
 - Backend refactoring (modular routers/)
+- Community Feed: public projects + firm offers
