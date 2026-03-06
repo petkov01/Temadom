@@ -2873,17 +2873,16 @@ async def delete_project(project_id: str, user=Depends(get_current_user)):
 
 @api_router.post("/ai-designer/photo-pdf")
 async def generate_photo_pdf(request: Request):
-    """Generate PDF for 3D Photo Designer result — renders + budget + links. Cyrillic support."""
+    """Generate PDF for 3D Photo Designer result — logo, renders, budget, region-based labor."""
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import mm
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.styles import ParagraphStyle
     from reportlab.lib import colors
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
     import io
 
-    # Register Cyrillic font
     FONT = 'FreeSans'
     FONT_B = 'FreeSansBold'
     try:
@@ -2902,6 +2901,7 @@ async def generate_photo_pdf(request: Request):
     user_name = data.get("user_name", "")
     project_id = data.get("project_id", "")
     active_tier = data.get("active_tier", "medium")
+    user_region = data.get("user_region", "")
 
     STYLE_NAMES = {"modern": "Модерен", "minimalist": "Минималист", "classic": "Класически",
                    "boho": "Бохо", "hitech": "Хай-тек", "industrial": "Индустриален",
@@ -2911,21 +2911,32 @@ async def generate_photo_pdf(request: Request):
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=15*mm, bottomMargin=15*mm, leftMargin=15*mm, rightMargin=15*mm)
 
-    title_s = ParagraphStyle('TitleBG', fontName=FONT_B, fontSize=22, spaceAfter=6, textColor=colors.HexColor('#F97316'), alignment=1)
     subtitle_s = ParagraphStyle('SubBG', fontName=FONT, fontSize=11, spaceAfter=10, textColor=colors.HexColor('#666666'), alignment=1)
     heading_s = ParagraphStyle('HeadBG', fontName=FONT_B, fontSize=14, spaceBefore=14, spaceAfter=6, textColor=colors.HexColor('#1E2A38'))
     body_s = ParagraphStyle('BodyBG', fontName=FONT, fontSize=10, spaceAfter=4)
+    body_c = ParagraphStyle('BodyCenter', fontName=FONT, fontSize=10, spaceAfter=4, alignment=1)
     small_s = ParagraphStyle('SmallBG', fontName=FONT, fontSize=8, textColor=colors.HexColor('#999999'), alignment=1)
     total_s = ParagraphStyle('TotalBG', fontName=FONT_B, fontSize=16, spaceAfter=4, textColor=colors.HexColor('#F97316'), alignment=2)
+    labor_s = ParagraphStyle('LaborBG', fontName=FONT_B, fontSize=11, spaceAfter=4, textColor=colors.HexColor('#1E2A38'))
 
     story = []
-    story.append(Paragraph("TEMADOM 3D DESIGNER", title_s))
+
+    # Logo centered
+    logo_path = '/app/frontend/public/temadom-logo.png'
+    try:
+        logo = RLImage(logo_path, width=60*mm, height=60*mm, kind='proportional')
+        logo.hAlign = 'CENTER'
+        story.append(logo)
+        story.append(Spacer(1, 4))
+    except Exception:
+        pass
+
     story.append(Paragraph(f"Проект: {style_bg} | {dimensions.get('width','?')}м x {dimensions.get('length','?')}м x {dimensions.get('height','?')}м | Бюджет: {budget_eur} EUR", subtitle_s))
     if user_name:
-        story.append(Paragraph(f"Клиент: {user_name} | Дата: {datetime.now().strftime('%d.%m.%Y')}", body_s))
+        story.append(Paragraph(f"Клиент: {user_name} | Дата: {datetime.now().strftime('%d.%m.%Y')}", body_c))
     story.append(Spacer(1, 6))
 
-    # Add render images
+    # Render images
     for r in renders[:3]:
         img_b64 = r.get("image_base64", "")
         label = r.get("label", "")
@@ -2976,13 +2987,17 @@ async def generate_photo_pdf(request: Request):
         ]))
         story.append(t)
 
+    # Labor — region-based
     labor = budget.get("labor_estimate_eur", 0)
     if labor:
-        story.append(Spacer(1, 6))
-        story.append(Paragraph(f"Труд (ориентировъчно): {labor} EUR", body_s))
+        story.append(Spacer(1, 8))
+        region_text = f" за обл. {user_region}" if user_region else ""
+        story.append(Paragraph(f"Труд (ориентировъчно{region_text}): {labor} EUR", labor_s))
+        story.append(Paragraph(f"* Цената за труд е ориентировъчна{region_text}. Може да варира в зависимост от сложността.", small_s))
 
     if active:
         total = (active.get("total_eur", 0) or 0) + (labor or 0)
+        story.append(Spacer(1, 4))
         story.append(Paragraph(f"ОБЩА СУМА: {total} EUR", total_s))
 
     story.append(Spacer(1, 16))

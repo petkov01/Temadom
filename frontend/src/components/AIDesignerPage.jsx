@@ -459,8 +459,16 @@ export const AIDesignerPage = () => {
     if (!results) return;
     setPdfLoading(true);
     try {
-      const budgetTiers = results.budget?.budget_tiers || [];
-      const currentTier = budgetTiers.find(t => t.tier === activeTier) || budgetTiers[0];
+      // Get user region if logged in
+      let userRegion = '';
+      let userName = '';
+      if (token) {
+        try {
+          const me = await axios.get(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+          userRegion = me.data?.region || me.data?.city || '';
+          userName = me.data?.name || me.data?.companyName || '';
+        } catch {}
+      }
       const res = await axios.post(`${API}/ai-designer/photo-pdf`, {
         renders: (results.renders || []).map(r => ({ label: r.label, image_base64: r.image_base64 })),
         budget: results.budget || {},
@@ -469,6 +477,8 @@ export const AIDesignerPage = () => {
         budget_eur: budget,
         project_id: results.id || '',
         active_tier: activeTier,
+        user_region: userRegion,
+        user_name: userName,
       }, { responseType: 'blob' });
 
       const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
