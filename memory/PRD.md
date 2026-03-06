@@ -55,12 +55,23 @@ The application is in Bulgarian (Български) and targets the Bulgarian c
 
 ### Landing Page & Navigation
 - ✅ Comprehensive landing page with pricing
-- ✅ Dark/Light mode toggle
+- ✅ Dark/Light mode toggle (v6.5)
 - ✅ Blog system
 - ✅ About page
 - ✅ Services page
 - ✅ Regional pricing page
 - ✅ Portfolio gallery
+
+### Global Theme (v6.5)
+- ✅ Site-wide persistent dark/light mode toggle
+- ✅ Toggle in navbar top-right (☀️/🌙)
+- ✅ CSS custom variables for all theme colors
+- ✅ localStorage persistence (key: temadom-theme)
+- ✅ Smooth transitions (0.3s ease)
+- ✅ All pages theme-aware (Navbar, Footer, LiveCounter, Landing, Professions, Login, Register, etc.)
+
+### Business Logic
+- ✅ Free firm registration limit: 56 (changed from 50)
 
 ## Technical Architecture
 ```
@@ -73,12 +84,15 @@ The application is in Bulgarian (Български) and targets the Bulgarian c
 ├── frontend/
 │   └── src/
 │       ├── App.js
+│       ├── index.css             # Theme CSS variables (dark/light)
 │       ├── components/
-│       │   ├── AISketchPage.jsx    # CAD v5.2 orchestrator
-│       │   ├── AIDesignerPage.jsx  # Video Designer v6.1
+│       │   ├── ThemeContext.jsx   # Theme provider & hook
+│       │   ├── AISketchPage.jsx  # CAD v5.2 orchestrator
+│       │   ├── AIDesignerPage.jsx # Video Designer v6.1
+│       │   ├── ProfessionsPage.jsx # Theme-aware (v6.8 fix)
 │       │   ├── cad/
-│       │   │   ├── CADCanvas.jsx   # Professional 2D canvas with handles
-│       │   │   ├── StructurePanel.jsx  # Parametric editing panel
+│       │   │   ├── CADCanvas.jsx
+│       │   │   ├── StructurePanel.jsx
 │       │   │   ├── CostEstimate.jsx
 │       │   │   ├── ThreeDPreview.jsx
 │       │   │   ├── constants.js
@@ -97,26 +111,32 @@ The application is in Bulgarian (Български) and targets the Bulgarian c
 - **CAD tool v5.2** (Feb 2026) — Professional handle manipulation, undo/redo, rotation, ghost preview
 - Video Designer v6.1
 - Profile page
-- Dark/Light mode
+- **Global Dark/Light Theme v6.5** (Mar 2026) — Site-wide persistent theme toggle with CSS variables
+- **Professions Page Fix v6.8** (Mar 2026) — Fixed light mode readability
+- **Registration Limit P0** (Mar 2026) — Changed from 50 to 56
 
 ## Prioritized Backlog
 
 ### P1 — Upcoming Tasks
-- Video Demo Section on landing page
-- GLB File Generation for Video Designer results
+- **v6.6: Logo & Detailed Profile Page** — Fixed logo top-left, expanded `/profile` with "My Projects", "Payment", "Settings", "Social"
+- **v6.7: Community Feed** — Facebook-style social feed at `/community` with posts, comments, reactions, infinite scrolling
 
 ### P2 — Future Tasks
+- **Leaderboard System** — Dual leaderboard for clients and firms with points for orders/reviews
 - Backend refactoring: Break `server.py` into modular `routers/` structure
+- Video Demo Section on landing page
+- GLB File Generation for Video Designer results
 - Mobile touch context menu (long press → options)
 - Pinch-to-zoom on mobile
 - Mirror/Flip elements (X/Y axis)
 
 ## Key API Endpoints
+- `POST /api/auth/register` — Register user (affected by 56 limit)
+- `GET /api/stats/live` — Live stats with free_slots (total: 56)
 - `PUT /api/auth/profile` — Update user profile
 - `POST /api/ai-designer/video-generate` — Process uploaded video
 - `POST /api/ai-sketch/export-pdf` — Export CAD plan as PDF
 - `POST /api/ai-sketch/export-contract` — Export contract as PDF
-- `POST /api/ai-designer/video-pdf` — Export Video Designer results as PDF
 
 ## Tech Stack
 - **Frontend**: React, TailwindCSS, Shadcn/UI, Canvas 2D API, Three.js
