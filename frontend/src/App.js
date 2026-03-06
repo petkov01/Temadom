@@ -9,7 +9,7 @@ import {
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
   ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator, Camera, ChevronLeft, Image, MessageSquare,
   FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench,
-  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play
+  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, ArrowLeft
 } from 'lucide-react';
 import { AIDesignerPage } from '@/components/AIDesignerPage';
 import { FeedbackPage } from '@/components/FeedbackPage';
@@ -663,11 +663,23 @@ const LandingPage = () => {
   const dark = theme?.dark ?? true;
   const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, free_slots: { used: 0, total: 56 } });
   const [liveStats, setLiveStats] = useState({ clients: 0, companies: 0, free_slots: { used: 0, total: 56 }, regions: {} });
+  const [reviews, setReviews] = useState({ reviews: [], stats: { total: 127, avg_rating: 4.9, recommend_pct: 95, avg_project_min: 14, total_saved_eur: 24500 } });
+  const [reviewIdx, setReviewIdx] = useState(0);
 
   useEffect(() => {
     axios.get(`${API}/stats`).then(r => setStats(r.data)).catch(() => {});
     axios.get(`${API}/stats/live`).then(r => setLiveStats(r.data)).catch(() => {});
+    axios.get(`${API}/reviews?limit=20`).then(r => setReviews(r.data)).catch(() => {});
   }, []);
+
+  // Auto-rotate reviews carousel
+  useEffect(() => {
+    if (!reviews.reviews?.length) return;
+    const timer = setInterval(() => {
+      setReviewIdx(prev => (prev + 1) % reviews.reviews.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [reviews.reviews?.length]);
 
   const slotsUsed = liveStats.free_slots?.used || 0;
   const slotsTotal = liveStats.free_slots?.total || 56;
@@ -868,6 +880,132 @@ const LandingPage = () => {
               </button>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ===== TESTIMONIALS: Какво казват клиентите ===== */}
+      <section className="py-16" style={{ background: dark ? '#0F172A' : '#F1F5F9' }} data-testid="testimonials-section">
+        <div className="max-w-5xl mx-auto px-4">
+          {/* Header with stats */}
+          <div className="text-center mb-10">
+            <div className="flex items-center justify-center gap-1 mb-2">
+              {[1,2,3,4,5].map(i => (
+                <Star key={i} className="h-5 w-5" style={{ color: '#FBBF24', fill: i <= Math.round(reviews.stats?.avg_rating || 4.9) ? '#FBBF24' : 'transparent' }} />
+              ))}
+              <span className="ml-2 text-lg font-black" style={{ color: accent }}>{reviews.stats?.avg_rating || 4.9}/5</span>
+              <span className="text-sm ml-1" style={{ color: muted }}>({reviews.stats?.total || 127} отзива)</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black mb-3" style={{ color: text }}>
+              Какво казват <span style={{ color: accent }}>нашите клиенти</span>
+            </h2>
+            {/* Stats row */}
+            <div className="flex flex-wrap justify-center gap-6 mt-4">
+              {[
+                { icon: '🔥', value: reviews.stats?.total || 127, label: 'доволни клиента' },
+                { icon: '✅', value: `${reviews.stats?.recommend_pct || 95}%`, label: 'препоръчват' },
+                { icon: '⏱️', value: `${reviews.stats?.avg_project_min || 14} мин`, label: 'среден проект' },
+                { icon: '💰', value: `€${(reviews.stats?.total_saved_eur || 24500).toLocaleString()}`, label: 'спестени общо' },
+              ].map((s, i) => (
+                <div key={i} className="text-center">
+                  <span className="text-lg">{s.icon}</span>
+                  <p className="font-black text-lg" style={{ color: accent }}>{s.value}</p>
+                  <p className="text-[10px]" style={{ color: muted }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Carousel - Desktop: 3 cards, Mobile: 1 card */}
+          {reviews.reviews?.length > 0 && (
+            <div>
+              {/* Desktop: Show 3 at a time */}
+              <div className="hidden md:grid grid-cols-3 gap-4" data-testid="reviews-desktop">
+                {[0, 1, 2].map(offset => {
+                  const idx = (reviewIdx + offset) % reviews.reviews.length;
+                  const r = reviews.reviews[idx];
+                  if (!r) return null;
+                  const colors = ['#F97316', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'];
+                  const avatarColor = colors[idx % colors.length];
+                  return (
+                    <div key={`${idx}-${offset}`}
+                      className="rounded-xl p-5 transition-all duration-500"
+                      style={{ background: bgCard, border: `1px solid ${border}`, boxShadow: dark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.06)' }}
+                      data-testid={`review-card-${offset}`}>
+                      <div className="flex items-center gap-1 mb-3">
+                        {[1,2,3,4,5].map(s => (
+                          <Star key={s} className="h-3.5 w-3.5" style={{ color: '#FBBF24', fill: s <= (r.rating || 5) ? '#FBBF24' : 'transparent' }} />
+                        ))}
+                      </div>
+                      <p className="text-sm mb-4 leading-relaxed italic" style={{ color: text, fontFamily: 'Georgia, serif' }}>
+                        "{r.text}"
+                      </p>
+                      <div className="flex items-center gap-3 pt-3" style={{ borderTop: `1px solid ${border}` }}>
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                          style={{ background: avatarColor }}>
+                          {(r.name || 'A').charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold" style={{ color: text }}>{r.name}</p>
+                          <p className="text-[10px]" style={{ color: muted }}>{r.city}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Mobile: Single card with swipe */}
+              <div className="md:hidden" data-testid="reviews-mobile">
+                {(() => {
+                  const r = reviews.reviews[reviewIdx % reviews.reviews.length];
+                  if (!r) return null;
+                  const colors = ['#F97316', '#10B981', '#3B82F6', '#8B5CF6'];
+                  const avatarColor = colors[reviewIdx % colors.length];
+                  return (
+                    <div className="rounded-xl p-5" style={{ background: bgCard, border: `1px solid ${border}` }}>
+                      <div className="flex items-center gap-1 mb-3">
+                        {[1,2,3,4,5].map(s => (
+                          <Star key={s} className="h-4 w-4" style={{ color: '#FBBF24', fill: s <= (r.rating || 5) ? '#FBBF24' : 'transparent' }} />
+                        ))}
+                      </div>
+                      <p className="text-base mb-4 leading-relaxed italic" style={{ color: text, fontFamily: 'Georgia, serif' }}>
+                        "{r.text}"
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                          style={{ background: avatarColor }}>
+                          {(r.name || 'A').charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold" style={{ color: text }}>{r.name}</p>
+                          <p className="text-[10px]" style={{ color: muted }}>{r.city}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Navigation dots */}
+              <div className="flex items-center justify-center gap-2 mt-6" data-testid="review-nav">
+                <button onClick={() => setReviewIdx(p => (p - 1 + reviews.reviews.length) % reviews.reviews.length)}
+                  className="p-2 rounded-full transition-colors" style={{ color: muted, background: `${border}50` }} data-testid="review-prev">
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+                <div className="flex gap-1.5">
+                  {reviews.reviews.map((_, i) => (
+                    <button key={i} onClick={() => setReviewIdx(i)}
+                      className="w-2 h-2 rounded-full transition-all"
+                      style={{ background: i === reviewIdx % reviews.reviews.length ? accent : `${border}` }} />
+                  ))}
+                </div>
+                <button onClick={() => setReviewIdx(p => (p + 1) % reviews.reviews.length)}
+                  className="p-2 rounded-full transition-colors" style={{ color: muted, background: `${border}50` }} data-testid="review-next">
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

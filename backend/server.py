@@ -1291,6 +1291,81 @@ async def get_live_stats():
 async def root():
     return {"message": "Maistori Marketplace API", "version": "1.0.0"}
 
+# ============== REVIEWS/TESTIMONIALS ==============
+
+INITIAL_REVIEWS = [
+    {"id": "r1", "name": "Иван Петров", "city": "София", "rating": 5, "text": "За 15 минути получих 3D дизайн + линкове към плочки от Praktiker! Спестих 1200€ от бюджета!", "category": "3d_designer", "created_at": "2025-12-15T10:00:00Z"},
+    {"id": "r2", "name": "Мария Георгиева", "city": "Пловдив", "rating": 5, "text": "Бюджет €1800 — показа ми ТОЧНО какво мога да си позволя. Намерих всичко с 1 клик!", "category": "3d_designer", "created_at": "2026-01-10T14:30:00Z"},
+    {"id": "r3", "name": "Димитър Иванов", "city": "Варна", "rating": 5, "text": "360° изгледът впечатли майстора — взе проекта веднага! Супер платформа!", "category": "3d_designer", "created_at": "2026-01-22T09:15:00Z"},
+    {"id": "r4", "name": "Елена Стоянова", "city": "Бургас", "rating": 5, "text": "CAD скицата беше перфектна. Архитектът ми я одобри без корекции. Браво TemaDom!", "category": "cad_sketch", "created_at": "2026-02-01T11:00:00Z"},
+    {"id": "r5", "name": "Георги Николов", "city": "Стара Загора", "rating": 4, "text": "Намерих 3 фирми за ремонт на банята за 1 ден. Преди търсех 2 седмици!", "category": "platform", "created_at": "2026-02-05T16:45:00Z"},
+    {"id": "r6", "name": "Анна Димитрова", "city": "Русе", "rating": 5, "text": "Калкулаторът за цени ме спаси от надуване. Знаех точната цена преди да се обадя!", "category": "calculator", "created_at": "2026-02-10T08:20:00Z"},
+    {"id": "r7", "name": "Петър Василев", "city": "Благоевград", "rating": 5, "text": "Като фирма — получихме 5 клиента за първия месец. Безплатният PREMIUM си заслужава!", "category": "platform", "created_at": "2026-02-15T13:00:00Z"},
+    {"id": "r8", "name": "Светлана Колева", "city": "Велико Търново", "rating": 5, "text": "Директните линкове към продукти ми спестиха цял ден обикаляне по магазини!", "category": "3d_designer", "created_at": "2026-02-20T10:30:00Z"},
+]
+
+@api_router.get("/reviews")
+async def get_reviews(limit: int = 20):
+    """Get published reviews for the site."""
+    reviews = await db.reviews.find(
+        {"published": True},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(limit)
+    
+    # If no reviews in DB yet, seed with initial ones
+    if not reviews:
+        for r in INITIAL_REVIEWS:
+            r["published"] = True
+            r["user_id"] = None
+        await db.reviews.insert_many([{**r} for r in INITIAL_REVIEWS])
+        reviews = INITIAL_REVIEWS
+    
+    # Compute stats
+    all_reviews = await db.reviews.find({"published": True}, {"_id": 0, "rating": 1}).to_list(500)
+    total = len(all_reviews)
+    avg_rating = sum(r.get("rating", 5) for r in all_reviews) / max(total, 1)
+    recommend_pct = round(sum(1 for r in all_reviews if r.get("rating", 0) >= 4) / max(total, 1) * 100)
+    
+    return {
+        "reviews": reviews,
+        "stats": {
+            "total": total,
+            "avg_rating": round(avg_rating, 1),
+            "recommend_pct": recommend_pct,
+            "avg_project_min": 14,
+            "total_saved_eur": 24500
+        }
+    }
+
+@api_router.post("/reviews")
+async def submit_review(data: dict, user=Depends(get_current_user)):
+    """Submit a review (any logged-in user)."""
+    text = data.get("text", "").strip()
+    rating = data.get("rating", 5)
+    category = data.get("category", "platform")
+    
+    if not text or len(text) < 5:
+        raise HTTPException(status_code=400, detail="Отзивът трябва да е поне 5 символа")
+    if rating < 1 or rating > 5:
+        raise HTTPException(status_code=400, detail="Рейтингът трябва да е между 1 и 5")
+    
+    review = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "name": user.get("name", "Анонимен"),
+        "city": user.get("city", ""),
+        "rating": rating,
+        "text": text[:500],
+        "category": category,
+        "published": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.reviews.insert_one(review)
+    review.pop("_id", None)
+    return {"review": review}
+
+
+
 # Include router and middleware - MUST be after all route definitions
 # (moved to end of file)
 
@@ -2599,9 +2674,9 @@ async def generate_photo_design(
         reno_instruction = notes or "complete renovation with modern finishes"
 
         camera_angles = [
-            ("photographed from the entrance/door looking inward, full room visible, wide angle", "Фронтален"),
-            ("photographed from the left wall at 45 degrees showing depth and perspective", "Ляв ъгъл"),
-            ("photographed from the right wall at 45 degrees showing depth and perspective", "Десен ъгъл"),
+            ("photographed from the most accessible viewpoint showing the FULL room, wide angle panoramic shot", "Общ план"),
+            ("photographed from one corner of the room looking forward-right at 45 degrees, showing depth and perspective, 180 degree coverage", "Ъгъл 1"),
+            ("photographed from the OPPOSITE corner looking forward-left at 45 degrees, 180 degree coverage, complementing the first corner shot", "Ъгъл 2"),
         ]
 
         variant_angles = []

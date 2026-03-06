@@ -121,8 +121,8 @@ const PhotoGuide = () => {
               <Camera className="h-5 w-5 text-[#F97316]" />
             </div>
             <div>
-              <p className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>КАК ДА СНИМАШ ПРАВИЛНО</p>
-              <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>Качи 3 снимки от различни ъгли</p>
+              <p className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>КАК ДА СНИМАШ ЗА ПЕРФЕКТЕН 3D ДИЗАЙН</p>
+              <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>3 снимки = 1 идеален 360° изглед</p>
             </div>
           </div>
           {open ? <ChevronUp className="h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} /> : <ChevronDown className="h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} />}
@@ -130,19 +130,30 @@ const PhotoGuide = () => {
         {open && (
           <div className="px-4 pb-4 space-y-3" data-testid="guide-content">
             {[
-              { icon: '1', text: 'Снимка 1: ФРОНТАЛНА — от входа навътре' },
-              { icon: '2', text: 'Снимка 2: ЛЯВА СТЕНА — на 45° от ляво' },
-              { icon: '3', text: 'Снимка 3: ДЯСНА СТЕНА — на 45° от дясно' },
-              { icon: '!', text: 'Включи ВСИЧКИ лампи за добро осветление' },
-              { icon: '!', text: 'Снимай ХОРИЗОНТАЛНО (landscape) за 360° ефект' },
+              { icon: '1', title: 'ОБЩ ПЛАН', text: 'Застани в ДОСТЪПНА точка с НАЙ-ПЪЛЕН ИЗГЛЕД. Снимай цялото помещение наведнъж. Включи колкото се може повече стени/обекти.' },
+              { icon: '2', title: 'ЪГЪЛ 1 (напред-дясно)', text: 'Застани в ЕДИН ЪГЪЛ на помещението. Снимай НАПРЕД-ДЯСНО с максимален обхват (180°).' },
+              { icon: '3', title: 'ЪГЪЛ 2 (напред-ляво)', text: 'Застани в ПРОТИВОПОЛОЖЕН ЪГЪЛ. Снимай НАПРЕД-ЛЯВО (180° обхват). AI ще създаде ПЪЛНИЯ 360° ИЗГЛЕД.' },
             ].map((step, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-full bg-[#F97316]/10 flex items-center justify-center text-[#F97316] text-xs font-black flex-shrink-0">{step.icon}</div>
-                <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{step.text}</p>
+              <div key={i} className="rounded-lg p-3" style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.15)' }}>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#F97316]/15 flex items-center justify-center text-[#F97316] text-xs font-black flex-shrink-0">{step.icon}</div>
+                  <div>
+                    <p className="text-xs font-bold text-[#F97316] mb-0.5">{step.title}</p>
+                    <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{step.text}</p>
+                  </div>
+                </div>
               </div>
             ))}
-            <div className="rounded-lg p-3 mt-2" style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.2)' }}>
-              <p className="text-[#F97316] text-xs font-medium">JPG/PNG (макс 10MB на снимка) | Поне 1 снимка задължителна</p>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <div className="rounded-lg p-2.5 text-center" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <p className="text-red-400 text-[10px] font-bold">НЕ: 3 снимки от едно място</p>
+              </div>
+              <div className="rounded-lg p-2.5 text-center" style={{ background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.2)' }}>
+                <p className="text-green-400 text-[10px] font-bold">ДА: 1 общ + 2 от ъгли</p>
+              </div>
+            </div>
+            <div className="rounded-lg p-3" style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.2)' }}>
+              <p className="text-[#F97316] text-xs font-medium">JPG/PNG (макс 10MB) | Поне 1 снимка задължителна | Хоризонтално (landscape) за 360°</p>
             </div>
           </div>
         )}
@@ -361,7 +372,7 @@ export const AIDesignerPage = () => {
   const budgetTiers = results?.budget?.budget_tiers || [];
   const currentTierData = budgetTiers.find(t => t.tier === activeTier) || budgetTiers[0];
 
-  const photoLabels = ['Фронтална', 'Лява', 'Дясна'];
+  const photoLabels = ['Общ план', 'Ъгъл 1', 'Ъгъл 2'];
 
   return (
     <div className="min-h-screen py-6 px-3 md:px-6" style={{ background: 'var(--theme-bg)' }} data-testid="ia-designer-page">
