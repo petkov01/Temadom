@@ -2269,56 +2269,110 @@ async def generate_video_design(
     room_type: str = Form("living_room"),
     notes: str = Form("")
 ):
-    """Video Designer v6.1: Upload 60s video → AI extracts 12 keyframes → 360° renovation."""
+    """Video Designer v6.2: Upload video → FFmpeg convert → AI extracts keyframes → 360° renovation."""
+    import subprocess
+    import shutil
+
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
 
-    # Validate video
-    if not video.content_type or not video.content_type.startswith("video/"):
-        raise HTTPException(status_code=400, detail="Моля, качете видео файл (MP4)")
+    # Validate video content type
+    ct = (video.content_type or "").lower()
+    fname = (video.filename or "").lower()
+    is_video = ct.startswith("video/") or any(fname.endswith(ext) for ext in [".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v", ".wmv", ".hevc"])
+    if not is_video:
+        raise HTTPException(status_code=400, detail="Моля, качете видео файл (MP4, MOV, AVI, MKV)")
 
-    # Save video to temp file
+    # Read video bytes
     video_bytes = await video.read()
-    if len(video_bytes) > 50 * 1024 * 1024:  # 50MB limit
-        raise HTTPException(status_code=400, detail="Видеото е твърде голямо (макс. 50MB)")
+    if len(video_bytes) > 40 * 1024 * 1024:  # 40MB limit
+        raise HTTPException(status_code=400, detail="Видеото е твърде голямо (макс. 35MB). Компресирайте с Handbrake: H.264, CRF 22.")
 
-    with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
-        tmp.write(video_bytes)
-        tmp_path = tmp.name
+    # Determine file extension
+    ext = ".mp4"
+    if fname:
+        for e in [".mov", ".avi", ".mkv", ".webm", ".m4v", ".wmv"]:
+            if fname.endswith(e):
+                ext = e
+                break
+
+    # Save original to temp
+    tmp_dir = tempfile.mkdtemp(prefix="temadom_video_")
+    original_path = os.path.join(tmp_dir, f"original{ext}")
+    converted_path = os.path.join(tmp_dir, "converted.mp4")
+
+    with open(original_path, 'wb') as f:
+        f.write(video_bytes)
 
     try:
+        # Step 0: FFmpeg auto-convert to H.264 MP4
+        ffmpeg_cmd = [
+            "ffmpeg", "-y", "-i", original_path,
+            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+            "-c:a", "aac", "-b:a", "128k",
+            "-movflags", "+faststart",
+            "-vf", "scale='min(1280,iw)':'min(720,ih)':force_original_aspect_ratio=decrease",
+            "-max_muxing_queue_size", "1024",
+            "-t", "65",  # max 65 seconds
+            converted_path
+        ]
+
+        logging.info(f"Video Designer: Converting {ext} → MP4 H.264 with FFmpeg")
+        result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=120)
+
+        if result.returncode != 0 or not os.path.exists(converted_path):
+            logging.error(f"FFmpeg error: {result.stderr[:500]}")
+            # Fallback: try using original file directly
+            converted_path = original_path
+            logging.warning("FFmpeg conversion failed, trying original file")
+
+        # Use the converted file for frame extraction
+        work_path = converted_path if os.path.exists(converted_path) and os.path.getsize(converted_path) > 0 else original_path
+
         # Extract key frames using OpenCV
-        cap = cv2.VideoCapture(tmp_path)
+        cap = cv2.VideoCapture(work_path)
         if not cap.isOpened():
-            raise HTTPException(status_code=400, detail="Невалиден видео файл")
+            # Last resort: try extracting a single frame with FFmpeg
+            first_frame_path = os.path.join(tmp_dir, "frame_0.jpg")
+            ff_frame = subprocess.run(
+                ["ffmpeg", "-y", "-i", original_path, "-vframes", "1", "-q:v", "2", first_frame_path],
+                capture_output=True, text=True, timeout=30
+            )
+            if ff_frame.returncode == 0 and os.path.exists(first_frame_path):
+                with open(first_frame_path, 'rb') as ff:
+                    frame_bytes = ff.read()
+                extracted_frames = [base64.b64encode(frame_bytes).decode('utf-8')]
+                duration = 0
+                logging.warning("OpenCV failed, extracted 1 frame via FFmpeg")
+            else:
+                raise HTTPException(status_code=400, detail="Невалиден видео формат. Моля, конвертирайте в MP4 (H.264) с Handbrake.")
+        else:
+            fps = cap.get(cv2.CAP_PROP_FPS) or 30
+            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            duration = total_frames / fps if fps > 0 else 0
 
-        fps = cap.get(cv2.CAP_PROP_FPS) or 30
-        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        duration = total_frames / fps if fps > 0 else 0
+            if duration > 65:
+                cap.release()
+                raise HTTPException(status_code=400, detail="Видеото е твърде дълго (макс. 60 секунди)")
 
-        if duration > 65:
+            # Extract 12 keyframes (every ~5 seconds)
+            num_frames = min(12, max(4, int(duration / 5))) if duration > 0 else 4
+            frame_indices = [int(total_frames * i / num_frames) for i in range(num_frames)] if total_frames > num_frames else list(range(min(total_frames, 12)))
+            extracted_frames = []
+            for idx in frame_indices:
+                cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
+                ret, frame = cap.read()
+                if ret:
+                    h, w = frame.shape[:2]
+                    if max(h, w) > 1280:
+                        scale_factor = 1280 / max(h, w)
+                        frame = cv2.resize(frame, (int(w * scale_factor), int(h * scale_factor)))
+                    _, buf = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+                    extracted_frames.append(base64.b64encode(buf).decode('utf-8'))
             cap.release()
-            raise HTTPException(status_code=400, detail="Видеото е твърде дълго (макс. 60 секунди)")
-
-        # Extract 12 keyframes (every ~5 seconds)
-        num_frames = min(12, max(4, int(duration / 5)))
-        frame_indices = [int(total_frames * i / num_frames) for i in range(num_frames)] if total_frames > num_frames else list(range(total_frames))
-        extracted_frames = []
-        for idx in frame_indices:
-            cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
-            ret, frame = cap.read()
-            if ret:
-                # Resize if too large
-                h, w = frame.shape[:2]
-                if max(h, w) > 1280:
-                    scale_factor = 1280 / max(h, w)
-                    frame = cv2.resize(frame, (int(w * scale_factor), int(h * scale_factor)))
-                _, buf = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
-                extracted_frames.append(base64.b64encode(buf).decode('utf-8'))
-        cap.release()
 
         if not extracted_frames:
-            raise HTTPException(status_code=400, detail="Не можаха да се извлекат кадри от видеото")
+            raise HTTPException(status_code=400, detail="Не можаха да се извлекат кадри от видеото. Опитайте MP4 H.264 формат.")
 
         logging.info(f"Video Designer: extracted {len(extracted_frames)} frames from {duration:.1f}s video")
 
@@ -2495,9 +2549,10 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting.
         logging.error(f"Video Designer error: {e}")
         raise HTTPException(status_code=500, detail=f"Грешка при обработка: {str(e)}")
     finally:
-        # Cleanup temp file
+        # Cleanup temp directory
         try:
-            os.unlink(tmp_path)
+            import shutil as _shutil
+            _shutil.rmtree(tmp_dir, ignore_errors=True)
         except:
             pass
 

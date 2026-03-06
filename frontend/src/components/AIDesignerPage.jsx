@@ -196,8 +196,11 @@ export const AIDesignerPage = () => {
 
   const handleVideoSelect = (idx, file) => {
     if (!file) return;
-    if (!file.type.startsWith('video/')) { toast.error('Моля, изберете видео файл (MP4)'); return; }
-    if (file.size > 50 * 1024 * 1024) { toast.error('Макс. 50MB'); return; }
+    const fname = file.name?.toLowerCase() || '';
+    const validExts = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.m4v', '.wmv'];
+    const isValid = file.type?.startsWith('video/') || validExts.some(e => fname.endsWith(e));
+    if (!isValid) { toast.error('Поддържани формати: MP4, MOV, AVI, MKV, WebM'); return; }
+    if (file.size > 40 * 1024 * 1024) { toast.error('Макс. 35MB. Компресирайте с Handbrake (H.264, CRF 22).'); return; }
     updateRoom(idx, 'videoFile', file);
     updateRoom(idx, 'videoUrl', URL.createObjectURL(file));
   };
@@ -350,7 +353,7 @@ export const AIDesignerPage = () => {
                           onDrop={(e) => { e.preventDefault(); handleVideoSelect(idx, e.dataTransfer.files?.[0]); }}
                           onDragOver={(e) => e.preventDefault()}
                           onClick={() => fileInputRefs.current[idx]?.click()} data-testid={`video-drop-${idx}`}>
-                          <input ref={el => fileInputRefs.current[idx] = el} type="file" accept="video/mp4,video/quicktime,video/webm,video/*"
+                          <input ref={el => fileInputRefs.current[idx] = el} type="file" accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm,video/*"
                             capture="environment" className="hidden"
                             onChange={e => handleVideoSelect(idx, e.target.files?.[0])} data-testid={`video-input-${idx}`} />
                           <div className="flex flex-col items-center gap-3">
@@ -359,7 +362,7 @@ export const AIDesignerPage = () => {
                             </div>
                             <div>
                               <p className="text-white font-bold text-lg">КАЧИ ВИДЕО</p>
-                              <p className="text-slate-500 text-sm">Макс 60 секунди MP4 (до 50MB)</p>
+                              <p className="text-slate-500 text-sm">MP4, MOV, AVI, MKV (до 35MB, макс 60 сек)</p>
                             </div>
                             <div className="flex gap-2 mt-1">
                               <Badge className="bg-[#253545] text-slate-400 text-[10px]"><Upload className="h-3 w-3 mr-1" />Drag & Drop</Badge>
