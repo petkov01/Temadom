@@ -5,7 +5,7 @@ TemaDom is a web application for construction and interior design targeting the 
 
 ## Core Products
 1. **AI-Assisted CAD System (`/ai-sketch`)** — 2D plans with 3D preview and cost estimation
-2. **3D Photo Designer v8.0 (`/room-scan`)** — Photo-based AI room redesign with 3 separate 3D renders, budget-based materials, direct product links, PDF export, enhanced sharing
+2. **3D Photo Designer v8.0 (`/room-scan`)** — BASIC: Photos → 3D renders → Share. Multi-room packages (1/2/5 rooms)
 3. **Community Feed (`/community`)** — Social feed with posts, likes, comments, filters
 
 ## Implemented Features
@@ -19,16 +19,15 @@ TemaDom is a web application for construction and interior design targeting the 
 - Color-coded handles, endpoint dragging, rotation, undo/redo
 - PDF export, cost estimation, multi-floor
 
-### 3D Photo Designer v8.0 — `/room-scan`
-- **NO 360° — REMOVED COMPLETELY**
-- Budget-driven workflow: EUR presets (1000, 2000, 3000, 5000, 10000)
-- 3 tiers: Economy (60%), Medium (100%), Premium (150%)
-- 3 photos -> 3 separate 3D renders (OpenAI GPT Image 1)
-- Direct product links to Bulgarian stores
-- **PDF download** with TemaDom logo (centered, large), renders, budget table, region-based labor
-- **Enhanced sharing** — Facebook, WhatsApp, Viber, Twitter, Email, Copy link
-- **Fullscreen viewer** with swipe, download per image
-- My Projects: save/load/delete
+### 3D Photo Designer v8.0 — `/room-scan` (BASIC)
+- **NO 360°, NO PDF, NO Fullscreen, NO Budget** — чисто базово
+- Multi-room packages: 69EUR (1 стая), 129EUR (2 стаи), 199EUR (до 5 стаи, Апартамент)
+- Всяка стая: собствен room type dropdown + style dropdown + 3 фото слота + бележки
+- Add/remove rooms dynamically, package downgrade trims rooms
+- 3 photos → OpenAI GPT Image 1 → 3 separate 3D renders
+- Before/After slider per render (if original photo available)
+- Share: Facebook, WhatsApp, Viber, Twitter, Email, Copy link
+- Flow: Снимки → 3D рендери → Сподели → КРАЙ
 
 ### Community Feed v1.0 — `/community`
 - Post types: text, project, question, before_after
