@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Loader2, X, Upload, CheckCircle, Share2, RotateCcw,
   Copy, Facebook, Twitter, MessageCircle, Mail, Link2, Phone, ArrowLeft, ArrowRight,
-  Plus, Trash2 } from 'lucide-react';
+  Plus, Trash2, Download, Maximize2, Minimize2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -491,8 +491,31 @@ export const AIDesignerPage = () => {
                               <img src={afterImg} alt={r.label} className="w-full h-full object-cover" />
                             </div>
                           )}
-                          <div className="px-3 py-2 text-center">
+                          <div className="flex items-center justify-between px-3 py-2">
                             <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>{r.label}</span>
+                            <div className="flex gap-1">
+                              <button onClick={() => {
+                                const a = document.createElement('a');
+                                a.href = afterImg;
+                                a.download = `temadom-3d-${roomResult.roomName}-${i + 1}.png`;
+                                a.click();
+                                toast.success('Изтеглено!');
+                              }}
+                                className="p-1.5 rounded-lg hover:bg-[#F97316]/10 transition-colors"
+                                style={{ color: 'var(--theme-text-muted)' }}
+                                data-testid={`download-render-${ri}-${i}`}>
+                                <Download className="h-3.5 w-3.5" />
+                              </button>
+                              <button onClick={() => {
+                                const win = window.open('', '_blank');
+                                win.document.write(`<html><head><title>TemaDom 3D</title><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body><img src="${afterImg}" /></body></html>`);
+                              }}
+                                className="p-1.5 rounded-lg hover:bg-[#F97316]/10 transition-colors"
+                                style={{ color: 'var(--theme-text-muted)' }}
+                                data-testid={`fullscreen-render-${ri}-${i}`}>
+                                <Maximize2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>

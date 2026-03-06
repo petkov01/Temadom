@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Mail, Building2, Hash, Calendar, Shield, Edit2, Save, LogOut, Camera, CreditCard,
-  Bookmark, Eye, Trash2, Share2, Settings, Image as ImageIcon, MapPin, Globe, FileText, ExternalLink } from 'lucide-react';
+  Bookmark, Eye, Trash2, Share2, Settings, Image as ImageIcon, MapPin, Globe, FileText, ExternalLink,
+  Gift, Copy, CheckCircle, MessageCircle, Phone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,9 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [referral, setReferral] = useState(null);
+  const [refCode, setRefCode] = useState('');
+  const [applyingRef, setApplyingRef] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileRef = useRef(null);
@@ -32,7 +36,7 @@ const ProfilePage = () => {
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
 
-  useEffect(() => { fetchProfile(); fetchProjects(); }, []);
+  useEffect(() => { fetchProfile(); fetchProjects(); fetchReferral(); }, []);
 
   const fetchProfile = async () => {
     try {
@@ -87,6 +91,31 @@ const ProfilePage = () => {
       setProjects(prev => prev.filter(p => p.id !== id));
       toast.success('Проектът е изтрит');
     } catch { toast.error('Грешка при изтриване'); }
+  };
+
+  const fetchReferral = async () => {
+    try {
+      const res = await axios.get(`${API}/referrals/status`, { headers });
+      setReferral(res.data);
+    } catch { /* no referrals */ }
+  };
+
+  const applyReferralCode = async () => {
+    if (!refCode.trim()) return;
+    setApplyingRef(true);
+    try {
+      const res = await axios.post(`${API}/referrals/apply`, { code: refCode.trim() }, { headers: { ...headers, 'Content-Type': 'application/json' } });
+      toast.success(res.data.reward);
+      setRefCode('');
+      fetchReferral();
+    } catch (err) { toast.error(err.response?.data?.detail || 'Грешка'); }
+    setApplyingRef(false);
+  };
+
+  const copyReferralLink = () => {
+    if (!referral) return;
+    navigator.clipboard.writeText(referral.referral_link);
+    toast.success('Реферален линк копиран!');
   };
 
   if (!profile) {
@@ -147,12 +176,15 @@ const ProfilePage = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="info" className="w-full">
-          <TabsList className="w-full grid grid-cols-3 mb-4" style={{ background: 'var(--theme-bg-secondary)' }}>
+          <TabsList className="w-full grid grid-cols-4 mb-4" style={{ background: 'var(--theme-bg-secondary)' }}>
             <TabsTrigger value="info" data-testid="tab-info">
               <User className="h-3.5 w-3.5 mr-1.5" /> Профил
             </TabsTrigger>
             <TabsTrigger value="projects" data-testid="tab-projects">
-              <Bookmark className="h-3.5 w-3.5 mr-1.5" /> Проекти ({projects.length})
+              <Bookmark className="h-3.5 w-3.5 mr-1.5" /> Проекти
+            </TabsTrigger>
+            <TabsTrigger value="referrals" data-testid="tab-referrals">
+              <Gift className="h-3.5 w-3.5 mr-1.5" /> Реферали
             </TabsTrigger>
             <TabsTrigger value="settings" data-testid="tab-settings">
               <Settings className="h-3.5 w-3.5 mr-1.5" /> Настройки
@@ -335,6 +367,110 @@ const ProfilePage = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* TAB: Referrals */}
+          <TabsContent value="referrals">
+            <div className="space-y-4">
+              {/* Your code */}
+              <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
+                    <Gift className="h-4 w-4 text-[#F97316]" /> Вашият реферален код
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {referral && (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 p-3 rounded-lg text-center font-mono text-xl font-black tracking-widest text-[#F97316]"
+                          style={{ background: 'rgba(249,115,22,0.08)', border: '2px dashed rgba(249,115,22,0.3)' }}
+                          data-testid="referral-code">
+                          {referral.referral_code}
+                        </div>
+                        <Button size="sm" className="bg-[#F97316] hover:bg-[#EA580C] text-white h-12 px-4"
+                          onClick={copyReferralLink} data-testid="copy-referral-btn">
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      {/* Share buttons */}
+                      <div className="flex gap-2">
+                        <a href={`https://wa.me/?text=${encodeURIComponent(`Регистрирай се в TemaDom с мой код ${referral.referral_code} и получи €3 кредит! ${referral.referral_link}`)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-white text-xs font-medium"
+                          style={{ background: '#25D366' }} data-testid="share-ref-whatsapp">
+                          <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+                        </a>
+                        <a href={`viber://forward?text=${encodeURIComponent(`Регистрирай се в TemaDom: ${referral.referral_link}`)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-white text-xs font-medium"
+                          style={{ background: '#7360F2' }} data-testid="share-ref-viber">
+                          <Phone className="h-3.5 w-3.5" /> Viber
+                        </a>
+                      </div>
+
+                      {/* Stats */}
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <div className="p-3 rounded-lg text-center" style={{ background: 'var(--theme-bg-surface)' }}>
+                          <p className="text-2xl font-black text-[#F97316]">{referral.referral_count}</p>
+                          <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>Поканени</p>
+                        </div>
+                        <div className="p-3 rounded-lg text-center" style={{ background: 'var(--theme-bg-surface)' }}>
+                          <p className="text-2xl font-black text-[#10B981]">{referral.total_reward_eur} EUR</p>
+                          <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>Спечелено</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Rewards milestones */}
+              {referral?.rewards_table && (
+                <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm" style={{ color: 'var(--theme-text)' }}>Награди</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {referral.rewards_table.map((r, i) => (
+                        <div key={i} className="flex items-center justify-between p-2.5 rounded-lg"
+                          style={{ background: r.unlocked ? 'rgba(16,185,129,0.08)' : 'var(--theme-bg-surface)', border: `1px solid ${r.unlocked ? 'rgba(16,185,129,0.3)' : 'var(--theme-border)'}` }}>
+                          <div className="flex items-center gap-2">
+                            {r.unlocked ? <CheckCircle className="h-4 w-4 text-[#10B981]" /> : <div className="w-4 h-4 rounded-full border-2" style={{ borderColor: 'var(--theme-border)' }} />}
+                            <span className="text-xs font-medium" style={{ color: 'var(--theme-text)' }}>{r.count} реферала</span>
+                          </div>
+                          <span className={`text-xs font-bold ${r.unlocked ? 'text-[#10B981]' : ''}`}
+                            style={!r.unlocked ? { color: 'var(--theme-text-muted)' } : {}}>
+                            {r.reward}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Apply code */}
+              <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm" style={{ color: 'var(--theme-text)' }}>Имате реферален код?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-2">
+                    <Input value={refCode} onChange={e => setRefCode(e.target.value.toUpperCase())}
+                      placeholder="Въведете код..." className="font-mono uppercase tracking-wider"
+                      maxLength={10} data-testid="apply-ref-input" />
+                    <Button className="bg-[#F97316] hover:bg-[#EA580C] text-white px-4"
+                      onClick={applyReferralCode} disabled={applyingRef || !refCode.trim()}
+                      data-testid="apply-ref-btn">
+                      {applyingRef ? '...' : 'Приложи'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* TAB: Settings */}

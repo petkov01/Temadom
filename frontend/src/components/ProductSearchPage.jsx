@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { Search, Upload, X, ExternalLink, ShoppingCart, Loader2, Camera, Tag, Store, Euro, Sparkles } from 'lucide-react';
+import { Search, X, ExternalLink, ShoppingCart, Loader2, Camera, Tag, Store,
+  Sparkles, Share2, MessageCircle, Phone, Facebook, Copy, CheckCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
+const SITE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const ROOM_TYPES = [
   { id: '', label: 'Без уточнение' },
@@ -58,6 +60,46 @@ const ProductCard = ({ product }) => (
     </div>
   </a>
 );
+
+/* Share Results Panel */
+const ShareResults = ({ results }) => {
+  const [copied, setCopied] = useState(false);
+  const shareText = `Намерих ${results.total_products} продукта в ${results.stores_count} магазина чрез TemaDom AI!\n\n` +
+    (results.queries || []).slice(0, 3).map(q => `- ${q}`).join('\n') +
+    `\n\nОпитай и ти: ${SITE_URL}/product-search`;
+
+  const copy = () => {
+    navigator.clipboard.writeText(shareText);
+    setCopied(true);
+    toast.success('Копирано!');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const links = [
+    { name: 'WhatsApp', icon: MessageCircle, color: '#25D366', url: `https://wa.me/?text=${encodeURIComponent(shareText)}` },
+    { name: 'Viber', icon: Phone, color: '#7360F2', url: `viber://forward?text=${encodeURIComponent(shareText)}` },
+    { name: 'Facebook', icon: Facebook, color: '#1877F2', url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL + '/product-search')}&quote=${encodeURIComponent(shareText)}` },
+  ];
+
+  return (
+    <div className="flex items-center gap-2 flex-wrap" data-testid="share-results">
+      {links.map(l => (
+        <a key={l.name} href={l.url} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-xs font-medium hover:opacity-90 transition-opacity"
+          style={{ background: l.color }} data-testid={`share-${l.name.toLowerCase()}`}>
+          <l.icon className="h-3.5 w-3.5" /> {l.name}
+        </a>
+      ))}
+      <button onClick={copy}
+        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium"
+        style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}
+        data-testid="share-copy">
+        {copied ? <CheckCircle className="h-3.5 w-3.5 text-[#10B981]" /> : <Copy className="h-3.5 w-3.5" />}
+        {copied ? 'Копирано' : 'Копирай'}
+      </button>
+    </div>
+  );
+};
 
 export const ProductSearchPage = () => {
   const [image, setImage] = useState(null);
@@ -138,7 +180,6 @@ export const ProductSearchPage = () => {
         {/* Upload + Search */}
         <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
           <CardContent className="p-5">
-            {/* Image upload zone */}
             {!imagePreview ? (
               <div
                 onClick={() => imgRef.current?.click()}
@@ -148,17 +189,12 @@ export const ProductSearchPage = () => {
                 style={{ borderColor: 'var(--theme-border)' }}
                 data-testid="upload-zone">
                 <Camera className="h-10 w-10 mx-auto mb-3" style={{ color: 'var(--theme-text-subtle)' }} />
-                <p className="text-sm font-bold mb-1" style={{ color: 'var(--theme-text)' }}>
-                  Качете снимка на стая
-                </p>
-                <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
-                  Плъзнете или кликнете (JPEG, PNG, до 10MB)
-                </p>
+                <p className="text-sm font-bold mb-1" style={{ color: 'var(--theme-text)' }}>Качете снимка на стая</p>
+                <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>Плъзнете или кликнете (JPEG, PNG, до 10MB)</p>
               </div>
             ) : (
               <div className="relative rounded-xl overflow-hidden mb-4" data-testid="image-preview">
-                <img src={imagePreview} alt="Preview" className="w-full max-h-72 object-contain rounded-xl"
-                  style={{ background: '#000' }} />
+                <img src={imagePreview} alt="Preview" className="w-full max-h-72 object-contain rounded-xl" style={{ background: '#000' }} />
                 <button onClick={removeImage}
                   className="absolute top-2 right-2 bg-red-500/90 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors"
                   data-testid="remove-image-btn">
@@ -169,12 +205,9 @@ export const ProductSearchPage = () => {
             <input ref={imgRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
               onChange={e => handleImage(e.target.files?.[0])} />
 
-            {/* Room type + Text query */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
               <div>
-                <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--theme-text-muted)' }}>
-                  Тип стая (по избор)
-                </label>
+                <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--theme-text-muted)' }}>Тип стая (по избор)</label>
                 <select value={roomType} onChange={e => setRoomType(e.target.value)}
                   className="w-full rounded-lg px-3 py-2.5 text-sm"
                   style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}
@@ -183,9 +216,7 @@ export const ProductSearchPage = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--theme-text-muted)' }}>
-                  Допълнително търсене
-                </label>
+                <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--theme-text-muted)' }}>Допълнително търсене</label>
                 <input value={textQuery} onChange={e => setTextQuery(e.target.value)}
                   placeholder="напр. бойлер 80 литра"
                   className="w-full rounded-lg px-3 py-2.5 text-sm"
@@ -218,23 +249,26 @@ export const ProductSearchPage = () => {
 
         {results && !loading && (
           <div className="mt-6 space-y-4" data-testid="search-results">
-            {/* Summary */}
-            <div className="flex items-center justify-between px-1">
+            {/* Summary + Share */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-1">
               <p className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>
                 <ShoppingCart className="inline h-4 w-4 text-[#F97316] mr-1.5" />
                 {results.total_products} продукта от {results.stores_count} магазина
               </p>
-              {results.queries?.length > 0 && (
-                <div className="flex gap-1 flex-wrap justify-end">
-                  {results.queries.slice(0, 4).map((q, i) => (
-                    <span key={i} className="px-2 py-0.5 rounded-md text-[10px] font-medium"
-                      style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
-                      {q}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <ShareResults results={results} />
             </div>
+
+            {/* Query tags */}
+            {results.queries?.length > 0 && (
+              <div className="flex gap-1 flex-wrap px-1">
+                {results.queries.slice(0, 6).map((q, i) => (
+                  <span key={i} className="px-2 py-0.5 rounded-md text-[10px] font-medium"
+                    style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
+                    {q}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* Grouped by query */}
             {results.results_by_query && Object.entries(results.results_by_query).map(([query, products]) => (
@@ -252,7 +286,6 @@ export const ProductSearchPage = () => {
               )
             ))}
 
-            {/* No results */}
             {results.total_products === 0 && (
               <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
                 <CardContent className="py-12 text-center">

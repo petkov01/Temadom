@@ -3568,16 +3568,75 @@ async def get_ai_design_gallery():
 
 @api_router.get("/referrals/status")
 async def get_referral_status(user: dict = Depends(get_current_user)):
-    """Get referral status (demo mode)"""
+    """Get referral status with rewards tracking"""
+    referral_code = user["id"][:8].upper()
     referral_count = await db.referrals.count_documents({"referrer_id": user["id"]})
+    total_reward = referral_count * 3  # €3 per referral
+
+    # Get list of referred users
+    referrals = await db.referrals.find(
+        {"referrer_id": user["id"]}, {"_id": 0}
+    ).sort("created_at", -1).limit(20).to_list(20)
+
     return {
+        "referral_code": referral_code,
         "referral_count": referral_count,
-        "referral_code": user["id"][:8],
-        "test_mode": True,
-        "rewards": {
-            "client": {"required": 5, "bonus": "€3 кредит (демо)"},
-            "company": {"tier1": {"required": 1, "bonus": "Бонус (демо)"}, "tier2": {"required": 10, "bonus": "Голям бонус (демо)"}}
-        }
+        "total_reward_eur": total_reward,
+        "referral_link": f"https://temadom.com/register?ref={referral_code}",
+        "rewards_table": [
+            {"count": 1, "reward": "3 EUR кредит", "unlocked": referral_count >= 1},
+            {"count": 3, "reward": "10 EUR кредит", "unlocked": referral_count >= 3},
+            {"count": 5, "reward": "Безплатен 3D рендер", "unlocked": referral_count >= 5},
+            {"count": 10, "reward": "1 месец PRO абонамент", "unlocked": referral_count >= 10},
+        ],
+        "referrals": referrals,
+    }
+
+
+@api_router.post("/referrals/apply")
+async def apply_referral(request: Request, user: dict = Depends(get_current_user)):
+    """Apply a referral code during or after registration"""
+    data = await request.json()
+    code = data.get("code", "").strip().upper()
+    if not code or len(code) < 6:
+        raise HTTPException(status_code=400, detail="Невалиден реферален код")
+
+    # Check if user already used a referral
+    existing = await db.referrals.find_one({"referred_id": user["id"]})
+    if existing:
+        raise HTTPException(status_code=400, detail="Вече сте използвали реферален код")
+
+    # Find referrer by code (first 8 chars of user ID)
+    referrer = await db.users.find_one({"id": {"$regex": f"^{code}", "$options": "i"}}, {"_id": 0, "id": 1, "name": 1})
+    if not referrer:
+        raise HTTPException(status_code=404, detail="Реферален код не е намерен")
+    if referrer["id"] == user["id"]:
+        raise HTTPException(status_code=400, detail="Не може да използвате собствен код")
+
+    referral = {
+        "id": str(uuid.uuid4()),
+        "referrer_id": referrer["id"],
+        "referrer_name": referrer.get("name", ""),
+        "referred_id": user["id"],
+        "referred_name": user.get("name", ""),
+        "reward_eur": 3,
+        "status": "completed",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.referrals.insert_one(referral)
+
+    # Count total referrals for bonus milestones
+    total = await db.referrals.count_documents({"referrer_id": referrer["id"]})
+    bonus_msg = ""
+    if total == 5:
+        bonus_msg = " + Безплатен 3D рендер!"
+    elif total == 10:
+        bonus_msg = " + 1 месец PRO абонамент!"
+
+    return {
+        "applied": True,
+        "referrer_name": referrer.get("name", "Потребител"),
+        "reward": f"€3 кредит за вас и реферера{bonus_msg}",
     }
 
 @api_router.get("/top-companies")
