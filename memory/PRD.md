@@ -43,6 +43,10 @@ TemaDom is a web application for construction and interior design targeting the 
 ### Landing Page
 - Big TemaDom logo (130px desktop, left corner)
 - Regional breakdown: 28 regions with status
+- **Firm Subscription Plans section** — БАЗОВ 15EUR, ПРО 35EUR, PREMIUM 75EUR
+  - Notification priority explanation (PREMIUM first, ПРО +10min, БАЗОВ manual)
+  - Feature comparison with checkmarks/X marks
+  - CTA buttons per plan
 - Testimonials carousel with auto-rotate and stats
 - Reviews API: any logged-in user can submit
 - NO 360° references anywhere
