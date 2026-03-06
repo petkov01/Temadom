@@ -2596,6 +2596,7 @@ async def generate_photo_design(
     style: str = Form("modern"),
     room_type: str = Form("living_room"),
     notes: str = Form(""),
+    budget_eur: str = Form("2500"),
     budget_tier: str = Form("medium"),
     authorization: str = Form(None)
 ):
@@ -2669,7 +2670,8 @@ async def generate_photo_design(
 
         room_desc = room_analysis.get("description", f"a {room_type_name} interior")
 
-        # Step 2: Generate 3 angles of renovated room (for 360° view)
+        # Step 2: Generate 3 angles of renovated room — PRIORITY #1
+        # If any angle fails, continue with what we have
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         reno_instruction = notes or "complete renovation with modern finishes"
 
@@ -2686,6 +2688,7 @@ async def generate_photo_design(
 
 ROOM DESCRIPTION (keep EXACT layout): {room_desc}
 Dimensions: {width}m x {length}m, height {height}m.
+CLIENT BUDGET: {budget_eur}€ — design within this budget range.
 
 RENOVATION REQUEST: {reno_instruction}
 
@@ -2695,6 +2698,7 @@ STRICT RULES:
 3. Apply ONLY the requested renovation changes
 4. Preserve 1:1 scale and proportions
 5. Use EXACT dimensions from parameters
+6. Materials should look like they cost within {budget_eur}€ total budget
 
 Style: {style_desc}.
 Ultra-realistic professional interior photography, 8K quality, perfect lighting, natural shadows."""
@@ -2712,8 +2716,10 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
                         "label": angle_label,
                         "image_base64": img_b64
                     })
+                    logging.info(f"Photo Designer: angle {angle_idx+1} ({angle_label}) generated OK")
             except Exception as img_err:
                 logging.error(f"Photo Designer image gen error angle {angle_idx+1}: {img_err}")
+                # Continue with next angle — don't stop the whole process
                 continue
 
         generated_images = []
@@ -2728,7 +2734,14 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
         budget_chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"photo-budget-{uuid.uuid4()}",
-            system_message="""Ти си експерт по строителни материали в България. Генерираш БЮДЖЕТ с 3 варианта (Иконом, Среден, Премиум) с ДИРЕКТНИ ЛИНКОВЕ към реални продукти от български магазини.
+            system_message=f"""Ти си експерт по строителни материали в България. Клиентът има бюджет от {budget_eur}€.
+
+Генерирай БЮДЖЕТ с 3 варианта (Иконом, Среден, Премиум) СПРЯМО БЮДЖЕТА на клиента:
+- Иконом: до {int(int(budget_eur)*0.6)}€ (60% от бюджета)
+- Среден: до {budget_eur}€ (100% от бюджета)  
+- Премиум: до {int(int(budget_eur)*1.5)}€ (150% от бюджета)
+
+Всеки вариант трябва да има ДИРЕКТНИ ЛИНКОВЕ към реални продукти от български магазини.
 
 ЗАДЪЛЖИТЕЛНИ МАГАЗИНИ:
 - Praktiker (praktiker.bg) - плочки, боя, настилки
@@ -2744,15 +2757,17 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
 - ДА: https://praktiker.bg/bg/Плочки/Плочки-за-под/Гранитогрес-60х60-см-сив/p/12345
 - Генерирай РЕАЛИСТИЧНИ product URLs с ID
 
+БЮДЖЕТ НА КЛИЕНТА: {budget_eur}€ — ВМЕСТЕНО В РАМКИТЕ!
+
 Отговори САМО в JSON:
-{
+{{
   "budget_tiers": [
-    {
+    {{
       "tier": "economy",
       "tier_name": "Иконом",
       "total_eur": 0,
       "materials": [
-        {
+        {{
           "name": "Плочки 60x60 сиви",
           "category": "Настилки",
           "quantity": "15 m²",
@@ -2761,25 +2776,26 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
           "product_url": "https://praktiker.bg/bg/...",
           "product_id": "12345",
           "available": true
-        }
+        }}
       ]
-    },
-    {
+    }},
+    {{
       "tier": "medium",
       "tier_name": "Среден",
       "total_eur": 0,
       "materials": [...]
-    },
-    {
+    }},
+    {{
       "tier": "premium",
       "tier_name": "Премиум",
       "total_eur": 0,
       "materials": [...]
-    }
+    }}
   ],
   "labor_estimate_eur": 0,
+  "client_budget_eur": {budget_eur},
   "summary": "Кратко описание"
-}"""
+}}"""
         ).with_model("openai", "gpt-4o")
 
         detected_products = room_analysis.get("products_detected", [])
@@ -2787,13 +2803,18 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
 
         budget_msg = UserMessage(
             text=f"""Генерирай бюджет за ремонт на {room_type_name} ({width}м x {length}м x {height}м).
+БЮДЖЕТ НА КЛИЕНТА: {budget_eur}€ — Вместено в рамките!
 Стил: {style_desc}
 {f'Бележки: {notes}' if notes else ''}
 Състояние: {room_analysis.get('current_state', 'нуждае се от ремонт')}
 Открити продукти: {products_str}
 Елементи: {', '.join(room_analysis.get('elements', []))}
 
-Генерирай 3 БЮДЖЕТНИ ВАРИАНТА (Иконом, Среден, Премиум) с ДИРЕКТНИ ЛИНКОВЕ към реални продукти от български магазини. Всеки вариант трябва да има поне 8-12 материала с точни линкове."""
+Генерирай 3 БЮДЖЕТНИ ВАРИАНТА:
+- Иконом: до {int(int(budget_eur)*0.6)}€
+- Среден: до {budget_eur}€
+- Премиум: до {int(int(budget_eur)*1.5)}€
+Всеки вариант с поне 8-12 материала с ДИРЕКТНИ ЛИНКОВЕ."""
         )
         budget_response = await budget_chat.send_message(budget_msg)
 
@@ -2822,6 +2843,7 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
             "generated_count": len(variant_angles),
             "budget_data": budget_data,
             "notes": notes,
+            "budget_eur": int(budget_eur),
             "budget_tier": budget_tier,
             "shared": False,
             "created_at": datetime.now(timezone.utc).isoformat()

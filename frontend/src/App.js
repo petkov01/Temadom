@@ -50,6 +50,9 @@ const TemaDomLogo = ({ className = "h-12" }) => (
     />
   </div>
 );
+
+// Navbar logo: big and prominent 
+const NAVBAR_LOGO_CLASS = "h-[100px] md:h-[130px] w-auto";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -234,11 +237,11 @@ const Navbar = () => {
   return (
     <nav style={{ background: 'var(--theme-nav-bg)', borderBottom: '1px solid var(--theme-nav-border)' }} className="sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-[80px]">
+        <div className="flex justify-between h-[110px]">
           {/* Left: Logo - prominent and left-corner */}
-          <div className="flex items-center -ml-2 lg:-ml-4">
+          <div className="flex items-center -ml-4 lg:-ml-8">
             <Link to="/" className="flex items-center pt-1" data-testid="logo-link">
-              <TemaDomLogo className="h-[68px] md:h-[82px] w-auto" />
+              <TemaDomLogo className={NAVBAR_LOGO_CLASS} />
             </Link>
           </div>
 
@@ -536,7 +539,7 @@ const LiveCounter = () => {
   const freeLeft = Math.max(0, stats.free_slots.total - stats.free_slots.used);
 
   return (
-    <div className={`fixed top-[90px] right-4 z-40 hidden md:block transition-all duration-300 ${show ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`} data-testid="live-counter">
+    <div className={`fixed top-[110px] right-4 z-40 hidden md:block transition-all duration-300 ${show ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`} data-testid="live-counter">
       <button onClick={() => setShow(!show)} className="absolute -left-7 top-2 rounded-l-lg px-1.5 py-2 transition-colors" style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', color: 'var(--theme-text-muted)' }} data-testid="live-counter-toggle">
         {show ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </button>

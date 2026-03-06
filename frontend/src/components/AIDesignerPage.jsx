@@ -273,6 +273,7 @@ export const AIDesignerPage = () => {
   const [style, setStyle] = useState('modern');
   const [roomType, setRoomType] = useState('living_room');
   const [notes, setNotes] = useState('');
+  const [budget, setBudget] = useState('2500');
   const [loading, setLoading] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [uploadPct, setUploadPct] = useState(0);
@@ -319,6 +320,7 @@ export const AIDesignerPage = () => {
     fd.append('style', style);
     fd.append('room_type', roomType);
     fd.append('notes', notes);
+    fd.append('budget_eur', budget);
     fd.append('budget_tier', activeTier);
     if (token) fd.append('authorization', `Bearer ${token}`);
 
@@ -516,6 +518,41 @@ export const AIDesignerPage = () => {
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Budget Input */}
+            <Card style={{ background: 'var(--theme-card-bg)', border: '2px solid #F97316' }}>
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <ShoppingCart className="h-4 w-4 text-[#F97316]" />
+                  <span className="text-[#F97316] text-xs font-bold">БЮДЖЕТ ЗА РЕМОНТ</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Твоят бюджет (EUR)</Label>
+                    <div className="relative">
+                      <Input type="number" step="100" min="500" max="50000" value={budget} onChange={e => setBudget(e.target.value)}
+                        className="h-14 text-center text-2xl font-black pl-8" data-testid="budget-input" />
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#F97316] font-bold text-lg">€</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  {[1000, 2000, 3000, 5000, 10000].map(v => (
+                    <button key={v} onClick={() => setBudget(String(v))}
+                      className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                        budget === String(v) ? 'bg-[#F97316] text-white' : ''
+                      }`}
+                      style={budget !== String(v) ? { background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)', border: '1px solid var(--theme-border)' } : {}}
+                      data-testid={`budget-${v}`}>
+                      €{v.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] mt-2 text-center" style={{ color: 'var(--theme-text-subtle)' }}>
+                  AI ще подбере материали в рамките на бюджета с директни линкове
+                </p>
               </CardContent>
             </Card>
 
