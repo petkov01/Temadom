@@ -5,7 +5,7 @@ TemaDom is a web application for construction and interior design targeting the 
 
 ## Core Products
 1. **AI-Assisted CAD System (`/ai-sketch`)** — 2D plans with 3D preview and cost estimation
-2. **3D Photo Designer v7.0 (`/room-scan`)** — Photo-based AI room redesign with 360° view, budget tiers, direct product links
+2. **3D Photo Designer v7.0 (`/room-scan`)** — Photo-based AI room redesign with 360° view, budget-based materials, direct product links
 
 ## Implemented Features
 
@@ -19,38 +19,35 @@ TemaDom is a web application for construction and interior design targeting the 
 - PDF export, cost estimation, multi-floor
 
 ### 3D Photo Designer v7.0 — `/room-scan`
+- **Budget-driven workflow**: Client enters budget (€) → AI generates materials WITHIN that budget
+- Budget quick presets: €1000, €2000, €3000, €5000, €10000
+- 3 tiers: Economy (60%), Medium (100%), Premium (150% of budget)
 - Photo-based: 3 photos (Общ план, Ъгъл 1, Ъгъл 2) → AI → 360° redesign
-- Budget: 3 tiers (Economy/Medium/Premium) with direct product links
-- Bulgarian stores: Praktiker, Jysk, MrBricolage, IKEA, Teknoimpex, Bauhaus, HomeMax
-- 360° viewer: Before/After slider, 3 angle views
+- Direct product links to Bulgarian stores (Praktiker, Jysk, MrBricolage, IKEA, Teknoimpex, Bauhaus, HomeMax)
 - Share: Facebook, Twitter, direct link. My Projects: save/load/delete
+- Generation priority: 3D renders → Budget+links → 360° (optional)
 
 ### Landing Page
-- Regional breakdown: 28 regions with status indicators
-- **Testimonials carousel**: 8 reviews, auto-rotate (5s), 3 cards desktop / 1 mobile
-- Stats: rating, recommend %, avg project time, total saved
-- Reviews API: any logged-in user can submit reviews (site-wide, not just designer)
-
-### Reviews System
-- `GET /api/reviews` — Public reviews + stats
-- `POST /api/reviews` — Submit review (auth required), any category
-- 8 seed reviews from different cities/features
+- **Big TemaDom logo** (130px desktop, left corner)
+- Regional breakdown: 28 regions with status
+- **Testimonials carousel**: Reviews from site-wide users, auto-rotate, stats
+- Reviews API: any logged-in user can submit (site-wide)
+- "3D Photo Designer" text (not Video)
 
 ### Global Theme v6.5
 - Persistent dark/light mode toggle with CSS variables
 
 ## Key API Endpoints
-- `POST /api/ai-designer/photo-generate` — 3 photos → AI redesign + budget
+- `POST /api/ai-designer/photo-generate` — 3 photos + budget_eur → AI redesign + budget
 - `GET /api/ai-designer/my-projects` — User's projects (auth)
 - `GET /api/reviews` — Public reviews + stats
 - `POST /api/reviews` — Submit review (auth)
 - `GET /api/stats/live` — Live stats + per-region breakdown
-- `POST /api/auth/register` — With regional limit check
 
 ## Prioritized Backlog
 
 ### P1 — Upcoming
-- **Real-time web scraping** for Bulgarian stores (Praktiker, Jysk, etc.) — actual prices/availability
+- **Real-time web scraping** for Bulgarian stores — actual prices/availability
 - v6.6: Detailed Profile Page (My Projects, Payment, Settings)
 - v6.7: Community Feed (Facebook-style social feed)
 
