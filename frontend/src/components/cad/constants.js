@@ -6,7 +6,6 @@ export const CH = 600;
 export const TOOLS = [
   { id: 'select', label: 'Избери', group: 'basic' },
   { id: 'wall', label: 'Стена', group: 'structure' },
-  { id: 'roof', label: 'Покрив', group: 'structure' },
   { id: 'slab', label: 'Плоча', group: 'structure' },
   { id: 'rect', label: 'Правоъгълник', group: 'shape' },
   { id: 'circle', label: 'Кръг', group: 'shape' },
@@ -20,21 +19,20 @@ export const TOOLS = [
 ];
 
 export const TOOL_ICONS = {
-  select: 'MousePointer', wall: 'Fence', roof: 'Triangle', slab: 'Layers',
+  select: 'MousePointer', wall: 'Fence', slab: 'Layers',
   rect: 'Square', circle: 'Circle', stairs: 'ArrowUpRight', door: 'DoorOpen',
   window: 'PanelTop', column: 'Cylinder', beam: 'Minus', dimension: 'Ruler',
   erase: 'Eraser',
 };
 
 export const OBJ_COLORS = {
-  wall: '#90cdf4', roof: '#e67e22', slab: '#68d391', rect: '#68d391',
+  wall: '#90cdf4', slab: '#68d391', rect: '#68d391',
   stairs: '#ffa500', door: '#e74c3c', window: '#3498db', column: '#9b59b6',
   beam: '#f39c12', circle: '#1abc9c', dimension: '#8C56FF', line: '#a0aec0',
 };
 
 export const DEFAULTS = {
   wall: { height: 3, thickness: 25 },
-  roof: { roofAngle: 30, overhang: 0.5 },
   slab: { slabThickness: 15 },
   stairs: { steps: 8, rise: 0.17, run: 0.30, stairWidth: 1.2 },
   door: { doorWidth: 0.9, doorHeight: 2.1 },

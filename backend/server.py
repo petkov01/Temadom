@@ -4638,6 +4638,22 @@ STORE_SEARCH_URLS = {
     "mrbricolage": {"name": "Mr.Bricolage", "base": "https://www.mrbricolage.bg", "search": "https://www.mrbricolage.bg/search?q={query}"},
     "bauhaus": {"name": "Bauhaus", "base": "https://www.bauhaus.bg", "search": "https://www.bauhaus.bg/catalogsearch/result/?q={query}"},
     "homemax": {"name": "HomeMax", "base": "https://www.homemax.bg", "search": "https://www.homemax.bg/catalogsearch/result/?q={query}"},
+    "technomarket": {"name": "Technomarket", "base": "https://www.technomarket.bg", "search": "https://www.technomarket.bg/search?q={query}", "priority": ["бойлер", "климатик", "осветление", "хладилник", "готварска", "пералня", "съдомиялна", "вентилатор", "аспиратор"]},
+    "teknoimpex": {"name": "Teknoimpex", "base": "https://teknoimpex.bg", "search": "https://teknoimpex.bg/search?q={query}"},
+    "ikea": {"name": "IKEA", "base": "https://www.ikea.bg", "search": "https://www.ikea.bg/search/?q={query}"},
+    "temax": {"name": "Temax", "base": "https://www.temax.bg", "search": "https://www.temax.bg/search/?q={query}"},
+    "maximarket": {"name": "Maximarket", "base": "https://www.maximarket.bg", "search": "https://www.maximarket.bg/catalogsearch/result/?q={query}"},
+    "toplivo": {"name": "Toplivo", "base": "https://www.toplivo.bg", "search": "https://www.toplivo.bg/search?q={query}"},
+    "marmag": {"name": "Marmag", "base": "https://marmag.bg", "search": "https://marmag.bg/search?q={query}"},
+    "paros": {"name": "Paros", "base": "https://www.paros.bg", "search": "https://www.paros.bg/search?q={query}"},
+    "praktis": {"name": "Praktis", "base": "https://praktis.bg", "search": "https://praktis.bg/search?q={query}"},
+    "angro": {"name": "Angro", "base": "https://angro.bg", "search": "https://angro.bg/search?q={query}"},
+    "rilaonline": {"name": "Rila Online", "base": "https://rilaonline.com", "search": "https://rilaonline.com/search?q={query}"},
+    "baustoff": {"name": "Baustoff Metall", "base": "https://baustoff-metall.bg", "search": "https://baustoff-metall.bg/search?q={query}"},
+    "atek": {"name": "Atek", "base": "https://atek.bg", "search": "https://atek.bg/search?q={query}"},
+    "vako": {"name": "Vako", "base": "https://vako.bg", "search": "https://vako.bg/search?q={query}"},
+    "buildmark": {"name": "Buildmark", "base": "https://buildmark.bg", "search": "https://buildmark.bg/search?q={query}"},
+    "obijavki": {"name": "Obijavki", "base": "https://obijavki.com", "search": "https://obijavki.com/search?q={query}"},
 }
 
 async def scrape_store(store_key: str, query: str) -> list:

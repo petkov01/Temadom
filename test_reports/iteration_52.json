@@ -1,0 +1,92 @@
+{
+  "summary": "Iteration 52: Verified 21 Bulgarian stores + CAD calculator fixes (Дълбочина→Височина, no Покрив)",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "=== BACKEND API TESTS (6/6 passed) ===",
+    "✅ GET /api/scrape/stores returns 200",
+    "✅ GET /api/scrape/stores returns exactly 21 stores",
+    "✅ Technomarket found in stores (id: technomarket, name: Technomarket)",
+    "✅ All 21 store names verified: Praktiker, Jysk, Mr.Bricolage, Bauhaus, HomeMax, Technomarket, Teknoimpex, IKEA, Temax, Maximarket, Toplivo, Marmag, Paros, Praktis, Angro, Rila Online, Baustoff Metall, Atek, Vako, Buildmark, Obijavki",
+    "✅ GET /api/scrape/search?q=test returns valid JSON with query, total, stores_searched fields",
+    "✅ POST /api/auth/login with comm2@test.bg works correctly",
+    "",
+    "=== FRONTEND CAD PAGE TESTS (ALL PASSED) ===",
+    "",
+    "--- Toolbar Verification ---",
+    "✅ 12 toolbar buttons: Избери, Стена, Плоча, Правоъгълник, Кръг, Стълби, Врата, Прозорец, Колона, Греда, X/Y/Z, Изтрий",
+    "✅ NO 'Покрив' (Roof) button in toolbar",
+    "",
+    "--- Manual Add Buttons ---",
+    "✅ 7 manual add buttons: +Стена, +Плоча, +Стълби, +Врата, +Прозорец, +Колона, +Греда",
+    "✅ NO 'Покрив' in manual add buttons",
+    "",
+    "--- Dimension Labels ---",
+    "✅ NO 'Дълбочина' (Depth) text anywhere on CAD page",
+    "✅ Wall element shows: ДЪЛЖИНА, Дебелина, Височина (correct)",
+    "✅ Slab element shows: Широчина, Височина, Дебелина (correct - Дълбочина replaced with Височина)",
+    "✅ 'Височина' (Height) label used correctly"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration52.py",
+    "/app/test_reports/pytest/pytest_results_iter52.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_iteration52.py"
+  ],
+  "success_rate": {
+    "backend": "100% (6/6 tests passed)",
+    "frontend": "100% (all CAD verifications passed)"
+  },
+  "seed_data_creation": "None - used existing test user comm2@test.bg",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 52 verified: 1) Exactly 21 Bulgarian stores in /api/scrape/stores including new Technomarket. 2) CAD page (/ai-sketch) toolbar has NO 'Покрив' button. 3) Manual add buttons are: Стена, Плоча, Стълби, Врата, Прозорец, Колона, Греда (no Покрив). 4) 'Дълбочина' label completely removed from CAD - replaced with 'Височина' for slab depth dimension. Wall uses: Дължина, Дебелина, Височина. Slab uses: Широчина, Височина, Дебелина. Auth required via AuthGate modal with comm2@test.bg/Test123!. Key data-testids: tool-*, add-*-btn, structure-panel, dims-*, obj-*.",
+  "features_tested": {
+    "stores_endpoint": {
+      "status": "PASS",
+      "details": "GET /api/scrape/stores returns exactly 21 Bulgarian stores"
+    },
+    "technomarket_added": {
+      "status": "PASS",
+      "details": "Technomarket store present with id='technomarket', name='Technomarket'"
+    },
+    "all_21_stores": {
+      "status": "PASS",
+      "store_list": "Praktiker, Jysk, Mr.Bricolage, Bauhaus, HomeMax, Technomarket, Teknoimpex, IKEA, Temax, Maximarket, Toplivo, Marmag, Paros, Praktis, Angro, Rila Online, Baustoff Metall, Atek, Vako, Buildmark, Obijavki"
+    },
+    "search_endpoint": {
+      "status": "PASS",
+      "details": "GET /api/scrape/search?q=test returns valid JSON with required fields"
+    },
+    "no_pokriv_toolbar": {
+      "status": "PASS",
+      "details": "CAD toolbar does NOT have 'Покрив' button - only 12 tools present"
+    },
+    "no_pokriv_manual": {
+      "status": "PASS", 
+      "details": "Manual add buttons do NOT include Покрив - only 7 buttons: Стена, Плоча, Стълби, Врата, Прозорец, Колона, Греда"
+    },
+    "no_dulbochina": {
+      "status": "PASS",
+      "details": "NO 'Дълбочина' text anywhere on CAD page - replaced with 'Височина'"
+    },
+    "wall_dimensions": {
+      "status": "PASS",
+      "details": "Wall shows: Дължина, Дебелина (25 см), Височина (3 м)"
+    },
+    "slab_dimensions": {
+      "status": "PASS",
+      "details": "Slab shows: Широчина, Височина (was Дълбочина), Дебелина - correctly fixed"
+    }
+  }
+}

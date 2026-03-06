@@ -8,13 +8,13 @@ import { GRID, OBJ_COLORS } from './constants';
 import { autoType, smartHint } from './utils';
 
 const TYPE_LABELS = {
-  wall: 'Стена', roof: 'Покрив', slab: 'Плоча', stairs: 'Стълби',
+  wall: 'Стена', slab: 'Плоча', stairs: 'Стълби',
   door: 'Врата', window: 'Прозорец', column: 'Колона', beam: 'Греда',
   circle: 'Кръг', ignore: 'Скрит',
 };
 
 const MANUAL_TYPES = [
-  ['wall', 'Стена', '#90cdf4'], ['roof', 'Покрив', '#e67e22'], ['slab', 'Плоча', '#68d391'],
+  ['wall', 'Стена', '#90cdf4'], ['slab', 'Плоча', '#68d391'],
   ['stairs', 'Стълби', '#ffa500'], ['door', 'Врата', '#e74c3c'], ['window', 'Прозорец', '#3498db'],
   ['column', 'Колона', '#9b59b6'], ['beam', 'Греда', '#f39c12'],
 ];
@@ -133,7 +133,7 @@ function ObjectCard({ el, i, isSel, scale, onSelect, onDelete, onUpdate, onUpdat
             <>
               <DimInput label="Широчина" val={dims.width}
                 onChange={v => onUpdateDimension(i, 'width', v)} color="#FF8C42" />
-              <DimInput label="Дълбочина" val={dims.depth}
+              <DimInput label="Височина" val={dims.depth}
                 onChange={v => onUpdateDimension(i, 'depth', v)} color="#4DA6FF" />
               <DimInput label="Дебелина" val={(el.slabThickness || 15)} unit="см"
                 onChange={v => onUpdate(i, 'slabThickness', v)} step={1} color="#28A745" />
@@ -146,7 +146,7 @@ function ObjectCard({ el, i, isSel, scale, onSelect, onDelete, onUpdate, onUpdat
                 <DimInput label="Дебелина" val={(el.thickness || 25)} unit="см"
                   onChange={v => onUpdate(i, 'thickness', v)} step={1} color="#4DA6FF" />
               )}
-              {(t === 'wall' || t === 'roof' || t === 'beam') && (
+              {(t === 'wall' || t === 'beam') && (
                 <DimInput label="Височина" val={t === 'beam' ? ((el.beamHeight || 45)) : (el.height ?? 3)} unit={t === 'beam' ? 'см' : 'м'}
                   onChange={v => t === 'beam' ? onUpdate(i, 'beamHeight', v) : onUpdate(i, 'height', v)}
                   step={t === 'beam' ? 1 : 0.1} color="#28A745" />
@@ -158,10 +158,6 @@ function ObjectCard({ el, i, isSel, scale, onSelect, onDelete, onUpdate, onUpdat
 
       {/* === EXTRA PARAMETERS === */}
       <div className="grid grid-cols-2 gap-1.5">
-        {t === 'roof' && (<>
-          <ParamInput label="Ъгъл (°)" val={el.roofAngle ?? 30} onChange={v => onUpdate(i, 'roofAngle', v)} />
-          <ParamInput label="Надвес (м)" val={el.overhang ?? 0.5} onChange={v => onUpdate(i, 'overhang', v)} step={0.1} />
-        </>)}
         {t === 'stairs' && (<>
           <ParamInput label="Стъпала" val={el.steps ?? 8} onChange={v => onUpdate(i, 'steps', Math.max(1, v))} />
           <ParamInput label="Rise (м)" val={el.rise ?? 0.17} onChange={v => onUpdate(i, 'rise', v)} step={0.01} />
@@ -185,7 +181,7 @@ function ObjectCard({ el, i, isSel, scale, onSelect, onDelete, onUpdate, onUpdat
 
       {/* TYPE SWITCH */}
       <div className="flex flex-wrap gap-1 mt-1.5">
-        {['wall', 'roof', 'slab', 'stairs', 'door', 'window', 'column', 'beam', 'ignore'].map(tp => (
+        {['wall', 'slab', 'stairs', 'door', 'window', 'column', 'beam', 'ignore'].map(tp => (
           <button key={tp} onClick={e => { e.stopPropagation(); onUpdate(i, '_type', tp); }}
             className={`text-[8px] px-1.5 py-0.5 rounded border ${t === tp ? 'border-[#28A745] bg-[#28A745]/10 text-[#28A745]' : 'border-[#2A3A4C] text-slate-600 hover:text-slate-300'}`}>
             {TYPE_LABELS[tp] || tp}
