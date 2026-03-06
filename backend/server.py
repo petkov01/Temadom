@@ -5103,6 +5103,168 @@ async def delete_post(post_id: str, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="Публикацията не е намерена или нямате права")
     return {"deleted": True}
 
+
+# ============== LEADERBOARD ==============
+
+@api_router.get("/leaderboard/clients")
+async def leaderboard_clients(period: str = "all"):
+    """Top clients by published projects, likes received, and activity"""
+    match_stage = {}
+    if period == "month":
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+        match_stage = {"created_at": {"$gte": cutoff}}
+
+    pipeline = [
+        {"$match": match_stage} if match_stage else {"$match": {}},
+        {"$group": {
+            "_id": "$user_id",
+            "projects_count": {"$sum": 1},
+            "total_views": {"$sum": {"$ifNull": ["$views", 0]}},
+            "user_name": {"$first": "$user_name"},
+            "user_avatar": {"$first": "$user_avatar"},
+        }},
+        {"$sort": {"projects_count": -1, "total_views": -1}},
+        {"$limit": 20},
+    ]
+    results = await db.published_projects.aggregate(pipeline).to_list(20)
+
+    leaderboard = []
+    for idx, r in enumerate(results):
+        uid = r["_id"]
+        posts_count = await db.community_posts.count_documents({"user_id": uid})
+        likes_received = 0
+        async for post in db.community_posts.find({"user_id": uid}, {"likes_count": 1, "_id": 0}):
+            likes_received += post.get("likes_count", 0)
+
+        leaderboard.append({
+            "rank": idx + 1,
+            "user_id": uid,
+            "user_name": r.get("user_name", "Потребител"),
+            "user_avatar": r.get("user_avatar", ""),
+            "projects_count": r.get("projects_count", 0),
+            "posts_count": posts_count,
+            "likes_received": likes_received,
+            "views": r.get("total_views", 0),
+            "score": r.get("projects_count", 0) * 10 + likes_received * 3 + posts_count * 2,
+        })
+
+    leaderboard.sort(key=lambda x: x["score"], reverse=True)
+    for i, entry in enumerate(leaderboard):
+        entry["rank"] = i + 1
+
+    return {"period": period, "type": "clients", "entries": leaderboard}
+
+
+@api_router.get("/leaderboard/companies")
+async def leaderboard_companies(period: str = "all"):
+    """Top firms by reviews, completed projects, and rating"""
+    companies = await db.users.find(
+        {"user_type": {"$in": ["company", "firm"]}},
+        {"_id": 0, "id": 1, "name": 1, "avatar_b64": 1, "region": 1}
+    ).to_list(100)
+
+    leaderboard = []
+    for comp in companies:
+        cid = comp["id"]
+        reviews = await db.reviews.find({"company_id": cid}, {"_id": 0, "rating": 1}).to_list(500)
+        review_count = len(reviews)
+        avg_rating = round(sum(r.get("rating", 0) for r in reviews) / review_count, 1) if review_count > 0 else 0
+        offers_count = await db.community_offers.count_documents({"company_id": cid})
+        projects_done = await db.published_projects.count_documents({"company_id": cid})
+
+        score = avg_rating * 20 + review_count * 5 + offers_count * 3 + projects_done * 10
+        leaderboard.append({
+            "rank": 0,
+            "company_id": cid,
+            "company_name": comp.get("name", "Фирма"),
+            "company_avatar": comp.get("avatar_b64", ""),
+            "region": comp.get("region", ""),
+            "avg_rating": avg_rating,
+            "review_count": review_count,
+            "offers_count": offers_count,
+            "projects_done": projects_done,
+            "score": round(score, 1),
+        })
+
+    leaderboard.sort(key=lambda x: x["score"], reverse=True)
+    for i, entry in enumerate(leaderboard):
+        entry["rank"] = i + 1
+
+    return {"period": period, "type": "companies", "entries": leaderboard[:20]}
+
+
+# ============== COMMUNITY v3: OFFERS ==============
+
+@api_router.post("/community/offers")
+async def create_offer(request: Request, user: dict = Depends(get_current_user)):
+    """A company creates an offer on a project post"""
+    if user.get("user_type") not in ("company", "firm"):
+        raise HTTPException(status_code=403, detail="Само фирми могат да правят оферти")
+
+    data = await request.json()
+    post_id = data.get("post_id", "")
+    price_eur = data.get("price_eur", 0)
+    message = data.get("message", "").strip()
+    timeline_days = data.get("timeline_days", 0)
+
+    if not post_id or not message:
+        raise HTTPException(status_code=400, detail="Посочете публикация и съобщение")
+
+    post = await db.community_posts.find_one({"id": post_id}, {"_id": 0, "id": 1})
+    if not post:
+        raise HTTPException(status_code=404, detail="Публикацията не е намерена")
+
+    offer = {
+        "id": str(uuid.uuid4()),
+        "post_id": post_id,
+        "company_id": user["id"],
+        "company_name": user.get("name", ""),
+        "company_avatar": user.get("avatar_b64", ""),
+        "company_region": user.get("region", ""),
+        "price_eur": price_eur,
+        "message": message[:500],
+        "timeline_days": timeline_days,
+        "status": "pending",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.community_offers.insert_one(offer)
+    offer.pop("_id", None)
+    return offer
+
+
+@api_router.get("/community/offers/{post_id}")
+async def get_post_offers(post_id: str):
+    """Get all offers for a specific post"""
+    offers = await db.community_offers.find(
+        {"post_id": post_id}, {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    return {"offers": offers}
+
+
+@api_router.get("/community/public-projects")
+async def get_public_projects(page: int = 1, limit: int = 12):
+    """Get published projects for the community gallery"""
+    skip = (page - 1) * limit
+    total = await db.published_projects.count_documents({})
+    projects = await db.published_projects.find(
+        {}, {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+
+    for p in projects:
+        for key in ["before_images", "generated_images"]:
+            imgs = p.get(key, [])
+            if isinstance(imgs, list):
+                for i, img_obj in enumerate(imgs):
+                    if isinstance(img_obj, dict):
+                        for k in list(img_obj.keys()):
+                            if "base64" in k and len(str(img_obj.get(k, ""))) > 200:
+                                img_obj[k] = img_obj[k][:100] + "..."
+                    elif isinstance(img_obj, str) and len(img_obj) > 200:
+                        imgs[i] = img_obj[:100] + "..."
+
+    return {"projects": projects, "total": total, "page": page}
+
+
 # Include router - MUST be after all route definitions
 app.include_router(api_router)
 

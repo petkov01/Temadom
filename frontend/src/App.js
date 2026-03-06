@@ -9,7 +9,7 @@ import {
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
   ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator, Camera, ChevronLeft, Image, MessageSquare,
   FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench,
-  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, ArrowLeft
+  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, ArrowLeft, Trophy
 } from 'lucide-react';
 import { AIDesignerPage } from '@/components/AIDesignerPage';
 import { FeedbackPage } from '@/components/FeedbackPage';
@@ -34,6 +34,7 @@ import RegionalPage from '@/components/RegionalPage';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import CommunityPage from '@/components/CommunityPage';
 import ProductSearchPage from '@/components/ProductSearchPage';
+import LeaderboardPage from '@/components/LeaderboardPage';
 import { LanguageProvider, useLanguage } from '@/i18n/LanguageContext';
 import { LANGUAGES } from '@/i18n/translations';
 import { Chatbot } from '@/components/Chatbot';
@@ -307,6 +308,9 @@ const Navbar = () => {
                   </Link>
                   <Link to="/product-search" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#F97316] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-product-search">
                     <ShoppingCart className="h-4 w-4" /> AI Търсене
+                  </Link>
+                  <Link to="/leaderboard" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#F97316] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-leaderboard">
+                    <Trophy className="h-4 w-4" /> Класация
                   </Link>
                   <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-about">
                     <Info className="h-4 w-4" /> За нас
@@ -3727,6 +3731,7 @@ function App() {
                 <Route path="/analytics" element={<AnalyticsDashboard />} />
                 <Route path="/community" element={<CommunityPage />} />
                 <Route path="/product-search" element={<ProductSearchPage />} />
+                <Route path="/leaderboard" element={<LeaderboardPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/dashboard" element={<AuthGate><CompanyDashboard /></AuthGate>} />

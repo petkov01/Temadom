@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { MessageSquare, Heart, Send, Trash2, Image as ImageIcon, Share2,
-  ChevronDown, Filter, PlusCircle, X, User, Building2, Clock, Bookmark } from 'lucide-react';
+  ChevronDown, Filter, PlusCircle, X, User, Building2, Clock, Bookmark,
+  Euro, CalendarDays, Briefcase, Eye } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +18,7 @@ const POST_TYPES = [
   { id: 'project', name: 'Проекти' },
   { id: 'question', name: 'Въпроси' },
   { id: 'before_after', name: 'Преди/След' },
+  { id: 'offer', name: 'Оферти' },
 ];
 
 const timeAgo = (d) => {
@@ -207,6 +209,92 @@ const Comment = ({ comment }) => (
   </div>
 );
 
+/* ---- Offers on a post ---- */
+const OffersSection = ({ postId, isCompany }) => {
+  const [offers, setOffers] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [price, setPrice] = useState('');
+  const [msg, setMsg] = useState('');
+  const [days, setDays] = useState('');
+  const [sending, setSending] = useState(false);
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    axios.get(`${API}/community/offers/${postId}`).then(r => setOffers(r.data.offers)).catch(() => {});
+  }, [postId]);
+
+  const submit = async () => {
+    if (!msg.trim()) return;
+    setSending(true);
+    try {
+      const res = await axios.post(`${API}/community/offers`, {
+        post_id: postId, price_eur: Number(price) || 0, message: msg, timeline_days: Number(days) || 0,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setOffers(prev => [res.data, ...prev]);
+      setMsg(''); setPrice(''); setDays(''); setShowForm(false);
+      toast.success('Офертата е изпратена!');
+    } catch (err) { toast.error(err.response?.data?.detail || 'Грешка'); }
+    setSending(false);
+  };
+
+  return (
+    <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--theme-border)' }} data-testid={`offers-section-${postId}`}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] font-bold flex items-center gap-1" style={{ color: 'var(--theme-text-muted)' }}>
+          <Briefcase className="h-3 w-3" /> {offers.length} оферти
+        </span>
+        {isCompany && !showForm && (
+          <button onClick={() => setShowForm(true)} className="text-[10px] font-bold text-[#F97316] hover:underline" data-testid={`make-offer-btn-${postId}`}>
+            + Направи оферта
+          </button>
+        )}
+      </div>
+
+      {showForm && (
+        <div className="space-y-2 mb-3 p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
+          <div className="grid grid-cols-2 gap-2">
+            <input value={price} onChange={e => setPrice(e.target.value)} placeholder="Цена (EUR)" type="number"
+              className="text-xs rounded-lg px-3 py-2" style={{ background: 'var(--theme-card-bg)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}
+              data-testid={`offer-price-${postId}`} />
+            <input value={days} onChange={e => setDays(e.target.value)} placeholder="Срок (дни)" type="number"
+              className="text-xs rounded-lg px-3 py-2" style={{ background: 'var(--theme-card-bg)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}
+              data-testid={`offer-days-${postId}`} />
+          </div>
+          <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder="Опишете офертата..." rows={2}
+            className="w-full text-xs rounded-lg px-3 py-2 resize-none" style={{ background: 'var(--theme-card-bg)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}
+            data-testid={`offer-msg-${postId}`} />
+          <div className="flex justify-end gap-2">
+            <button onClick={() => setShowForm(false)} className="text-xs px-3 py-1.5 rounded-lg" style={{ color: 'var(--theme-text-muted)' }}>Отказ</button>
+            <Button size="sm" className="bg-[#F97316] hover:bg-[#EA580C] text-white text-xs px-4" onClick={submit} disabled={sending || !msg.trim()}
+              data-testid={`submit-offer-${postId}`}>
+              {sending ? '...' : 'Изпрати оферта'}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {offers.slice(0, 3).map(o => (
+        <div key={o.id} className="flex items-start gap-2 py-2 px-1" style={{ borderTop: '1px solid var(--theme-border)' }}>
+          <div className="w-7 h-7 rounded-full bg-[#F97316] flex items-center justify-center flex-shrink-0">
+            {o.company_avatar ? <img src={`data:image/jpeg;base64,${o.company_avatar}`} alt="" className="w-7 h-7 rounded-full object-cover" /> : <Building2 className="h-3.5 w-3.5 text-white" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold truncate" style={{ color: 'var(--theme-text)' }}>{o.company_name}</span>
+              {o.company_region && <span className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>{o.company_region}</span>}
+            </div>
+            <p className="text-[11px] mt-0.5" style={{ color: 'var(--theme-text-muted)' }}>{o.message}</p>
+            <div className="flex items-center gap-3 mt-1">
+              {o.price_eur > 0 && <span className="text-[10px] font-bold text-[#F97316]"><Euro className="inline h-2.5 w-2.5" /> {o.price_eur} EUR</span>}
+              {o.timeline_days > 0 && <span className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}><CalendarDays className="inline h-2.5 w-2.5" /> {o.timeline_days} дни</span>}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 /* ---- Post Card ---- */
 const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
   const [showComments, setShowComments] = useState(false);
@@ -226,8 +314,8 @@ const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
     setSubmitting(false);
   };
 
-  const typeBadge = { text: null, project: 'Проект', question: 'Въпрос', before_after: 'Преди/След' };
-  const typeColor = { project: '#F97316', question: '#4DA6FF', before_after: '#10B981' };
+  const typeBadge = { text: null, project: 'Проект', question: 'Въпрос', before_after: 'Преди/След', offer: 'Оферта' };
+  const typeColor = { project: '#F97316', question: '#4DA6FF', before_after: '#10B981', offer: '#8B5CF6' };
 
   return (
     <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid={`post-${post.id}`}>
@@ -301,7 +389,17 @@ const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
             style={{ color: 'var(--theme-text-muted)' }} data-testid={`comments-toggle-${post.id}`}>
             <MessageSquare className="h-4 w-4" /> {post.comments_count || 0}
           </button>
+          {post.type === 'project' && (
+            <span className="flex items-center gap-1.5 text-xs font-medium" style={{ color: 'var(--theme-text-muted)' }}>
+              <Briefcase className="h-4 w-4" /> Оферти
+            </span>
+          )}
         </div>
+
+        {/* Offers for project posts */}
+        {post.type === 'project' && (
+          <OffersSection postId={post.id} isCompany={userId && post.user_id !== userId} />
+        )}
 
         {/* Comments */}
         {showComments && (
