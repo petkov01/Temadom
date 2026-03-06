@@ -5,7 +5,7 @@ TemaDom is a web application for construction and interior design targeting the 
 
 ## Core Products
 1. **AI-Assisted CAD System (`/ai-sketch`)** — 2D plans with 3D preview and cost estimation
-2. **3D Photo Designer v8.0 (`/room-scan`)** — BASIC: Photos → 3D renders → Share. Multi-room packages (1/2/5 rooms)
+2. **3D Photo Designer v9.0 (`/room-scan`)** — Vision-powered: Photos → AI analysis → Room-specific 3D renders + Budget
 3. **Community Feed (`/community`)** — Social feed with posts, likes, comments, filters, image uploads, project linking
 4. **AI Product Search (`/product-search`)** — Upload photo → AI identifies products → Search 21 Bulgarian stores
 
@@ -22,26 +22,26 @@ TemaDom is a web application for construction and interior design targeting the 
 - **Fixed**: "Дълбочина" → "Височина" everywhere
 - **Removed**: "Покрив/Roof" element type completely
 
-### 3D Photo Designer v8.0 — `/room-scan` (BASIC)
+### 3D Photo Designer v9.0 — `/room-scan` ✅ EMERGENCY FIX APPLIED
+- **NEW**: GPT-4o Vision analyzes each uploaded photo BEFORE generation
+- **NEW**: Vision identifies room type, visible elements, colors, layout, camera angle
+- **NEW**: Room-specific prompt ensures bathroom→bathroom, kitchen→kitchen (no more mismatches)
 - Multi-room packages: 69EUR (1 стая), 129EUR (2 стаи), 199EUR (до 5 стаи)
-- 3 photos → OpenAI GPT Image 1 → 3 separate 3D renders
+- Room types: Баня, Кухня, Хол, Спалня, Коридор, Балкон, Стълбище, Фасада
+- Styles: Модерен, Минималист, Класически, Бохо, Хай-тек, Индустриален, Скандинавски, Лофт, Неокласически, Арт Деко
+- 3 photos → GPT-4o Vision analysis → gpt-image-1 3D renders → Budget with 21 store links
 - Before/After slider, Share (Facebook, WhatsApp, Viber, Twitter, Email)
 
-### Community Feed v2.0 — `/community` ✅ COMPLETED
+### Community Feed v2.0 — `/community` ✅
 - Post types: text, project, question, before_after
-- **NEW**: Image upload (up to 4 images per post, base64)
-- **NEW**: Link 3D designer projects to posts
-- **NEW**: Image-only posts allowed (no text required)
-- Like/unlike toggle, comments, post deletion
-- Filter by type, pagination with "Load more"
+- Image upload (up to 4 images per post, base64)
+- Link 3D designer projects to posts
+- Image-only posts allowed
+- Like/unlike, comments, deletion, filters, pagination
 
-### AI Product Search v1.0 — `/product-search` ✅ COMPLETED
-- Upload photo → OpenAI Vision (GPT-4o via Emergent LLM key) analyzes image
-- AI identifies 3-8 product search queries from the photo
-- Parallel search across 21 Bulgarian stores
-- Results grouped by query with EUR/BGN prices and direct store links
-- Room type selector (Баня, Кухня, Спалня, etc.)
-- Text query fallback when no image
+### AI Product Search v1.0 — `/product-search` ✅
+- Upload photo → OpenAI Vision (GPT-4o) analyzes → Search 21 stores
+- Results with EUR/BGN prices and direct store links
 - Technomarket prioritized for appliances
 
 ### Web Scraping API — 21 Bulgarian Stores
@@ -51,27 +51,25 @@ TemaDom is a web application for construction and interior design targeting the 
 - 3 plans: БАЗОВ (15EUR), ПРО (35EUR), PREMIUM (75EUR)
 - Period toggle: 1/3/6/12 months with discounts
 
-### Global Theme v6.5
-- Persistent dark/light mode toggle
+### Global Theme v6.5 — Persistent dark/light mode toggle
 
 ## Key API Endpoints
-- `POST /api/scrape/ai-search` — AI photo analysis + 21 store search ✅ NEW
-- `POST /api/community/posts` — Create post with images & project link ✅ UPDATED
+- `POST /api/ai-designer/photo-generate` — Vision + 3D render + budget (multipart/form-data) ✅ FIXED
+- `POST /api/scrape/ai-search` — AI photo analysis + 21 store search
+- `POST /api/community/posts` — Create post with images & project link
 - `GET /api/community/posts` — List posts (public, paginated)
-- `POST /api/community/posts/{id}/like` — Toggle like
-- `POST /api/community/posts/{id}/comment` — Add comment
-- `DELETE /api/community/posts/{id}` — Delete own post
 - `GET /api/scrape/stores` — 21 Bulgarian stores list
-- `GET /api/scrape/search?q=...` — Product search across stores
 
 ## Prioritized Backlog
 
 ### P0 — DONE ✅
 - Community Feed: image upload, project sharing ✅
 - AI Product Search: photo → 21 stores ✅
+- EMERGENCY FIX: Room recognition with Vision ✅
 
 ### P1 — Upcoming
-- FB Pixel/Google Analytics tracking
+- Share results button in AI Product Search (→ Community Feed / WhatsApp/Viber)
+- FB Pixel / Google Analytics tracking
 - Referral rewards (automatic)
 - Mobile fullscreen + download
 - PDF export (site design)
