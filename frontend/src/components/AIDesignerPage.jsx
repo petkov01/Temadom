@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Loader2, X, Upload, CheckCircle, Share2, RotateCcw,
   Copy, Facebook, Twitter, MessageCircle, Mail, Link2, Phone, ArrowLeft, ArrowRight,
-  Plus, Trash2, Download, Maximize2, Minimize2 } from 'lucide-react';
+  Plus, Trash2, Download, Maximize2, Ruler } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +37,12 @@ const PACKAGES = [
   { id: 3, label: 'Апартамент', price: 199, maxRooms: 5 },
 ];
 
+const BUDGETS = [
+  { value: 2000, label: '2,000 лв' },
+  { value: 5000, label: '5,000 лв' },
+  { value: 10000, label: '10,000 лв' },
+];
+
 const PHOTO_LABELS = ['Общ план', 'Ъгъл 1', 'Ъгъл 2'];
 
 const emptyRoom = () => ({
@@ -46,6 +52,10 @@ const emptyRoom = () => ({
   photos: [null, null, null],
   photoUrls: [null, null, null],
   notes: '',
+  length: '4.0',
+  width: '3.0',
+  height: '2.6',
+  budget: 5000,
 });
 
 /* ---- Before / After Slider ---- */
@@ -58,25 +68,22 @@ const BeforeAfterSlider = ({ before, after, label }) => {
     setPos(Math.max(2, Math.min(98, ((clientX - r.left) / r.width) * 100)));
   };
   return (
-    <div ref={ref} className="relative w-full aspect-video rounded-xl overflow-hidden cursor-col-resize select-none"
-      style={{ border: '1px solid var(--theme-border)' }}
-      onMouseMove={(e) => e.buttons && handleMove(e.clientX)}
-      onTouchMove={(e) => handleMove(e.touches[0].clientX)}
-      data-testid="before-after-slider">
-      <img src={after} alt="After" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+    <div ref={ref} className="relative aspect-video cursor-col-resize overflow-hidden select-none"
+      onMouseMove={e => { if (e.buttons === 1) handleMove(e.clientX); }}
+      onTouchMove={e => handleMove(e.touches[0].clientX)}
+      data-testid={`slider-${label}`}>
+      <img src={after} alt="After" className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 overflow-hidden" style={{ width: `${pos}%` }}>
-        <img src={before} alt="Before" className="w-full h-full object-cover"
-          style={{ width: `${(100 * 100) / Math.max(pos, 1)}%`, maxWidth: 'none' }} draggable={false} />
+        <img src={before} alt="Before" className="w-full h-full object-cover" style={{ width: `${10000 / pos}%`, maxWidth: 'none' }} />
       </div>
-      <div className="absolute top-0 bottom-0" style={{ left: `${pos}%` }}>
-        <div className="w-0.5 h-full bg-white shadow-lg" />
-        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center">
-          <ArrowLeft className="h-3 w-3 text-slate-700" /><ArrowRight className="h-3 w-3 text-slate-700" />
+      <div className="absolute top-0 bottom-0" style={{ left: `${pos}%`, transform: 'translateX(-50%)' }}>
+        <div className="h-full w-0.5 bg-white shadow-lg" />
+        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center">
+          <ArrowLeft className="h-3 w-3 text-gray-600" /><ArrowRight className="h-3 w-3 text-gray-600" />
         </div>
       </div>
-      <div className="absolute top-3 left-3 bg-black/60 text-white text-[11px] font-bold px-3 py-1 rounded-lg backdrop-blur-sm">ПРЕДИ</div>
-      <div className="absolute top-3 right-3 bg-[#F97316]/90 text-white text-[11px] font-bold px-3 py-1 rounded-lg backdrop-blur-sm">СЛЕД</div>
-      {label && <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-3 py-1 rounded-lg backdrop-blur-sm">{label}</div>}
+      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded">ПРЕДИ</div>
+      <div className="absolute top-2 right-2 px-2 py-0.5 bg-[#F97316]/90 text-white text-[10px] font-bold rounded">СЛЕД</div>
     </div>
   );
 };
@@ -86,14 +93,7 @@ const ShareMenu = ({ projectId, onClose }) => {
   const shareUrl = `${SITE_URL}/projects/${projectId}`;
   const shareText = '3D дизайн проект от TemaDom';
   const [copied, setCopied] = useState(false);
-
-  const copyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    toast.success('Линкът е копиран!');
-    setTimeout(() => setCopied(false), 2000);
-  };
-
+  const copyLink = () => { navigator.clipboard.writeText(shareUrl); setCopied(true); toast.success('Линкът е копиран!'); setTimeout(() => setCopied(false), 2000); };
   const links = [
     { name: 'Facebook', icon: Facebook, color: '#1877F2', url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}` },
     { name: 'WhatsApp', icon: MessageCircle, color: '#25D366', url: `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}` },
@@ -101,7 +101,6 @@ const ShareMenu = ({ projectId, onClose }) => {
     { name: 'Twitter', icon: Twitter, color: '#000', url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}` },
     { name: 'Email', icon: Mail, color: '#EA4335', url: `mailto:?subject=${encodeURIComponent('Моят 3D проект от TemaDom')}&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}` },
   ];
-
   return (
     <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="share-menu">
       <CardContent className="p-4">
@@ -120,23 +119,17 @@ const ShareMenu = ({ projectId, onClose }) => {
         <div className="grid grid-cols-3 gap-2">
           {links.map(l => (
             <a key={l.name} href={l.url} target="_blank" rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-white text-xs font-medium hover:opacity-90 transition-opacity"
+              className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-white text-xs font-medium hover:opacity-90"
               style={{ background: l.color }} data-testid={`share-${l.name.toLowerCase()}`}>
               <l.icon className="h-3.5 w-3.5" /> {l.name}
             </a>
           ))}
           <button onClick={copyLink}
             className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-medium"
-            style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}
-            data-testid="share-link">
+            style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}>
             <Link2 className="h-3.5 w-3.5" /> Линк
           </button>
         </div>
-        {navigator.share && (
-          <Button variant="outline" className="w-full text-xs mt-2" onClick={() => navigator.share({ title: 'TemaDom 3D', url: shareUrl, text: shareText })} data-testid="share-native">
-            <Share2 className="h-3.5 w-3.5 mr-1.5" /> Още...
-          </Button>
-        )}
       </CardContent>
     </Card>
   );
@@ -167,9 +160,9 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
   return (
     <Card style={{ background: 'var(--theme-card-bg)', border: '2px solid var(--theme-border)' }}
       data-testid={`room-card-${index}`}>
-      <CardContent className="p-4">
+      <CardContent className="p-4 space-y-3">
         {/* Room header */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#F97316]/15 flex items-center justify-center text-[#F97316] text-sm font-black">{index + 1}</div>
             <span className="font-bold text-sm" style={{ color: 'var(--theme-text)' }}>
@@ -177,15 +170,15 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
             </span>
           </div>
           {total > 1 && (
-            <button onClick={onRemove} className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+            <button onClick={onRemove} className="p-1.5 rounded-lg hover:bg-red-500/10"
               style={{ color: 'var(--theme-text-muted)' }} data-testid={`remove-room-${index}`}>
               <Trash2 className="h-4 w-4" />
             </button>
           )}
         </div>
 
-        {/* Room type + Style selectors */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
+        {/* Room type + Style */}
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Помещение</Label>
             <Select value={room.roomType} onValueChange={v => onUpdate({ ...room, roomType: v })}>
@@ -202,49 +195,89 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
           </div>
         </div>
 
-        {/* 3 Photo slots */}
-        <div className="grid grid-cols-3 gap-2" data-testid={`photo-grid-${index}`}>
-          {[0, 1, 2].map(pIdx => (
+        {/* DIMENSIONS */}
+        <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <Ruler className="h-3.5 w-3.5 text-[#F97316]" />
+            <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Размери на помещението</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Дължина (м)</Label>
+              <Input type="number" step="0.1" min="1" max="20" value={room.length}
+                onChange={e => onUpdate({ ...room, length: e.target.value })}
+                className="h-9 text-xs text-center font-bold" data-testid={`length-${index}`} />
+            </div>
+            <div>
+              <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Ширина (м)</Label>
+              <Input type="number" step="0.1" min="1" max="20" value={room.width}
+                onChange={e => onUpdate({ ...room, width: e.target.value })}
+                className="h-9 text-xs text-center font-bold" data-testid={`width-${index}`} />
+            </div>
+            <div>
+              <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Височина (м)</Label>
+              <Input type="number" step="0.1" min="2" max="5" value={room.height}
+                onChange={e => onUpdate({ ...room, height: e.target.value })}
+                className="h-9 text-xs text-center font-bold" data-testid={`height-${index}`} />
+            </div>
+          </div>
+        </div>
+
+        {/* BUDGET CHECKBOXES */}
+        <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-[#F97316] font-black text-sm">лв</span>
+            <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Бюджет</span>
+          </div>
+          <div className="flex gap-2">
+            {BUDGETS.map(b => (
+              <button key={b.value} onClick={() => onUpdate({ ...room, budget: b.value })}
+                className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${room.budget === b.value ? 'text-white shadow-md scale-[1.03]' : ''}`}
+                style={{
+                  background: room.budget === b.value ? '#F97316' : 'var(--theme-card-bg)',
+                  color: room.budget !== b.value ? 'var(--theme-text-muted)' : undefined,
+                  border: `2px solid ${room.budget === b.value ? '#F97316' : 'var(--theme-border)'}`,
+                }}
+                data-testid={`budget-${b.value}-${index}`}>
+                {b.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Photo upload grid */}
+        <div className="grid grid-cols-3 gap-2">
+          {PHOTO_LABELS.map((label, pIdx) => (
             <div key={pIdx}>
-              <Label className="text-[9px] mb-0.5 block font-bold" style={{ color: 'var(--theme-text-subtle)' }}>
-                {PHOTO_LABELS[pIdx]} {pIdx === 0 && <span className="text-red-400">*</span>}
-              </Label>
-              {!room.photos[pIdx] ? (
-                <div className="aspect-square rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all hover:border-[#F97316]/40"
-                  style={{ background: 'var(--theme-card-bg)', border: '2px dashed var(--theme-border)' }}
-                  onDrop={(e) => { e.preventDefault(); handlePhoto(pIdx, e.dataTransfer.files?.[0]); }}
-                  onDragOver={(e) => e.preventDefault()}
-                  onClick={() => refs.current[pIdx]?.click()}
-                  data-testid={`photo-drop-${index}-${pIdx}`}>
-                  <input ref={el => refs.current[pIdx] = el} type="file" accept="image/*"
-                    capture="environment" className="hidden"
-                    onChange={e => handlePhoto(pIdx, e.target.files?.[0])} />
-                  <Upload className="h-5 w-5 text-[#F97316] mb-0.5" />
-                  <p className="text-[9px]" style={{ color: 'var(--theme-text-muted)' }}>Качи</p>
+              <Label className="text-[10px] mb-1 block text-center" style={{ color: 'var(--theme-text-subtle)' }}>{label}</Label>
+              {room.photoUrls[pIdx] ? (
+                <div className="relative aspect-video rounded-lg overflow-hidden group">
+                  <img src={room.photoUrls[pIdx]} alt={label} className="w-full h-full object-cover" />
+                  <button onClick={() => removePhoto(pIdx)}
+                    className="absolute top-1 right-1 bg-red-500/90 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    data-testid={`remove-photo-${index}-${pIdx}`}>
+                    <X className="h-3 w-3" />
+                  </button>
                 </div>
               ) : (
-                <div className="relative aspect-square rounded-lg overflow-hidden" style={{ border: '2px solid #10B981' }}>
-                  <img src={room.photoUrls[pIdx]} alt="" className="w-full h-full object-cover" />
-                  <button onClick={() => removePhoto(pIdx)}
-                    className="absolute top-0.5 right-0.5 bg-red-500/90 text-white rounded-full p-0.5"
-                    data-testid={`remove-photo-${index}-${pIdx}`}>
-                    <X className="h-2.5 w-2.5" />
-                  </button>
-                  <div className="absolute bottom-0.5 left-0.5 bg-[#10B981] text-white text-[8px] font-bold px-1 py-0.5 rounded">
-                    <CheckCircle className="h-2 w-2 inline mr-0.5" />{PHOTO_LABELS[pIdx]}
-                  </div>
-                </div>
+                <button onClick={() => refs.current[pIdx]?.click()}
+                  className="w-full aspect-video rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 hover:border-[#F97316]/40 transition-colors"
+                  style={{ borderColor: 'var(--theme-border)' }}
+                  data-testid={`upload-photo-${index}-${pIdx}`}>
+                  <Camera className="h-5 w-5" style={{ color: 'var(--theme-text-subtle)' }} />
+                  <span className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>Снимка</span>
+                </button>
               )}
+              <input ref={el => refs.current[pIdx] = el} type="file" accept="image/*" className="hidden"
+                onChange={e => { handlePhoto(pIdx, e.target.files?.[0]); e.target.value = ''; }} />
             </div>
           ))}
         </div>
 
         {/* Notes */}
-        <div className="mt-2">
-          <Textarea value={room.notes} onChange={e => onUpdate({ ...room, notes: e.target.value })}
-            placeholder="Бележки (по желание)..." className="min-h-[36px] text-xs"
-            data-testid={`notes-${index}`} />
-        </div>
+        <Textarea value={room.notes} onChange={e => onUpdate({ ...room, notes: e.target.value })}
+          placeholder="Бележки (по желание)..." className="min-h-[36px] text-xs"
+          data-testid={`notes-${index}`} />
       </CardContent>
     </Card>
   );
@@ -264,19 +297,12 @@ export const AIDesignerPage = () => {
 
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
 
-  // Sync rooms count with package
   useEffect(() => {
-    if (rooms.length < pkg.maxRooms && pkg.maxRooms > 1 && rooms.length === 1) {
-      // Don't auto-add, let user add manually
-    }
-    // Trim rooms if package downgraded
-    if (rooms.length > pkg.maxRooms) {
-      setRooms(prev => prev.slice(0, pkg.maxRooms));
-    }
+    if (rooms.length > pkg.maxRooms) setRooms(prev => prev.slice(0, pkg.maxRooms));
   }, [pkg, rooms.length]);
 
   const addRoom = () => {
-    if (rooms.length >= pkg.maxRooms) { toast.error(`Максимум ${pkg.maxRooms} помещения за този пакет`); return; }
+    if (rooms.length >= pkg.maxRooms) { toast.error(`Максимум ${pkg.maxRooms} помещения`); return; }
     setRooms(prev => [...prev, emptyRoom()]);
   };
 
@@ -297,19 +323,20 @@ export const AIDesignerPage = () => {
     timerRef.current = setInterval(() => setElapsed(p => p + 1), 1000);
 
     try {
-      // Generate for each room sequentially
       const allRoomResults = [];
       for (let ri = 0; ri < rooms.length; ri++) {
         const room = rooms[ri];
-        const hasPhotos = room.photos.some(p => p !== null);
-        if (!hasPhotos) continue;
+        if (!room.photos.some(p => p !== null)) continue;
 
         const fd = new FormData();
         room.photos.forEach((p, i) => { if (p) fd.append(`photo${i + 1}`, p); });
         fd.append('style', room.style);
         fd.append('room_type', room.roomType);
         fd.append('notes', room.notes);
-        fd.append('budget_eur', '0');
+        fd.append('budget_eur', String(Math.round(room.budget / 1.96)));
+        fd.append('width', room.length);
+        fd.append('length', room.width);
+        fd.append('height', room.height);
         if (token) fd.append('authorization', `Bearer ${token}`);
 
         const res = await axios.post(`${API}/ai-designer/photo-generate`, fd, {
@@ -324,6 +351,9 @@ export const AIDesignerPage = () => {
           roomName,
           style: room.style,
           renders: res.data.renders || [],
+          budget: res.data.budget || {},
+          dimensions: { length: room.length, width: room.width, height: room.height },
+          budgetBgn: room.budget,
           id: res.data.id,
         });
         setUploadPct(0);
@@ -363,7 +393,7 @@ export const AIDesignerPage = () => {
             </h1>
           </div>
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
-            Качи снимки → получи реалистични 3D рендери
+            Качи снимки + размери + бюджет → получи 3x PNG рендери
           </p>
         </div>
 
@@ -403,7 +433,7 @@ export const AIDesignerPage = () => {
             {/* Add Room button */}
             {rooms.length < pkg.maxRooms && (
               <button onClick={addRoom}
-                className="w-full py-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 transition-all hover:border-[#F97316]/40"
+                className="w-full py-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 hover:border-[#F97316]/40"
                 style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }}
                 data-testid="add-room-btn">
                 <Plus className="h-5 w-5 text-[#F97316]" />
@@ -462,19 +492,26 @@ export const AIDesignerPage = () => {
         ) : (
           /* ===== RESULTS ===== */
           <div className="space-y-5" data-testid="results-section">
-
             {results.rooms.map((roomResult, ri) => (
               <div key={ri} className="space-y-3" data-testid={`result-room-${ri}`}>
                 {/* Room header */}
-                {results.rooms.length > 1 && (
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-[#F97316]/15 flex items-center justify-center text-[#F97316] text-sm font-black">{ri + 1}</div>
-                    <h3 className="font-bold text-sm" style={{ color: 'var(--theme-text)' }}>{roomResult.roomName}</h3>
-                    <Badge className="bg-[#10B981]/15 text-[#10B981] text-[10px]">{roomResult.renders.length} рендера</Badge>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="w-8 h-8 rounded-lg bg-[#F97316]/15 flex items-center justify-center text-[#F97316] text-sm font-black">{ri + 1}</div>
+                  <h3 className="font-bold text-sm" style={{ color: 'var(--theme-text)' }}>{roomResult.roomName}</h3>
+                  <Badge className="bg-[#10B981]/15 text-[#10B981] text-[10px]">{roomResult.renders.length} PNG</Badge>
+                  {roomResult.dimensions && (
+                    <span className="text-[10px] px-2 py-0.5 rounded" style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)' }}>
+                      {roomResult.dimensions.length}x{roomResult.dimensions.width}x{roomResult.dimensions.height} м
+                    </span>
+                  )}
+                  {roomResult.budgetBgn && (
+                    <span className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
+                      {roomResult.budgetBgn.toLocaleString()} лв
+                    </span>
+                  )}
+                </div>
 
-                {/* Renders */}
+                {/* Renders as PNG */}
                 <div className={`grid gap-3 ${roomResult.renders.length === 1 ? 'grid-cols-1' : roomResult.renders.length === 2 ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}
                   data-testid={`renders-grid-${ri}`}>
                   {roomResult.renders.map((r, i) => {
@@ -499,9 +536,9 @@ export const AIDesignerPage = () => {
                                 a.href = afterImg;
                                 a.download = `temadom-3d-${roomResult.roomName}-${i + 1}.png`;
                                 a.click();
-                                toast.success('Изтеглено!');
+                                toast.success('PNG изтеглено!');
                               }}
-                                className="p-1.5 rounded-lg hover:bg-[#F97316]/10 transition-colors"
+                                className="p-1.5 rounded-lg hover:bg-[#F97316]/10"
                                 style={{ color: 'var(--theme-text-muted)' }}
                                 data-testid={`download-render-${ri}-${i}`}>
                                 <Download className="h-3.5 w-3.5" />
@@ -510,7 +547,7 @@ export const AIDesignerPage = () => {
                                 const win = window.open('', '_blank');
                                 win.document.write(`<html><head><title>TemaDom 3D</title><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body><img src="${afterImg}" /></body></html>`);
                               }}
-                                className="p-1.5 rounded-lg hover:bg-[#F97316]/10 transition-colors"
+                                className="p-1.5 rounded-lg hover:bg-[#F97316]/10"
                                 style={{ color: 'var(--theme-text-muted)' }}
                                 data-testid={`fullscreen-render-${ri}-${i}`}>
                                 <Maximize2 className="h-3.5 w-3.5" />
@@ -522,6 +559,15 @@ export const AIDesignerPage = () => {
                     );
                   })}
                 </div>
+
+                {/* Budget info */}
+                {roomResult.budget?.summary && (
+                  <div className="p-3 rounded-lg text-xs" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }}
+                    data-testid={`budget-info-${ri}`}>
+                    <p className="font-bold mb-1" style={{ color: 'var(--theme-text)' }}>Бюджет: {roomResult.budgetBgn?.toLocaleString()} лв</p>
+                    <p>{roomResult.budget.summary}</p>
+                  </div>
+                )}
               </div>
             ))}
 
