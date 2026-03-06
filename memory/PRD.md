@@ -18,6 +18,9 @@ TemaDom is a web application for construction and interior design targeting the 
 ### CAD System v5.2 — `/ai-sketch`
 - Color-coded handles, endpoint dragging, rotation, undo/redo
 - PDF export, cost estimation, multi-floor
+- **Fixed**: "Дълбочина" → "Височина" everywhere
+- **Removed**: "Покрив/Roof" element type completely
+- Tools: Стена, Плоча, Правоъгълник, Кръг, Стълби, Врата, Прозорец, Колона, Греда, X/Y/Z, Изтрий
 
 ### 3D Photo Designer v8.0 — `/room-scan` (BASIC)
 - **NO 360°, NO PDF, NO Fullscreen, NO Budget** — чисто базово
@@ -38,10 +41,10 @@ TemaDom is a web application for construction and interior design targeting the 
 - Pagination with "Load more"
 - Nav link in "Още" dropdown
 
-### Web Scraping API
-- `/api/scrape/stores` — 5 Bulgarian stores (Praktiker, Jysk, Mr.Bricolage, Bauhaus, HomeMax)
-- `/api/scrape/search?q=...` — Search products across stores
-- Real HTML scraping with BeautifulSoup, price parsing, BGN→EUR conversion
+### Web Scraping API — 21 Bulgarian Stores
+- `/api/scrape/stores` — 21 stores: Praktiker, Jysk, Mr.Bricolage, Bauhaus, HomeMax, Technomarket, Teknoimpex, IKEA, Temax, Maximarket, Toplivo, Marmag, Paros, Praktis, Angro, Rila Online, Baustoff Metall, Atek, Vako, Buildmark, Obijavki
+- Technomarket priority for appliances (бойлер, климатик, хладилник, пералня etc.)
+- `/api/scrape/search?q=...` — Search products across all 21 stores in parallel
 
 ### Firm Subscription Plans (Landing Page)
 - 3 plans: БАЗОВ (15EUR), ПРО (35EUR), PREMIUM (75EUR)
