@@ -1,37 +1,35 @@
-# TEMADOM — Product Requirements Document
+# TEMADOM — MVP READY FOR LAUNCH
 
-## Original Problem Statement
-TemaDom is a web application for construction and interior design targeting the Bulgarian market.
+## Status: PRODUCTION READY
 
-## Core Products
-1. **AI-Assisted CAD System (`/ai-sketch`)**
-2. **3D Photo Designer v9.1 (`/room-scan`)** — Vision + Dimensions + Budget + PNG only
-3. **Community Feed v3.0 (`/community`)** — Posts, offers, notifications
-4. **AI Product Search (`/product-search`)** — Photo → 21 stores
-5. **Leaderboard (`/leaderboard`)** — Clients + Firms
-6. **Notifications** — Bell icon, auto-triggered
-7. **Stripe Payments** — Subscription checkout
-8. **Referral System** — Auto rewards
+## Core Features — ALL WORKING
+1. **3D Photo Designer v9.1** — GPT-4o Vision + gpt-image-1 → 3x PNG renders
+   - Room dimensions (Дължина/Ширина/Височина)
+   - Budget checkboxes (2,000 / 5,000 / 10,000 лв)
+   - Download PNG + Fullscreen per render
+   - Multi-room packages: 69/129/199 EUR
 
-## 3D Designer v9.1 — CURRENT ✅
-- Dimensions: Дължина/Ширина/Височина (м) — defaults 4.0/3.0/2.6
-- Budget checkboxes: 2,000лв / 5,000лв / 10,000лв
-- GPT-4o Vision analyzes each photo → room-specific 3D render
-- 3x PNG output (no PDF)
-- Download + Fullscreen buttons
-- Multi-room packages: 69/129/199 EUR
-- Saves to profile: renders + budget + dimensions
+2. **AI Product Search** — Photo → 21 Bulgarian stores with EUR prices + share
 
-## Key API Endpoints
-- `POST /api/ai-designer/photo-generate` — Vision + 3D + budget (form-data)
-- `POST /api/scrape/ai-search` — AI photo → 21 stores
-- `GET /api/leaderboard/clients|companies`
-- `GET/POST /api/notifications`
-- `POST /api/payments/checkout?package_type=X`
-- `POST /api/community/offers`
+3. **Community Feed v3** — Posts, images, project linking, firm offers, filters
 
-## Backlog
-- Full backend refactoring
+4. **Leaderboard** — Dual ranking: Clients + Firms with scoring
+
+5. **Notifications** — Bell icon, auto-triggered on offers/likes
+
+6. **Stripe Payments** — 17 packages (БАЗОВ/ПРО/PREMIUM × 1/3/6/12 months)
+
+7. **Referral System** — Auto rewards, WhatsApp/Viber share, milestones
+
+8. **CAD System** — 2D plans with cost estimation
+
+9. **Auth** — JWT, regional firm limits (2 per region × 28 = 56)
+
+10. **Tracking** — Google Analytics + Facebook Pixel + PostHog
+
+## Post-Launch Backlog (Week 2)
+- Backend refactoring (server.py → modular routers)
 - Real scraping for 21 stores
-- Email notifications
+- Email notifications (SendGrid)
 - Push notifications
+- Enhanced mobile UX
