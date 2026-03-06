@@ -1,69 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import { User, Mail, Building2, Hash, Calendar, Shield, Edit2, Save, LogOut, Camera, CreditCard } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Mail, Building2, Hash, Calendar, Shield, Edit2, Save, LogOut, Camera, CreditCard,
+  Bookmark, Eye, Trash2, Share2, Settings, Image as ImageIcon, MapPin, Globe, FileText, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useAuth } from '../App';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
+const SITE = process.env.REACT_APP_BACKEND_URL;
 
 const ProfilePage = () => {
   const { user, setUser, logout } = useAuth();
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileRef = useRef(null);
   const [form, setForm] = useState({
     name: '', email: '', company_name: '', bulstat: '',
     city: '', description: '', website: '',
   });
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  const token = localStorage.getItem('token');
+  const headers = { Authorization: `Bearer ${token}` };
+
+  useEffect(() => { fetchProfile(); fetchProjects(); }, []);
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(`${API}/auth/me`, { headers });
       setProfile(res.data);
+      if (res.data.avatar) setAvatarUrl(`data:image/jpeg;base64,${res.data.avatar}`);
       setForm({
-        name: res.data.name || '',
-        email: res.data.email || '',
-        company_name: res.data.company_name || '',
-        bulstat: res.data.bulstat || '',
-        city: res.data.city || '',
-        description: res.data.description || '',
+        name: res.data.name || '', email: res.data.email || '',
+        company_name: res.data.company_name || '', bulstat: res.data.bulstat || '',
+        city: res.data.city || '', description: res.data.description || '',
         website: res.data.website || '',
       });
-    } catch {
-      toast.error('Грешка при зареждане на профила');
-    }
+    } catch { toast.error('Грешка при зареждане на профила'); }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get(`${API}/ai-designer/my-projects`, { headers });
+      setProjects(res.data.projects || []);
+    } catch { /* no projects */ }
   };
 
   const handleSave = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.put(`${API}/auth/profile`, form, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-      });
-      setProfile(res.data);
+      const res = await axios.put(`${API}/auth/profile`, form, { headers: { ...headers, 'Content-Type': 'application/json' } });
+      setProfile(prev => ({ ...prev, ...res.data }));
       setEditing(false);
       toast.success('Профилът е обновен!');
-    } catch (err) {
-      toast.error(err.response?.data?.detail || 'Грешка при запис');
-    }
+    } catch (err) { toast.error(err.response?.data?.detail || 'Грешка при запис'); }
     setLoading(false);
+  };
+
+  const handleAvatarUpload = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Само снимки (JPG/PNG)'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('Макс. 5MB'); return; }
+    setUploadingAvatar(true);
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const res = await axios.post(`${API}/auth/avatar`, fd, { headers: { ...headers, 'Content-Type': 'multipart/form-data' } });
+      setAvatarUrl(`data:image/jpeg;base64,${res.data.avatar}`);
+      toast.success('Профилната снимка е обновена!');
+    } catch (err) { toast.error(err.response?.data?.detail || 'Грешка при качване'); }
+    setUploadingAvatar(false);
+  };
+
+  const deleteProject = async (id) => {
+    try {
+      await axios.delete(`${API}/ai-designer/project/${id}`, { headers });
+      setProjects(prev => prev.filter(p => p.id !== id));
+      toast.success('Проектът е изтрит');
+    } catch { toast.error('Грешка при изтриване'); }
   };
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{background: "var(--theme-bg)"}}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--theme-bg)' }}>
         <div className="animate-spin h-8 w-8 border-2 border-[#F97316] border-t-transparent rounded-full" />
       </div>
     );
@@ -73,149 +101,306 @@ const ProfilePage = () => {
   const createdDate = profile.created_at ? new Date(profile.created_at).toLocaleDateString('bg-BG') : 'N/A';
 
   return (
-    <div className="min-h-screen py-8 px-4" style={{background: "var(--theme-bg)"}} data-testid="profile-page">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-full bg-[#F97316]/10 flex items-center justify-center mx-auto mb-4 border-2 border-[#F97316]/30">
-            <User className="h-10 w-10 text-[#F97316]" />
+    <div className="min-h-screen py-6 px-4" style={{ background: 'var(--theme-bg)' }} data-testid="profile-page">
+      <div className="max-w-3xl mx-auto">
+
+        {/* Profile Header with Avatar */}
+        <div className="text-center mb-6">
+          <div className="relative inline-block mb-4">
+            <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-[#F97316]/30 shadow-xl mx-auto"
+              style={{ background: 'var(--theme-bg-surface)' }} data-testid="avatar-container">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" data-testid="avatar-image" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <User className="h-12 w-12 text-[#F97316]" />
+                </div>
+              )}
+            </div>
+            <button
+              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-[#F97316] text-white flex items-center justify-center shadow-lg hover:bg-[#EA580C] transition-colors"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploadingAvatar}
+              data-testid="upload-avatar-btn"
+            >
+              {uploadingAvatar ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Camera className="h-4 w-4" />}
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" className="hidden"
+              onChange={e => handleAvatarUpload(e.target.files?.[0])} data-testid="avatar-file-input" />
           </div>
-          <h1 className="text-2xl font-bold text-white" data-testid="profile-name">{profile.name}</h1>
-          <p className="text-slate-400 text-sm">{profile.email}</p>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }} data-testid="profile-name">{profile.name}</h1>
+          <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{profile.email}</p>
           <div className="flex items-center justify-center gap-2 mt-2">
             <Badge className={`text-xs ${isCompany ? 'bg-[#F97316]/15 text-[#F97316]' : 'bg-[#4DA6FF]/15 text-[#4DA6FF]'}`}>
               {isCompany ? 'Фирма' : 'Клиент'}
             </Badge>
             {profile.subscription_active && (
-              <Badge className="bg-[#10B981]/15 text-[#10B981] text-xs">Активен абонамент</Badge>
+              <Badge className="bg-[#10B981]/15 text-[#10B981] text-xs">PREMIUM</Badge>
+            )}
+            {profile.city && (
+              <Badge variant="outline" className="text-xs" style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }}>
+                <MapPin className="h-3 w-3 mr-1" /> {profile.city}
+              </Badge>
             )}
           </div>
         </div>
 
-        {/* Profile Info */}
-        <Card className="bg-[#1E2A38] border-[#2A3A4C] mb-4">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-white text-sm flex items-center justify-between">
-              <span>Лична информация</span>
-              {!editing ? (
-                <Button size="sm" variant="ghost" className="text-[#F97316] hover:text-[#FF8C42] text-xs h-7"
-                  onClick={() => setEditing(true)} data-testid="edit-profile-btn">
-                  <Edit2 className="h-3.5 w-3.5 mr-1" /> Редактирай
-                </Button>
-              ) : (
-                <Button size="sm" className="bg-[#10B981] hover:bg-[#059669] text-white text-xs h-7"
-                  onClick={handleSave} disabled={loading} data-testid="save-profile-btn">
-                  <Save className="h-3.5 w-3.5 mr-1" /> {loading ? 'Запис...' : 'Запази'}
-                </Button>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-[10px] text-slate-500 mb-1 block">Име</Label>
-                {editing ? (
-                  <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                    className="h-9 bg-[#0F1923] border-[#3A4A5C] text-white text-sm" data-testid="profile-input-name" />
-                ) : (
-                  <p className="text-white text-sm flex items-center gap-2"><User className="h-3.5 w-3.5 text-slate-500" />{profile.name}</p>
-                )}
-              </div>
-              <div>
-                <Label className="text-[10px] text-slate-500 mb-1 block">Имейл</Label>
-                <p className="text-white text-sm flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-slate-500" />{profile.email}</p>
-              </div>
-            </div>
+        {/* Tabs */}
+        <Tabs defaultValue="info" className="w-full">
+          <TabsList className="w-full grid grid-cols-3 mb-4" style={{ background: 'var(--theme-bg-secondary)' }}>
+            <TabsTrigger value="info" data-testid="tab-info">
+              <User className="h-3.5 w-3.5 mr-1.5" /> Профил
+            </TabsTrigger>
+            <TabsTrigger value="projects" data-testid="tab-projects">
+              <Bookmark className="h-3.5 w-3.5 mr-1.5" /> Проекти ({projects.length})
+            </TabsTrigger>
+            <TabsTrigger value="settings" data-testid="tab-settings">
+              <Settings className="h-3.5 w-3.5 mr-1.5" /> Настройки
+            </TabsTrigger>
+          </TabsList>
 
-            {isCompany && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-[10px] text-slate-500 mb-1 block">Фирма</Label>
-                  {editing ? (
-                    <Input value={form.company_name} onChange={e => setForm(p => ({ ...p, company_name: e.target.value }))}
-                      className="h-9 bg-[#0F1923] border-[#3A4A5C] text-white text-sm" data-testid="profile-input-company" />
+          {/* TAB: Personal Info */}
+          <TabsContent value="info">
+            <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center justify-between" style={{ color: 'var(--theme-text)' }}>
+                  <span>Лична информация</span>
+                  {!editing ? (
+                    <Button size="sm" variant="ghost" className="text-[#F97316] hover:text-[#FF8C42] text-xs h-7"
+                      onClick={() => setEditing(true)} data-testid="edit-profile-btn">
+                      <Edit2 className="h-3.5 w-3.5 mr-1" /> Редактирай
+                    </Button>
                   ) : (
-                    <p className="text-white text-sm flex items-center gap-2"><Building2 className="h-3.5 w-3.5 text-slate-500" />{profile.company_name || '—'}</p>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="ghost" className="text-xs h-7" style={{ color: 'var(--theme-text-muted)' }}
+                        onClick={() => setEditing(false)}>Отказ</Button>
+                      <Button size="sm" className="bg-[#10B981] hover:bg-[#059669] text-white text-xs h-7"
+                        onClick={handleSave} disabled={loading} data-testid="save-profile-btn">
+                        <Save className="h-3.5 w-3.5 mr-1" /> {loading ? 'Запис...' : 'Запази'}
+                      </Button>
+                    </div>
                   )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Име</Label>
+                    {editing ? (
+                      <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                        className="h-9 text-sm" data-testid="profile-input-name" />
+                    ) : (
+                      <p className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}><User className="h-3.5 w-3.5" style={{ color: 'var(--theme-text-subtle)' }} />{profile.name}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Имейл</Label>
+                    <p className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}><Mail className="h-3.5 w-3.5" style={{ color: 'var(--theme-text-subtle)' }} />{profile.email}</p>
+                  </div>
                 </div>
-                <div>
-                  <Label className="text-[10px] text-slate-500 mb-1 block">БУЛСТАТ</Label>
-                  {editing ? (
-                    <Input value={form.bulstat} onChange={e => setForm(p => ({ ...p, bulstat: e.target.value }))}
-                      className="h-9 bg-[#0F1923] border-[#3A4A5C] text-white text-sm" data-testid="profile-input-bulstat" />
-                  ) : (
-                    <p className="text-white text-sm flex items-center gap-2"><Hash className="h-3.5 w-3.5 text-slate-500" />{profile.bulstat || '—'}</p>
-                  )}
+
+                {isCompany && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Фирма</Label>
+                      {editing ? (
+                        <Input value={form.company_name} onChange={e => setForm(p => ({ ...p, company_name: e.target.value }))}
+                          className="h-9 text-sm" data-testid="profile-input-company" />
+                      ) : (
+                        <p className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}><Building2 className="h-3.5 w-3.5" style={{ color: 'var(--theme-text-subtle)' }} />{profile.company_name || '—'}</p>
+                      )}
+                    </div>
+                    <div>
+                      <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>БУЛСТАТ</Label>
+                      {editing ? (
+                        <Input value={form.bulstat} onChange={e => setForm(p => ({ ...p, bulstat: e.target.value }))}
+                          className="h-9 text-sm" data-testid="profile-input-bulstat" />
+                      ) : (
+                        <p className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}><Hash className="h-3.5 w-3.5" style={{ color: 'var(--theme-text-subtle)' }} />{profile.bulstat || '—'}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Град / Област</Label>
+                    {editing ? (
+                      <Input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
+                        placeholder="София" className="h-9 text-sm" data-testid="profile-input-city" />
+                    ) : (
+                      <p className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}><MapPin className="h-3.5 w-3.5" style={{ color: 'var(--theme-text-subtle)' }} />{profile.city || '—'}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Уебсайт</Label>
+                    {editing ? (
+                      <Input value={form.website} onChange={e => setForm(p => ({ ...p, website: e.target.value }))}
+                        placeholder="https://..." className="h-9 text-sm" data-testid="profile-input-website" />
+                    ) : (
+                      <p className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
+                        <Globe className="h-3.5 w-3.5" style={{ color: 'var(--theme-text-subtle)' }} />
+                        {profile.website ? <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-[#4DA6FF] hover:underline">{profile.website}</a> : '—'}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-[10px] text-slate-500 mb-1 block">Град</Label>
-                {editing ? (
-                  <Input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
-                    placeholder="София" className="h-9 bg-[#0F1923] border-[#3A4A5C] text-white text-sm" data-testid="profile-input-city" />
-                ) : (
-                  <p className="text-white text-sm">{profile.city || '—'}</p>
+                {editing && (
+                  <div>
+                    <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Описание</Label>
+                    <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+                      placeholder="Кратко описание на дейността..." className="min-h-[60px] text-sm" data-testid="profile-input-desc" />
+                  </div>
                 )}
-              </div>
-              <div>
-                <Label className="text-[10px] text-slate-500 mb-1 block">Уебсайт</Label>
-                {editing ? (
-                  <Input value={form.website} onChange={e => setForm(p => ({ ...p, website: e.target.value }))}
-                    placeholder="https://..." className="h-9 bg-[#0F1923] border-[#3A4A5C] text-white text-sm" data-testid="profile-input-website" />
-                ) : (
-                  <p className="text-white text-sm">{profile.website || '—'}</p>
+                {!editing && profile.description && (
+                  <div>
+                    <Label className="text-[10px] mb-1 block" style={{ color: 'var(--theme-text-subtle)' }}>Описание</Label>
+                    <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{profile.description}</p>
+                  </div>
                 )}
-              </div>
+
+                {/* Account Stats */}
+                <div className="pt-4 mt-2" style={{ borderTop: '1px solid var(--theme-border)' }}>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <Calendar className="h-5 w-5 text-[#4DA6FF] mx-auto mb-1" />
+                      <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>Регистрация</p>
+                      <p className="text-xs font-medium" style={{ color: 'var(--theme-text)' }} data-testid="profile-created">{createdDate}</p>
+                    </div>
+                    <div>
+                      <Shield className="h-5 w-5 text-[#10B981] mx-auto mb-1" />
+                      <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>Тип акаунт</p>
+                      <p className="text-xs font-medium" style={{ color: 'var(--theme-text)' }}>{isCompany ? 'Фирма' : 'Клиент'}</p>
+                    </div>
+                    <div>
+                      <CreditCard className="h-5 w-5 text-[#F97316] mx-auto mb-1" />
+                      <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>Абонамент</p>
+                      <p className="text-xs font-medium" style={{ color: 'var(--theme-text)' }}>{profile.subscription_active ? 'PREMIUM' : 'Безплатен'}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* TAB: My Projects */}
+          <TabsContent value="projects">
+            <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm" style={{ color: 'var(--theme-text)' }}>
+                  Моите 3D проекти ({projects.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {projects.length === 0 ? (
+                  <div className="text-center py-8">
+                    <FileText className="h-10 w-10 mx-auto mb-3" style={{ color: 'var(--theme-text-subtle)' }} />
+                    <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>Нямате запазени проекти</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--theme-text-subtle)' }}>Създайте първия си проект в 3D Photo Designer</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {projects.map(p => (
+                      <div key={p.id} className="flex items-center justify-between p-3 rounded-lg transition-colors"
+                        style={{ border: '1px solid var(--theme-border)' }} data-testid={`my-project-${p.id}`}>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate" style={{ color: 'var(--theme-text)' }}>{p.room_type}</p>
+                          <div className="flex items-center gap-3 text-[10px] mt-0.5" style={{ color: 'var(--theme-text-subtle)' }}>
+                            <span>{p.dimensions?.width}×{p.dimensions?.length}м</span>
+                            <span>{p.style}</span>
+                            {p.budget_eur && <span className="text-[#F97316] font-bold">€{p.budget_eur}</span>}
+                            <span>{new Date(p.created_at).toLocaleDateString('bg-BG')}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 ml-3 flex-shrink-0">
+                          <a href={`${SITE}/projects/${p.id}`} target="_blank" rel="noopener noreferrer"
+                            className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5" style={{ color: 'var(--theme-text-muted)' }}
+                            data-testid={`view-project-${p.id}`}>
+                            <Eye className="h-4 w-4" />
+                          </a>
+                          <button onClick={() => { navigator.clipboard.writeText(`${SITE}/projects/${p.id}`); toast.success('Линкът е копиран!'); }}
+                            className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5" style={{ color: 'var(--theme-text-muted)' }}>
+                            <Share2 className="h-4 w-4" />
+                          </button>
+                          <button onClick={() => deleteProject(p.id)}
+                            className="p-2 rounded-lg hover:bg-red-500/10 text-red-400"
+                            data-testid={`delete-project-${p.id}`}>
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* TAB: Settings */}
+          <TabsContent value="settings">
+            <div className="space-y-4">
+              {/* Account type & subscription */}
+              <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm" style={{ color: 'var(--theme-text)' }}>Акаунт & Абонамент</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: 'var(--theme-text)' }}>Тип акаунт</p>
+                      <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{isCompany ? 'Фирмен профил' : 'Клиентски профил'}</p>
+                    </div>
+                    <Badge className={isCompany ? 'bg-[#F97316]/15 text-[#F97316]' : 'bg-[#4DA6FF]/15 text-[#4DA6FF]'}>
+                      {isCompany ? 'Фирма' : 'Клиент'}
+                    </Badge>
+                  </div>
+                  <div className="h-px" style={{ background: 'var(--theme-border)' }} />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: 'var(--theme-text)' }}>Абонамент</p>
+                      <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
+                        {profile.subscription_active ? `Активен до ${profile.subscription_expires || 'N/A'}` : 'Безплатен план'}
+                      </p>
+                    </div>
+                    <Badge className={profile.subscription_active ? 'bg-[#10B981]/15 text-[#10B981]' : 'bg-slate-500/15 text-slate-400'}>
+                      {profile.subscription_active ? 'PREMIUM' : 'FREE'}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Statistics */}
+              <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm" style={{ color: 'var(--theme-text)' }}>Статистика</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)' }}>
+                      <p className="text-xl font-black text-[#F97316]">{projects.length}</p>
+                      <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>3D проекта</p>
+                    </div>
+                    <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)' }}>
+                      <p className="text-xl font-black text-[#4DA6FF]">{profile.calculator_uses || 0}</p>
+                      <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>Калкулации</p>
+                    </div>
+                    <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)' }}>
+                      <p className="text-xl font-black text-[#10B981]">{profile.free_leads_used || 0}</p>
+                      <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>Ползвани лийдове</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Logout */}
+              <Button variant="outline" className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 h-11"
+                onClick={logout} data-testid="logout-btn">
+                <LogOut className="mr-2 h-4 w-4" /> Изход от акаунта
+              </Button>
             </div>
-
-            {editing && (
-              <div>
-                <Label className="text-[10px] text-slate-500 mb-1 block">Описание</Label>
-                <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                  placeholder="Кратко описание на дейността..."
-                  className="bg-[#0F1923] border-[#3A4A5C] text-white min-h-[60px] text-sm" data-testid="profile-input-desc" />
-              </div>
-            )}
-            {!editing && profile.description && (
-              <div>
-                <Label className="text-[10px] text-slate-500 mb-1 block">Описание</Label>
-                <p className="text-slate-300 text-sm">{profile.description}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Account Info */}
-        <Card className="bg-[#1E2A38] border-[#2A3A4C] mb-4">
-          <CardContent className="pt-5 pb-4">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <Calendar className="h-5 w-5 text-[#4DA6FF] mx-auto mb-1" />
-                <p className="text-slate-500 text-[10px]">Регистрация</p>
-                <p className="text-white text-xs font-medium" data-testid="profile-created">{createdDate}</p>
-              </div>
-              <div>
-                <Shield className="h-5 w-5 text-[#10B981] mx-auto mb-1" />
-                <p className="text-slate-500 text-[10px]">Тип акаунт</p>
-                <p className="text-white text-xs font-medium">{isCompany ? 'Фирма' : 'Клиент'}</p>
-              </div>
-              <div>
-                <CreditCard className="h-5 w-5 text-[#F97316] mx-auto mb-1" />
-                <p className="text-slate-500 text-[10px]">Абонамент</p>
-                <p className="text-white text-xs font-medium">{profile.subscription_active ? 'Активен' : 'Безплатен'}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Logout */}
-        <Button variant="outline" className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 h-11"
-          onClick={logout} data-testid="logout-btn">
-          <LogOut className="mr-2 h-4 w-4" /> Изход от акаунта
-        </Button>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

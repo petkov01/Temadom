@@ -241,6 +241,7 @@ async def get_me(user: dict = Depends(get_current_user)):
         "purchased_leads": user.get("purchased_leads", []),
         "free_leads_used": user.get("free_leads_used", 0),
         "calculator_uses": user.get("calculator_uses", 0),
+        "avatar": user.get("avatar_b64"),
         "created_at": user.get("created_at")
     }
 
@@ -268,6 +269,30 @@ async def update_profile(request: Request, user: dict = Depends(get_current_user
         "subscription_active": updated.get("subscription_active", False),
         "created_at": updated.get("created_at")
     }
+
+
+@api_router.post("/auth/avatar")
+async def upload_avatar(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    """Upload profile avatar image."""
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Само снимки (JPG/PNG)")
+    contents = await file.read()
+    if len(contents) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Макс. 5MB")
+    avatar_b64 = base64.b64encode(contents).decode('utf-8')
+    await db.users.update_one({"id": user["id"]}, {"$set": {"avatar_b64": avatar_b64}})
+    return {"avatar": avatar_b64}
+
+
+@api_router.get("/auth/avatar/{user_id}")
+async def get_avatar(user_id: str):
+    """Get user avatar by user_id."""
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, "avatar_b64": 1})
+    if not u or not u.get("avatar_b64"):
+        raise HTTPException(status_code=404, detail="Няма аватар")
+    return {"avatar": u["avatar_b64"]}
+
+
 
 # ============== CATEGORIES ROUTES ==============
 
