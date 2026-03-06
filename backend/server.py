@@ -4556,9 +4556,6 @@ async def delete_scanner3d_project(project_id: str, user: dict = Depends(get_cur
     return {"message": "Проектът е изтрит"}
 
 
-# Include router - MUST be after all route definitions
-app.include_router(api_router)
-
 # ============== BACKGROUND TASKS: SUBSCRIPTION MANAGEMENT ==============
 import asyncio
 
@@ -4628,6 +4625,241 @@ async def check_subscriptions_background():
             logger.error(f"Subscription check error: {e}")
         
         await asyncio.sleep(3600)  # Check every hour
+
+
+# ==================== WEB SCRAPING — Product Search ====================
+
+import httpx
+from bs4 import BeautifulSoup
+
+STORE_SEARCH_URLS = {
+    "praktiker": {"name": "Praktiker", "base": "https://praktiker.bg", "search": "https://praktiker.bg/bg/search?q={query}"},
+    "jysk": {"name": "Jysk", "base": "https://jysk.bg", "search": "https://jysk.bg/catalogsearch/result/?q={query}"},
+    "mrbricolage": {"name": "Mr.Bricolage", "base": "https://www.mrbricolage.bg", "search": "https://www.mrbricolage.bg/search?q={query}"},
+    "bauhaus": {"name": "Bauhaus", "base": "https://www.bauhaus.bg", "search": "https://www.bauhaus.bg/catalogsearch/result/?q={query}"},
+    "homemax": {"name": "HomeMax", "base": "https://www.homemax.bg", "search": "https://www.homemax.bg/catalogsearch/result/?q={query}"},
+}
+
+async def scrape_store(store_key: str, query: str) -> list:
+    """Try to scrape product results from a Bulgarian store. Returns list of products or fallback."""
+    store = STORE_SEARCH_URLS.get(store_key)
+    if not store:
+        return []
+
+    url = store["search"].format(query=query.replace(" ", "+"))
+    products = []
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client_http:
+            headers_req = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+                "Accept-Language": "bg-BG,bg;q=0.9,en;q=0.8",
+            }
+            resp = await client_http.get(url, headers=headers_req)
+
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.text, "html.parser")
+
+                # Generic product extraction patterns
+                for selector in [
+                    "div.product-item", "div.product-card", "li.product-item",
+                    "div.product", "article.product", "div[data-product]",
+                    "div.search-result-item", "div.item-product",
+                ]:
+                    items = soup.select(selector)
+                    if items:
+                        for item in items[:5]:
+                            name_el = item.select_one("h2, h3, .product-name, .product-title, a.product-name, .name")
+                            price_el = item.select_one(".price, .product-price, .current-price, span.price")
+                            link_el = item.select_one("a[href]")
+
+                            name = name_el.get_text(strip=True) if name_el else None
+                            price_text = price_el.get_text(strip=True) if price_el else ""
+                            link = link_el.get("href", "") if link_el else ""
+
+                            if name:
+                                # Parse price
+                                price_num = 0
+                                import re as re_local
+                                price_match = re_local.search(r'([\d.,]+)', price_text.replace(" ", ""))
+                                if price_match:
+                                    try:
+                                        price_num = float(price_match.group(1).replace(",", "."))
+                                    except ValueError:
+                                        pass
+
+                                full_link = link if link.startswith("http") else store["base"] + link
+
+                                products.append({
+                                    "name": name[:100],
+                                    "price_bgn": price_num,
+                                    "price_eur": round(price_num / 1.96, 2) if price_num > 0 else 0,
+                                    "url": full_link,
+                                    "store": store["name"],
+                                    "available": True,
+                                    "scraped": True,
+                                })
+                        break
+    except Exception as e:
+        logging.warning(f"Scrape {store_key} failed: {e}")
+
+    return products
+
+
+@api_router.get("/scrape/search")
+async def search_products(q: str, store: str = "all"):
+    """Search for real products across Bulgarian stores."""
+    if not q or len(q) < 2:
+        raise HTTPException(status_code=400, detail="Моля, въведете поне 2 символа")
+
+    results = {}
+    stores_to_search = [store] if store != "all" else list(STORE_SEARCH_URLS.keys())
+
+    tasks = [scrape_store(s, q) for s in stores_to_search]
+    store_results = await asyncio.gather(*tasks)
+
+    for s_key, prods in zip(stores_to_search, store_results):
+        if prods:
+            results[s_key] = prods
+
+    all_products = []
+    for prods in results.values():
+        all_products.extend(prods)
+
+    return {
+        "query": q,
+        "total": len(all_products),
+        "stores_searched": len(stores_to_search),
+        "stores_with_results": len(results),
+        "products": all_products[:20],
+        "by_store": results,
+    }
+
+
+@api_router.get("/scrape/stores")
+async def get_stores():
+    """Get list of supported Bulgarian stores."""
+    return {
+        "stores": [
+            {"id": k, "name": v["name"], "url": v["base"]}
+            for k, v in STORE_SEARCH_URLS.items()
+        ]
+    }
+
+
+# ==================== COMMUNITY FEED ====================
+
+@api_router.post("/community/posts")
+async def create_post(request: Request, user: dict = Depends(get_current_user)):
+    """Create a community post."""
+    data = await request.json()
+    text = data.get("text", "").strip()
+    post_type = data.get("type", "text")  # text, project, question, before_after
+    project_id = data.get("project_id")
+    images_b64 = data.get("images", [])
+
+    if not text and not project_id:
+        raise HTTPException(status_code=400, detail="Добавете текст или проект")
+
+    post = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_name": user.get("name", "Потребител"),
+        "user_type": user.get("user_type", "client"),
+        "user_avatar": user.get("avatar_b64", ""),
+        "text": text[:2000],
+        "type": post_type,
+        "project_id": project_id,
+        "images": images_b64[:5],
+        "likes": [],
+        "comments": [],
+        "likes_count": 0,
+        "comments_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    # If linking a project, fetch its data
+    if project_id:
+        proj = await db.ai_designs.find_one({"id": project_id}, {"_id": 0, "room_type": 1, "style": 1, "budget_eur": 1, "dimensions": 1})
+        if proj:
+            post["project_data"] = proj
+
+    await db.community_posts.insert_one(post)
+    post.pop("_id", None)
+    return post
+
+
+@api_router.get("/community/posts")
+async def get_posts(page: int = 1, limit: int = 20, post_type: str = "all"):
+    """Get community feed posts with pagination."""
+    query = {}
+    if post_type != "all":
+        query["type"] = post_type
+
+    skip = (page - 1) * limit
+    posts = await db.community_posts.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.community_posts.count_documents(query)
+
+    return {
+        "posts": posts,
+        "total": total,
+        "page": page,
+        "pages": max(1, (total + limit - 1) // limit),
+    }
+
+
+@api_router.post("/community/posts/{post_id}/like")
+async def toggle_like(post_id: str, user: dict = Depends(get_current_user)):
+    """Toggle like on a post."""
+    post = await db.community_posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Публикацията не е намерена")
+
+    likes = post.get("likes", [])
+    if user["id"] in likes:
+        likes.remove(user["id"])
+    else:
+        likes.append(user["id"])
+
+    await db.community_posts.update_one({"id": post_id}, {"$set": {"likes": likes, "likes_count": len(likes)}})
+    return {"liked": user["id"] in likes, "likes_count": len(likes)}
+
+
+@api_router.post("/community/posts/{post_id}/comment")
+async def add_comment(post_id: str, request: Request, user: dict = Depends(get_current_user)):
+    """Add a comment to a post."""
+    data = await request.json()
+    text = data.get("text", "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Добавете текст")
+
+    comment = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_name": user.get("name", "Потребител"),
+        "user_type": user.get("user_type", "client"),
+        "user_avatar": user.get("avatar_b64", ""),
+        "text": text[:500],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    await db.community_posts.update_one(
+        {"id": post_id},
+        {"$push": {"comments": comment}, "$inc": {"comments_count": 1}}
+    )
+    return comment
+
+
+@api_router.delete("/community/posts/{post_id}")
+async def delete_post(post_id: str, user: dict = Depends(get_current_user)):
+    """Delete own post."""
+    result = await db.community_posts.delete_one({"id": post_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Публикацията не е намерена или нямате права")
+    return {"deleted": True}
+
+# Include router - MUST be after all route definitions
+app.include_router(api_router)
 
 @app.on_event("startup")
 async def start_background_tasks():
