@@ -161,7 +161,7 @@ const ChatPage = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#1E2A38]" data-testid="chat-page">
+    <div className="min-h-screen" style={{background: "var(--theme-bg-secondary)"}} data-testid="chat-page">
       <div className="max-w-6xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
           <MessageSquare className="h-6 w-6 text-[#FF8C42]" />

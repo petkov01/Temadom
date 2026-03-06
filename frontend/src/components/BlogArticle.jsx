@@ -41,7 +41,7 @@ const BlogArticle = () => {
   // Render detailed article with markdown-like content
   if (detailedArticle) {
     return (
-      <div className="min-h-screen bg-[#253545]" data-testid="blog-article">
+      <div className="min-h-screen" style={{background: "var(--theme-bg-surface)"}} data-testid="blog-article">
         <article className="max-w-4xl mx-auto px-4 py-8">
           <Link to="/blog" className="text-[#FF8C42] hover:text-[#FF8C42] text-sm flex items-center gap-1 mb-6">
             <ArrowLeft className="h-4 w-4" /> Към блога
@@ -150,7 +150,7 @@ const BlogArticle = () => {
   const region = article.regionKey ? REGIONS[article.regionKey] : null;
 
   return (
-    <div className="min-h-screen bg-[#253545]" data-testid="blog-article">
+    <div className="min-h-screen" style={{background: "var(--theme-bg-surface)"}} data-testid="blog-article">
       <article className="max-w-4xl mx-auto px-4 py-8">
         <Link to="/blog" className="text-[#FF8C42] hover:text-[#FF8C42] text-sm flex items-center gap-1 mb-6">
           <ArrowLeft className="h-4 w-4" /> Към блога

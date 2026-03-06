@@ -30,7 +30,7 @@ const RegionalPage = () => {
   const otherRegions = Object.entries(REGIONS).filter(([k]) => k !== regionKey).sort((a, b) => b[1].multiplier - a[1].multiplier);
 
   return (
-    <div className="min-h-screen bg-[#253545]" data-testid="regional-page">
+    <div className="min-h-screen" style={{background: "var(--theme-bg-surface)"}} data-testid="regional-page">
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-14">
         <div className="max-w-5xl mx-auto px-4">
           <Link to="/prices" className="text-orange-400 hover:text-orange-300 text-sm flex items-center gap-1 mb-4">

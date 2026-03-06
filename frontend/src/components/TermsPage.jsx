@@ -8,7 +8,7 @@ const TermsPage = () => {
   const { lang } = useLanguage();
   const isEn = lang === 'en';
   return (
-    <div className="min-h-screen bg-[#1E2A38]" data-testid="terms-page">
+    <div className="min-h-screen" style={{background: "var(--theme-bg-secondary)"}} data-testid="terms-page">
       {/* Header */}
       <section className="bg-slate-900 text-white py-14">
         <div className="max-w-4xl mx-auto px-4 text-center">

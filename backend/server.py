@@ -1219,7 +1219,7 @@ async def get_live_stats():
     total_companies = await db.company_profiles.count_documents({})
     total_masters = await db.users.count_documents({"role": "company"})
     total_projects = await db.projects.count_documents({"status": "active"})
-    free_used = min(total_clients, 50)
+    free_used = min(total_clients, 56)
     # Count online users (sessions active in last 60s)
     cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
     online = sum(1 for v in _online_sessions.values() if v >= cutoff)
@@ -1228,7 +1228,7 @@ async def get_live_stats():
         "companies": total_companies,
         "masters": total_masters,
         "projects": total_projects,
-        "free_slots": {"used": free_used, "total": 50},
+        "free_slots": {"used": free_used, "total": 56},
         "online": max(1, online)
     }
 

@@ -98,7 +98,7 @@ const AboutPage = () => {
   const c = content[lang] || content.bg;
 
   return (
-    <div className="min-h-screen bg-[#0F1923]" data-testid="about-page">
+    <div className="min-h-screen" style={{background: "var(--theme-bg)"}} data-testid="about-page">
       {/* Hero */}
       <section className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-10">

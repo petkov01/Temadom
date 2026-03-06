@@ -42,7 +42,7 @@ const BlogPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#1E2A38]" data-testid="blog-page">
+    <div className="min-h-screen" style={{background: "var(--theme-bg-secondary)"}} data-testid="blog-page">
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-14">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <BookOpen className="h-10 w-10 text-orange-400 mx-auto mb-4" />

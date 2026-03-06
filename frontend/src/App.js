@@ -144,7 +144,8 @@ const ThemeToggle = () => {
   if (!theme) return null;
   return (
     <button onClick={theme.toggle}
-      className="p-2 rounded-lg text-slate-400 hover:text-[#F97316] transition-colors hover:bg-white/5"
+      className="p-2 rounded-lg theme-text-muted hover:text-[#F97316] transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+      style={{ color: 'var(--theme-text-muted)' }}
       data-testid="theme-toggle" title={theme.dark ? 'Светъл режим' : 'Тъмен режим'}>
       {theme.dark ? <span className="text-sm">☀️</span> : <span className="text-sm">🌙</span>}
     </button>
@@ -159,15 +160,15 @@ const AuthGate = ({ children }) => {
   return (
     <div className="relative min-h-screen">
       <div className="pointer-events-none opacity-40 blur-[2px] select-none">{children}</div>
-      <div className="absolute inset-0 flex items-center justify-center z-50 bg-[#0F1923]/60 backdrop-blur-sm">
-        <div className="bg-[#1E2A38] border border-[#3A4A5C] rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl" data-testid="auth-gate-modal">
+      <div className="absolute inset-0 flex items-center justify-center z-50 backdrop-blur-sm" style={{ background: 'var(--theme-overlay)' }}>
+        <div className="rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="auth-gate-modal">
           <div className="w-16 h-16 bg-[#F97316]/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="h-8 w-8 text-[#F97316]" />
           </div>
-          <h3 className="text-white text-xl font-bold mb-2">Само за регистрирани</h3>
-          <p className="text-slate-400 text-sm mb-6">Регистрирайте се безплатно, за да използвате тази функция.</p>
+          <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>Само за регистрирани</h3>
+          <p className="text-sm mb-6" style={{ color: 'var(--theme-text-muted)' }}>Регистрирайте се безплатно, за да използвате тази функция.</p>
           <div className="flex gap-3">
-            <button onClick={() => navigate('/login')} className="flex-1 py-3 rounded-xl border border-[#3A4A5C] text-slate-300 hover:bg-white/5 font-medium text-sm" data-testid="auth-gate-login">Вход</button>
+            <button onClick={() => navigate('/login')} className="flex-1 py-3 rounded-xl font-medium text-sm transition-colors" style={{ border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }} data-testid="auth-gate-login">Вход</button>
             <button onClick={() => navigate('/register')} className="flex-1 py-3 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-sm" data-testid="auth-gate-register">Регистрация</button>
           </div>
         </div>
@@ -200,21 +201,21 @@ const Navbar = () => {
     const freeLeft = Math.max(0, mobileStats.free_slots.total - mobileStats.free_slots.used);
     return (
       <div className="grid grid-cols-4 gap-2" data-testid="mobile-live-counter">
-        <div className="bg-[#1E2A38] rounded-lg p-2 text-center">
+        <div className="rounded-lg p-2 text-center" style={{ background: 'var(--theme-bg-secondary)' }}>
           <p className="text-sm font-bold text-[#A8D5BA]">{mobileStats.clients}</p>
-          <p className="text-[9px] text-slate-500">клиенти</p>
+          <p className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>клиенти</p>
         </div>
-        <div className="bg-[#1E2A38] rounded-lg p-2 text-center">
+        <div className="rounded-lg p-2 text-center" style={{ background: 'var(--theme-bg-secondary)' }}>
           <p className="text-sm font-bold text-[#B8D0E8]">{mobileStats.companies}</p>
-          <p className="text-[9px] text-slate-500">фирми</p>
+          <p className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>фирми</p>
         </div>
-        <div className="bg-[#1E2A38] rounded-lg p-2 text-center">
+        <div className="rounded-lg p-2 text-center" style={{ background: 'var(--theme-bg-secondary)' }}>
           <p className="text-sm font-bold text-[#E8DAB2]">{mobileStats.masters}</p>
-          <p className="text-[9px] text-slate-500">майстори</p>
+          <p className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>майстори</p>
         </div>
-        <div className="bg-[#1E2A38] rounded-lg p-2 text-center">
+        <div className="rounded-lg p-2 text-center" style={{ background: 'var(--theme-bg-secondary)' }}>
           <p className="text-sm font-bold text-[#28A745]">{freeLeft} FREE</p>
-          <p className="text-[9px] text-slate-500">{mobileStats.free_slots.used}/{mobileStats.free_slots.total}</p>
+          <p className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>{mobileStats.free_slots.used}/{mobileStats.free_slots.total}</p>
         </div>
       </div>
     );
@@ -231,7 +232,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-[#0F1923] border-b border-[#2A3A4C] sticky top-0 z-50">
+    <nav style={{ background: 'var(--theme-nav-bg)', borderBottom: '1px solid var(--theme-nav-border)' }} className="sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-[80px]">
           {/* Left: Logo - prominent and left-corner */}
@@ -243,18 +244,18 @@ const Navbar = () => {
 
           {/* Right: Nav links + Language + Auth */}
           <div className="hidden md:flex items-center gap-3 lg:gap-4">
-            <Link to="/" className="text-slate-300 hover:text-[#FF8C42] text-sm font-medium transition-colors" data-testid="nav-home">
+            <Link to="/" className="text-sm font-medium transition-colors hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
               Главна
             </Link>
-            <Link to="/calculator" className="text-slate-300 hover:text-[#FF8C42] text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-calculator">
+            <Link to="/calculator" className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-calculator">
               <Calculator className="h-3.5 w-3.5" />
               Калкулатор
             </Link>
-            <Link to="/companies" className="text-slate-300 hover:text-[#FF8C42] text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-companies">
+            <Link to="/companies" className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
               <Building2 className="h-3.5 w-3.5" />
               Фирми
             </Link>
-            <Link to="/ads" className="text-slate-300 hover:text-[#FF8C42] text-sm font-medium transition-colors flex items-center gap-1" data-testid="nav-ads">
+            <Link to="/ads" className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
               <Megaphone className="h-3.5 w-3.5" />
               Обяви
             </Link>
@@ -263,42 +264,43 @@ const Navbar = () => {
             <div className="relative" ref={moreRef}>
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="text-slate-300 hover:text-[#FF8C42] text-sm font-medium transition-colors flex items-center gap-1"
+                className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]"
+                style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="nav-more-btn"
               >
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
                 Още
               </button>
               {moreOpen && (
-                <div className="absolute top-full right-0 mt-2 w-52 bg-[#1E2A38] border border-[#3A4A5C] rounded-lg shadow-2xl py-1 z-50" data-testid="nav-more-dropdown">
-                  <Link to="/ai-sketch" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ai-sketch">
+                <div className="absolute top-full right-0 mt-2 w-52 rounded-lg shadow-2xl py-1 z-50" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="nav-more-dropdown">
+                  <Link to="/ai-sketch" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-ai-sketch">
                     <FileText className="h-4 w-4" /> AI Sketch (скици)
                   </Link>
-                  <Link to="/room-scan" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#8C56FF] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-room-scan">
+                  <Link to="/room-scan" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#8C56FF] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-room-scan">
                     <Camera className="h-4 w-4" /> 3D Video Designer
                   </Link>
-                  <Link to="/ready-projects" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#28A745] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-ready-projects">
+                  <Link to="/ready-projects" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#28A745] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-ready-projects">
                     <FolderSearch className="h-4 w-4" /> Готови проекти
                   </Link>
-                  <Link to="/companies" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#4DA6FF] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-companies">
+                  <Link to="/companies" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#4DA6FF] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-companies">
                     <Building2 className="h-4 w-4" /> Фирми
                   </Link>
-                  <Link to="/subscriptions" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-subscriptions">
+                  <Link to="/subscriptions" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-subscriptions">
                     <ShoppingCart className="h-4 w-4" /> Абонаменти
                   </Link>
-                  <Link to="/services" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-services">
+                  <Link to="/services" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-services">
                     <Hammer className="h-4 w-4" /> Услуги
                   </Link>
-                  <Link to="/professions" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-professions">
+                  <Link to="/professions" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-professions">
                     <HardHat className="h-4 w-4" /> Професии
                   </Link>
-                  <Link to="/blog" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-blog">
+                  <Link to="/blog" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-blog">
                     <BookOpen className="h-4 w-4" /> Блог
                   </Link>
-                  <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-about">
+                  <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-about">
                     <Info className="h-4 w-4" /> За нас
                   </Link>
-                  <Link to="/feedback" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-[#253545] hover:text-[#FF8C42] transition-colors" onClick={() => setMoreOpen(false)} data-testid="nav-feedback">
+                  <Link to="/feedback" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-feedback">
                     <Star className="h-4 w-4" /> Обратна връзка
                   </Link>
                 </div>
@@ -306,7 +308,7 @@ const Navbar = () => {
             </div>
 
             {/* Separator */}
-            <div className="h-5 w-px bg-[#3A4A5C] mx-1"></div>
+            <div className="h-5 w-px mx-1" style={{ background: 'var(--theme-border)' }}></div>
 
             {/* Theme toggle */}
             <ThemeToggle />
@@ -315,21 +317,23 @@ const Navbar = () => {
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 text-slate-400 hover:text-[#4DA6FF] text-sm transition-colors px-2 py-1 rounded-md hover:bg-white/5"
+                className="flex items-center gap-1.5 text-sm transition-colors px-2 py-1 rounded-md hover:text-[#4DA6FF]"
+                style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="lang-switcher-btn"
               >
                 <Globe className="h-4 w-4" />
                 <span className="text-xs font-medium uppercase">{lang}</span>
               </button>
               {langOpen && (
-                <div className="absolute top-full right-0 mt-2 w-44 bg-[#1E2A38] border border-[#3A4A5C] rounded-lg shadow-2xl py-1 z-50" data-testid="lang-dropdown">
+                <div className="absolute top-full right-0 mt-2 w-44 rounded-lg shadow-2xl py-1 z-50" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="lang-dropdown">
                   {LANGUAGES.map(l => (
                     <button
                       key={l.code}
                       onClick={() => { switchLang(l.code); setLangOpen(false); }}
                       className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${
-                        l.code === lang ? 'bg-[#FF8C42]/10 text-[#FF8C42] font-medium' : 'text-slate-300 hover:bg-[#253545]'
+                        l.code === lang ? 'bg-[#FF8C42]/10 text-[#FF8C42] font-medium' : ''
                       }`}
+                      style={l.code !== lang ? { color: 'var(--theme-text-muted)' } : {}}
                       data-testid={`lang-option-${l.code}`}
                     >
                       <span className="text-base">{l.flag}</span>
@@ -349,19 +353,19 @@ const Navbar = () => {
                     </Button>
                   </Link>
                 )}
-                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="text-slate-300 hover:text-[#FF8C42] font-medium flex items-center gap-1.5" data-testid="nav-dashboard">
+                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="font-medium flex items-center gap-1.5 hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-dashboard">
                   <LayoutGrid className="h-4 w-4" />
                   {t('nav_dashboard')}
                 </Link>
-                <Link to="/messages" className="text-slate-300 hover:text-[#FF8C42] font-medium flex items-center gap-1.5" data-testid="nav-messages">
+                <Link to="/messages" className="font-medium flex items-center gap-1.5 hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-messages">
                   <MessageSquare className="h-4 w-4" />
                   {t('nav_messages')}
                 </Link>
                 <div className="flex items-center gap-3">
-                  <Link to="/profile" className="text-sm text-slate-400 hover:text-[#FF8C42] transition-colors flex items-center gap-1" data-testid="nav-profile">
+                  <Link to="/profile" className="text-sm hover:text-[#FF8C42] transition-colors flex items-center gap-1" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-profile">
                     <User className="h-3.5 w-3.5" /> {user.name}
                   </Link>
-                  <Button variant="ghost" size="sm" onClick={logout} className="text-slate-400 hover:text-white hover:bg-white/10" data-testid="logout-btn">
+                  <Button variant="ghost" size="sm" onClick={logout} className="hover:bg-black/5 dark:hover:bg-white/10" style={{ color: 'var(--theme-text-muted)' }} data-testid="logout-btn">
                     <LogOut className="h-4 w-4" />
                   </Button>
                 </div>
@@ -369,7 +373,7 @@ const Navbar = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-white/10" data-testid="login-btn">{t('nav_login')}</Button>
+                  <Button variant="ghost" className="hover:bg-black/5 dark:hover:bg-white/10" style={{ color: 'var(--theme-text-muted)' }} data-testid="login-btn">{t('nav_login')}</Button>
                 </Link>
                 <Link to="/register">
                   <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" data-testid="register-btn">
@@ -385,20 +389,22 @@ const Navbar = () => {
             <div className="relative" ref={mobileLangRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="p-2 text-slate-400 hover:text-[#4DA6FF]"
+                className="p-2 hover:text-[#4DA6FF]"
+                style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="mobile-lang-btn"
               >
                 <Globe className="h-5 w-5" />
               </button>
               {langOpen && (
-                <div className="absolute top-full right-0 mt-2 w-44 bg-[#1E2A38] border border-[#3A4A5C] rounded-lg shadow-2xl py-1 z-50">
+                <div className="absolute top-full right-0 mt-2 w-44 rounded-lg shadow-2xl py-1 z-50" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
                   {LANGUAGES.map(l => (
                     <button
                       key={l.code}
                       onClick={() => { switchLang(l.code); setLangOpen(false); }}
                       className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm ${
-                        l.code === lang ? 'bg-[#FF8C42]/10 text-[#FF8C42] font-medium' : 'text-slate-300 hover:bg-[#253545]'
+                        l.code === lang ? 'bg-[#FF8C42]/10 text-[#FF8C42] font-medium' : ''
                       }`}
+                      style={l.code !== lang ? { color: 'var(--theme-text-muted)' } : {}}
                     >
                       <span className="text-base">{l.flag}</span>
                       <span>{l.name}</span>
@@ -408,7 +414,8 @@ const Navbar = () => {
               )}
             </div>
             <button 
-              className="p-2 text-slate-300"
+              className="p-2"
+              style={{ color: 'var(--theme-text-muted)' }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               data-testid="mobile-menu-btn"
             >
@@ -419,63 +426,63 @@ const Navbar = () => {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0F1923] border-t border-[#2A3A4C] animate-slideDown">
+        <div className="md:hidden animate-slideDown" style={{ background: 'var(--theme-nav-bg)', borderTop: '1px solid var(--theme-nav-border)' }}>
           <div className="px-4 py-4 space-y-3">
             {/* Mobile Live Counter */}
             <MobileLiveStats />
-            <div className="h-px bg-[#2A3A4C]" />
-            <Link to="/projects" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+            <div className="h-px" style={{ background: 'var(--theme-nav-border)' }} />
+            <Link to="/projects" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <FolderSearch className="h-4 w-4" /> {t('nav_projects')}
             </Link>
-            <Link to="/companies" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/companies" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <Building2 className="h-4 w-4" /> {t('nav_companies')}
             </Link>
-            <Link to="/calculator" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/calculator" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <Calculator className="h-4 w-4" /> {t('nav_calculator')}
             </Link>
-            <Link to="/ai-sketch" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-sketch">
+            <Link to="/ai-sketch" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-sketch">
               <FileText className="h-4 w-4" /> AI Sketch (скици)
             </Link>
-            <Link to="/room-scan" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#8C56FF]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-room-scan">
+            <Link to="/room-scan" className="block py-2 flex items-center gap-2 hover:text-[#8C56FF]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-room-scan">
               <Camera className="h-4 w-4" /> 3D Video Designer
             </Link>
-            <Link to="/ready-projects" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#28A745]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ready-projects">
+            <Link to="/ready-projects" className="block py-2 flex items-center gap-2 hover:text-[#28A745]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ready-projects">
               <FolderSearch className="h-4 w-4" /> Готови проекти
             </Link>
-            <Link to="/companies" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#4DA6FF]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-companies">
+            <Link to="/companies" className="block py-2 flex items-center gap-2 hover:text-[#4DA6FF]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-companies">
               <Building2 className="h-4 w-4" /> Фирми
             </Link>
-            <Link to="/subscriptions" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/subscriptions" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <ShoppingCart className="h-4 w-4" /> Абонаменти
             </Link>
-            <Link to="/services" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/services" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <Hammer className="h-4 w-4" /> {t('nav_services')}
             </Link>
-            <Link to="/blog" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-blog">
+            <Link to="/blog" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-blog">
               <BookOpen className="h-4 w-4" /> {t('nav_blog')}
             </Link>
-            <Link to="/about" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/about" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <Info className="h-4 w-4" /> {t('nav_about')}
             </Link>
             {user ? (
               <>
-                <Link to="/profile" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/profile" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
                   <User className="h-4 w-4" /> Профил
                 </Link>
-                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
                   <LayoutGrid className="h-4 w-4" /> {t('nav_dashboard')}
                 </Link>
-                <Link to="/messages" className="block py-2 text-slate-300 flex items-center gap-2 hover:text-[#FF8C42]" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/messages" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
                   <MessageSquare className="h-4 w-4" /> {t('nav_messages')}
                 </Link>
-                <Button variant="ghost" className="w-full justify-start text-slate-300 hover:text-white hover:bg-white/10" onClick={() => { logout(); setMobileMenuOpen(false); }}>
+                <Button variant="ghost" className="w-full justify-start hover:bg-black/5 dark:hover:bg-white/10" style={{ color: 'var(--theme-text-muted)' }} onClick={() => { logout(); setMobileMenuOpen(false); }}>
                   <LogOut className="h-4 w-4 mr-2" /> {t('nav_logout')}
                 </Button>
               </>
             ) : (
               <div className="flex gap-3 pt-3">
                 <Link to="/login" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full border-[#3A4A5C] text-slate-300 hover:bg-white/5">{t('nav_login')}</Button>
+                  <Button variant="outline" className="w-full" style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }}>{t('nav_login')}</Button>
                 </Link>
                 <Link to="/register" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
                   <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white">{t('nav_register_short')}</Button>
@@ -491,13 +498,12 @@ const Navbar = () => {
 
 // ============== LIVE COUNTER (fixed top-right) ==============
 const LiveCounter = () => {
-  const [stats, setStats] = useState({ clients: 0, companies: 0, masters: 0, online: 1, free_slots: { used: 0, total: 50 } });
+  const [stats, setStats] = useState({ clients: 0, companies: 0, masters: 0, online: 1, free_slots: { used: 0, total: 56 } });
   const [show, setShow] = useState(true);
   const [pulse, setPulse] = useState(false);
   const sessionRef = useRef(null);
 
   useEffect(() => {
-    // Generate session ID once
     if (!sessionRef.current) sessionRef.current = Math.random().toString(36).slice(2);
 
     const fetchStats = () => {
@@ -531,42 +537,41 @@ const LiveCounter = () => {
 
   return (
     <div className={`fixed top-[90px] right-4 z-40 hidden md:block transition-all duration-300 ${show ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`} data-testid="live-counter">
-      <button onClick={() => setShow(!show)} className="absolute -left-7 top-2 bg-[#0F1923] border border-[#2A3A4C] rounded-l-lg px-1.5 py-2 text-slate-400 hover:text-white transition-colors" data-testid="live-counter-toggle">
+      <button onClick={() => setShow(!show)} className="absolute -left-7 top-2 rounded-l-lg px-1.5 py-2 transition-colors" style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', color: 'var(--theme-text-muted)' }} data-testid="live-counter-toggle">
         {show ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </button>
-      <div className={`bg-[#0F1923]/95 backdrop-blur-lg border border-[#2A3A4C] rounded-xl p-3 min-w-[160px] shadow-xl ${pulse ? 'ring-2 ring-[#28A745]/50' : ''}`} style={{ transition: 'box-shadow 0.5s' }}>
+      <div className={`backdrop-blur-lg rounded-xl p-3 min-w-[160px] shadow-xl ${pulse ? 'ring-2 ring-[#28A745]/50' : ''}`} style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', transition: 'box-shadow 0.5s' }}>
         <div className="space-y-2">
-          {/* Online now */}
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28A745] opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#28A745]"></span></span>
             <span className="text-[#28A745] text-xs font-bold tabular-nums">{stats.online || 1}</span>
-            <span className="text-slate-500 text-[10px]">онлайн</span>
+            <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>онлайн</span>
           </div>
-          <div className="h-px bg-[#2A3A4C] my-0.5" />
+          <div className="h-px my-0.5" style={{ background: 'var(--theme-nav-border)' }} />
           <div className="flex items-center gap-2">
             <Users className="h-3.5 w-3.5 text-[#A8D5BA]" />
-            <span className={`text-white text-xs font-bold tabular-nums ${pulse ? 'text-[#A8D5BA]' : ''}`} style={{ transition: 'color 0.5s' }}>{(stats.clients || 0).toLocaleString()}</span>
-            <span className="text-slate-500 text-[10px]">клиенти</span>
+            <span className={`text-xs font-bold tabular-nums ${pulse ? 'text-[#A8D5BA]' : ''}`} style={{ color: pulse ? undefined : 'var(--theme-text)', transition: 'color 0.5s' }}>{(stats.clients || 0).toLocaleString()}</span>
+            <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>клиенти</span>
           </div>
           <div className="flex items-center gap-2">
             <Building2 className="h-3.5 w-3.5 text-[#B8D0E8]" />
-            <span className="text-white text-xs font-bold tabular-nums">{stats.companies || 0}</span>
-            <span className="text-slate-500 text-[10px]">фирми</span>
+            <span className="text-xs font-bold tabular-nums" style={{ color: 'var(--theme-text)' }}>{stats.companies || 0}</span>
+            <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>фирми</span>
           </div>
           <div className="flex items-center gap-2">
             <Wrench className="h-3.5 w-3.5 text-[#E8DAB2]" />
-            <span className="text-white text-xs font-bold tabular-nums">{stats.masters || 0}</span>
-            <span className="text-slate-500 text-[10px]">майстори</span>
+            <span className="text-xs font-bold tabular-nums" style={{ color: 'var(--theme-text)' }}>{stats.masters || 0}</span>
+            <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>майстори</span>
           </div>
-          <div className="h-px bg-[#2A3A4C] my-0.5" />
+          <div className="h-px my-0.5" style={{ background: 'var(--theme-nav-border)' }} />
           <div className="flex items-center gap-2">
             <Zap className="h-3.5 w-3.5 text-[#28A745]" />
             <div className="flex-1">
               <div className="flex justify-between items-center">
                 <span className="text-[#28A745] text-[10px] font-bold">{freeLeft} FREE</span>
-                <span className="text-slate-600 text-[9px]">{stats.free_slots.used}/{stats.free_slots.total}</span>
+                <span className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>{stats.free_slots.used}/{stats.free_slots.total}</span>
               </div>
-              <div className="h-1 bg-[#1E2A38] rounded-full mt-0.5 overflow-hidden">
+              <div className="h-1 rounded-full mt-0.5 overflow-hidden" style={{ background: 'var(--theme-bg-secondary)' }}>
                 <div className="h-full bg-[#28A745] rounded-full transition-all duration-1000"
                   style={{ width: `${(stats.free_slots.used / stats.free_slots.total) * 100}%` }} />
               </div>
@@ -582,7 +587,7 @@ const LiveCounter = () => {
 const Footer = () => {
   const { t } = useLanguage();
   return (
-  <footer className="bg-[#0F1923] border-t border-[#2A3A4C] text-white py-12 mt-auto">
+  <footer className="py-12 mt-auto" style={{ background: 'var(--theme-nav-bg)', borderTop: '1px solid var(--theme-nav-border)', color: 'var(--theme-text)' }}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
@@ -590,13 +595,13 @@ const Footer = () => {
             <TemaDomLogo className="h-16 w-auto" />
             <p className="text-[#FF8C42] text-xs font-bold tracking-wider uppercase mt-2">{t('footer_tagline')}</p>
           </div>
-          <p className="text-slate-400 text-sm">
+          <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             {t('footer_desc')}
           </p>
         </div>
         <div>
           <h4 className="font-semibold mb-4 text-[#FF8C42]">{t('footer_clients')}</h4>
-          <ul className="space-y-2 text-slate-400 text-sm">
+          <ul className="space-y-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             <li><Link to="/register" className="hover:text-[#FF8C42] transition-colors">{t('footer_publish')}</Link></li>
             <li><Link to="/companies" className="hover:text-[#FF8C42] transition-colors">{t('footer_find_company')}</Link></li>
             <li><Link to="/services" className="hover:text-[#FF8C42] transition-colors">{t('footer_services')}</Link></li>
@@ -606,7 +611,7 @@ const Footer = () => {
         </div>
         <div>
           <h4 className="font-semibold mb-4 text-[#FF8C42]">{t('footer_for_companies')}</h4>
-          <ul className="space-y-2 text-slate-400 text-sm">
+          <ul className="space-y-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             <li><Link to="/register" className="hover:text-[#FF8C42] transition-colors">{t('footer_register_link')}</Link></li>
             <li><Link to="/projects" className="hover:text-[#FF8C42] transition-colors">{t('footer_view_projects')}</Link></li>
             <li><Link to="/subscriptions" className="hover:text-[#FF8C42] transition-colors">Абонаменти</Link></li>
@@ -617,17 +622,17 @@ const Footer = () => {
         </div>
         <div>
           <h4 className="font-semibold mb-4 text-[#FF8C42]">{t('footer_info')}</h4>
-          <ul className="space-y-2 text-slate-400 text-sm">
+          <ul className="space-y-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             <li><Link to="/about" className="hover:text-[#FF8C42] transition-colors">{t('footer_about')}</Link></li>
             <li><Link to="/terms" className="hover:text-[#FF8C42] transition-colors">{t('footer_terms')}</Link></li>
             <li className="text-[#4DA6FF]">info@temadom.com</li>
           </ul>
         </div>
       </div>
-      <Separator className="my-8 bg-[#2A3A4C]" />
+      <Separator className="my-8" style={{ background: 'var(--theme-nav-border)' }} />
       <div className="flex flex-col items-center gap-3">
         <TemaDomLogo className="h-12 w-auto opacity-60" />
-        <p className="text-center text-slate-500 text-sm">
+        <p className="text-center text-sm" style={{ color: 'var(--theme-text-subtle)' }}>
           © 2025-2026 TemaDom. {t('footer_rights')}
         </p>
       </div>
@@ -656,8 +661,8 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const dark = theme?.dark ?? true;
-  const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, free_slots: { used: 0, total: 50 } });
-  const [liveStats, setLiveStats] = useState({ clients: 0, companies: 0, free_slots: { used: 0, total: 50 } });
+  const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, free_slots: { used: 0, total: 56 } });
+  const [liveStats, setLiveStats] = useState({ clients: 0, companies: 0, free_slots: { used: 0, total: 56 } });
 
   useEffect(() => {
     axios.get(`${API}/stats`).then(r => setStats(r.data)).catch(() => {});
@@ -665,7 +670,7 @@ const LandingPage = () => {
   }, []);
 
   const slotsUsed = liveStats.free_slots?.used || 0;
-  const slotsTotal = liveStats.free_slots?.total || 50;
+  const slotsTotal = liveStats.free_slots?.total || 56;
   const slotsLeft = Math.max(0, slotsTotal - slotsUsed);
 
   const bg = dark ? '#0F172A' : '#F8FAFC';
@@ -693,7 +698,7 @@ const LandingPage = () => {
               <span className="text-4xl font-black tabular-nums" style={{ color: accent }}>{slotsTotal}</span>
               <div className="h-8 w-px mx-1" style={{ background: border }} />
               <div className="text-left">
-                <p style={{ color: accent }} className="text-sm font-bold leading-tight">ПЪРВИ 50 ФИРМИ</p>
+                <p style={{ color: accent }} className="text-sm font-bold leading-tight">ПЪРВИ 56 ФИРМИ</p>
                 <p style={{ color: dark ? '#FCD34D' : '#D97706' }} className="text-xs font-bold">= 1 ГОДИНА ПРЕМИУМ 0 EUR</p>
               </div>
             </div>
@@ -847,7 +852,7 @@ const LandingPage = () => {
             <span className="text-xs font-bold" style={{ color: accent }}>ОСТАВАТ {slotsLeft} МЕСТА</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-black mb-4">
-            Първи <span style={{ color: accent }}>50 фирми</span> = 1 година ПРЕМИУМ
+            Първи <span style={{ color: accent }}>56 фирми</span> = 1 година ПРЕМИУМ
           </h2>
           <p className="text-lg mb-8" style={{ color: muted }}>Регистрирай фирмата си и получи достъп до всички AI функции безплатно за 12 месеца.</p>
           <button onClick={() => navigate('/register')} data-testid="cta-register"
@@ -1007,11 +1012,11 @@ const ProjectsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8">
+    <div className="min-h-screen py-8" style={{ background: 'var(--theme-bg-secondary)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">{t('projects_title')}</h1>
-          <p className="text-slate-400">{t('projects_subtitle')}</p>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>{t('projects_title')}</h1>
+          <p style={{ color: 'var(--theme-text-muted)' }}>{t('projects_subtitle')}</p>
         </div>
 
         <PageInstructions
@@ -1206,7 +1211,7 @@ const ProjectDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] py-8">
+      <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
         <div className="max-w-4xl mx-auto px-4">
           <Card className="h-96 animate-pulse bg-[#253545]" />
         </div>
@@ -1217,7 +1222,7 @@ const ProjectDetailPage = () => {
   if (!project) return null;
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button 
           variant="ghost" 
@@ -1477,7 +1482,7 @@ const CompaniesPage = () => {
   }, [category, city]);
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">{t('comp_title')}</h1>
@@ -1599,7 +1604,7 @@ const FindMasterPage = () => {
   }, [category, city, proType]);
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="find-master-page">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}} data-testid="find-master-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">{t('fm_title')}</h1>
@@ -1782,7 +1787,7 @@ const CompanyDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] py-8">
+      <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
         <div className="max-w-4xl mx-auto px-4">
           <Card className="h-96 animate-pulse bg-[#253545]" />
         </div>
@@ -1793,7 +1798,7 @@ const CompanyDetailPage = () => {
   if (!company) return null;
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button variant="ghost" className="mb-4" onClick={() => navigate('/companies')}>
           {t('cd_back')}
@@ -1990,8 +1995,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-md bg-[#253545] border-[#3A4A5C]" data-testid="login-form">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4" style={{ background: 'var(--theme-bg-secondary)' }}>
+      <Card className="w-full max-w-md" data-testid="login-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <TemaDomLogo className="h-16 w-auto" />
@@ -2034,7 +2039,7 @@ const LoginPage = () => {
           </form>
         </CardContent>
         <CardFooter className="justify-center">
-          <p className="text-sm text-slate-400">
+          <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             {t('login_no_account')}{' '}
             <Link to="/register" className="text-[#FF8C42] hover:underline">
               {t('login_register')}
@@ -2099,8 +2104,8 @@ const RegisterPage = () => {
   const isProUser = userType === 'company' || userType === 'master';
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-md bg-[#253545] border-[#3A4A5C]" data-testid="register-form">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4" style={{ background: 'var(--theme-bg-secondary)' }}>
+      <Card className="w-full max-w-md" data-testid="register-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <TemaDomLogo className="h-16 w-auto" />
@@ -2430,7 +2435,7 @@ const CompanyDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] py-8">
+      <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="animate-pulse space-y-6">
             <Card className="h-32 bg-[#253545]" />
@@ -2442,7 +2447,7 @@ const CompanyDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="company-dashboard">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}} data-testid="company-dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">{t('dash_title')}</h1>
@@ -2652,7 +2657,7 @@ const ClientDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] py-8">
+      <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
         <div className="max-w-7xl mx-auto px-4">
           <Card className="h-64 animate-pulse bg-[#253545]" />
         </div>
@@ -2661,7 +2666,7 @@ const ClientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="client-dashboard">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}} data-testid="client-dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -2911,7 +2916,7 @@ const PaymentSuccessPage = () => {
   }, [sessionId, token, refreshUser]);
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4" style={{background: "var(--theme-bg-secondary)"}}>
       <Card className="w-full max-w-md text-center p-8" data-testid="payment-success">
         {status === 'checking' && (
           <>
@@ -2963,7 +2968,7 @@ const PaymentCancelPage = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4" style={{background: "var(--theme-bg-secondary)"}}>
       <Card className="w-full max-w-md text-center p-8" data-testid="payment-cancel">
         <AlertCircle className="h-16 w-16 mx-auto mb-4 text-slate-400" />
         <h2 className="text-2xl font-bold mb-2">{t('pay_cancelled')}</h2>
@@ -3004,7 +3009,7 @@ const AdsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="ads-page">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}} data-testid="ads-page">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -3132,7 +3137,7 @@ const SubscriptionsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-12" data-testid="subscriptions-page">
+    <div className="min-h-screen py-12" style={{background: "var(--theme-bg-secondary)"}} data-testid="subscriptions-page">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Абонаменти и услуги</h1>

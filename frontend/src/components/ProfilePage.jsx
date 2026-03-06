@@ -63,7 +63,7 @@ const ProfilePage = () => {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-[#0F1923] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{background: "var(--theme-bg)"}}>
         <div className="animate-spin h-8 w-8 border-2 border-[#F97316] border-t-transparent rounded-full" />
       </div>
     );
@@ -73,7 +73,7 @@ const ProfilePage = () => {
   const createdDate = profile.created_at ? new Date(profile.created_at).toLocaleDateString('bg-BG') : 'N/A';
 
   return (
-    <div className="min-h-screen bg-[#0F1923] py-8 px-4" data-testid="profile-page">
+    <div className="min-h-screen py-8 px-4" style={{background: "var(--theme-bg)"}} data-testid="profile-page">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

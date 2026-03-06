@@ -580,7 +580,7 @@ const PriceCalculator = () => {
   // Auth guard - if not logged in, show registration prompt
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center py-16 px-4" data-testid="calculator-auth-guard">
+      <div className="min-h-screen flex items-center justify-center py-16 px-4" style={{background: "var(--theme-bg-secondary)"}} data-testid="calculator-auth-guard">
         <div className="max-w-md w-full text-center">
           <div className="bg-[#253545] rounded-2xl shadow-lg border border-[#3A4A5C] p-8">
             <div className="bg-[#FF8C42]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -615,7 +615,7 @@ const PriceCalculator = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="price-calculator">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}} data-testid="price-calculator">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-10">

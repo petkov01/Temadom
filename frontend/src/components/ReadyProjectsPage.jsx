@@ -64,14 +64,14 @@ export const ReadyProjectsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E2A38] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{background: "var(--theme-bg-secondary)"}}>
         <Loader2 className="h-8 w-8 animate-spin text-[#FF8C42]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="ready-projects-page">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}} data-testid="ready-projects-page">
       <div className="max-w-3xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
