@@ -5,9 +5,10 @@ TemaDom is a web application for construction and interior design targeting the 
 
 ## Core Products
 1. **AI-Assisted CAD System (`/ai-sketch`)** — 2D plans with 3D preview and cost estimation
-2. **3D Photo Designer v9.0 (`/room-scan`)** — Vision-powered: Photos → AI analysis → Room-specific 3D renders + Budget
-3. **Community Feed (`/community`)** — Social feed with posts, likes, comments, filters, image uploads, project linking
-4. **AI Product Search (`/product-search`)** — Upload photo → AI identifies products → Search 21 Bulgarian stores
+2. **3D Photo Designer v9.0 (`/room-scan`)** — Vision-powered: Photos → AI analysis → Room-specific 3D renders + Budget + Download/Fullscreen
+3. **Community Feed (`/community`)** — Social feed with posts, images, project linking, likes, comments
+4. **AI Product Search (`/product-search`)** — Upload photo → AI identifies products → Search 21 stores + Share results
+5. **Referral System** — Automatic rewards, share via WhatsApp/Viber, milestones
 
 ## Implemented Features
 
@@ -19,63 +20,65 @@ TemaDom is a web application for construction and interior design targeting the 
 ### CAD System v5.2 — `/ai-sketch`
 - Color-coded handles, endpoint dragging, rotation, undo/redo
 - PDF export, cost estimation, multi-floor
-- **Fixed**: "Дълбочина" → "Височина" everywhere
-- **Removed**: "Покрив/Roof" element type completely
 
-### 3D Photo Designer v9.0 — `/room-scan` ✅ EMERGENCY FIX APPLIED
-- **NEW**: GPT-4o Vision analyzes each uploaded photo BEFORE generation
-- **NEW**: Vision identifies room type, visible elements, colors, layout, camera angle
-- **NEW**: Room-specific prompt ensures bathroom→bathroom, kitchen→kitchen (no more mismatches)
-- Multi-room packages: 69EUR (1 стая), 129EUR (2 стаи), 199EUR (до 5 стаи)
-- Room types: Баня, Кухня, Хол, Спалня, Коридор, Балкон, Стълбище, Фасада
-- Styles: Модерен, Минималист, Класически, Бохо, Хай-тек, Индустриален, Скандинавски, Лофт, Неокласически, Арт Деко
-- 3 photos → GPT-4o Vision analysis → gpt-image-1 3D renders → Budget with 21 store links
+### 3D Photo Designer v9.0 — `/room-scan` ✅
+- GPT-4o Vision analyzes each uploaded photo BEFORE generation
+- Room-specific prompts (bathroom→bathroom, kitchen→kitchen)
+- Multi-room packages: 69EUR/129EUR/199EUR
+- **Download** button per render (PNG)
+- **Fullscreen** view per render (opens in new tab)
 - Before/After slider, Share (Facebook, WhatsApp, Viber, Twitter, Email)
 
 ### Community Feed v2.0 — `/community` ✅
-- Post types: text, project, question, before_after
-- Image upload (up to 4 images per post, base64)
-- Link 3D designer projects to posts
-- Image-only posts allowed
+- Image upload (up to 4), project linking, image-only posts
 - Like/unlike, comments, deletion, filters, pagination
 
 ### AI Product Search v1.0 — `/product-search` ✅
-- Upload photo → OpenAI Vision (GPT-4o) analyzes → Search 21 stores
-- Results with EUR/BGN prices and direct store links
-- Technomarket prioritized for appliances
+- OpenAI Vision (GPT-4o) → 21 store search
+- **Share results**: WhatsApp, Viber, Facebook, Copy buttons
+
+### Referral System v1.0 ✅
+- **Backend**: GET /api/referrals/status, POST /api/referrals/apply
+- Unique referral code (first 8 chars of user ID)
+- Share via WhatsApp/Viber with pre-filled messages
+- Rewards milestones: 1→€3, 3→€10, 5→free 3D, 10→PRO month
+- Apply referral code with validation (no self-referral, no duplicates)
+
+### FB Pixel + Google Analytics ✅
+- Google Analytics 4 (G-526267282)
+- Facebook Pixel (PLACEHOLDER_FB_PIXEL_ID — user needs to replace)
+- PostHog analytics
+
+### Profile Page v2.0 — `/profile` ✅
+- 4 tabs: Профил, Проекти, Реферали, Настройки
+- Avatar upload, personal info editing
+- My Projects list with view/share/delete
+- Referral code + share + rewards milestones
+- Account type, subscription status, statistics
 
 ### Web Scraping API — 21 Bulgarian Stores
-- Praktiker, Jysk, Mr.Bricolage, Bauhaus, HomeMax, Technomarket, Teknoimpex, IKEA, Temax, Maximarket, Toplivo, Marmag, Paros, Praktis, Angro, Rila Online, Baustoff Metall, Atek, Vako, Buildmark, Obijavki
-
 ### Firm Subscription Plans (Landing Page)
-- 3 plans: БАЗОВ (15EUR), ПРО (35EUR), PREMIUM (75EUR)
-- Period toggle: 1/3/6/12 months with discounts
-
-### Global Theme v6.5 — Persistent dark/light mode toggle
+### Global Theme v6.5 — Persistent dark/light mode
 
 ## Key API Endpoints
-- `POST /api/ai-designer/photo-generate` — Vision + 3D render + budget (multipart/form-data) ✅ FIXED
-- `POST /api/scrape/ai-search` — AI photo analysis + 21 store search
-- `POST /api/community/posts` — Create post with images & project link
-- `GET /api/community/posts` — List posts (public, paginated)
-- `GET /api/scrape/stores` — 21 Bulgarian stores list
+- `POST /api/ai-designer/photo-generate` — Vision + 3D render + budget
+- `POST /api/scrape/ai-search` — AI photo → 21 store search
+- `GET /api/referrals/status` — Referral code, count, rewards
+- `POST /api/referrals/apply` — Apply referral code
+- `POST /api/community/posts` — Create post with images
+- `GET /api/community/posts` — List posts
 
 ## Prioritized Backlog
 
-### P0 — DONE ✅
-- Community Feed: image upload, project sharing ✅
-- AI Product Search: photo → 21 stores ✅
-- EMERGENCY FIX: Room recognition with Vision ✅
+### P1 — DONE ✅
+- Share results (WhatsApp/Viber/Facebook) ✅
+- FB Pixel tracking ✅
+- Referral rewards (automatic) ✅
+- Mobile fullscreen + download ✅
+- Profile Page enhanced (4 tabs) ✅
 
-### P1 — Upcoming
-- Share results button in AI Product Search (→ Community Feed / WhatsApp/Viber)
-- FB Pixel / Google Analytics tracking
-- Referral rewards (automatic)
-- Mobile fullscreen + download
-- PDF export (site design)
-- Profile Page functionality (My Projects, Payment, Settings)
+### P2 — Upcoming
+- PDF export for 3D designs (enhanced with site branding)
 - Leaderboard System (clients & firms)
-
-### P2 — Future
-- Backend refactoring (modular routers/)
 - Community Feed: public projects + firm offers
+- Backend refactoring (modular routers/)
