@@ -4763,6 +4763,103 @@ async def get_stores():
     }
 
 
+@api_router.post("/scrape/ai-search")
+async def ai_product_search(request: Request):
+    """AI-powered product search: analyze photo → identify products → search 21 stores."""
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+
+    data = await request.json()
+    image_b64 = data.get("image_base64", "")
+    room_type = data.get("room_type", "")
+    user_query = data.get("query", "")
+
+    if not image_b64 and not user_query:
+        raise HTTPException(status_code=400, detail="Добавете снимка или заявка")
+
+    try:
+        # Step 1: AI analyzes the photo to identify products
+        search_queries = []
+        if image_b64:
+            analysis_chat = LlmChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=f"ai-search-{uuid.uuid4()}",
+                system_message="""Ти си експерт по строителни материали и интериор в България.
+Анализирай снимката и идентифицирай конкретни продукти/материали, които виждаш.
+
+Отговори САМО с JSON списък от търсещи заявки (на български):
+{"queries": ["бойлер 80 литра", "LED лампа таванна", "плочки 60x60 сиви", "смесител за мивка хром"]}
+
+ПРАВИЛА:
+- 3-8 заявки, конкретни и кратки
+- Приоритет: електроуреди (Technomarket), настилки (Praktiker), мебели (IKEA/Jysk)
+- Включвай размери/цветове ако са видими"""
+            ).with_model("openai", "gpt-4o")
+
+            img_msg = UserMessage(
+                text=f"Анализирай тази снимка{f' на {room_type}' if room_type else ''} и идентифицирай продукти за покупка.",
+                file_contents=[ImageContent(image_base64=image_b64)]
+            )
+            ai_response = await analysis_chat.send_message(img_msg)
+
+            try:
+                json_match = re_module.search(r'\{[\s\S]*\}', ai_response)
+                if json_match:
+                    parsed = json_module.loads(json_match.group(0))
+                    search_queries = parsed.get("queries", [])[:8]
+            except Exception:
+                pass
+
+        if user_query:
+            search_queries.insert(0, user_query)
+
+        if not search_queries:
+            search_queries = ["плочки за баня", "бойлер", "LED осветление"]
+
+        # Step 2: Search all 21 stores in parallel for each query
+        all_results = {}
+        for query in search_queries[:5]:
+            stores_to_search = list(STORE_SEARCH_URLS.keys())
+
+            # Prioritize Technomarket for appliances
+            appliance_keywords = ["бойлер", "климатик", "хладилник", "пералн", "съдомиялн", "аспиратор", "вентилатор", "готварск", "лампа", "осветлен"]
+            is_appliance = any(kw in query.lower() for kw in appliance_keywords)
+            if is_appliance:
+                stores_to_search = ["technomarket"] + [s for s in stores_to_search if s != "technomarket"]
+
+            tasks = [scrape_store(s, query) for s in stores_to_search[:10]]
+            store_results = await asyncio.gather(*tasks)
+
+            query_products = []
+            for prods in store_results:
+                query_products.extend(prods)
+
+            # Sort by price (cheapest first), take top 5
+            query_products.sort(key=lambda p: p.get("price_eur", 99999) if p.get("price_eur", 0) > 0 else 99999)
+            all_results[query] = query_products[:5]
+
+        # Flatten top results
+        top_products = []
+        for query, prods in all_results.items():
+            for p in prods:
+                p["search_query"] = query
+                top_products.append(p)
+
+        return {
+            "queries": search_queries,
+            "total_products": len(top_products),
+            "results_by_query": all_results,
+            "top_products": top_products[:20],
+            "stores_count": len(STORE_SEARCH_URLS),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"AI Product Search error: {e}")
+        raise HTTPException(status_code=500, detail=f"Грешка: {str(e)}")
+
+
 # ==================== COMMUNITY FEED ====================
 
 @api_router.post("/community/posts")

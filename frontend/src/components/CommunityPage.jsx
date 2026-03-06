@@ -32,16 +32,63 @@ const NewPostForm = ({ onPost }) => {
   const [text, setText] = useState('');
   const [type, setType] = useState('text');
   const [posting, setPosting] = useState(false);
+  const [images, setImages] = useState([]);
+  const [imageUrls, setImageUrls] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  const imgRef = useRef(null);
   const token = localStorage.getItem('token');
 
+  const addImage = (file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error('Макс. 5MB'); return; }
+    if (images.length >= 4) { toast.error('Макс. 4 снимки'); return; }
+    setImages(prev => [...prev, file]);
+    setImageUrls(prev => [...prev, URL.createObjectURL(file)]);
+  };
+
+  const removeImage = (idx) => {
+    URL.revokeObjectURL(imageUrls[idx]);
+    setImages(prev => prev.filter((_, i) => i !== idx));
+    setImageUrls(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const loadProjects = async () => {
+    if (!token) return;
+    try {
+      const res = await axios.get(`${API}/ai-designer/my-projects`, { headers: { Authorization: `Bearer ${token}` } });
+      setProjects(res.data.projects || []);
+      setShowProjectPicker(true);
+    } catch { toast.error('Грешка при зареждане на проекти'); }
+  };
+
   const submit = async () => {
-    if (!text.trim()) { toast.error('Напишете нещо'); return; }
+    if (!text.trim() && !selectedProject && images.length === 0) { toast.error('Добавете текст, снимка или проект'); return; }
     if (!token) { toast.error('Влезте в профила'); return; }
     setPosting(true);
     try {
-      const res = await axios.post(`${API}/community/posts`, { text, type }, { headers: { Authorization: `Bearer ${token}` } });
+      // Convert images to base64
+      const imagesB64 = [];
+      for (const img of images) {
+        const b64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.readAsDataURL(img);
+        });
+        imagesB64.push(b64);
+      }
+
+      const res = await axios.post(`${API}/community/posts`, {
+        text, type, images: imagesB64,
+        project_id: selectedProject?.id || null,
+      }, { headers: { Authorization: `Bearer ${token}` } });
       onPost(res.data);
       setText('');
+      setImages([]);
+      imageUrls.forEach(u => URL.revokeObjectURL(u));
+      setImageUrls([]);
+      setSelectedProject(null);
       toast.success('Публикувано!');
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка');
@@ -54,8 +101,72 @@ const NewPostForm = ({ onPost }) => {
       <CardContent className="p-4">
         <Textarea value={text} onChange={e => setText(e.target.value)} placeholder="Споделете нещо с общността..."
           className="min-h-[60px] mb-3 resize-none" maxLength={2000} data-testid="post-text-input" />
+
+        {/* Image previews */}
+        {imageUrls.length > 0 && (
+          <div className="flex gap-2 mb-3 flex-wrap" data-testid="image-previews">
+            {imageUrls.map((url, i) => (
+              <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden" style={{ border: '1px solid var(--theme-border)' }}>
+                <img src={url} alt="" className="w-full h-full object-cover" />
+                <button onClick={() => removeImage(i)} className="absolute top-0.5 right-0.5 bg-red-500/90 text-white rounded-full p-0.5"
+                  data-testid={`remove-img-${i}`}>
+                  <X className="h-2.5 w-2.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Selected project */}
+        {selectedProject && (
+          <div className="flex items-center gap-2 mb-3 p-2 rounded-lg" style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.2)' }}>
+            <Bookmark className="h-4 w-4 text-[#F97316] flex-shrink-0" />
+            <span className="text-xs font-medium flex-1" style={{ color: 'var(--theme-text)' }}>
+              Проект: {selectedProject.room_type} | {selectedProject.style}
+            </span>
+            <button onClick={() => setSelectedProject(null)} style={{ color: 'var(--theme-text-muted)' }}><X className="h-3.5 w-3.5" /></button>
+          </div>
+        )}
+
+        {/* Project picker */}
+        {showProjectPicker && (
+          <div className="mb-3 max-h-40 overflow-y-auto rounded-lg" style={{ border: '1px solid var(--theme-border)' }}>
+            {projects.length === 0 ? (
+              <p className="p-3 text-xs text-center" style={{ color: 'var(--theme-text-muted)' }}>Нямате проекти</p>
+            ) : projects.map(p => (
+              <button key={p.id} onClick={() => { setSelectedProject(p); setType('project'); setShowProjectPicker(false); }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-left text-xs hover:bg-black/5 dark:hover:bg-white/5"
+                style={{ borderBottom: '1px solid var(--theme-border)', color: 'var(--theme-text)' }}
+                data-testid={`pick-project-${p.id}`}>
+                <Bookmark className="h-3 w-3 text-[#F97316]" />
+                {p.room_type} | {p.style} | {new Date(p.created_at).toLocaleDateString('bg-BG')}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 items-center">
+            {/* Image upload */}
+            <button onClick={() => imgRef.current?.click()}
+              className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              style={{ color: images.length > 0 ? '#F97316' : 'var(--theme-text-muted)' }}
+              data-testid="add-image-btn">
+              <ImageIcon className="h-4.5 w-4.5" />
+            </button>
+            <input ref={imgRef} type="file" accept="image/*" className="hidden" onChange={e => addImage(e.target.files?.[0])} />
+
+            {/* Project link */}
+            <button onClick={loadProjects}
+              className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              style={{ color: selectedProject ? '#F97316' : 'var(--theme-text-muted)' }}
+              data-testid="link-project-btn">
+              <Bookmark className="h-4.5 w-4.5" />
+            </button>
+
+            <div className="w-px h-5 mx-1" style={{ background: 'var(--theme-border)' }} />
+
+            {/* Type pills */}
             {POST_TYPES.filter(t => t.id !== 'all').map(t => (
               <button key={t.id} onClick={() => setType(t.id)}
                 className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${type === t.id ? 'bg-[#F97316] text-white' : ''}`}
@@ -66,7 +177,7 @@ const NewPostForm = ({ onPost }) => {
             ))}
           </div>
           <Button size="sm" className="bg-[#F97316] hover:bg-[#EA580C] text-white font-bold px-4"
-            onClick={submit} disabled={posting || !text.trim()} data-testid="submit-post-btn">
+            onClick={submit} disabled={posting || (!text.trim() && !selectedProject && images.length === 0)} data-testid="submit-post-btn">
             {posting ? '...' : <><Send className="h-3.5 w-3.5 mr-1.5" /> Публикувай</>}
           </Button>
         </div>

@@ -15,7 +15,7 @@ import io
 import uuid
 
 # Use public URL from frontend .env
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://temadom-profile.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://interior-vision-79.preview.emergentagent.com')
 
 @pytest.fixture(scope="module")
 def api_client():

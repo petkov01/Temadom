@@ -1,161 +1,142 @@
 <analysis>**original_problem_statement:**
 The user is building TemaDom, a multifaceted web application for construction and interior design. The core features revolve around an AI-assisted CAD tool and a 3D interior design generator.
 
-Throughout the session, the user has requested and overseen the implementation of several major features and fixes:
-*   **Registration System:** The initial limit of 50 free firm registrations was increased to 56. This was further refined with a high-priority requirement to limit registrations to a maximum of 2 firms per of the 28 regions in Bulgaria. The UI was updated to show these regional limits.
-*   **UI/UX Overhaul:** A global, persistent light/dark theme was implemented site-wide, which also resolved a UI bug on the Professions page. The site's logo was replaced and iteratively resized and repositioned based on user feedback.
-*   **3D Designer Evolution:** The  tool was significantly evolved from a video-based system to one that uses 3 user-uploaded photos. Key enhancements include:
-    *   A mandatory budget input field, which the AI uses to select materials.
-    *   A backend refactor to prioritize the generation flow: 1) 3D Renders, 2) Budget/Product links, 3) Optional 360° view, to prevent failures.
-    *   Placeholder logic for finding real products from Bulgarian stores with direct purchase links.
-    *   Updated UI instructions to guide users on how to take effective photos for the 3D generation.
-*   **Landing Page Enhancements:** The landing page was updated to reflect the new photo-based designer and regional registration stats. A new Customer Reviews carousel section was added to build social proof.
-*   **Profile Page Overhaul:** The user requested a complete redesign of the  page to include a profile picture, My Projects, Payment, and Settings sections.
+Throughout the sessions, the user has directed a rapid, iterative development process, including:
+*   **Registration System:** Implemented a system with a total cap and a per-region limit for firm registrations in Bulgaria.
+*   **UI/UX Overhaul:** A global light/dark theme, logo updates, and a new Firm Subscriptions section on the landing page with dynamic pricing for 3, 6, and 12-month plans.
+*   **3D Designer Evolution (and De-evolution):** The designer was upgraded from a video-based to a photo-based system with budget inputs, PDF generation, and fullscreen views. It was then subjected to a HARD RESET at the user's request, stripping it down to a barebones version. The current iteration supports multi-room packages (1, 2, or 5 rooms), where a user uploads 3 photos per room and receives 3 simple image renders, with all extra features removed.
+*   **PDF Generation:** The PDF export feature was enhanced to use a Cyrillic-supporting font, embed the site's logo, and include a region-specific estimate for labor costs.
+*   **CAD Tool:** Critical bugs in the  page were fixed, including renaming Depth to Height globally, removing a Roof element feature, and consolidating a duplicated Columns section.
+*   **Web Scraping & Community:** A foundation was laid for a web scraping service (now targeting 21 stores) and a social community feed. The latest request is to enhance the community feed with image uploads and to create an AI-powered endpoint that analyzes an image to find products across these stores.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-The application is a full-stack project using React for the frontend and a monolithic FastAPI  for the backend with a MongoDB database.
-*   **Frontend**: A fully themed (light/dark) application featuring a landing page with a customer review carousel and regional registration stats, a sophisticated AI CAD tool (), the newly overhauled photo-based 3D Designer (), and a rewritten (but untested) user profile page ().
-*   **Backend**: The  file contains all API endpoints. This includes authentication, user management, the complex registration logic (total and regional limits), a new API for customer reviews, and the multi-step 3D design generation logic (which accepts photos and a budget).
-*   **Key Completed Features**: Global theme, 56-firm registration limit with regional caps, a new logo, a customer reviews section, and the core transformation of the 3D designer to a photo-and-budget-based system.
+The application is a full-stack project using React and a monolithic FastAPI backend () with MongoDB.
+*   **Frontend**: The UI reflects the latest user requests.  has a new, interactive firm subscription section.  is a simplified, multi-room version of the 3D designer.  contains the fixed CAD tool. A new but basic  exists, with UI elements for the next task (image upload, project selection) already added but not yet functional.
+*   **Backend**: The  file is now over 5,000 lines and contains all endpoints. This includes the simplified 3D design generation logic, the updated PDF endpoint with Cyrillic font support, the expanded 21-store list for the scraping service, and new placeholder endpoints for the community feed () and an AI-powered product search ().
 
 **Last working item**:
-*   Last item agent was working: The agent was implementing a complete overhaul of the user profile page () as per the user's request. This involves adding an avatar upload feature, and placeholder sections for My Projects, Payment, and Settings. The agent created the new backend endpoints and rewrote the frontend  component.
+*   Last item agent was working: The agent began implementing two user requests in parallel:
+    1.  **Community Feed Enhancements**: Adding functionality for users to upload an image and link one of their 3D projects when creating a new post.
+    2.  **AI Scraping Integration**: Creating a new backend endpoint () intended to analyze a user-uploaded image, identify products within it, and search for them across the 21 configured online stores.
 *   Status: IN PROGRESS
 *   Agent Testing Done: N
-*   Which testing method agent to use? both. The backend agent should test the new avatar upload/retrieval endpoints (, ). The frontend testing agent should be used to verify the new profile page UI, including the avatar display and the layout of the new sections.
+*   Which testing method agent to use? both. The backend agent needs to test the updated  endpoint to ensure it correctly handles  and . It also needs to test the new (currently mocked)  endpoint. The frontend testing agent must verify the  form, confirming that image uploads and project selections are correctly sent to the backend.
 *   User Testing Done: N
 
 **All Pending/In progress Issue list**:
-There are no outstanding bugs. All work is focused on new feature development.
+No outstanding bugs are reported. All pending work is feature development.
 
 **In progress Task List**:
-*   **Task 1: Complete and Test the New Profile Page (v6.6) (P0)**
-    *   **Description**: The user requested a detailed profile page with a profile picture, My Projects, Payment Details, and Settings.
-    *   **Where to resume**: The agent has already created the necessary backend changes in  ( endpoint,  in  response) and has completely rewritten . The immediate next step is to test this new implementation. This involves:
-        1.  Verifying the backend and frontend compile without errors.
-        2.  Using  or a testing agent to test the avatar upload functionality.
-        3.  Using the screenshot tool or frontend testing agent to verify the new profile page renders correctly after login and that the uploaded avatar is displayed.
-        4.  Implementing the logic for the My Projects, Payment, and Settings tabs, which are currently UI placeholders.
-    *   **What will be achieved with this?** A functional and feature-rich user profile page that allows for personalization and access to user-specific content.
+*   **Task 1: Complete Community Feed & AI Scraping Features (P0)**
+    *   **Description**: The user wants to enhance the community feed with image uploads and project sharing, and create a new AI-driven product search feature.
+    *   **Where to resume**:
+        *   **Backend ():**
+            *   The  Pydantic model was updated with  and . The creation logic within the  endpoint needs to be finalized to handle and save this data.
+            *   The new  endpoint is a placeholder. It needs to be implemented to (at a minimum) receive an image and call the (also mocked) scraping function.
+        *   **Frontend ():**
+            *   The  function needs to be completed. It must read the selected file, convert it to base64, get the selected project ID, and include both in the payload for the  API call.
+    *   **What will be achieved with this?** A more engaging community feed where users can share visual content, and the foundational backend endpoint for the AI product search feature.
     *   **Status:** IN PROGRESS
     *   **Should Test frontend/backend/both after fix?** Both
     *   **Blocked on something:** No.
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   **P0: Real-time Web Scraping for Product Prices**: The user explicitly approved this enhancement. This requires building a backend service to scrape Bulgarian e-commerce sites (e.g., Praktiker, Jysk) to provide live pricing and availability for the 3D Designer's budget feature. This should be the next major task after the profile page is completed.
-    *   **P1: Implement My Projects & Sharing**: Build out the My Projects section on the new profile page. Implement the backend logic to save, list, and retrieve a user's generated designs. Add the requested project sharing functionality ().
-    *   **P1: Community Feed (v6.7)**: Create a new page at  for a social-style feed where users can post, comment, and react.
+    *   **P1: Implement Full Profile Page Functionality**: The My Projects, Payment, and Settings sections on the  page are still UI placeholders and need backend and frontend implementation. This includes saving, listing, and displaying a user's generated 3D designs.
+    *   **P1: AI Scraping - Real Implementation**: The current product search is mocked. This task involves integrating a real AI vision service (via ) to identify products from an image.
 *   **Future Tasks:**
-    *   **P2: Leaderboard System**: Implement the dual leaderboard for clients and firms, including the points system.
-    *   **P2: Backend Refactoring**: Break down the monolithic  into a modular structure with a  directory to improve maintainability.
+    *   **P2: Leaderboard System**: Implement the planned dual leaderboard for clients and firms.
+    *   **P2: Backend Refactoring**: The monolithic  is critically large and needs to be broken down into a modular structure using FastAPI's .
 
 **Completed work in this session**
-- **Registration Logic Overhaul (DONE):**
-  - Increased firm registration limit to 56.
-  - Implemented a mandatory limit of 2 firms per Bulgarian region in .
-  - Updated the registration form in  with a region dropdown.
-  - Updated the landing page to display live regional registration statistics.
-- **Global Theme & UI Fixes (DONE):**
-  - Implemented a persistent, site-wide light/dark theme using  and CSS variables in .
-  - This fixed a visibility bug on the  page (v6.8).
-- **3D Designer Major Upgrade (DONE):**
-  - Converted the designer from video-based to a 3-photo upload system in .
-  - Added a mandatory budget input field to the UI and backend processing in .
-  - Refactored the backend generation flow to be more robust (Render -> Budget -> Optional 360°).
-  - Updated UI text and instructions across the site to refer to Photos instead of Video.
-- **Landing Page Enhancements (DONE):**
-  - Added a Customer Reviews carousel section, fetched from a new  endpoint.
-- **Branding (DONE):**
-  - Replaced the site logo and iteratively adjusted its size and position in  based on direct user feedback.
+- **3D Designer Hard Reset (DONE):** Stripped the designer of all advanced features (PDF, budget, fullscreen) and rebuilt it as a simple, multi-room package selector that generates 3 basic renders per room.
+- **Landing Page Firm Subscriptions Section (DONE):** Added a new section with a dynamic period toggle (1/3/6/12 months) and automatically calculated pricing discounts.
+- **PDF Generation Overhaul (DONE):** Fixed Cyrillic text rendering by adding a custom font, replaced the title with the site's logo, and added region-specific labor cost estimates.
+- **CAD Calculator Critical Fixes (DONE):** Globally replaced Дълбочина (Depth) with Височина (Height), removed the Покрив (Roof) element from the UI and logic.
+- **Web Scraper Enhancement (DONE):** Expanded the target store list in  to 21 stores.
 
 **Earlier issues found/mentioned but not fixed**
 *   None.
 
 **Known issue recurrence from previous fork**
-*   **Issue recurrence in previous fork:** CAD element manipulation.
-*   **Recurrence count:** 2+
-*   **Status:** RESOLVED in a previous session. No new recurrence.
+*   None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, React Hooks, TailwindCSS, shadcn/ui, Konva.js (for CAD), Three.js (for 3D viewer).
--   **Backend:** FastAPI, MongoDB, Pydantic, OpenCV. The backend contains placeholder logic for AI generation and product scraping that will need to be replaced with real implementations.
+-   **Frontend:** React, React Hooks ( for dynamic UI), React Router,  for client-side PDF generation.
+-   **Backend:** FastAPI, MongoDB,  library with custom font support for PDF generation.
+-   **Architecture:** Monolithic backend, component-based React frontend.
 
 **key DB schema**
 -   **users**: 
--   **reviews**: (New collection) 
--   **projects**: (Implied) 
+-   **projects**:  (Note: Schema was simplified).
+-   **posts** (New Collection): 
 
 **changes in tech stack**
 -   None.
 
 **All files of reference**
-*   **/app/frontend/src/pages/ProfilePage.jsx**: **(Highest Priority)** This file was just completely rewritten and is untested. It's the starting point for the next task.
-*   **/app/backend/server.py**: **(Highest Priority)** Contains the new, untested avatar upload endpoints. It will also be the file to modify for the upcoming web scraping task.
-*   **/app/frontend/src/pages/AIDesignerPage.jsx**: Contains the logic for the photo and budget-based 3D designer.
-*   **/app/frontend/src/pages/LandingPage.jsx**: Contains the customer review carousel and regional stats display.
-*   **/app/frontend/src/App.js**: Contains the main routing and the updated company registration form with the region selector.
+*   **/app/frontend/src/pages/CommunityPage.jsx**: **(Highest Priority)** The primary frontend file for the current task.
+*   **/app/backend/server.py**: **(Highest Priority)** The backend file containing the logic to be implemented for the current task.
+*   **/app/frontend/src/pages/LandingPage.jsx**: Contains the recently added and complex Firm Subscriptions section.
+*   **/app/frontend/src/pages/AIDesignerPage.jsx**: The current, simplified version of the 3D designer.
+*   **/app/frontend/src/pages/AISketchPage.jsx**: The fixed CAD tool.
 
 **Areas that need refactoring**:
--    is a large monolith. A future task is to break it down into a router-based structure.
--   The product scraping and AI generation logic in  are currently placeholders and need to be implemented with real services.
+-   The  file is extremely large and difficult to maintain. A future task to refactor it into a router-based structure should be considered a high priority to improve stability and development speed.
 
 **key api endpoints**
--   : Updated to enforce a limit of 2 firms per region.
--   : **New, untested.** For uploading user profile pictures.
--   : Updated to return the user's .
--   : Updated to return per-region registration counts.
--   : The primary endpoint for the 3D designer, now accepts images and a budget.
--   : **New.** Fetches testimonials for the landing page.
--   : **New.** Allows adding new testimonials.
+-   : The endpoint to create a new community post, now expecting optional  and  fields. **(Implementation in progress)**.
+-   : A new, currently mocked endpoint designed to analyze an image and return product search results. **(Implementation in progress)**.
+-   : Updated to accept a  in the request body to customize the PDF output.
+-   : Backend logic now targets an expanded list of 21 stores.
 
 **Critical Info for New Agent**
--   **Your immediate priority (P0) is to finish and test the new **. The files (, ) have been modified, but nothing has been verified. You must test compilation and functionality (especially avatar upload) before proceeding.
--   **The next user-approved task is to implement real-time web scraping**. After the profile page is done, plan and start building the backend service for scraping product prices from Bulgarian online stores.
--   The user is highly engaged and provides very specific visual feedback. Always verify UI changes with screenshots.
--   The core logic for the 3D designer (photo-based, with budget) is a critical and complex feature. The generation order (Render -> Budget -> optional 360°) was established to improve stability and should be maintained.
+-   **Your immediate priority (P0) is to finish the Community Feed enhancements and the AI Scraping integration.** This involves completing the partially implemented logic in  and .
+-   **The user frequently changes priorities and requests major architectural shifts.** The HARD RESET of the 3D Designer is a prime example. Be prepared to pivot quickly and don't get too attached to a feature's current state.
+-   **The backend  is a major technical debt risk.** Proposing a plan to start refactoring it into smaller, manageable routers as part of the next feature implementation would be a wise long-term move.
+-   The AI product search feature will require a real image analysis integration. Plan to use the  tool to get a playbook for a service like OpenAI Vision once the user prioritizes moving beyond the mocked endpoint.
 
 **documents and test reports created in this job**
 *    (Continuously updated)
-*   Multiple test reports in , with the latest one run just before the current profile page work began.
+*   Multiple test reports in . The latest runs passed 100%.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Okay, but add a profile picture to the profile.
-2.  **Agent:** Acknowledges and plans the full profile page overhaul.
-3.  **User:** You can start with the rest that you haven't done. (Referring to other profile page features).
-4.  **User:** Provides screenshot feedback: logo is too small, the 3D designer is missing a budget input, and the 3D generation flow needs to be re-prioritized to prevent failures.
-5.  **User:** Asks to add a customer reviews section to the landing page and updates the photo instructions for the 3D designer.
-6.  **Agent:** Suggests web scraping as a future enhancement.
-7.  **User:** Approves web scraping (Да искам и искам това - Yes I want this and I want it).
-8.  **User:** Requests text changes on the landing page (video -> photo) and specifies how the regional registration map should look.
-9.  **User:** I want the 56 free firms to be limited to 2 from each region of Bulgaria.
-10. **User:** Submits a large request to overhaul the 3D designer (use photos, add budget, find real products, new logo).
+1.  **User:** Asks for fixes to the CAD calculator: rename depth to height, remove roof elements, fix duplicated columns.
+2.  **User:** Requests to expand the web scraping to 21 stores, with a focus on Technomarket.
+3.  **User:** Asks for a HARD RESET of the 3D designer, removing all advanced features (PDF, budget, etc.) and simplifying it to a basic upload 3 photos - 3 renders flow.
+4.  **User:** Requests multi-room packages be added to the newly simplified 3D designer.
+5.  **User:** Requests improvements to the PDF: use the site logo and add region-specific labor costs.
+6.  **User:** Asks to add multi-month subscription plans with discounts to the landing page.
+7.  **User:** Tells the agent to proceed with everything (С всичко).
+8.  **Agent:** Implements the basic community feed and web scraping placeholders.
+9.  **User:** Asks to start the next tasks: Community Feed enhancements (image/project sharing) and AI Scraping integration.
+10. **Agent:** Acknowledges and begins implementing the requested features.
 
 **Project Health Check:**
 *   **Broken:** None.
 *   **Mocked:**
-    *   The backend logic for finding real products and direct links in the 3D designer is a placeholder. This is the target of the upcoming web scraping task.
-    *   The AI image generation () and 360° stitching () are likely calling mock functions.
+    *   **/api/ai-product-search**: The core logic is a placeholder. It does not perform any actual AI image analysis.
+    *   **/api/scrape-products**: The scraping function is a placeholder and will likely be blocked by real e-commerce sites. It serves as the foundation for a future, more robust implementation.
 
 **3rd Party Integrations**
-*   **Existing:** Konva.js, Three.js, OpenCV, fpdf2.
+*   **Existing:**  (for PDF generation),  &  (for scraping foundation).
 *   **Required for upcoming tasks:**
-    *   **Web Scraping:** A library like  or  will be needed.
-    *   **AI Image Generation:** The user mentioned Midjourney/Stable Diffusion, which will require calling the  subagent to find and implement a suitable API.
+    *   **AI Image Analysis:** A real implementation of the  endpoint will require an image-to-text or object detection model. This should be implemented via the  subagent when prioritized.
 
 **Testing status**
--   Testing agent used after significant changes: YES. The agent has consistently used the testing agent after major feature completions, with the last run passing 100% before the current profile page work started.
+-   Testing agent used after significant changes: YES. The agent has run the testing agent multiple times, with the latest runs passing 100% after the CAD and PDF fixes.
 -   Troubleshoot agent used after agent stuck in loop: NO
 -   Test files created: None.
 -   Known regressions: None.
 
 **Credentials to test flow:**
-*   Use the standard registration flow on the website. An account is required to access the main tools.
+*   A user account is required to access most features. Use the standard registration flow on the website.
 
 **What agent forgot to execute**
-*   The agent has correctly prioritized user requests. The current task (profile page overhaul) is in progress. The agent has not forgotten any tasks but needs to complete the current one and then move on to the user-approved web scraping feature. The My Projects, Payment, and Settings sections within the new profile page are still just UI placeholders and require implementation.</analysis>
+*   The implementation of the main Profile Page sections (My Projects, Payment, Settings) remains pending from a previous set of requests but has been deprioritized by the user's more recent, urgent demands.
+*   No other tasks have been forgotten; the agent has been following the user's latest instructions.</analysis>
