@@ -165,19 +165,16 @@ const AuthGate = ({ children }) => {
   const navigate = useNavigate();
   if (user) return children;
   return (
-    <div className="relative min-h-screen">
-      <div className="pointer-events-none opacity-40 blur-[2px] select-none">{children}</div>
-      <div className="absolute inset-0 flex items-center justify-center z-50 backdrop-blur-sm" style={{ background: 'var(--theme-overlay)' }}>
-        <div className="rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="auth-gate-modal">
-          <div className="w-16 h-16 bg-[#F97316]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock className="h-8 w-8 text-[#F97316]" />
-          </div>
-          <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>Само за регистрирани</h3>
-          <p className="text-sm mb-6" style={{ color: 'var(--theme-text-muted)' }}>Регистрирайте се безплатно, за да използвате тази функция.</p>
-          <div className="flex gap-3">
-            <button onClick={() => navigate('/login')} className="flex-1 py-3 rounded-xl font-medium text-sm transition-colors" style={{ border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }} data-testid="auth-gate-login">Вход</button>
-            <button onClick={() => navigate('/register')} className="flex-1 py-3 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-sm" data-testid="auth-gate-register">Регистрация</button>
-          </div>
+    <div className="relative min-h-screen flex items-center justify-center" style={{ background: 'var(--theme-bg)' }}>
+      <div className="rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="auth-gate-modal">
+        <div className="w-16 h-16 bg-[#F97316]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Lock className="h-8 w-8 text-[#F97316]" />
+        </div>
+        <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>Само за регистрирани</h3>
+        <p className="text-sm mb-6" style={{ color: 'var(--theme-text-muted)' }}>Регистрирайте се безплатно, за да използвате тази функция.</p>
+        <div className="flex gap-3">
+          <button onClick={() => navigate('/login')} className="flex-1 py-3 rounded-xl font-medium text-sm transition-colors" style={{ border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }} data-testid="auth-gate-login">Вход</button>
+          <button onClick={() => navigate('/register')} className="flex-1 py-3 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-sm" data-testid="auth-gate-register">Регистрация</button>
         </div>
       </div>
     </div>
@@ -3714,43 +3711,43 @@ function App() {
             <main className="flex-1">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/projects" element={<ProjectsPage />} />
-                <Route path="/projects/:id" element={<ProjectDetailPage />} />
-                <Route path="/companies" element={<CompaniesPage />} />
-                <Route path="/companies/:id" element={<CompanyDetailPage />} />
-                <Route path="/find-master" element={<FindMasterPage />} />
-                <Route path="/calculator" element={<PriceCalculator />} />
-                <Route path="/services" element={<ServicesPage />} />
+                <Route path="/projects" element={<AuthGate><ProjectsPage /></AuthGate>} />
+                <Route path="/projects/:id" element={<AuthGate><ProjectDetailPage /></AuthGate>} />
+                <Route path="/companies" element={<AuthGate><CompaniesPage /></AuthGate>} />
+                <Route path="/companies/:id" element={<AuthGate><CompanyDetailPage /></AuthGate>} />
+                <Route path="/find-master" element={<AuthGate><FindMasterPage /></AuthGate>} />
+                <Route path="/calculator" element={<AuthGate><PriceCalculator /></AuthGate>} />
+                <Route path="/services" element={<AuthGate><ServicesPage /></AuthGate>} />
                 <Route path="/messages" element={<AuthGate><ChatPage /></AuthGate>} />
-                <Route path="/about" element={<AboutPage />} />
+                <Route path="/about" element={<AuthGate><AboutPage /></AuthGate>} />
                 <Route path="/profile" element={<AuthGate><ProfilePage /></AuthGate>} />
                 <Route path="/terms" element={<TermsPage />} />
-                <Route path="/professions" element={<ProfessionsPage />} />
-                <Route path="/blog" element={<BlogPage />} />
-                <Route path="/blog/:slug" element={<BlogArticle />} />
-                <Route path="/prices" element={<PricesByRegionPage />} />
-                <Route path="/region/:slug" element={<RegionalPage />} />
-                <Route path="/analytics" element={<AnalyticsDashboard />} />
-                <Route path="/community" element={<CommunityPage />} />
-                <Route path="/product-search" element={<ProductSearchPage />} />
-                <Route path="/leaderboard" element={<LeaderboardPage />} />
+                <Route path="/professions" element={<AuthGate><ProfessionsPage /></AuthGate>} />
+                <Route path="/blog" element={<AuthGate><BlogPage /></AuthGate>} />
+                <Route path="/blog/:slug" element={<AuthGate><BlogArticle /></AuthGate>} />
+                <Route path="/prices" element={<AuthGate><PricesByRegionPage /></AuthGate>} />
+                <Route path="/region/:slug" element={<AuthGate><RegionalPage /></AuthGate>} />
+                <Route path="/analytics" element={<AuthGate><AnalyticsDashboard /></AuthGate>} />
+                <Route path="/community" element={<AuthGate><CommunityPage /></AuthGate>} />
+                <Route path="/product-search" element={<AuthGate><ProductSearchPage /></AuthGate>} />
+                <Route path="/leaderboard" element={<AuthGate><LeaderboardPage /></AuthGate>} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/dashboard" element={<AuthGate><CompanyDashboard /></AuthGate>} />
                 <Route path="/dashboard/client" element={<AuthGate><ClientDashboard /></AuthGate>} />
-                <Route path="/payment/success" element={<PaymentSuccessPage />} />
-                <Route path="/payment/cancel" element={<PaymentCancelPage />} />
-                <Route path="/ads" element={<AdsPage />} />
+                <Route path="/payment/success" element={<AuthGate><PaymentSuccessPage /></AuthGate>} />
+                <Route path="/payment/cancel" element={<AuthGate><PaymentCancelPage /></AuthGate>} />
+                <Route path="/ads" element={<AuthGate><AdsPage /></AuthGate>} />
                 <Route path="/ai-designer" element={<AuthGate><AIDesignerPage /></AuthGate>} />
                 <Route path="/ai-sketch" element={<AuthGate><AISketchPage /></AuthGate>} />
                 <Route path="/ai-chart" element={<AuthGate><AIChartPage /></AuthGate>} />
                 <Route path="/room-scan" element={<AuthGate><AIDesignerPage /></AuthGate>} />
                 <Route path="/3d-scanner" element={<AuthGate><Scanner3DPage /></AuthGate>} />
                 <Route path="/3d-scanner/:projectId" element={<AuthGate><Scanner3DPage /></AuthGate>} />
-                <Route path="/ai-gallery" element={<PublishedGalleryPage />} />
-                <Route path="/ready-projects" element={<ReadyProjectsPage />} />
-                <Route path="/subscriptions" element={<SubscriptionsPage />} />
-                <Route path="/feedback" element={<FeedbackPage />} />
+                <Route path="/ai-gallery" element={<AuthGate><PublishedGalleryPage /></AuthGate>} />
+                <Route path="/ready-projects" element={<AuthGate><ReadyProjectsPage /></AuthGate>} />
+                <Route path="/subscriptions" element={<AuthGate><SubscriptionsPage /></AuthGate>} />
+                <Route path="/feedback" element={<AuthGate><FeedbackPage /></AuthGate>} />
               </Routes>
             </main>
             <Footer />
