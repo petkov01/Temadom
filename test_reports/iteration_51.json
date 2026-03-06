@@ -1,0 +1,139 @@
+{
+  "summary": "Iteration 51: AI Designer HARD RESET verified - Basic version with multi-room packages working correctly",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "=== BACKEND API TESTS (4/4 passed) ===",
+    "✅ POST /api/ai-designer/photo-generate - Endpoint exists and accepts photos, returns renders",
+    "✅ POST /api/auth/login - Login with comm2@test.bg works correctly",
+    "✅ GET /api/ - API root accessible",
+    "✅ GET /api/stats/live - Returns regions data",
+    "",
+    "=== FRONTEND UI TESTS (ALL PASSED) ===",
+    "",
+    "--- Package Selection ---",
+    "✅ data-testid='ai-designer-page' visible",
+    "✅ Header text: 'Качи снимки → получи реалистични 3D рендери' (no budget/360 text)",
+    "✅ data-testid='package-selection' visible",
+    "✅ Package 1 (pkg-1): 69EUR - 1 помещение - до 1 стая",
+    "✅ Package 2 (pkg-2): 129EUR - 2 помещения - до 2 стаи",
+    "✅ Package 3 (pkg-3): 199EUR - Апартамент - до 5 стаи",
+    "",
+    "--- Room Card Elements ---",
+    "✅ Room card (room-card-0) visible with room number badge",
+    "✅ Room type dropdown (room-type-0) - Хол selected by default",
+    "✅ Style dropdown (style-0) - Модерен selected by default",
+    "✅ Photo grid (photo-grid-0) with 3 slots",
+    "✅ Photo slot 0 (Общ план *) - required",
+    "✅ Photo slot 1 (Ъгъл 1)",
+    "✅ Photo slot 2 (Ъгъл 2)",
+    "✅ Notes textarea (notes-0) visible",
+    "",
+    "--- Package 1 (1 room max) ---",
+    "✅ NO 'Добави стая' button visible (correct behavior)",
+    "✅ Generate button: 'ГЕНЕРИРАЙ 3D — 69 EUR'",
+    "",
+    "--- Package 2 (2 rooms max) ---",
+    "✅ 'Добави стая' button appears with text 'Добави стая (1/2)'",
+    "✅ Clicking adds second room (room-card-1)",
+    "✅ Second room has room-type-1, style-1, photo-grid-1",
+    "✅ Remove room button (remove-room-1) with trash icon visible",
+    "✅ Generate button updates to 'ГЕНЕРИРАЙ 3D — 129 EUR'",
+    "✅ At max rooms (2/2), add button disappears",
+    "",
+    "--- Package 3 (5 rooms max) ---",
+    "✅ Can add up to 5 rooms total",
+    "✅ Each room has independent room type, style, 3 photo slots, notes",
+    "✅ Generate button: 'ГЕНЕРИРАЙ 3D — 199 EUR'",
+    "",
+    "--- Package Downgrade ---",
+    "✅ Switching from pkg 3 to pkg 1 trims excess rooms",
+    "✅ Only 1 room remains after downgrade",
+    "✅ Add room button hidden for pkg 1",
+    "",
+    "--- Removed Features (VERIFIED NOT PRESENT) ---",
+    "✅ NO pdf-btn on page",
+    "✅ NO fullscreen-btn on page",
+    "✅ NO budget-input on page",
+    "✅ NO budget-tiers on page"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration51.py",
+    "/app/test_reports/pytest/pytest_results_iter51.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_iteration51.py"
+  ],
+  "success_rate": {
+    "backend": "100% (4/4 tests passed)",
+    "frontend": "100% (all UI features verified)"
+  },
+  "seed_data_creation": "None - used existing test user comm2@test.bg",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 51 verified the HARD RESET of AI Designer (/room-scan). Key features: 1) Multi-room packages: 69EUR (1 room), 129EUR (2 rooms), 199EUR (5 rooms). 2) Each room has independent room type dropdown, style dropdown, 3 photo slots (Общ план, Ъгъл 1, Ъгъл 2), notes textarea. 3) 'Добави стая' button only appears for packages 2 and 3. 4) Package downgrade trims excess rooms automatically. 5) REMOVED features confirmed: NO PDF, NO fullscreen, NO budget input/tiers. 6) Backend /api/ai-designer/photo-generate endpoint works. Key data-testids: ai-designer-page, package-selection, pkg-1/2/3, room-card-0/1/2/3/4, room-type-0/1, style-0/1, photo-grid-0/1, photo-drop-0-0/0-1/0-2, add-room-btn, remove-room-0/1, generate-btn, notes-0/1. Auth required via AuthGate modal.",
+  "features_tested": {
+    "package_1_69eur": {
+      "status": "PASS",
+      "details": "1 room max, no add-room button, generate shows 69 EUR"
+    },
+    "package_2_129eur": {
+      "status": "PASS",
+      "details": "2 rooms max, add-room button shows (1/2), can add second room"
+    },
+    "package_3_199eur": {
+      "status": "PASS",
+      "details": "5 rooms max, can add up to 5 rooms"
+    },
+    "room_card_elements": {
+      "status": "PASS",
+      "details": "Room type dropdown, style dropdown, 3 photo slots, notes textarea"
+    },
+    "multi_room_add_remove": {
+      "status": "PASS",
+      "details": "Add room button works, remove button (trash icon) works"
+    },
+    "package_downgrade_trim": {
+      "status": "PASS",
+      "details": "Downgrading package trims excess rooms correctly"
+    },
+    "no_pdf_button": {
+      "status": "PASS",
+      "details": "pdf-btn NOT present on page"
+    },
+    "no_fullscreen_button": {
+      "status": "PASS",
+      "details": "fullscreen-btn NOT present on page"
+    },
+    "no_budget_input": {
+      "status": "PASS",
+      "details": "budget-input NOT present on page"
+    },
+    "no_budget_tiers": {
+      "status": "PASS",
+      "details": "budget-tiers NOT present on page"
+    },
+    "photo_generate_api": {
+      "status": "PASS",
+      "endpoint": "POST /api/ai-designer/photo-generate",
+      "details": "Accepts photos and returns renders with id"
+    },
+    "header_text": {
+      "status": "PASS",
+      "details": "Shows 'Качи снимки → получи реалистични 3D рендери' - no budget/360 text"
+    },
+    "generate_button_text": {
+      "status": "PASS",
+      "details": "Shows 'ГЕНЕРИРАЙ 3D — {price} EUR' format"
+    }
+  }
+}
