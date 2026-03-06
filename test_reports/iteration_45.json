@@ -1,0 +1,99 @@
+{
+  "summary": "Iteration 45: Testing TemaDom text changes ('3D Video Designer' → '3D Photo Designer') and regional firm limit UI enhancements. Found and fixed one issue: mobile nav still showed '3D Video Designer'. All other features working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Mobile Navigation Menu",
+        "issue": "Mobile nav showed '3D Video Designer' instead of '3D Photo Designer'",
+        "selector": "[data-testid='mobile-nav-room-scan']",
+        "priority": "LOW",
+        "status": "FIXED"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "=== BACKEND API TESTS (7/7 passed) ===",
+    "✅ GET /api/stats/live - Returns 'regions' field with 28 entries",
+    "✅ GET /api/stats/live - Returns free_slots with total=56",
+    "✅ GET /api/stats/live - All 28 Bulgarian regions present",
+    "✅ POST /api/auth/register - Company registration requires bulstat",
+    "✅ POST /api/auth/register - Validates bulstat format (9 digits)",
+    "✅ GET /api/ - API root accessible",
+    "✅ GET /api/categories - Returns categories",
+    "",
+    "=== FRONTEND UI TESTS ===",
+    "✅ Landing page hero button shows '3D Photo Designer'",
+    "✅ Landing page hero subtitle mentions '3 снимки' (not 'видео')",
+    "✅ Nav dropdown shows '3D Photo Designer'",
+    "✅ Mobile nav shows '3D Photo Designer' (after fix)",
+    "✅ Regional breakdown visible with 28 regions showing 0/2 format",
+    "✅ Stats row shows '23/56 (2/област)' format",
+    "✅ Hero counter shows '(2 на област × 28 області)'",
+    "✅ Registration page shows region dropdown for company type (not text input)",
+    "✅ Region dropdown shows availability indicators (X/2) with color coding",
+    "✅ Pricing features mention 'снимки' not 'видео'"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration45_updates.py",
+    "/app/test_reports/pytest/pytest_results_iter45.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Minor fix applied: Changed line 447 in App.js from '3D Video Designer' to '3D Photo Designer' in mobile navigation menu"
+  ],
+  "updated_files": [
+    "/app/frontend/src/App.js (line 447: mobile nav text fix)"
+  ],
+  "success_rate": {
+    "backend": "100% (7/7 tests passed)",
+    "frontend": "100% (all UI features verified after fix)"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 45 verified text changes from '3D Video Designer' to '3D Photo Designer' across the app. Fixed one mobile nav issue. Stats API /api/stats/live correctly returns 28 Bulgarian regions with per-region availability data. Registration page for companies shows region dropdown with color-coded availability (green/yellow/red). Key data-testids: hero-room-btn, nav-room-scan, mobile-nav-room-scan, region-breakdown, register-region.",
+  "features_tested": {
+    "text_3d_photo_designer": {
+      "status": "PASS (after fix)",
+      "details": "Hero button, nav dropdown, and mobile nav all show '3D Photo Designer'"
+    },
+    "hero_subtitle_snimki": {
+      "status": "PASS",
+      "details": "Hero subtitle mentions 'Качи 3 снимки' not 'видео'"
+    },
+    "pricing_features_snimki": {
+      "status": "PASS",
+      "details": "Pricing cards mention '3 снимки → 360° дизайн' and similar"
+    },
+    "regional_breakdown_28_regions": {
+      "status": "PASS",
+      "details": "Landing page shows regional breakdown with all 28 Bulgarian regions"
+    },
+    "stats_api_regions": {
+      "status": "PASS",
+      "details": "GET /api/stats/live returns 'regions' dict with 28 entries"
+    },
+    "register_region_dropdown": {
+      "status": "PASS",
+      "details": "Company registration shows region dropdown (not text input)"
+    },
+    "region_availability_indicators": {
+      "status": "PASS",
+      "details": "Region dropdown shows X/2 format with green/yellow/red color coding"
+    },
+    "stats_row_format": {
+      "status": "PASS",
+      "details": "Stats row shows '23/56 (2/област)' format"
+    },
+    "hero_counter_text": {
+      "status": "PASS",
+      "details": "Hero counter shows '(2 на област × 28 области)'"
+    }
+  }
+}

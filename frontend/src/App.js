@@ -277,7 +277,7 @@ const Navbar = () => {
                     <FileText className="h-4 w-4" /> AI Sketch (скици)
                   </Link>
                   <Link to="/room-scan" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#8C56FF] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-room-scan">
-                    <Camera className="h-4 w-4" /> 3D Video Designer
+                    <Camera className="h-4 w-4" /> 3D Photo Designer
                   </Link>
                   <Link to="/ready-projects" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#28A745] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-ready-projects">
                     <FolderSearch className="h-4 w-4" /> Готови проекти
@@ -444,7 +444,7 @@ const Navbar = () => {
               <FileText className="h-4 w-4" /> AI Sketch (скици)
             </Link>
             <Link to="/room-scan" className="block py-2 flex items-center gap-2 hover:text-[#8C56FF]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-room-scan">
-              <Camera className="h-4 w-4" /> 3D Video Designer
+              <Camera className="h-4 w-4" /> 3D Photo Designer
             </Link>
             <Link to="/ready-projects" className="block py-2 flex items-center gap-2 hover:text-[#28A745]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ready-projects">
               <FolderSearch className="h-4 w-4" /> Готови проекти
@@ -662,7 +662,7 @@ const LandingPage = () => {
   const theme = useTheme();
   const dark = theme?.dark ?? true;
   const [stats, setStats] = useState({ total_projects: 0, total_companies: 0, free_slots: { used: 0, total: 56 } });
-  const [liveStats, setLiveStats] = useState({ clients: 0, companies: 0, free_slots: { used: 0, total: 56 } });
+  const [liveStats, setLiveStats] = useState({ clients: 0, companies: 0, free_slots: { used: 0, total: 56 }, regions: {} });
 
   useEffect(() => {
     axios.get(`${API}/stats`).then(r => setStats(r.data)).catch(() => {});
@@ -699,6 +699,7 @@ const LandingPage = () => {
               <div className="h-8 w-px mx-1" style={{ background: border }} />
               <div className="text-left">
                 <p style={{ color: accent }} className="text-sm font-bold leading-tight">ПЪРВИ 56 ФИРМИ</p>
+                <p style={{ color: muted }} className="text-[10px]">(2 на област × 28 области)</p>
                 <p style={{ color: dark ? '#FCD34D' : '#D97706' }} className="text-xs font-bold">= 1 ГОДИНА ПРЕМИУМ 0 EUR</p>
               </div>
             </div>
@@ -713,7 +714,7 @@ const LandingPage = () => {
           </h1>
 
           <p className="text-base md:text-lg text-center mb-10 max-w-2xl" style={{ color: muted }}>
-            Заснеми 15-секундно видео → получи реалистичен 3D ремонт с 360° панорама.
+            Качи 3 снимки → получи реалистичен 3D ремонт с 360° панорама и бюджет с линкове.
             Виж точно как ще изглежда ПРЕДИ да платиш.
           </p>
 
@@ -722,7 +723,7 @@ const LandingPage = () => {
               className="group relative px-8 py-4 rounded-xl text-white text-lg font-bold overflow-hidden transition-all hover:scale-105 active:scale-95"
               style={{ background: accent, boxShadow: `0 0 30px ${accent}40` }}>
               <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Camera className="mr-2 h-6 w-6 inline" /> 3D Video Designer
+              <Camera className="mr-2 h-6 w-6 inline" /> 3D Photo Designer
             </button>
             <button onClick={() => navigate('/ai-sketch')} data-testid="hero-sketch-btn"
               className="px-8 py-4 rounded-xl text-lg font-bold border-2 transition-all hover:scale-105 active:scale-95"
@@ -737,7 +738,7 @@ const LandingPage = () => {
               { v: `${liveStats.companies || 21}`, l: 'Фирми', c: accent },
               { v: `${liveStats.clients || 9}`, l: 'Клиенти', c: '#10B981' },
               { v: '1:1', l: 'Точен мащаб', c: dark ? '#FCD34D' : '#D97706' },
-              { v: `${slotsLeft} FREE`, l: `${slotsUsed}/${slotsTotal} заети`, c: '#10B981' },
+              { v: `${slotsLeft} FREE`, l: `${slotsUsed}/${slotsTotal} (2/област)`, c: '#10B981' },
             ].map((s, i) => (
               <div key={i} className="rounded-xl p-4 text-center backdrop-blur-lg border" 
                 style={{ background: dark ? 'rgba(30,41,59,0.6)' : 'rgba(255,255,255,0.7)', borderColor: border }}>
@@ -746,6 +747,33 @@ const LandingPage = () => {
               </div>
             ))}
           </div>
+
+          {/* Regional breakdown */}
+          {liveStats.regions && (
+            <div className="max-w-3xl w-full mt-6 rounded-xl p-4 backdrop-blur-lg border" 
+              style={{ background: dark ? 'rgba(30,41,59,0.6)' : 'rgba(255,255,255,0.7)', borderColor: border }} data-testid="region-breakdown">
+              <p className="text-xs font-bold mb-3 text-center" style={{ color: muted }}>{slotsUsed}/56 ФИРМИ (2 на област)</p>
+              <div className="flex flex-wrap gap-1.5 justify-center">
+                {Object.entries(liveStats.regions || {}).map(([region, data]) => {
+                  const full = data.used >= data.total;
+                  const partial = data.used > 0 && !full;
+                  return (
+                    <span key={region} className={`inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full font-medium ${
+                      full ? 'bg-red-500/15 text-red-400' : partial ? 'bg-yellow-500/15 text-yellow-400' : 'bg-green-500/15 text-green-400'
+                    }`} data-testid={`region-${region}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${full ? 'bg-red-500' : partial ? 'bg-yellow-500' : 'bg-green-500'}`} />
+                      {region} {data.used}/{data.total}
+                    </span>
+                  );
+                })}
+              </div>
+              <div className="flex justify-center gap-4 mt-3 text-[9px]" style={{ color: muted }}>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Свободна</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> 1/2</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Пълна</span>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -789,9 +817,9 @@ const LandingPage = () => {
           <p className="text-center mb-10 text-sm" style={{ color: muted }}>Реалистичен 1:1 проект на вашето помещение</p>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['Видео до 60 секунди', '12 keyframes', '10 стила', 'Пред/След рендер', 'PDF проект'], color: accent, popular: false },
-              { name: '2 ПОМЕЩЕНИЯ', price: '129', rooms: '2', features: ['2 помещения', 'Видео до 60 секунди', '10 стила за всяко', 'Пред/След рендер', 'Калкулация'], color: '#10B981', popular: true },
-              { name: 'АПАРТАМЕНТ', price: '199', rooms: '3-5', features: ['До 5 помещения', 'Видео до 60 секунди', 'Пълна калкулация', 'Всички стилове', 'Приоритетна обработка'], color: '#8B5CF6', popular: false },
+              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['3 снимки → 360° дизайн', '3 ъгъла рендер', '10 стила', 'Пред/След сравнение', 'Бюджет + линкове'], color: accent, popular: false },
+              { name: '2 ПОМЕЩЕНИЯ', price: '129', rooms: '2', features: ['2 помещения', '3 снимки на помещение', '10 стила за всяко', 'Пред/След рендер', 'Бюджет + директни линкове'], color: '#10B981', popular: true },
+              { name: 'АПАРТАМЕНТ', price: '199', rooms: '3-5', features: ['До 5 помещения', '3 снимки на помещение', 'Пълен бюджет', 'Всички стилове', 'Приоритетна обработка'], color: '#8B5CF6', popular: false },
             ].map((plan, i) => (
               <div key={i} className={`rounded-2xl p-6 text-center border backdrop-blur-lg relative transition-transform hover:scale-105 ${plan.popular ? 'ring-2' : ''}`}
                 style={{ background: dark ? 'rgba(30,41,59,0.6)' : 'rgba(255,255,255,0.8)', borderColor: plan.popular ? plan.color : border, ...(plan.popular ? { boxShadow: `0 0 40px ${plan.color}20` } : {}) }}
@@ -2051,6 +2079,15 @@ const LoginPage = () => {
   );
 };
 
+const BULGARIA_REGIONS_LIST = [
+  "Благоевград", "Бургас", "Варна", "Велико Търново", "Видин",
+  "Враца", "Габрово", "Добрич", "Кърджали", "Кюстендил",
+  "Ловеч", "Монтана", "Пазарджик", "Перник", "Плевен",
+  "Пловдив", "Разград", "Русе", "Силистра", "Сливен",
+  "Смолян", "София", "София-град", "Стара Загора",
+  "Търговище", "Хасково", "Шумен", "Ямбол"
+];
+
 const RegisterPage = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -2059,7 +2096,7 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '', // hidden but kept for backend compatibility
+    phone: '',
     city: '',
     telegram_username: '',
     bulstat: '',
@@ -2067,6 +2104,16 @@ const RegisterPage = () => {
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
+  const [regionStats, setRegionStats] = useState({});
+
+  // Fetch region stats for company registration
+  useEffect(() => {
+    if (userType === 'company') {
+      axios.get(`${API}/stats/live`).then(res => {
+        setRegionStats(res.data.regions || {});
+      }).catch(() => {});
+    }
+  }, [userType]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -2212,12 +2259,42 @@ const RegisterPage = () => {
             </div>
             <div>
               <Label>{t('reg_city')}</Label>
-              <Input 
-                placeholder={t('reg_city_placeholder')}
-                value={formData.city}
-                onChange={(e) => setFormData(d => ({ ...d, city: e.target.value }))}
-                data-testid="register-city"
-              />
+              {userType === 'company' ? (
+                <div>
+                  <Select value={formData.city} onValueChange={(val) => setFormData(d => ({ ...d, city: val }))}>
+                    <SelectTrigger data-testid="register-region">
+                      <SelectValue placeholder="Изберете област..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BULGARIA_REGIONS_LIST.map(region => {
+                        const stats = regionStats[region] || { used: 0, total: 2 };
+                        const full = stats.used >= stats.total;
+                        return (
+                          <SelectItem key={region} value={region} disabled={full}>
+                            <span className="flex items-center gap-2">
+                              <span className={`w-2 h-2 rounded-full ${full ? 'bg-red-500' : stats.used > 0 ? 'bg-yellow-500' : 'bg-green-500'}`} />
+                              {region} ({stats.used}/{stats.total})
+                              {full && <span className="text-red-400 text-[10px] ml-1">ПЪЛНО</span>}
+                            </span>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-center gap-3 mt-2 text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Свободна (0/2)</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> Частично (1/2)</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> Пълна (2/2)</span>
+                  </div>
+                </div>
+              ) : (
+                <Input 
+                  placeholder={t('reg_city_placeholder')}
+                  value={formData.city}
+                  onChange={(e) => setFormData(d => ({ ...d, city: e.target.value }))}
+                  data-testid="register-city"
+                />
+              )}
             </div>
 
             {isProUser && (
@@ -3251,11 +3328,11 @@ const SubscriptionsPage = () => {
         </div>
 
         {/* AI Video Designer module */}
-        <h2 className="text-2xl font-bold text-white mb-2">3D Video Designer</h2>
-        <p className="text-slate-400 text-sm mb-6">Качете видео на помещение → AI генерира 3D ремонт с 360° панорама.</p>
+        <h2 className="text-2xl font-bold text-white mb-2">3D Photo Designer</h2>
+        <p className="text-slate-400 text-sm mb-6">Качете 3 снимки на помещение → AI генерира 3D ремонт с 360° панорама + бюджет с директни линкове.</p>
         <div className="grid md:grid-cols-3 gap-4 max-w-3xl">
           {[
-            { name: '1 помещение', price: '69 EUR', features: ['1 видео → 4 ъгъла', 'PDF проект', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
+            { name: '1 помещение', price: '69 EUR', features: ['3 снимки → 360° дизайн', 'Бюджет + линкове', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
             { name: '2 помещения', price: '129 EUR', features: ['2 видеа → 8 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
             { name: 'Апартамент', price: '199 EUR', features: ['До 5 видеа → 20 ъгъла', 'PDF за всяко помещение', 'Пълна сметка + 3D', 'Приоритетна обработка'] },
           ].map((plan, i) => (
