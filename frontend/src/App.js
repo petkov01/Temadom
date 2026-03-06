@@ -43,7 +43,7 @@ import { ThemeProvider, useTheme } from '@/components/ThemeContext';
 const TemaDomLogo = ({ className = "h-12" }) => (
   <div className="flex items-center" data-testid="temadom-logo">
     <img 
-      src="/logo-temadom.png" 
+      src="/temadom-logo.png" 
       alt="TemaDom" 
       className={className}
       style={{ objectFit: 'contain' }}
@@ -238,7 +238,7 @@ const Navbar = () => {
           {/* Left: Logo - prominent and left-corner */}
           <div className="flex items-center -ml-2 lg:-ml-4">
             <Link to="/" className="flex items-center pt-1" data-testid="logo-link">
-              <TemaDomLogo className="h-[58px] md:h-[72px] w-auto" />
+              <TemaDomLogo className="h-[68px] md:h-[82px] w-auto" />
             </Link>
           </div>
 

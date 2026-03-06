@@ -81,6 +81,36 @@ CATEGORIES = [
     {"id": "general", "name": "Общо строителство", "icon": "Building2"}
 ]
 
+# Bulgaria's 28 regions (области) - 2 free firm slots each = 56 total
+BULGARIA_REGIONS = {
+    "Благоевград": "Благоевград", "Бургас": "Бургас", "Варна": "Варна",
+    "Велико Търново": "Велико Търново", "Видин": "Видин", "Враца": "Враца",
+    "Габрово": "Габрово", "Добрич": "Добрич", "Кърджали": "Кърджали",
+    "Кюстендил": "Кюстендил", "Ловеч": "Ловеч", "Монтана": "Монтана",
+    "Пазарджик": "Пазарджик", "Перник": "Перник", "Плевен": "Плевен",
+    "Пловдив": "Пловдив", "Разград": "Разград", "Русе": "Русе",
+    "Силистра": "Силистра", "Сливен": "Сливен", "Смолян": "Смолян",
+    "София": "София", "София-град": "София-град", "Стара Загора": "Стара Загора",
+    "Търговище": "Търговище", "Хасково": "Хасково", "Шумен": "Шумен",
+    "Ямбол": "Ямбол"
+}
+FREE_FIRMS_PER_REGION = 2
+
+def get_region_from_city(city: str) -> str:
+    """Map a city name to its region. If exact match fails, check if city contains region name."""
+    if not city:
+        return "София-град"
+    city_clean = city.strip()
+    # Direct match
+    if city_clean in BULGARIA_REGIONS:
+        return BULGARIA_REGIONS[city_clean]
+    # Check if any region name is contained in city
+    for region in BULGARIA_REGIONS:
+        if region.lower() in city_clean.lower() or city_clean.lower() in region.lower():
+            return BULGARIA_REGIONS[region]
+    # Default to Sofia
+    return "София-град"
+
 # ============== AUTH ROUTES ==============
 
 @api_router.post("/auth/register")
@@ -105,6 +135,18 @@ async def register(user_data: UserCreate):
         existing_bulstat = await db.users.find_one({"bulstat": bulstat})
         if existing_bulstat:
             raise HTTPException(status_code=400, detail="Този Булстат вече е регистриран")
+        
+        # Check regional limit for free firms (2 per region)
+        region = get_region_from_city(user_data.city)
+        region_count = await db.company_profiles.count_documents({
+            "city": {"$regex": f".*{region}.*", "$options": "i"},
+            "user_type": "company"
+        })
+        if region_count >= FREE_FIRMS_PER_REGION:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Лимитът от {FREE_FIRMS_PER_REGION} безплатни фирми за област {region} е достигнат. Моля, свържете се с нас за платен абонамент."
+            )
     
     # Create user
     user_dict = user_data.model_dump()
@@ -128,6 +170,7 @@ async def register(user_data: UserCreate):
             "description": None,
             "categories": [],
             "city": user_data.city,
+            "region": get_region_from_city(user_data.city),
             "address": None,
             "website": None,
             "logo_url": None,
@@ -2440,6 +2483,345 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting.
             os.unlink(tmp_path)
         except:
             pass
+
+
+
+# ============== ENHANCED 3D DESIGNER (v7.0) ==============
+
+# Bulgarian store product catalog for direct links
+BG_STORE_CATALOG = {
+    "praktiker": {"name": "Praktiker", "base_url": "https://praktiker.bg", "categories": ["плочки", "бояджийство", "настилки", "инструменти", "осветление"]},
+    "jysk": {"name": "Jysk", "base_url": "https://jysk.bg", "categories": ["мебели", "осветление", "декорация", "текстил"]},
+    "mrbricolage": {"name": "Mr.Bricolage", "base_url": "https://mrbricolage.bg", "categories": ["боя", "плочки", "ВиК", "електричество", "инструменти"]},
+    "ikea": {"name": "IKEA", "base_url": "https://ikea.bg", "categories": ["мебели", "осветление", "кухня", "баня", "декорация"]},
+    "teknoimpex": {"name": "Teknoimpex", "base_url": "https://teknoimpex.bg", "categories": ["бойлери", "радиатори", "ВиК", "котли", "помпи"]},
+    "bauhaus": {"name": "Bauhaus", "base_url": "https://bauhaus.bg", "categories": ["плочки", "боя", "настилки", "дограма", "изолация"]},
+    "homemax": {"name": "HomeMax", "base_url": "https://homemax.bg", "categories": ["мебели", "осветление", "декорация", "текстил"]}
+}
+
+
+@api_router.post("/ai-designer/photo-generate")
+async def generate_photo_design(
+    photo1: UploadFile = File(...),
+    photo2: UploadFile = File(None),
+    photo3: UploadFile = File(None),
+    width: str = Form("4"),
+    length: str = Form("5"),
+    height: str = Form("2.7"),
+    style: str = Form("modern"),
+    room_type: str = Form("living_room"),
+    notes: str = Form(""),
+    budget_tier: str = Form("medium"),
+    authorization: str = Form(None)
+):
+    """Enhanced 3D Designer v7: 3 photos → AI redesign → 360° view → budget with direct product links."""
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+
+    # Get current user if auth provided
+    user_id = None
+    if authorization:
+        try:
+            token = authorization.replace("Bearer ", "")
+            payload = decode_token(token)
+            user_id = payload.get("user_id")
+        except Exception:
+            pass
+
+    # Process uploaded photos
+    photos_b64 = []
+    for photo in [photo1, photo2, photo3]:
+        if photo and photo.filename:
+            photo_bytes = await photo.read()
+            if len(photo_bytes) > 10 * 1024 * 1024:
+                raise HTTPException(status_code=400, detail="Снимката е твърде голяма (макс. 10MB)")
+            photos_b64.append(base64.b64encode(photo_bytes).decode('utf-8'))
+
+    if not photos_b64:
+        raise HTTPException(status_code=400, detail="Качете поне една снимка")
+
+    style_desc = AI_STYLES.get(style, AI_STYLES.get("modern", "modern style"))
+    ROOM_TYPE_NAMES = {
+        "bathroom": "баня", "kitchen": "кухня", "living_room": "хол",
+        "bedroom": "спалня", "corridor": "коридор", "balcony": "балкон",
+        "stairs": "стълбище", "facade": "фасада", "other": "помещение"
+    }
+    room_type_name = ROOM_TYPE_NAMES.get(room_type, "помещение")
+
+    try:
+        # Step 1: Analyze photos
+        analysis_chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"photo-designer-{uuid.uuid4()}",
+            system_message=f"""Ти си експерт интериорен дизайнер. Получаваш {len(photos_b64)} снимки на {room_type_name}.
+
+СТРИКТЕН РЕЖИМ 1:1 — анализирай ТОЧНО какво виждаш:
+- САМО елементи от снимките (плочки, стени, мебели, осветление, прозорци, врати, уреди)
+- НЕ добавяй нови елементи
+- Опиши ТОЧНАТА геометрия, пропорции и позиции
+- Идентифицирай КОНКРЕТНИ продукти (бойлер, плочки тип, лампи тип)
+
+Отговори в JSON:
+{{"room_type": "{room_type_name}", "current_state": "детайлно описание", "elements": ["списък на всички видими елементи"], "products_detected": [{{"name": "...", "category": "...", "estimated_size": "..."}}], "lighting": "тип", "colors": ["цветове"], "furniture": ["мебели"], "layout": "разпределение", "description": "VERY DETAILED English description of the EXACT room visible — include every fixture, wall position, floor area, window/door positions, lighting, appliances."}}"""
+        ).with_model("openai", "gpt-4o")
+
+        image_contents = [ImageContent(image_base64=f) for f in photos_b64]
+        analysis_msg = UserMessage(
+            text=f"Анализирай ТОЧНО тези {len(photos_b64)} снимки на {room_type_name}. Размери: {width}м x {length}м x {height}м. Опиши 1:1 какво виждаш, включително ВСИЧКИ видими продукти/уреди.",
+            file_contents=image_contents
+        )
+        analysis_response = await analysis_chat.send_message(analysis_msg)
+
+        room_analysis = {}
+        try:
+            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', analysis_response)
+            if json_match:
+                room_analysis = json_module.loads(json_match.group(1))
+            else:
+                room_analysis = json_module.loads(analysis_response)
+        except Exception:
+            room_analysis = {"room_type": room_type_name, "description": f"a {room_type_name} interior", "current_state": "needs renovation"}
+
+        room_desc = room_analysis.get("description", f"a {room_type_name} interior")
+
+        # Step 2: Generate 3 angles of renovated room (for 360° view)
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        reno_instruction = notes or "complete renovation with modern finishes"
+
+        camera_angles = [
+            ("photographed from the entrance/door looking inward, full room visible, wide angle", "Фронтален"),
+            ("photographed from the left wall at 45 degrees showing depth and perspective", "Ляв ъгъл"),
+            ("photographed from the right wall at 45 degrees showing depth and perspective", "Десен ъгъл"),
+        ]
+
+        variant_angles = []
+        for angle_idx, (angle_desc, angle_label) in enumerate(camera_angles):
+            try:
+                strict_prompt = f"""STRICT 1:1 RENOVATION of the EXACT room described below. {angle_desc}.
+
+ROOM DESCRIPTION (keep EXACT layout): {room_desc}
+Dimensions: {width}m x {length}m, height {height}m.
+
+RENOVATION REQUEST: {reno_instruction}
+
+STRICT RULES:
+1. Keep the EXACT same room geometry, proportions, and layout
+2. Do NOT add new objects/elements that aren't in the original
+3. Apply ONLY the requested renovation changes
+4. Preserve 1:1 scale and proportions
+5. Use EXACT dimensions from parameters
+
+Style: {style_desc}.
+Ultra-realistic professional interior photography, 8K quality, perfect lighting, natural shadows."""
+
+                img_result = await image_gen.generate_images(
+                    prompt=strict_prompt,
+                    model="gpt-image-1",
+                    number_of_images=1
+                )
+
+                if img_result and len(img_result) > 0:
+                    img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
+                    variant_angles.append({
+                        "angle": angle_idx + 1,
+                        "label": angle_label,
+                        "image_base64": img_b64
+                    })
+            except Exception as img_err:
+                logging.error(f"Photo Designer image gen error angle {angle_idx+1}: {img_err}")
+                continue
+
+        generated_images = []
+        if variant_angles:
+            generated_images.append({
+                "variant": 1,
+                "angles": variant_angles,
+                "image_base64": variant_angles[0]["image_base64"] if variant_angles else "",
+            })
+
+        # Step 3: Generate budget with 3 tiers and DIRECT product links
+        budget_chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"photo-budget-{uuid.uuid4()}",
+            system_message="""Ти си експерт по строителни материали в България. Генерираш БЮДЖЕТ с 3 варианта (Иконом, Среден, Премиум) с ДИРЕКТНИ ЛИНКОВЕ към реални продукти от български магазини.
+
+ЗАДЪЛЖИТЕЛНИ МАГАЗИНИ:
+- Praktiker (praktiker.bg) - плочки, боя, настилки
+- Jysk (jysk.bg) - мебели, осветление, декорация
+- Mr.Bricolage (mrbricolage.bg) - боя, ВиК, електричество
+- IKEA (ikea.bg) - мебели, кухня, баня
+- Teknoimpex (teknoimpex.bg) - бойлери, радиатори, ВиК
+- Bauhaus (bauhaus.bg) - плочки, изолация, дограма
+- HomeMax (homemax.bg) - мебели, осветление
+
+ФОРМАТ НА ЛИНКОВЕ (ЗАДЪЛЖИТЕЛНО):
+- НЕ: praktiker.bg (общ линк)
+- ДА: https://praktiker.bg/bg/Плочки/Плочки-за-под/Гранитогрес-60х60-см-сив/p/12345
+- Генерирай РЕАЛИСТИЧНИ product URLs с ID
+
+Отговори САМО в JSON:
+{
+  "budget_tiers": [
+    {
+      "tier": "economy",
+      "tier_name": "Иконом",
+      "total_eur": 0,
+      "materials": [
+        {
+          "name": "Плочки 60x60 сиви",
+          "category": "Настилки",
+          "quantity": "15 m²",
+          "price_eur": 0,
+          "store": "Praktiker",
+          "product_url": "https://praktiker.bg/bg/...",
+          "product_id": "12345",
+          "available": true
+        }
+      ]
+    },
+    {
+      "tier": "medium",
+      "tier_name": "Среден",
+      "total_eur": 0,
+      "materials": [...]
+    },
+    {
+      "tier": "premium",
+      "tier_name": "Премиум",
+      "total_eur": 0,
+      "materials": [...]
+    }
+  ],
+  "labor_estimate_eur": 0,
+  "summary": "Кратко описание"
+}"""
+        ).with_model("openai", "gpt-4o")
+
+        detected_products = room_analysis.get("products_detected", [])
+        products_str = ", ".join([p.get("name", "") for p in detected_products]) if detected_products else "стандартни материали"
+
+        budget_msg = UserMessage(
+            text=f"""Генерирай бюджет за ремонт на {room_type_name} ({width}м x {length}м x {height}м).
+Стил: {style_desc}
+{f'Бележки: {notes}' if notes else ''}
+Състояние: {room_analysis.get('current_state', 'нуждае се от ремонт')}
+Открити продукти: {products_str}
+Елементи: {', '.join(room_analysis.get('elements', []))}
+
+Генерирай 3 БЮДЖЕТНИ ВАРИАНТА (Иконом, Среден, Премиум) с ДИРЕКТНИ ЛИНКОВЕ към реални продукти от български магазини. Всеки вариант трябва да има поне 8-12 материала с точни линкове."""
+        )
+        budget_response = await budget_chat.send_message(budget_msg)
+
+        budget_data = {}
+        try:
+            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', budget_response)
+            if json_match:
+                budget_data = json_module.loads(json_match.group(1))
+            else:
+                budget_data = json_module.loads(budget_response)
+        except Exception:
+            budget_data = {"budget_tiers": [], "labor_estimate_eur": 0}
+
+        # Save project to DB
+        design_id = str(uuid.uuid4())
+        design_record = {
+            "id": design_id,
+            "type": "photo",
+            "user_id": user_id,
+            "room_type": room_type_name,
+            "room_type_id": room_type,
+            "room_analysis": room_analysis,
+            "style": style,
+            "dimensions": {"width": width, "length": length, "height": height},
+            "photos_count": len(photos_b64),
+            "generated_count": len(variant_angles),
+            "budget_data": budget_data,
+            "notes": notes,
+            "budget_tier": budget_tier,
+            "shared": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        # Store generated images separately (they're large)
+        for i, angle in enumerate(variant_angles):
+            design_record[f"angle_{i}_b64"] = angle["image_base64"]
+        # Store original first photo as "before"
+        design_record["before_photo_b64"] = photos_b64[0] if photos_b64 else None
+
+        await db.ai_designs.insert_one(design_record)
+
+        return {
+            "id": design_id,
+            "room_analysis": room_analysis,
+            "generated_images": generated_images,
+            "budget": budget_data,
+            "before_photo": photos_b64[0] if photos_b64 else None,
+            "style": style,
+            "dimensions": {"width": width, "length": length, "height": height},
+            "photos_count": len(photos_b64),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Photo Designer error: {e}")
+        raise HTTPException(status_code=500, detail=f"Грешка при обработка: {str(e)}")
+
+
+@api_router.get("/ai-designer/my-projects")
+async def get_my_projects(user=Depends(get_current_user)):
+    """Get all projects for the current user."""
+    projects = await db.ai_designs.find(
+        {"user_id": user["id"]},
+        {"_id": 0, "angle_0_b64": 0, "angle_1_b64": 0, "angle_2_b64": 0, "before_photo_b64": 0}
+    ).sort("created_at", -1).to_list(100)
+    return {"projects": projects}
+
+
+@api_router.get("/ai-designer/project/{project_id}")
+async def get_project(project_id: str):
+    """Get a single project by ID (for sharing)."""
+    project = await db.ai_designs.find_one({"id": project_id}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    
+    # Reconstruct generated images from stored angles
+    angles = []
+    for i in range(3):
+        key = f"angle_{i}_b64"
+        if key in project and project[key]:
+            labels = ["Фронтален", "Ляв ъгъл", "Десен ъгъл"]
+            angles.append({"angle": i + 1, "label": labels[i] if i < len(labels) else f"Ъгъл {i+1}", "image_base64": project[key]})
+            del project[key]
+    
+    before_photo = project.pop("before_photo_b64", None)
+    
+    project["generated_images"] = [{"variant": 1, "angles": angles}] if angles else []
+    project["before_photo"] = before_photo
+    project["budget"] = project.get("budget_data", {})
+    
+    return project
+
+
+@api_router.post("/ai-designer/project/{project_id}/share")
+async def share_project(project_id: str, user=Depends(get_current_user)):
+    """Enable sharing for a project."""
+    result = await db.ai_designs.update_one(
+        {"id": project_id, "user_id": user["id"]},
+        {"$set": {"shared": True}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    return {"shared": True, "share_url": f"/projects/{project_id}"}
+
+
+@api_router.delete("/ai-designer/project/{project_id}")
+async def delete_project(project_id: str, user=Depends(get_current_user)):
+    """Delete a project."""
+    result = await db.ai_designs.delete_one({"id": project_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Проектът не е намерен")
+    return {"deleted": True}
+
 
 
 @api_router.post("/ai-designer/video-pdf")
