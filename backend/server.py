@@ -4871,8 +4871,8 @@ async def create_post(request: Request, user: dict = Depends(get_current_user)):
     project_id = data.get("project_id")
     images_b64 = data.get("images", [])
 
-    if not text and not project_id:
-        raise HTTPException(status_code=400, detail="Добавете текст или проект")
+    if not text and not project_id and not images_b64:
+        raise HTTPException(status_code=400, detail="Добавете текст, снимка или проект")
 
     post = {
         "id": str(uuid.uuid4()),

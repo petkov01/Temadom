@@ -33,6 +33,7 @@ import PricesByRegionPage from '@/components/PricesByRegionPage';
 import RegionalPage from '@/components/RegionalPage';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import CommunityPage from '@/components/CommunityPage';
+import ProductSearchPage from '@/components/ProductSearchPage';
 import { LanguageProvider, useLanguage } from '@/i18n/LanguageContext';
 import { LANGUAGES } from '@/i18n/translations';
 import { Chatbot } from '@/components/Chatbot';
@@ -303,6 +304,9 @@ const Navbar = () => {
                   </Link>
                   <Link to="/community" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-community">
                     <MessageSquare className="h-4 w-4" /> Общност
+                  </Link>
+                  <Link to="/product-search" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#F97316] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-product-search">
+                    <ShoppingCart className="h-4 w-4" /> AI Търсене
                   </Link>
                   <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-about">
                     <Info className="h-4 w-4" /> За нас
@@ -3722,6 +3726,7 @@ function App() {
                 <Route path="/region/:slug" element={<RegionalPage />} />
                 <Route path="/analytics" element={<AnalyticsDashboard />} />
                 <Route path="/community" element={<CommunityPage />} />
+                <Route path="/product-search" element={<ProductSearchPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/dashboard" element={<AuthGate><CompanyDashboard /></AuthGate>} />
