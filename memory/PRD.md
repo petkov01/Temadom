@@ -6,7 +6,7 @@ Build "TemaDom," a Bulgarian web application for construction and interior desig
 ## Core Architecture
 - **Frontend:** React + TailwindCSS + Shadcn/UI + Konva.js + Three.js
 - **Backend:** FastAPI + MongoDB (Motor) | Modular routers in `/backend/routes/`
-- **Integrations:** Stripe, Emergent LLM (OpenAI), OpenCV, fpdf2
+- **Integrations:** Stripe, Emergent LLM (OpenAI gpt-4o, gpt-image-1), OpenCV, fpdf2, FFmpeg
 
 ## What's Been Implemented
 
@@ -19,30 +19,18 @@ Build "TemaDom," a Bulgarian web application for construction and interior desig
 ### v6.8 — Professions Page UI Fix (DONE - Feb 2026)
 - Theme-aware styling, readable in both modes
 
-### Leaderboard — Active with Test Period (DONE - Feb 2026)
+### Leaderboard + Weekly Challenges + Referrals (DONE - Feb 2026)
 - Dual leaderboard: Clients vs Firms/Masters
 - Points: register=10, create_project=20, complete_project=50, leave_review=15, receive_review=10, portfolio_add=10, daily_login=2, referral=30
-- Auto-awards on registration, project creation, review, portfolio add
+- 3 rotating weekly challenges with progress bars, claim system, timer
+- Referral system with unique links, +30 points per referral, copy button, stats
+- Backend modularized: routes/leaderboard.py
 
-### Weekly Challenges (DONE - Feb 2026)
-- 3 rotating challenges per week based on ISO week number
-- Examples: "Публикувай 3 проекта" (+100), "Остави 2 отзива" (+50), "Добави 3 в портфолио" (+75)
-- Progress tracking with progress bars
-- Claim system — user clicks to collect bonus when challenge completed
-- Timer showing time remaining in the week
-
-### Referral System (DONE - Feb 2026)
-- Each user gets unique referral code (first 8 chars of user ID)
-- Shareable link: `/register?ref=CODE`
-- Referrer earns +30 points per successful referral
-- Registration page shows referral banner when `?ref=` is present
-- Copy-to-clipboard button for referral link
-- Stats: total referrals, points earned, recent referrals list
-
-### Backend Refactoring (STARTED - Feb 2026)
-- `routes/leaderboard.py` — leaderboard, challenges, referrals (extracted)
-- `config.py` — shared DB, auth, constants
-- `models/__init__.py` — Pydantic models
+### Video Designer FFmpeg Fix (DONE - Mar 2026)
+- FFmpeg auto-conversion: H.265, AVI, MOV, MKV → MP4 H.264 + AAC
+- 3-step fallback: FFmpeg convert → OpenCV extract → FFmpeg single-frame extraction
+- 35MB frontend limit, 40MB backend limit, 65s max duration
+- Frontend accepts: MP4, MOV, AVI, MKV, WebM
 
 ## Prioritized Backlog
 
@@ -57,5 +45,6 @@ Build "TemaDom," a Bulgarian web application for construction and interior desig
 
 ## Testing Status
 - v5.2 CAD: 14/14 passed
-- v6.5+v6.8+Leaderboard: 11/11 backend, 100% frontend (iteration_43)
-- Weekly Challenges + Referrals: 20/20 backend, 100% frontend (iteration_44)
+- v6.5+v6.8+Leaderboard: 11/11 (iteration_43)
+- Weekly Challenges + Referrals: 20/20 (iteration_44)
+- Video FFmpeg Fix: 9/11 backend + 100% frontend (iteration_45, 2 timeouts = preview env)
