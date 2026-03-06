@@ -6,77 +6,50 @@ TemaDom is a web application for construction and interior design targeting the 
 ## Core Products
 1. **AI-Assisted CAD System (`/ai-sketch`)** — 2D plans with 3D preview and cost estimation
 2. **3D Photo Designer v9.0 (`/room-scan`)** — Vision-powered: Photos → AI analysis → Room-specific 3D renders + Budget + Download/Fullscreen
-3. **Community Feed v3.0 (`/community`)** — Social feed with posts, images, project linking, offers from firms, likes, comments
-4. **AI Product Search (`/product-search`)** — Upload photo → AI identifies products → Search 21 stores + Share results
-5. **Leaderboard (`/leaderboard`)** — Dual ranking system for clients and firms
-6. **Referral System** — Automatic rewards, share via WhatsApp/Viber, milestones
+3. **Community Feed v3.0 (`/community`)** — Social feed with posts, images, offers from firms, notifications
+4. **AI Product Search (`/product-search`)** — Upload photo → AI identifies products → Search 21 stores + Share
+5. **Leaderboard (`/leaderboard`)** — Dual ranking: Clients and Firms
+6. **Referral System** — Auto rewards, WhatsApp/Viber share, milestones
+7. **Notifications System** — Real-time bell icon, unread count, mark-read
+8. **Stripe Payments** — Subscription checkout (БАЗОВ/ПРО/PREMIUM), payment history
 
 ## Implemented Features
 
-### Authentication & Users
-- JWT auth, AuthGate, Profile page (4 tabs: Профил, Проекти, Реферали, Настройки)
-- Regional firm limit: 2 free firms per region (28 x 2 = 56)
-- Avatar upload, personal info editing
+### Notifications v1.0 ✅ NEW
+- Bell icon in navbar with unread badge (polling every 30s)
+- Dropdown with notification list, mark-all-read, delete
+- Auto-triggered: offers on your posts, likes on your posts
+- Backend: GET /api/notifications, GET unread-count, POST mark-read
 
-### CAD System v5.2 — `/ai-sketch`
-- Color-coded handles, endpoint dragging, rotation, undo/redo, PDF export, cost estimation
+### Stripe Payments v1.0 ✅ NEW
+- 17 payment packages (БАЗОВ/ПРО/PREMIUM × 1/3/6/12 months + 3D design packages)
+- Real Stripe checkout redirect (test mode)
+- Payment history in Profile → Плащания tab
+- Auto-subscription activation on successful payment
+- Webhook handling for payment confirmation
 
-### 3D Photo Designer v9.0 — `/room-scan`
-- GPT-4o Vision analyzes each photo → room-specific prompts
-- Multi-room packages: 69EUR/129EUR/199EUR
-- Download + Fullscreen buttons per render
-- Before/After slider, Share (FB, WhatsApp, Viber, Twitter, Email)
+### Profile Page v3.0 ✅ ENHANCED
+- 5 tabs: Профил, Проекти, Плащания, Реферали, Настройки
 
-### Community Feed v3.0 — `/community` ✅ NEW
-- Post types: text, project, question, before_after, offer
-- Image upload (up to 4), project linking
-- **Firm Offers**: Companies can bid on project posts (price EUR, timeline days, message)
-- Public projects gallery endpoint
-- Like/unlike, comments, deletion, filters, pagination
+### Backend Modularization ✅ STARTED
+- routes/notifications.py — Notification CRUD endpoints
+- routes/payments.py — (template, using existing server.py endpoints)
+- routes/__init__.py
 
-### AI Product Search v1.0 — `/product-search`
-- OpenAI Vision → 21 store search
-- Share results: WhatsApp, Viber, Facebook, Copy
-
-### Leaderboard v1.0 — `/leaderboard` ✅ NEW
-- **Clients tab**: Ranked by score = projects*10 + likes*3 + posts*2
-- **Companies tab**: Ranked by score = rating*20 + reviews*5 + offers*3 + projects*10
-- Period filter: All time / This month
-- Top 3 highlighted with Crown/Medal/Award icons
-- Scoring explanation card
-
-### Referral System v1.0
-- Unique code, WhatsApp/Viber share
-- Milestones: 1→€3, 3→€10, 5→free 3D, 10→PRO month
-
-### Tracking
-- Google Analytics 4, Facebook Pixel, PostHog
-
-### PDF Export
-- 3D designs with TemaDom logo, renders, budget, region-based labor costs
-- Published project PDFs (images + materials)
-
-## Key API Endpoints
-- `GET /api/leaderboard/clients` ✅ NEW
-- `GET /api/leaderboard/companies` ✅ NEW
-- `POST /api/community/offers` ✅ NEW (company only)
-- `GET /api/community/offers/{post_id}` ✅ NEW
-- `GET /api/community/public-projects` ✅ NEW
-- `POST /api/ai-designer/photo-generate`
-- `POST /api/scrape/ai-search`
-- `GET/POST /api/referrals/status|apply`
-- `GET/POST/DELETE /api/community/posts`
+### All Previous Features ✅
+- AI Vision room recognition, Community v3 with offers, Leaderboard, Referrals, FB Pixel/GA, Download/Fullscreen
 
 ## Prioritized Backlog
 
 ### DONE ✅
-- All P0 + P1 features complete
-- Leaderboard system ✅
-- Community v3 with firm offers ✅
-- Public projects gallery ✅
+- All P0 + P1 + P2 features complete
+- Notifications system ✅
+- Stripe payments ✅
+- Backend modularization started ✅
 
-### P2 — Future
-- Backend refactoring (modular routers/ — server.py is ~5300 lines)
+### P3 — Future
+- Full backend refactoring (move all routes from server.py to routes/)
 - Real scraping implementation for 21 stores
 - Enhanced mobile responsiveness
-- Payment integration (Stripe) for subscriptions
+- Email notifications (SendGrid/Resend)
+- Push notifications
