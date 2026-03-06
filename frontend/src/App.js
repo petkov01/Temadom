@@ -1013,6 +1013,108 @@ const LandingPage = () => {
       </section>
 
       {/* ===== CTA: РЕГИСТРИРАЙ ФИРМАТА ===== */}
+      {/* ===== АБОНАМЕНТИ ЗА ФИРМИ ===== */}
+      <section className="py-16 border-t" style={{ borderColor: border }} data-testid="firm-subscriptions-section">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-black text-center mb-2" style={{ color: text }}>
+            Абонаменти за <span style={{ color: accent }}>фирми</span>
+          </h2>
+          <p className="text-center mb-4 text-sm" style={{ color: muted }}>Изберете план и получете клиенти с AI предимство</p>
+
+          {/* How notifications work */}
+          <div className="rounded-xl p-4 mb-8 max-w-3xl mx-auto" style={{ background: dark ? '#0F172A' : '#F1F5F9', border: `1px solid ${border}` }}>
+            <p className="text-xs font-bold text-center mb-3" style={{ color: text }}>Как работят известията за нови обяви?</p>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-lg p-2" style={{ background: '#8B5CF620', border: '1px solid #8B5CF630' }}>
+                <p className="text-[10px] font-bold text-[#8B5CF6]">PREMIUM</p>
+                <p className="text-[10px]" style={{ color: text }}>10:00 ч. — ПЪРВИ</p>
+              </div>
+              <div className="rounded-lg p-2" style={{ background: '#F9731620', border: '1px solid #F9731630' }}>
+                <p className="text-[10px] font-bold text-[#F97316]">ПРО</p>
+                <p className="text-[10px]" style={{ color: text }}>10:10 ч. — известие</p>
+              </div>
+              <div className="rounded-lg p-2" style={{ background: '#4DA6FF20', border: '1px solid #4DA6FF30' }}>
+                <p className="text-[10px] font-bold text-[#4DA6FF]">БАЗОВ</p>
+                <p className="text-[10px]" style={{ color: text }}>Ръчно търсене</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              {
+                name: 'БАЗОВ', price: '15', period: '/мес', color: '#4DA6FF',
+                badge: null,
+                features: ['Профил + портфолио', 'До 10 снимки', '5 оферти/месец', 'Основен профил', 'Преглед запитвания'],
+                limits: ['Без PDF договори', 'Без AI скици', 'Без Telegram известия'],
+              },
+              {
+                name: 'ПРО', price: '35', period: '/мес', color: '#F97316',
+                badge: '90% ИЗБИРАТ ТОЗИ!',
+                features: ['Всичко от БАЗОВ', 'Telegram известия', 'PDF договори', 'AI скици', 'Количествени сметки', 'Неограничени оферти', 'Приоритетно показване'],
+                limits: ['Без 10-мин. предимство'],
+              },
+              {
+                name: 'PREMIUM', price: '75', period: '/мес', color: '#8B5CF6',
+                badge: 'КРАЛСКИ!',
+                features: ['ВСИЧКО от ПРО', 'ПЪРВИ 10 МИН. предимство!', 'Персонализирани PDF', 'Неограничени AI скици', 'Екип до 5 души', 'API достъп', 'Персонален мениджър', 'Топ позиция'],
+                limits: [],
+              },
+            ].map((plan, i) => (
+              <div key={i} className={`rounded-2xl overflow-hidden transition-all hover:scale-[1.02] ${plan.badge ? 'ring-2' : ''}`}
+                style={{
+                  background: dark ? 'rgba(30,41,59,0.7)' : 'rgba(255,255,255,0.9)',
+                  border: `2px solid ${plan.badge ? plan.color : border}`,
+                  ringColor: plan.color,
+                  boxShadow: plan.badge ? `0 0 30px ${plan.color}20` : 'none'
+                }}
+                data-testid={`firm-plan-${plan.name.toLowerCase()}`}>
+                {plan.badge && (
+                  <div className="text-white text-center text-[10px] py-1.5 font-bold tracking-wider" style={{ background: plan.color }}>
+                    {plan.badge}
+                  </div>
+                )}
+                <div className="p-5">
+                  {/* Stars */}
+                  <div className="flex gap-0.5 justify-center mb-2">
+                    {Array.from({ length: i + 1 }, (_, s) => (
+                      <Star key={s} className="h-4 w-4 fill-current" style={{ color: plan.color }} />
+                    ))}
+                  </div>
+                  <h3 className="text-lg font-black text-center" style={{ color: text }}>{plan.name}</h3>
+                  <p className="text-3xl font-black text-center my-3" style={{ color: plan.color }}>
+                    {plan.price}<span className="text-sm font-normal" style={{ color: muted }}> EUR{plan.period}</span>
+                  </p>
+                  <div className="space-y-2 mb-4">
+                    {plan.features.map((f, fi) => (
+                      <div key={fi} className="flex items-center gap-2 text-sm" style={{ color: muted }}>
+                        <Check className="h-3.5 w-3.5 flex-shrink-0" style={{ color: plan.color }} /> {f}
+                      </div>
+                    ))}
+                  </div>
+                  {plan.limits.length > 0 && (
+                    <div className="space-y-1 mb-4 pt-3" style={{ borderTop: `1px solid ${border}` }}>
+                      {plan.limits.map((l, li) => (
+                        <div key={li} className="flex items-center gap-2 text-xs" style={{ color: muted }}>
+                          <X className="h-3 w-3 flex-shrink-0 text-red-400/60" /> {l}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <button onClick={() => navigate('/subscriptions')}
+                    className="w-full py-3 rounded-xl text-white font-bold transition-all hover:opacity-90"
+                    style={{ background: plan.color }}
+                    data-testid={`firm-plan-btn-${plan.name.toLowerCase()}`}>
+                    Избери {plan.name}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== CTA: РЕГИСТРИРАЙ ФИРМАТА (original) ===== */}
       <section className="py-16 relative overflow-hidden" style={{ background: dark ? '#1E293B' : '#FFF7ED' }}>
         <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${accent}15, ${accent}05)` }} />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">

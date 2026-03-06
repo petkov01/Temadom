@@ -2873,13 +2873,25 @@ async def delete_project(project_id: str, user=Depends(get_current_user)):
 
 @api_router.post("/ai-designer/photo-pdf")
 async def generate_photo_pdf(request: Request):
-    """Generate PDF for 3D Photo Designer result — renders + budget + links."""
+    """Generate PDF for 3D Photo Designer result — renders + budget + links. Cyrillic support."""
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import mm
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib import colors
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
     import io
+
+    # Register Cyrillic font
+    FONT = 'FreeSans'
+    FONT_B = 'FreeSansBold'
+    try:
+        pdfmetrics.registerFont(TTFont(FONT, '/usr/share/fonts/truetype/freefont/FreeSans.ttf'))
+        pdfmetrics.registerFont(TTFont(FONT_B, '/usr/share/fonts/truetype/freefont/FreeSansBold.ttf'))
+    except Exception:
+        FONT = 'Helvetica'
+        FONT_B = 'Helvetica-Bold'
 
     data = await request.json()
     renders = data.get("renders", [])
@@ -2891,21 +2903,26 @@ async def generate_photo_pdf(request: Request):
     project_id = data.get("project_id", "")
     active_tier = data.get("active_tier", "medium")
 
+    STYLE_NAMES = {"modern": "Модерен", "minimalist": "Минималист", "classic": "Класически",
+                   "boho": "Бохо", "hitech": "Хай-тек", "industrial": "Индустриален",
+                   "scandinavian": "Скандинавски", "loft": "Лофт", "neoclassic": "Неокласически", "artdeco": "Арт Деко"}
+    style_bg = STYLE_NAMES.get(style_name, style_name)
+
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=15*mm, bottomMargin=15*mm, leftMargin=15*mm, rightMargin=15*mm)
-    styles = getSampleStyleSheet()
 
-    title_s = ParagraphStyle('TitleBG', parent=styles['Title'], fontSize=20, spaceAfter=6, textColor=colors.HexColor('#F97316'))
-    subtitle_s = ParagraphStyle('SubBG', parent=styles['Normal'], fontSize=11, spaceAfter=10, textColor=colors.HexColor('#666666'))
-    heading_s = ParagraphStyle('HeadBG', parent=styles['Heading2'], fontSize=14, spaceBefore=12, spaceAfter=6, textColor=colors.HexColor('#1E2A38'))
-    body_s = ParagraphStyle('BodyBG', parent=styles['Normal'], fontSize=10, spaceAfter=4)
-    small_s = ParagraphStyle('SmallBG', parent=styles['Normal'], fontSize=8, textColor=colors.HexColor('#999999'))
+    title_s = ParagraphStyle('TitleBG', fontName=FONT_B, fontSize=22, spaceAfter=6, textColor=colors.HexColor('#F97316'), alignment=1)
+    subtitle_s = ParagraphStyle('SubBG', fontName=FONT, fontSize=11, spaceAfter=10, textColor=colors.HexColor('#666666'), alignment=1)
+    heading_s = ParagraphStyle('HeadBG', fontName=FONT_B, fontSize=14, spaceBefore=14, spaceAfter=6, textColor=colors.HexColor('#1E2A38'))
+    body_s = ParagraphStyle('BodyBG', fontName=FONT, fontSize=10, spaceAfter=4)
+    small_s = ParagraphStyle('SmallBG', fontName=FONT, fontSize=8, textColor=colors.HexColor('#999999'), alignment=1)
+    total_s = ParagraphStyle('TotalBG', fontName=FONT_B, fontSize=16, spaceAfter=4, textColor=colors.HexColor('#F97316'), alignment=2)
 
     story = []
     story.append(Paragraph("TEMADOM 3D DESIGNER", title_s))
-    story.append(Paragraph(f"Proekt: {style_name} | {dimensions.get('width','?')}m x {dimensions.get('length','?')}m x {dimensions.get('height','?')}m | Byudzhet: {budget_eur} EUR", subtitle_s))
+    story.append(Paragraph(f"Проект: {style_bg} | {dimensions.get('width','?')}м x {dimensions.get('length','?')}м x {dimensions.get('height','?')}м | Бюджет: {budget_eur} EUR", subtitle_s))
     if user_name:
-        story.append(Paragraph(f"Klient: {user_name}", body_s))
+        story.append(Paragraph(f"Клиент: {user_name} | Дата: {datetime.now().strftime('%d.%m.%Y')}", body_s))
     story.append(Spacer(1, 6))
 
     # Add render images
@@ -2917,7 +2934,7 @@ async def generate_photo_pdf(request: Request):
                 img_data = base64.b64decode(img_b64)
                 img_io = io.BytesIO(img_data)
                 img = RLImage(img_io, width=170*mm, height=105*mm)
-                story.append(Paragraph(f"3D Render: {label}", heading_s))
+                story.append(Paragraph(f"3D Рендер: {label}", heading_s))
                 story.append(img)
                 story.append(Spacer(1, 8))
             except Exception:
@@ -2927,8 +2944,8 @@ async def generate_photo_pdf(request: Request):
     tiers = budget.get("budget_tiers", [])
     active = next((t for t in tiers if t.get("tier") == active_tier), tiers[0] if tiers else None)
     if active:
-        story.append(Paragraph(f"BYUDZHET MATERIALI — {active.get('tier_name', active_tier)}", heading_s))
-        table_data = [["Material", "Kolichestvo", "Cena EUR", "Magazin", "Link"]]
+        story.append(Paragraph(f"БЮДЖЕТ МАТЕРИАЛИ — {active.get('tier_name', active_tier)}", heading_s))
+        table_data = [["Материал", "Количество", "Цена EUR", "Магазин", "Линк"]]
         for m in active.get("materials", []):
             url = m.get("product_url", "")
             link_text = url[:40] + "..." if len(url) > 40 else url
@@ -2939,29 +2956,40 @@ async def generate_photo_pdf(request: Request):
                 str(m.get("store", "")),
                 link_text
             ])
-        table_data.append(["OBSHTO", "", str(active.get("total_eur", 0)), "", ""])
+        table_data.append(["ОБЩО", "", str(active.get("total_eur", 0)), "", ""])
 
         t = Table(table_data, colWidths=[45*mm, 25*mm, 22*mm, 28*mm, 55*mm])
         t.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1E2A38')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), FONT_B),
+            ('FONTNAME', (0, 1), (-1, -2), FONT),
+            ('FONTNAME', (0, -1), (-1, -1), FONT_B),
             ('FONTSIZE', (0, 0), (-1, -1), 8),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#CCCCCC')),
             ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#F97316')),
             ('TEXTCOLOR', (0, -1), (-1, -1), colors.white),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.HexColor('#F8F8F8')]),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
         ]))
         story.append(t)
 
     labor = budget.get("labor_estimate_eur", 0)
     if labor:
         story.append(Spacer(1, 6))
-        story.append(Paragraph(f"Trud (orientirovcno): {labor} EUR", body_s))
+        story.append(Paragraph(f"Труд (ориентировъчно): {labor} EUR", body_s))
 
-    story.append(Spacer(1, 12))
-    site_url = os.environ.get("REACT_APP_BACKEND_URL", "https://temadom.com")
+    if active:
+        total = (active.get("total_eur", 0) or 0) + (labor or 0)
+        story.append(Paragraph(f"ОБЩА СУМА: {total} EUR", total_s))
+
+    story.append(Spacer(1, 16))
     story.append(Paragraph(f"temadom.com | {datetime.now().strftime('%d.%m.%Y')}", small_s))
     if project_id:
-        story.append(Paragraph(f"Link: {site_url}/projects/{project_id}", small_s))
+        site_url = os.environ.get("REACT_APP_BACKEND_URL", "https://temadom.com")
+        story.append(Paragraph(f"Линк: {site_url}/projects/{project_id}", small_s))
 
     doc.build(story)
     buf.seek(0)

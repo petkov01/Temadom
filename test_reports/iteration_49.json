@@ -1,0 +1,101 @@
+{
+  "summary": "Iteration 49: Verified firm subscription plans on landing page + Cyrillic PDF support + 360° removal - ALL TESTS PASS",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "=== BACKEND API TESTS (6/6 passed) ===",
+    "✅ GET /api/ - API root accessible",
+    "✅ GET /api/reviews - Reviews contain NO 360° text",
+    "✅ POST /api/ai-designer/photo-pdf - Returns valid PDF (application/pdf, %PDF header)",
+    "✅ POST /api/ai-designer/photo-pdf - Cyrillic text handling works (FreeSans font registered)",
+    "✅ GET /api/stats/live - Returns Bulgarian regions data",
+    "✅ GET /api/categories - Returns categories array",
+    "",
+    "=== FRONTEND UI TESTS ===",
+    "✅ Landing page (/) - NO 360° text found on entire page",
+    "✅ Landing page - Contains '3D' text (not 360°)",
+    "✅ Firm subscriptions section visible (data-testid='firm-subscriptions-section')",
+    "✅ БАЗОВ plan card found (15 EUR/мес) - data-testid='firm-plan-базов'",
+    "✅ ПРО plan card found (35 EUR/мес) - data-testid='firm-plan-про'",
+    "✅ PREMIUM plan card found (75 EUR/мес) - data-testid='firm-plan-premium'",
+    "✅ '90% ИЗБИРАТ ТОЗИ!' badge visible on ПРО plan",
+    "✅ 'КРАЛСКИ!' badge visible on PREMIUM plan",
+    "✅ БАЗОВ 'Избери' button found (data-testid='firm-plan-btn-базов')",
+    "✅ ПРО 'Избери' button found (data-testid='firm-plan-btn-про')",
+    "✅ PREMIUM 'Избери' button found (data-testid='firm-plan-btn-premium')",
+    "✅ Notification explanation box shows PREMIUM→ПРО→БАЗОВ priority",
+    "✅ 3D Designer page (/room-scan) - NO 360° text found",
+    "✅ v8.0 badge visible on 3D Designer page",
+    "✅ IA Designer page container found (data-testid='ia-designer-page')"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iteration49.py",
+    "/app/test_reports/pytest/pytest_results_iter49.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_iteration49.py"
+  ],
+  "success_rate": {
+    "backend": "100% (6/6 tests passed)",
+    "frontend": "100% (all UI features verified)"
+  },
+  "seed_data_creation": "None needed",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 49 verified: 1) Firm subscription plans on landing page - БАЗОВ (15 EUR), ПРО (35 EUR), PREMIUM (75 EUR) with Избери buttons. 2) PDF endpoint uses FreeSans font for Cyrillic support. 3) No 360° text anywhere on site (landing page and /room-scan). Notification explanation box shows priority order: PREMIUM gets notifications first (10:00), ПРО after 10 min, БАЗОВ manual search only. All data-testids work correctly: firm-subscriptions-section, firm-plan-базов, firm-plan-про, firm-plan-premium, firm-plan-btn-базов, firm-plan-btn-про, firm-plan-btn-premium.",
+  "features_tested": {
+    "firm_subscriptions_section": {
+      "status": "PASS",
+      "details": "Section visible on landing page with data-testid='firm-subscriptions-section'"
+    },
+    "basov_plan_15eur": {
+      "status": "PASS",
+      "details": "БАЗОВ plan card with 15 EUR price and Избери button visible"
+    },
+    "pro_plan_35eur": {
+      "status": "PASS",
+      "details": "ПРО plan card with 35 EUR price, '90% ИЗБИРАТ ТОЗИ!' badge, and Избери button visible"
+    },
+    "premium_plan_75eur": {
+      "status": "PASS",
+      "details": "PREMIUM plan card with 75 EUR price, 'КРАЛСКИ!' badge, and Избери button visible"
+    },
+    "notification_priority_box": {
+      "status": "PASS",
+      "details": "Explanation box shows PREMIUM→ПРО→БАЗОВ priority order (10:00, +10 мин, ръчно)"
+    },
+    "pdf_cyrillic_support": {
+      "status": "PASS",
+      "details": "POST /api/ai-designer/photo-pdf uses FreeSans font, returns valid PDF with Cyrillic"
+    },
+    "pdf_budget_table_columns": {
+      "status": "PASS",
+      "details": "PDF contains Bulgarian column headers: Материал, Количество, Цена EUR, Магазин, Линк"
+    },
+    "no_360_landing_page": {
+      "status": "PASS",
+      "details": "Landing page contains no '360' text - uses '3D' instead"
+    },
+    "no_360_room_scan": {
+      "status": "PASS",
+      "details": "3D Designer page (/room-scan) contains no '360' text"
+    },
+    "no_360_reviews_api": {
+      "status": "PASS",
+      "details": "GET /api/reviews returns reviews with no '360' text"
+    },
+    "v8_badge": {
+      "status": "PASS",
+      "details": "v8.0 badge visible on 3D Designer page header"
+    }
+  }
+}
