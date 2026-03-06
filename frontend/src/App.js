@@ -729,7 +729,7 @@ const LandingPage = () => {
           </h1>
 
           <p className="text-base md:text-lg text-center mb-10 max-w-2xl" style={{ color: muted }}>
-            Качи 3 снимки → получи реалистичен 3D ремонт с 360° панорама и бюджет с линкове.
+            Качи 3 снимки → получи реалистичен 3D ремонт + бюджет с директни линкове.
             Виж точно как ще изглежда ПРЕДИ да платиш.
           </p>
 
@@ -832,7 +832,7 @@ const LandingPage = () => {
           <p className="text-center mb-10 text-sm" style={{ color: muted }}>Реалистичен 1:1 проект на вашето помещение</p>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['3 снимки → 360° дизайн', '3 ъгъла рендер', '10 стила', 'Пред/След сравнение', 'Бюджет + линкове'], color: accent, popular: false },
+              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['3 снимки → 3D рендери', '3 ъгъла рендер', '10 стила', 'Пред/След сравнение', 'Бюджет + линкове'], color: accent, popular: false },
               { name: '2 ПОМЕЩЕНИЯ', price: '129', rooms: '2', features: ['2 помещения', '3 снимки на помещение', '10 стила за всяко', 'Пред/След рендер', 'Бюджет + директни линкове'], color: '#10B981', popular: true },
               { name: 'АПАРТАМЕНТ', price: '199', rooms: '3-5', features: ['До 5 помещения', '3 снимки на помещение', 'Пълен бюджет', 'Всички стилове', 'Приоритетна обработка'], color: '#8B5CF6', popular: false },
             ].map((plan, i) => (
@@ -3470,10 +3470,10 @@ const SubscriptionsPage = () => {
 
         {/* AI Video Designer module */}
         <h2 className="text-2xl font-bold text-white mb-2">3D Photo Designer</h2>
-        <p className="text-slate-400 text-sm mb-6">Качете 3 снимки на помещение → AI генерира 3D ремонт с 360° панорама + бюджет с директни линкове.</p>
+        <p className="text-slate-400 text-sm mb-6">Качете 3 снимки на помещение → AI генерира 3D ремонт + бюджет с директни линкове.</p>
         <div className="grid md:grid-cols-3 gap-4 max-w-3xl">
           {[
-            { name: '1 помещение', price: '69 EUR', features: ['3 снимки → 360° дизайн', 'Бюджет + линкове', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
+            { name: '1 помещение', price: '69 EUR', features: ['3 снимки → 3D рендери', 'Бюджет + линкове', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
             { name: '2 помещения', price: '129 EUR', features: ['2 видеа → 8 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
             { name: 'Апартамент', price: '199 EUR', features: ['До 5 видеа → 20 ъгъла', 'PDF за всяко помещение', 'Пълна сметка + 3D', 'Приоритетна обработка'] },
           ].map((plan, i) => (

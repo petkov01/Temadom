@@ -1321,7 +1321,7 @@ async def root():
 INITIAL_REVIEWS = [
     {"id": "r1", "name": "Иван Петров", "city": "София", "rating": 5, "text": "За 15 минути получих 3D дизайн + линкове към плочки от Praktiker! Спестих 1200€ от бюджета!", "category": "3d_designer", "created_at": "2025-12-15T10:00:00Z"},
     {"id": "r2", "name": "Мария Георгиева", "city": "Пловдив", "rating": 5, "text": "Бюджет €1800 — показа ми ТОЧНО какво мога да си позволя. Намерих всичко с 1 клик!", "category": "3d_designer", "created_at": "2026-01-10T14:30:00Z"},
-    {"id": "r3", "name": "Димитър Иванов", "city": "Варна", "rating": 5, "text": "360° изгледът впечатли майстора — взе проекта веднага! Супер платформа!", "category": "3d_designer", "created_at": "2026-01-22T09:15:00Z"},
+    {"id": "r3", "name": "Димитър Иванов", "city": "Варна", "rating": 5, "text": "3D рендерите впечатлиха майстора — взе проекта веднага! Супер платформа!", "category": "3d_designer", "created_at": "2026-01-22T09:15:00Z"},
     {"id": "r4", "name": "Елена Стоянова", "city": "Бургас", "rating": 5, "text": "CAD скицата беше перфектна. Архитектът ми я одобри без корекции. Браво TemaDom!", "category": "cad_sketch", "created_at": "2026-02-01T11:00:00Z"},
     {"id": "r5", "name": "Георги Николов", "city": "Стара Загора", "rating": 4, "text": "Намерих 3 фирми за ремонт на банята за 1 ден. Преди търсех 2 седмици!", "category": "platform", "created_at": "2026-02-05T16:45:00Z"},
     {"id": "r6", "name": "Анна Димитрова", "city": "Русе", "rating": 5, "text": "Калкулаторът за цени ме спаси от надуване. Знаех точната цена преди да се обадя!", "category": "calculator", "created_at": "2026-02-10T08:20:00Z"},
@@ -2625,11 +2625,10 @@ async def generate_photo_design(
     budget_tier: str = Form("medium"),
     authorization: str = Form(None)
 ):
-    """Enhanced 3D Designer v7: 3 photos → AI redesign → 360° view → budget with direct product links."""
+    """3D Designer v8: 3 photos -> 3 separate 3D renders + budget with direct product links. NO 360."""
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
 
-    # Get current user if auth provided
     user_id = None
     if authorization:
         try:
@@ -2639,8 +2638,8 @@ async def generate_photo_design(
         except Exception:
             pass
 
-    # Process uploaded photos
     photos_b64 = []
+    photo_labels = ["Общ план", "Ъгъл 1", "Ъгъл 2"]
     for photo in [photo1, photo2, photo3]:
         if photo and photo.filename:
             photo_bytes = await photo.read()
@@ -2658,104 +2657,41 @@ async def generate_photo_design(
         "stairs": "стълбище", "facade": "фасада", "other": "помещение"
     }
     room_type_name = ROOM_TYPE_NAMES.get(room_type, "помещение")
+    reno_instruction = notes or "complete renovation with modern finishes"
 
     try:
-        # Step 1: Analyze photos
-        analysis_chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"photo-designer-{uuid.uuid4()}",
-            system_message=f"""Ти си експерт интериорен дизайнер. Получаваш {len(photos_b64)} снимки на {room_type_name}.
-
-СТРИКТЕН РЕЖИМ 1:1 — анализирай ТОЧНО какво виждаш:
-- САМО елементи от снимките (плочки, стени, мебели, осветление, прозорци, врати, уреди)
-- НЕ добавяй нови елементи
-- Опиши ТОЧНАТА геометрия, пропорции и позиции
-- Идентифицирай КОНКРЕТНИ продукти (бойлер, плочки тип, лампи тип)
-
-Отговори в JSON:
-{{"room_type": "{room_type_name}", "current_state": "детайлно описание", "elements": ["списък на всички видими елементи"], "products_detected": [{{"name": "...", "category": "...", "estimated_size": "..."}}], "lighting": "тип", "colors": ["цветове"], "furniture": ["мебели"], "layout": "разпределение", "description": "VERY DETAILED English description of the EXACT room visible — include every fixture, wall position, floor area, window/door positions, lighting, appliances."}}"""
-        ).with_model("openai", "gpt-4o")
-
-        image_contents = [ImageContent(image_base64=f) for f in photos_b64]
-        analysis_msg = UserMessage(
-            text=f"Анализирай ТОЧНО тези {len(photos_b64)} снимки на {room_type_name}. Размери: {width}м x {length}м x {height}м. Опиши 1:1 какво виждаш, включително ВСИЧКИ видими продукти/уреди.",
-            file_contents=image_contents
-        )
-        analysis_response = await analysis_chat.send_message(analysis_msg)
-
-        room_analysis = {}
-        try:
-            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', analysis_response)
-            if json_match:
-                room_analysis = json_module.loads(json_match.group(1))
-            else:
-                room_analysis = json_module.loads(analysis_response)
-        except Exception:
-            room_analysis = {"room_type": room_type_name, "description": f"a {room_type_name} interior", "current_state": "needs renovation"}
-
-        room_desc = room_analysis.get("description", f"a {room_type_name} interior")
-
-        # Step 2: Generate 3 angles of renovated room — PRIORITY #1
-        # If any angle fails, continue with what we have
+        # Step 1: Generate 3 separate 3D renders — one per uploaded photo
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
-        reno_instruction = notes or "complete renovation with modern finishes"
-
-        camera_angles = [
-            ("photographed from the most accessible viewpoint showing the FULL room, wide angle panoramic shot", "Общ план"),
-            ("photographed from one corner of the room looking forward-right at 45 degrees, showing depth and perspective, 180 degree coverage", "Ъгъл 1"),
-            ("photographed from the OPPOSITE corner looking forward-left at 45 degrees, 180 degree coverage, complementing the first corner shot", "Ъгъл 2"),
-        ]
-
-        variant_angles = []
-        for angle_idx, (angle_desc, angle_label) in enumerate(camera_angles):
+        renders = []
+        for idx, photo_b64 in enumerate(photos_b64):
+            label = photo_labels[idx] if idx < len(photo_labels) else f"Снимка {idx+1}"
             try:
-                strict_prompt = f"""STRICT 1:1 RENOVATION of the EXACT room described below. {angle_desc}.
-
-ROOM DESCRIPTION (keep EXACT layout): {room_desc}
-Dimensions: {width}m x {length}m, height {height}m.
-CLIENT BUDGET: {budget_eur}€ — design within this budget range.
-
-RENOVATION REQUEST: {reno_instruction}
-
-STRICT RULES:
-1. Keep the EXACT same room geometry, proportions, and layout
-2. Do NOT add new objects/elements that aren't in the original
-3. Apply ONLY the requested renovation changes
-4. Preserve 1:1 scale and proportions
-5. Use EXACT dimensions from parameters
-6. Materials should look like they cost within {budget_eur}€ total budget
-
+                render_prompt = f"""Realistic 3D interior design render based on this photo.
+Keep the EXACT same room dimensions ({width}m x {length}m, height {height}m), layout, geometry and perspective.
+Apply a modern renovation: {reno_instruction}
 Style: {style_desc}.
-Ultra-realistic professional interior photography, 8K quality, perfect lighting, natural shadows."""
+Budget level: {budget_eur}EUR — materials should match this budget.
+Photorealistic, high quality, sharp details, professional interior photography, natural lighting, 8K."""
 
                 img_result = await image_gen.generate_images(
-                    prompt=strict_prompt,
+                    prompt=render_prompt,
                     model="gpt-image-1",
                     number_of_images=1
                 )
-
                 if img_result and len(img_result) > 0:
                     img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
-                    variant_angles.append({
-                        "angle": angle_idx + 1,
-                        "label": angle_label,
-                        "image_base64": img_b64
+                    renders.append({
+                        "index": idx,
+                        "label": label,
+                        "image_base64": img_b64,
+                        "original_base64": photo_b64
                     })
-                    logging.info(f"Photo Designer: angle {angle_idx+1} ({angle_label}) generated OK")
+                    logging.info(f"Photo Designer: render {idx+1} ({label}) generated OK")
             except Exception as img_err:
-                logging.error(f"Photo Designer image gen error angle {angle_idx+1}: {img_err}")
-                # Continue with next angle — don't stop the whole process
+                logging.error(f"Photo Designer render {idx+1} error: {img_err}")
                 continue
 
-        generated_images = []
-        if variant_angles:
-            generated_images.append({
-                "variant": 1,
-                "angles": variant_angles,
-                "image_base64": variant_angles[0]["image_base64"] if variant_angles else "",
-            })
-
-        # Step 3: Generate budget with 3 tiers and DIRECT product links
+        # Step 2: Generate budget with 3 tiers and DIRECT product links
         budget_chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"photo-budget-{uuid.uuid4()}",
@@ -2769,20 +2705,8 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
 Всеки вариант трябва да има ДИРЕКТНИ ЛИНКОВЕ към реални продукти от български магазини.
 
 ЗАДЪЛЖИТЕЛНИ МАГАЗИНИ:
-- Praktiker (praktiker.bg) - плочки, боя, настилки
-- Jysk (jysk.bg) - мебели, осветление, декорация
-- Mr.Bricolage (mrbricolage.bg) - боя, ВиК, електричество
-- IKEA (ikea.bg) - мебели, кухня, баня
-- Teknoimpex (teknoimpex.bg) - бойлери, радиатори, ВиК
-- Bauhaus (bauhaus.bg) - плочки, изолация, дограма
-- HomeMax (homemax.bg) - мебели, осветление
-
-ФОРМАТ НА ЛИНКОВЕ (ЗАДЪЛЖИТЕЛНО):
-- НЕ: praktiker.bg (общ линк)
-- ДА: https://praktiker.bg/bg/Плочки/Плочки-за-под/Гранитогрес-60х60-см-сив/p/12345
-- Генерирай РЕАЛИСТИЧНИ product URLs с ID
-
-БЮДЖЕТ НА КЛИЕНТА: {budget_eur}€ — ВМЕСТЕНО В РАМКИТЕ!
+- Praktiker (praktiker.bg), Jysk (jysk.bg), Mr.Bricolage (mrbricolage.bg)
+- IKEA (ikea.bg), Teknoimpex (teknoimpex.bg), Bauhaus (bauhaus.bg), HomeMax (homemax.bg)
 
 Отговори САМО в JSON:
 {{
@@ -2804,18 +2728,8 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
         }}
       ]
     }},
-    {{
-      "tier": "medium",
-      "tier_name": "Среден",
-      "total_eur": 0,
-      "materials": [...]
-    }},
-    {{
-      "tier": "premium",
-      "tier_name": "Премиум",
-      "total_eur": 0,
-      "materials": [...]
-    }}
+    {{"tier": "medium", "tier_name": "Среден", "total_eur": 0, "materials": [...]}},
+    {{"tier": "premium", "tier_name": "Премиум", "total_eur": 0, "materials": [...]}}
   ],
   "labor_estimate_eur": 0,
   "client_budget_eur": {budget_eur},
@@ -2823,23 +2737,11 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
 }}"""
         ).with_model("openai", "gpt-4o")
 
-        detected_products = room_analysis.get("products_detected", [])
-        products_str = ", ".join([p.get("name", "") for p in detected_products]) if detected_products else "стандартни материали"
-
         budget_msg = UserMessage(
             text=f"""Генерирай бюджет за ремонт на {room_type_name} ({width}м x {length}м x {height}м).
-БЮДЖЕТ НА КЛИЕНТА: {budget_eur}€ — Вместено в рамките!
-Стил: {style_desc}
-{f'Бележки: {notes}' if notes else ''}
-Състояние: {room_analysis.get('current_state', 'нуждае се от ремонт')}
-Открити продукти: {products_str}
-Елементи: {', '.join(room_analysis.get('elements', []))}
-
-Генерирай 3 БЮДЖЕТНИ ВАРИАНТА:
-- Иконом: до {int(int(budget_eur)*0.6)}€
-- Среден: до {budget_eur}€
-- Премиум: до {int(int(budget_eur)*1.5)}€
-Всеки вариант с поне 8-12 материала с ДИРЕКТНИ ЛИНКОВЕ."""
+БЮДЖЕТ: {budget_eur}€. Стил: {style_desc}. {f'Бележки: {notes}' if notes else ''}
+3 ВАРИАНТА: Иконом до {int(int(budget_eur)*0.6)}€, Среден до {budget_eur}€, Премиум до {int(int(budget_eur)*1.5)}€.
+Всеки с 8-12 материала с ДИРЕКТНИ ЛИНКОВЕ."""
         )
         budget_response = await budget_chat.send_message(budget_msg)
 
@@ -2861,11 +2763,10 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
             "user_id": user_id,
             "room_type": room_type_name,
             "room_type_id": room_type,
-            "room_analysis": room_analysis,
             "style": style,
             "dimensions": {"width": width, "length": length, "height": height},
             "photos_count": len(photos_b64),
-            "generated_count": len(variant_angles),
+            "renders_count": len(renders),
             "budget_data": budget_data,
             "notes": notes,
             "budget_eur": int(budget_eur),
@@ -2873,23 +2774,20 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
             "shared": False,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
-        # Store generated images separately (they're large)
-        for i, angle in enumerate(variant_angles):
-            design_record[f"angle_{i}_b64"] = angle["image_base64"]
-        # Store original first photo as "before"
-        design_record["before_photo_b64"] = photos_b64[0] if photos_b64 else None
+        for i, r in enumerate(renders):
+            design_record[f"render_{i}_b64"] = r["image_base64"]
+            design_record[f"original_{i}_b64"] = r["original_base64"]
 
         await db.ai_designs.insert_one(design_record)
 
         return {
             "id": design_id,
-            "room_analysis": room_analysis,
-            "generated_images": generated_images,
+            "renders": [{"index": r["index"], "label": r["label"], "image_base64": r["image_base64"], "original_base64": r["original_base64"]} for r in renders],
             "budget": budget_data,
-            "before_photo": photos_b64[0] if photos_b64 else None,
             "style": style,
             "dimensions": {"width": width, "length": length, "height": height},
             "photos_count": len(photos_b64),
+            "renders_count": len(renders),
         }
 
     except HTTPException:
@@ -2902,9 +2800,11 @@ Ultra-realistic professional interior photography, 8K quality, perfect lighting,
 @api_router.get("/ai-designer/my-projects")
 async def get_my_projects(user=Depends(get_current_user)):
     """Get all projects for the current user."""
+    exclude = {"_id": 0, "angle_0_b64": 0, "angle_1_b64": 0, "angle_2_b64": 0,
+               "before_photo_b64": 0, "render_0_b64": 0, "render_1_b64": 0, "render_2_b64": 0,
+               "original_0_b64": 0, "original_1_b64": 0, "original_2_b64": 0}
     projects = await db.ai_designs.find(
-        {"user_id": user["id"]},
-        {"_id": 0, "angle_0_b64": 0, "angle_1_b64": 0, "angle_2_b64": 0, "before_photo_b64": 0}
+        {"user_id": user["id"]}, exclude
     ).sort("created_at", -1).to_list(100)
     return {"projects": projects}
 
@@ -2915,20 +2815,36 @@ async def get_project(project_id: str):
     project = await db.ai_designs.find_one({"id": project_id}, {"_id": 0})
     if not project:
         raise HTTPException(status_code=404, detail="Проектът не е намерен")
-    
-    # Reconstruct generated images from stored angles
-    angles = []
+
+    # New v8 format: renders
+    renders = []
+    labels = ["Общ план", "Ъгъл 1", "Ъгъл 2"]
     for i in range(3):
-        key = f"angle_{i}_b64"
-        if key in project and project[key]:
-            labels = ["Фронтален", "Ляв ъгъл", "Десен ъгъл"]
-            angles.append({"angle": i + 1, "label": labels[i] if i < len(labels) else f"Ъгъл {i+1}", "image_base64": project[key]})
+        render_key = f"render_{i}_b64"
+        orig_key = f"original_{i}_b64"
+        if render_key in project and project[render_key]:
+            renders.append({
+                "index": i,
+                "label": labels[i] if i < len(labels) else f"Снимка {i+1}",
+                "image_base64": project[render_key],
+                "original_base64": project.get(orig_key, "")
+            })
+        # Also check old format (angle_X_b64)
+        angle_key = f"angle_{i}_b64"
+        if not renders and angle_key in project and project[angle_key]:
+            renders.append({
+                "index": i,
+                "label": labels[i] if i < len(labels) else f"Ъгъл {i+1}",
+                "image_base64": project[angle_key],
+                "original_base64": project.get("before_photo_b64", "") if i == 0 else ""
+            })
+
+    # Clean up large fields from response
+    for key in list(project.keys()):
+        if key.endswith("_b64"):
             del project[key]
-    
-    before_photo = project.pop("before_photo_b64", None)
-    
-    project["generated_images"] = [{"variant": 1, "angles": angles}] if angles else []
-    project["before_photo"] = before_photo
+
+    project["renders"] = renders
     project["budget"] = project.get("budget_data", {})
     
     return project
@@ -2955,18 +2871,109 @@ async def delete_project(project_id: str, user=Depends(get_current_user)):
     return {"deleted": True}
 
 
-
-@api_router.post("/ai-designer/video-pdf")
-async def generate_video_pdf(request: Request):
-    """Generate PDF for Video Designer result."""
+@api_router.post("/ai-designer/photo-pdf")
+async def generate_photo_pdf(request: Request):
+    """Generate PDF for 3D Photo Designer result — renders + budget + links."""
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import mm
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib import colors
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
     import io
+
+    data = await request.json()
+    renders = data.get("renders", [])
+    budget = data.get("budget", {})
+    dimensions = data.get("dimensions", {})
+    style_name = data.get("style", "modern")
+    budget_eur = data.get("budget_eur", 0)
+    user_name = data.get("user_name", "")
+    project_id = data.get("project_id", "")
+    active_tier = data.get("active_tier", "medium")
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=15*mm, bottomMargin=15*mm, leftMargin=15*mm, rightMargin=15*mm)
+    styles = getSampleStyleSheet()
+
+    title_s = ParagraphStyle('TitleBG', parent=styles['Title'], fontSize=20, spaceAfter=6, textColor=colors.HexColor('#F97316'))
+    subtitle_s = ParagraphStyle('SubBG', parent=styles['Normal'], fontSize=11, spaceAfter=10, textColor=colors.HexColor('#666666'))
+    heading_s = ParagraphStyle('HeadBG', parent=styles['Heading2'], fontSize=14, spaceBefore=12, spaceAfter=6, textColor=colors.HexColor('#1E2A38'))
+    body_s = ParagraphStyle('BodyBG', parent=styles['Normal'], fontSize=10, spaceAfter=4)
+    small_s = ParagraphStyle('SmallBG', parent=styles['Normal'], fontSize=8, textColor=colors.HexColor('#999999'))
+
+    story = []
+    story.append(Paragraph("TEMADOM 3D DESIGNER", title_s))
+    story.append(Paragraph(f"Proekt: {style_name} | {dimensions.get('width','?')}m x {dimensions.get('length','?')}m x {dimensions.get('height','?')}m | Byudzhet: {budget_eur} EUR", subtitle_s))
+    if user_name:
+        story.append(Paragraph(f"Klient: {user_name}", body_s))
+    story.append(Spacer(1, 6))
+
+    # Add render images
+    for r in renders[:3]:
+        img_b64 = r.get("image_base64", "")
+        label = r.get("label", "")
+        if img_b64:
+            try:
+                img_data = base64.b64decode(img_b64)
+                img_io = io.BytesIO(img_data)
+                img = RLImage(img_io, width=170*mm, height=105*mm)
+                story.append(Paragraph(f"3D Render: {label}", heading_s))
+                story.append(img)
+                story.append(Spacer(1, 8))
+            except Exception:
+                pass
+
+    # Budget table
+    tiers = budget.get("budget_tiers", [])
+    active = next((t for t in tiers if t.get("tier") == active_tier), tiers[0] if tiers else None)
+    if active:
+        story.append(Paragraph(f"BYUDZHET MATERIALI — {active.get('tier_name', active_tier)}", heading_s))
+        table_data = [["Material", "Kolichestvo", "Cena EUR", "Magazin", "Link"]]
+        for m in active.get("materials", []):
+            url = m.get("product_url", "")
+            link_text = url[:40] + "..." if len(url) > 40 else url
+            table_data.append([
+                str(m.get("name", "")),
+                str(m.get("quantity", "")),
+                str(m.get("price_eur", "")),
+                str(m.get("store", "")),
+                link_text
+            ])
+        table_data.append(["OBSHTO", "", str(active.get("total_eur", 0)), "", ""])
+
+        t = Table(table_data, colWidths=[45*mm, 25*mm, 22*mm, 28*mm, 55*mm])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1E2A38')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#CCCCCC')),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#F97316')),
+            ('TEXTCOLOR', (0, -1), (-1, -1), colors.white),
+        ]))
+        story.append(t)
+
+    labor = budget.get("labor_estimate_eur", 0)
+    if labor:
+        story.append(Spacer(1, 6))
+        story.append(Paragraph(f"Trud (orientirovcno): {labor} EUR", body_s))
+
+    story.append(Spacer(1, 12))
+    site_url = os.environ.get("REACT_APP_BACKEND_URL", "https://temadom.com")
+    story.append(Paragraph(f"temadom.com | {datetime.now().strftime('%d.%m.%Y')}", small_s))
+    if project_id:
+        story.append(Paragraph(f"Link: {site_url}/projects/{project_id}", small_s))
+
+    doc.build(story)
+    buf.seek(0)
+
+    return StreamingResponse(
+        buf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=temadom_3D_projekt_{project_id[:8] if project_id else 'new'}.pdf"}
+    )
+
+
+
 
     data = await request.json()
     materials = data.get("materials", {})

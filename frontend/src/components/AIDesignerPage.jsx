@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Camera, Loader2, X, Download, ArrowLeft, ArrowRight, Ruler, FileText, Upload, Plus,
-  ImageIcon, RotateCcw, CheckCircle, Info, ChevronDown, ChevronUp, Share2, ExternalLink,
-  ShoppingCart, Bookmark, Heart, Facebook, Twitter, Instagram, Link2, Copy, Eye } from 'lucide-react';
+import { Camera, Loader2, X, Download, ArrowLeft, ArrowRight, Ruler, Upload,
+  CheckCircle, ChevronDown, ChevronUp, Share2, ExternalLink,
+  ShoppingCart, Bookmark, RotateCcw, Eye, FileText, Maximize2, Copy,
+  Facebook, Twitter, MessageCircle, Mail, Link2, Phone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -25,16 +25,11 @@ const ROOM_TYPES = [
 ];
 
 const STYLES = [
-  { id: 'modern', name: 'Модерен' },
-  { id: 'minimalist', name: 'Минималист' },
-  { id: 'classic', name: 'Класически' },
-  { id: 'boho', name: 'Бохо' },
-  { id: 'hitech', name: 'Хай-тек' },
-  { id: 'industrial', name: 'Индустриален' },
-  { id: 'scandinavian', name: 'Скандинавски' },
-  { id: 'loft', name: 'Лофт' },
-  { id: 'neoclassic', name: 'Неокласически' },
-  { id: 'artdeco', name: 'Арт Деко' },
+  { id: 'modern', name: 'Модерен' }, { id: 'minimalist', name: 'Минималист' },
+  { id: 'classic', name: 'Класически' }, { id: 'boho', name: 'Бохо' },
+  { id: 'hitech', name: 'Хай-тек' }, { id: 'industrial', name: 'Индустриален' },
+  { id: 'scandinavian', name: 'Скандинавски' }, { id: 'loft', name: 'Лофт' },
+  { id: 'neoclassic', name: 'Неокласически' }, { id: 'artdeco', name: 'Арт Деко' },
 ];
 
 const PACKAGES = [
@@ -62,7 +57,7 @@ const GenProgress = ({ elapsed, total }) => {
   return (
     <div className="w-full" data-testid="progress-bar">
       <div className="flex justify-between items-end mb-2">
-        <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>AI генерира 360° дизайн...</span>
+        <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>AI генерира 3D рендери...</span>
         <span className="text-[#F97316] font-black text-2xl">{Math.round(pct)}%</span>
       </div>
       <div className="h-4 rounded-full overflow-hidden" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-border)' }}>
@@ -71,7 +66,7 @@ const GenProgress = ({ elapsed, total }) => {
       </div>
       <div className="flex justify-between text-[10px] mt-1" style={{ color: 'var(--theme-text-subtle)' }}>
         <span>0%</span>
-        <span>Снимки → AI анализ → 360° рендер → Бюджет → Линкове</span>
+        <span>Снимки → AI анализ → 3D рендери → Бюджет → Линкове</span>
         <span>100%</span>
       </div>
     </div>
@@ -122,7 +117,7 @@ const PhotoGuide = () => {
             </div>
             <div>
               <p className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>КАК ДА СНИМАШ ЗА ПЕРФЕКТЕН 3D ДИЗАЙН</p>
-              <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>3 снимки = 1 идеален 360° изглед</p>
+              <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>3 снимки = 3 реалистични 3D рендера</p>
             </div>
           </div>
           {open ? <ChevronUp className="h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} /> : <ChevronDown className="h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} />}
@@ -130,9 +125,9 @@ const PhotoGuide = () => {
         {open && (
           <div className="px-4 pb-4 space-y-3" data-testid="guide-content">
             {[
-              { icon: '1', title: 'ОБЩ ПЛАН', text: 'Застани в ДОСТЪПНА точка с НАЙ-ПЪЛЕН ИЗГЛЕД. Снимай цялото помещение наведнъж. Включи колкото се може повече стени/обекти.' },
-              { icon: '2', title: 'ЪГЪЛ 1 (напред-дясно)', text: 'Застани в ЕДИН ЪГЪЛ на помещението. Снимай НАПРЕД-ДЯСНО с максимален обхват (180°).' },
-              { icon: '3', title: 'ЪГЪЛ 2 (напред-ляво)', text: 'Застани в ПРОТИВОПОЛОЖЕН ЪГЪЛ. Снимай НАПРЕД-ЛЯВО (180° обхват). AI ще създаде ПЪЛНИЯ 360° ИЗГЛЕД.' },
+              { icon: '1', title: 'ОБЩ ПЛАН', text: 'Застани в ДОСТЪПНА точка с НАЙ-ПЪЛЕН ИЗГЛЕД. Снимай цялото помещение наведнъж.' },
+              { icon: '2', title: 'ЪГЪЛ 1 (напред-дясно)', text: 'Застани в ЕДИН ЪГЪЛ на помещението. Снимай НАПРЕД-ДЯСНО с максимален обхват.' },
+              { icon: '3', title: 'ЪГЪЛ 2 (напред-ляво)', text: 'Застани в ПРОТИВОПОЛОЖЕН ЪГЪЛ. Снимай НАПРЕД-ЛЯВО.' },
             ].map((step, i) => (
               <div key={i} className="rounded-lg p-3" style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.15)' }}>
                 <div className="flex items-start gap-3">
@@ -153,7 +148,7 @@ const PhotoGuide = () => {
               </div>
             </div>
             <div className="rounded-lg p-3" style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.2)' }}>
-              <p className="text-[#F97316] text-xs font-medium">JPG/PNG (макс 10MB) | Поне 1 снимка задължителна | Хоризонтално (landscape) за 360°</p>
+              <p className="text-[#F97316] text-xs font-medium">JPG/PNG (макс 10MB) | Поне 1 снимка задължителна</p>
             </div>
           </div>
         )}
@@ -165,24 +160,17 @@ const PhotoGuide = () => {
 /* ---- Budget Tier Card ---- */
 const BudgetTierCard = ({ tier, isActive, onClick }) => {
   if (!tier) return null;
-  const colors = { economy: '#10B981', medium: '#F97316', premium: '#8B5CF6' };
-  const icons = { economy: '💰', medium: '⭐', premium: '👑' };
-  const color = colors[tier.tier] || '#F97316';
-
+  const colorsMap = { economy: '#10B981', medium: '#F97316', premium: '#8B5CF6' };
+  const icons = { economy: '(E)', medium: '(S)', premium: '(P)' };
+  const color = colorsMap[tier.tier] || '#F97316';
   return (
-    <button
-      onClick={onClick}
+    <button onClick={onClick}
       className={`p-4 rounded-xl text-left transition-all w-full ${isActive ? 'ring-2 scale-[1.02]' : 'hover:shadow-md'}`}
-      style={{
-        background: 'var(--theme-card-bg)',
-        border: `2px solid ${isActive ? color : 'var(--theme-border)'}`,
-        ringColor: color
-      }}
-      data-testid={`budget-tier-${tier.tier}`}
-    >
+      style={{ background: 'var(--theme-card-bg)', border: `2px solid ${isActive ? color : 'var(--theme-border)'}`, ringColor: color }}
+      data-testid={`budget-tier-${tier.tier}`}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-lg">{icons[tier.tier] || '⭐'}</span>
-        <span className="font-black text-xl" style={{ color }}>{tier.total_eur || 0}€</span>
+        <span className="text-sm font-bold" style={{ color }}>{icons[tier.tier]}</span>
+        <span className="font-black text-xl" style={{ color }}>{tier.total_eur || 0}EUR</span>
       </div>
       <p className="font-bold text-sm" style={{ color: 'var(--theme-text)' }}>{tier.tier_name}</p>
       <p className="text-[10px] mt-1" style={{ color: 'var(--theme-text-muted)' }}>{tier.materials?.length || 0} материала</p>
@@ -192,17 +180,15 @@ const BudgetTierCard = ({ tier, isActive, onClick }) => {
 
 /* ---- Product Link Row ---- */
 const ProductLink = ({ material }) => (
-  <div className="flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5" 
+  <div className="flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5"
     style={{ borderBottom: '1px solid var(--theme-border)' }}
     data-testid={`product-${material.name}`}>
     <div className="flex-1 min-w-0 mr-3">
       <p className="font-medium text-sm truncate" style={{ color: 'var(--theme-text)' }}>{material.name}</p>
-      <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>
-        {material.quantity} | {material.store}
-      </p>
+      <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>{material.quantity} | {material.store}</p>
     </div>
     <div className="flex items-center gap-2 flex-shrink-0">
-      <span className="text-[#F97316] font-bold text-sm">{material.price_eur}€</span>
+      <span className="text-[#F97316] font-bold text-sm">{material.price_eur}EUR</span>
       {material.product_url && (
         <a href={material.product_url} target="_blank" rel="noopener noreferrer"
           className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F97316]/10 text-[#F97316] text-[10px] font-bold hover:bg-[#F97316]/20 transition-colors"
@@ -214,18 +200,122 @@ const ProductLink = ({ material }) => (
   </div>
 );
 
-/* ---- Share Modal ---- */
-const SharePanel = ({ projectId, onClose }) => {
+/* ---- Fullscreen Image Viewer ---- */
+const FullscreenViewer = ({ renders, startIndex, onClose }) => {
+  const [idx, setIdx] = useState(startIndex);
+  const touchStart = useRef(null);
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft') setIdx(p => Math.max(0, p - 1));
+      if (e.key === 'ArrowRight') setIdx(p => Math.min(renders.length - 1, p + 1));
+    };
+    window.addEventListener('keydown', handleKey);
+    document.body.style.overflow = 'hidden';
+    return () => { window.removeEventListener('keydown', handleKey); document.body.style.overflow = ''; };
+  }, [onClose, renders.length]);
+
+  const handleTouchStart = (e) => { touchStart.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (!touchStart.current) return;
+    const diff = touchStart.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0 && idx < renders.length - 1) setIdx(idx + 1);
+      if (diff < 0 && idx > 0) setIdx(idx - 1);
+    }
+    touchStart.current = null;
+  };
+
+  const downloadCurrent = () => {
+    const r = renders[idx];
+    if (!r?.image_base64) return;
+    const link = document.createElement('a');
+    link.href = `data:image/png;base64,${r.image_base64}`;
+    link.download = `temadom_3D_projekt_${idx + 1}.jpg`;
+    link.click();
+    toast.success('Изтеглено!');
+  };
+
+  const current = renders[idx];
+  if (!current) return null;
+
+  return (
+    <div className="fixed inset-0 z-[9999] bg-black flex flex-col"
+      onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}
+      data-testid="fullscreen-viewer">
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 py-3 bg-black/80 backdrop-blur-sm">
+        <span className="text-white text-sm font-bold">{current.label} ({idx + 1}/{renders.length})</span>
+        <div className="flex items-center gap-3">
+          <button onClick={downloadCurrent} className="text-white/80 hover:text-white p-2" data-testid="fullscreen-download">
+            <Download className="h-5 w-5" />
+          </button>
+          <button onClick={onClose} className="text-white/80 hover:text-white p-2" data-testid="fullscreen-close">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+      {/* Image */}
+      <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+        <img src={`data:image/png;base64,${current.image_base64}`} alt={current.label}
+          className="max-w-full max-h-full object-contain" draggable={false} />
+        {/* Nav arrows */}
+        {idx > 0 && (
+          <button onClick={() => setIdx(idx - 1)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+            data-testid="fullscreen-prev">
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+        )}
+        {idx < renders.length - 1 && (
+          <button onClick={() => setIdx(idx + 1)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+            data-testid="fullscreen-next">
+            <ArrowRight className="h-5 w-5" />
+          </button>
+        )}
+      </div>
+      {/* Bottom dots */}
+      <div className="flex justify-center gap-2 py-3 bg-black/80">
+        {renders.map((_, i) => (
+          <button key={i} onClick={() => setIdx(i)}
+            className={`w-2.5 h-2.5 rounded-full transition-all ${i === idx ? 'bg-[#F97316] scale-125' : 'bg-white/40'}`} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ---- Share Menu ---- */
+const ShareMenu = ({ projectId, budget, onClose }) => {
   const shareUrl = `${SITE_URL}/projects/${projectId}`;
+  const shareText = `3D дизайн проект от TemaDom${budget ? ` | Бюджет: ${budget}EUR` : ''}`;
   const [copied, setCopied] = useState(false);
+
   const copyLink = () => {
     navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     toast.success('Линкът е копиран!');
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const nativeShare = () => {
+    if (navigator.share) {
+      navigator.share({ title: 'Моят 3D проект от TemaDom', url: shareUrl, text: shareText });
+    }
+  };
+
+  const links = [
+    { name: 'Facebook', icon: Facebook, color: '#1877F2', url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}` },
+    { name: 'WhatsApp', icon: MessageCircle, color: '#25D366', url: `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}` },
+    { name: 'Viber', icon: Phone, color: '#7360F2', url: `viber://forward?text=${encodeURIComponent(shareText + ' ' + shareUrl)}` },
+    { name: 'Twitter', icon: Twitter, color: '#000', url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}` },
+    { name: 'Email', icon: Mail, color: '#EA4335', url: `mailto:?subject=${encodeURIComponent('Моят 3D проект от TemaDom')}&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}` },
+  ];
+
   return (
-    <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+    <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="share-menu">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <h4 className="font-bold text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
@@ -240,22 +330,27 @@ const SharePanel = ({ projectId, onClose }) => {
             {copied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </Button>
         </div>
-        {/* Social links */}
-        <div className="flex gap-2">
-          <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#1877F2] text-white text-xs font-medium hover:opacity-90" data-testid="share-fb">
-            <Facebook className="h-3.5 w-3.5" /> Facebook
-          </a>
-          <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent('Вижте моя 3D дизайн проект в TemaDom!')}`} target="_blank" rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-black text-white text-xs font-medium hover:opacity-90" data-testid="share-twitter">
-            <Twitter className="h-3.5 w-3.5" /> Twitter
-          </a>
+        {/* Social links grid */}
+        <div className="grid grid-cols-3 gap-2 mb-2">
+          {links.map(l => (
+            <a key={l.name} href={l.url} target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-white text-xs font-medium hover:opacity-90 transition-opacity"
+              style={{ background: l.color }} data-testid={`share-${l.name.toLowerCase()}`}>
+              <l.icon className="h-3.5 w-3.5" /> {l.name}
+            </a>
+          ))}
           <button onClick={copyLink}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium" 
-            style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text)' }} data-testid="share-link">
+            className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-medium"
+            style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}
+            data-testid="share-link">
             <Link2 className="h-3.5 w-3.5" /> Линк
           </button>
         </div>
+        {navigator.share && (
+          <Button variant="outline" className="w-full text-xs" onClick={nativeShare} data-testid="share-native">
+            <Share2 className="h-3.5 w-3.5 mr-1.5" /> Още опции...
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
@@ -278,9 +373,10 @@ export const AIDesignerPage = () => {
   const [elapsed, setElapsed] = useState(0);
   const [uploadPct, setUploadPct] = useState(0);
   const [results, setResults] = useState(null);
-  const [activeAngle, setActiveAngle] = useState(0);
   const [activeTier, setActiveTier] = useState('medium');
   const [showShare, setShowShare] = useState(false);
+  const [fullscreenIdx, setFullscreenIdx] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [myProjects, setMyProjects] = useState([]);
   const [showProjects, setShowProjects] = useState(false);
   const timerRef = useRef(null);
@@ -331,8 +427,7 @@ export const AIDesignerPage = () => {
         onUploadProgress: (e) => { if (e.total) setUploadPct(Math.round((e.loaded / e.total) * 100)); },
       });
       setResults(res.data);
-      setActiveAngle(0);
-      toast.success('360° дизайн генериран успешно!');
+      toast.success('3D рендери генерирани успешно!');
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка при генериране');
     }
@@ -347,8 +442,46 @@ export const AIDesignerPage = () => {
     setPhotoUrls([null, null, null]);
     setResults(null);
     setElapsed(0);
-    setActiveAngle(0);
     setShowShare(false);
+    setFullscreenIdx(null);
+  };
+
+  const downloadRender = (render, idx) => {
+    if (!render?.image_base64) return;
+    const link = document.createElement('a');
+    link.href = `data:image/png;base64,${render.image_base64}`;
+    link.download = `temadom_3D_projekt_${idx + 1}.jpg`;
+    link.click();
+    toast.success('Изтеглено!');
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!results) return;
+    setPdfLoading(true);
+    try {
+      const budgetTiers = results.budget?.budget_tiers || [];
+      const currentTier = budgetTiers.find(t => t.tier === activeTier) || budgetTiers[0];
+      const res = await axios.post(`${API}/ai-designer/photo-pdf`, {
+        renders: (results.renders || []).map(r => ({ label: r.label, image_base64: r.image_base64 })),
+        budget: results.budget || {},
+        dimensions: results.dimensions || {},
+        style: results.style || 'modern',
+        budget_eur: budget,
+        project_id: results.id || '',
+        active_tier: activeTier,
+      }, { responseType: 'blob' });
+
+      const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `temadom_3D_projekt_${results.id?.slice(0, 8) || 'new'}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('PDF изтеглен!');
+    } catch {
+      toast.error('Грешка при генериране на PDF');
+    }
+    setPdfLoading(false);
   };
 
   const loadMyProjects = async () => {
@@ -365,15 +498,12 @@ export const AIDesignerPage = () => {
       const res = await axios.get(`${API}/ai-designer/project/${projectId}`);
       setResults(res.data);
       setShowProjects(false);
-      setActiveAngle(0);
     } catch { toast.error('Грешка при зареждане на проект'); }
   };
 
-  const angles = results?.generated_images?.[0]?.angles || [];
-  const beforeImg = results?.before_photo ? `data:image/jpeg;base64,${results.before_photo}` : null;
+  const renders = results?.renders || [];
   const budgetTiers = results?.budget?.budget_tiers || [];
   const currentTierData = budgetTiers.find(t => t.tier === activeTier) || budgetTiers[0];
-
   const photoLabels = ['Общ план', 'Ъгъл 1', 'Ъгъл 2'];
 
   return (
@@ -386,9 +516,9 @@ export const AIDesignerPage = () => {
             <h1 className="text-2xl md:text-3xl font-black tracking-tight" style={{ color: 'var(--theme-text)' }}>
               TEMADOM <span className="text-[#F97316]">3D DESIGNER</span>
             </h1>
-            <Badge className="bg-[#F97316]/15 text-[#F97316] text-[10px] font-bold">v7.0</Badge>
+            <Badge className="bg-[#F97316]/15 text-[#F97316] text-[10px] font-bold">v8.0</Badge>
           </div>
-          <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>3 снимки → РЕАЛИСТИЧЕН 360° дизайн + бюджет с директни линкове</p>
+          <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>3 снимки → 3 РЕАЛИСТИЧНИ 3D рендера + бюджет с директни линкове</p>
         </div>
 
         {/* My Projects Button */}
@@ -436,16 +566,13 @@ export const AIDesignerPage = () => {
 
         {!results ? (
           <div className="space-y-4">
-            {/* Photo Guide */}
             <PhotoGuide />
 
             {/* Package Selection */}
             <div className="grid grid-cols-3 gap-2" data-testid="package-selection">
               {PACKAGES.map(p => (
                 <button key={p.id} onClick={() => setPkg(p)}
-                  className={`p-4 rounded-xl text-center transition-all ${
-                    pkg.id === p.id ? 'scale-[1.03] shadow-lg' : 'hover:shadow-md'
-                  }`}
+                  className={`p-4 rounded-xl text-center transition-all ${pkg.id === p.id ? 'scale-[1.03] shadow-lg' : 'hover:shadow-md'}`}
                   style={{
                     background: 'var(--theme-card-bg)',
                     border: `2px solid ${pkg.id === p.id ? '#F97316' : 'var(--theme-border)'}`,
@@ -459,7 +586,7 @@ export const AIDesignerPage = () => {
               ))}
             </div>
 
-            {/* Photo Upload Grid (3 slots) */}
+            {/* Photo Upload Grid */}
             <div className="grid grid-cols-3 gap-3" data-testid="photo-upload-grid">
               {[0, 1, 2].map(idx => (
                 <div key={idx} className="relative">
@@ -467,14 +594,12 @@ export const AIDesignerPage = () => {
                     {photoLabels[idx]} {idx === 0 && <span className="text-red-400">*</span>}
                   </Label>
                   {!photos[idx] ? (
-                    <div
-                      className="aspect-square rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all hover:border-[#F97316]/40"
+                    <div className="aspect-square rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all hover:border-[#F97316]/40"
                       style={{ background: 'var(--theme-card-bg)', border: '2px dashed var(--theme-border)' }}
                       onDrop={(e) => { e.preventDefault(); handlePhotoSelect(idx, e.dataTransfer.files?.[0]); }}
                       onDragOver={(e) => e.preventDefault()}
                       onClick={() => fileInputRefs.current[idx]?.click()}
-                      data-testid={`photo-drop-${idx}`}
-                    >
+                      data-testid={`photo-drop-${idx}`}>
                       <input ref={el => fileInputRefs.current[idx] = el} type="file" accept="image/*"
                         capture="environment" className="hidden"
                         onChange={e => handlePhotoSelect(idx, e.target.files?.[0])} data-testid={`photo-input-${idx}`} />
@@ -534,19 +659,17 @@ export const AIDesignerPage = () => {
                     <div className="relative">
                       <Input type="number" step="100" min="500" max="50000" value={budget} onChange={e => setBudget(e.target.value)}
                         className="h-14 text-center text-2xl font-black pl-8" data-testid="budget-input" />
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#F97316] font-bold text-lg">€</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#F97316] font-bold text-lg">EUR</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-2">
                   {[1000, 2000, 3000, 5000, 10000].map(v => (
                     <button key={v} onClick={() => setBudget(String(v))}
-                      className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
-                        budget === String(v) ? 'bg-[#F97316] text-white' : ''
-                      }`}
+                      className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${budget === String(v) ? 'bg-[#F97316] text-white' : ''}`}
                       style={budget !== String(v) ? { background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)', border: '1px solid var(--theme-border)' } : {}}
                       data-testid={`budget-${v}`}>
-                      €{v.toLocaleString()}
+                      EUR{v.toLocaleString()}
                     </button>
                   ))}
                 </div>
@@ -563,9 +686,7 @@ export const AIDesignerPage = () => {
                   <Label className="text-[10px] mb-2 block" style={{ color: 'var(--theme-text-subtle)' }}>Тип помещение</Label>
                   <Select value={roomType} onValueChange={setRoomType}>
                     <SelectTrigger className="h-10" data-testid="room-type"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {ROOM_TYPES.map(rt => <SelectItem key={rt.id} value={rt.id}>{rt.name}</SelectItem>)}
-                    </SelectContent>
+                    <SelectContent>{ROOM_TYPES.map(rt => <SelectItem key={rt.id} value={rt.id}>{rt.name}</SelectItem>)}</SelectContent>
                   </Select>
                 </CardContent>
               </Card>
@@ -574,9 +695,7 @@ export const AIDesignerPage = () => {
                   <Label className="text-[10px] mb-2 block" style={{ color: 'var(--theme-text-subtle)' }}>Стил</Label>
                   <Select value={style} onValueChange={setStyle}>
                     <SelectTrigger className="h-10" data-testid="style-select"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {STYLES.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
-                    </SelectContent>
+                    <SelectContent>{STYLES.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                   </Select>
                 </CardContent>
               </Card>
@@ -596,11 +715,11 @@ export const AIDesignerPage = () => {
             {loading ? (
               <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
                 <CardContent className="py-8 px-6">
-                  <GenProgress elapsed={elapsed} total={120} />
+                  <GenProgress elapsed={elapsed} total={180} />
                   {uploadPct > 0 && uploadPct < 100 && <UploadProgress pct={uploadPct} />}
                   <div className="flex items-center justify-center gap-3 mt-6">
                     <Loader2 className="h-6 w-6 animate-spin text-[#F97316]" />
-                    <span className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>AI анализира снимки → 360° рендер → Бюджет с линкове...</span>
+                    <span className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>AI генерира 3D рендери + бюджет с линкове...</span>
                   </div>
                 </CardContent>
               </Card>
@@ -621,67 +740,79 @@ export const AIDesignerPage = () => {
           /* ===== RESULTS ===== */
           <div className="space-y-4">
 
-            {/* 360° Angle tabs */}
-            {angles.length > 1 && (
-              <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
-                <CardContent className="py-2 px-3">
-                  <div className="flex gap-1.5 overflow-x-auto" data-testid="angle-tabs">
-                    {angles.map((a, i) => (
-                      <button key={i} onClick={() => setActiveAngle(i)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                          activeAngle === i ? 'bg-[#F97316] text-white' : ''
-                        }`}
-                        style={activeAngle !== i ? { background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)', border: '1px solid var(--theme-border)' } : {}}
-                        data-testid={`angle-tab-${i}`}>
-                        {a.label || `Ъгъл ${i + 1}`}
-                      </button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {/* === 3 SEPARATE 3D RENDERS === */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Camera className="h-5 w-5 text-[#F97316]" />
+                <h3 className="font-black text-sm" style={{ color: 'var(--theme-text)' }}>3D РЕНДЕРИ ({renders.length})</h3>
+                <Badge className="bg-[#10B981]/15 text-[#10B981] text-[10px] ml-auto">
+                  {results?.photos_count || 0} снимки → {renders.length} рендера
+                </Badge>
+              </div>
 
-            {/* 360° Before/After */}
-            <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
-                  360° ПРЕДИ / СЛЕД
-                  <Badge className="bg-[#10B981]/15 text-[#10B981] text-[10px] ml-auto">
-                    {angles.length} ъгъла | {results?.photos_count || 3} снимки
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {(() => {
-                  const afterImg = angles[activeAngle]?.image_base64 ? `data:image/png;base64,${angles[activeAngle].image_base64}` : null;
-                  if (!afterImg) return <p className="text-center py-8" style={{ color: 'var(--theme-text-muted)' }}>Няма генерирано изображение</p>;
-                  if (beforeImg) return <BeforeAfterSlider before={beforeImg} after={afterImg} label={`360° ротация | ${angles[activeAngle]?.label || ''}`} />;
-                  return <img src={afterImg} alt="Renovation" className="w-full rounded-xl" />;
-                })()}
-              </CardContent>
-            </Card>
+              {/* Render grid */}
+              <div className={`grid gap-3 ${renders.length === 1 ? 'grid-cols-1' : renders.length === 2 ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}
+                data-testid="renders-grid">
+                {renders.map((r, i) => {
+                  const afterImg = `data:image/png;base64,${r.image_base64}`;
+                  const beforeImg = r.original_base64 ? `data:image/jpeg;base64,${r.original_base64}` : null;
+                  return (
+                    <Card key={i} className="overflow-hidden" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}
+                      data-testid={`render-card-${i}`}>
+                      <CardContent className="p-0">
+                        {/* Before/After or just render */}
+                        {beforeImg ? (
+                          <BeforeAfterSlider before={beforeImg} after={afterImg} label={r.label} />
+                        ) : (
+                          <div className="relative aspect-video">
+                            <img src={afterImg} alt={r.label} className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        {/* Actions bar */}
+                        <div className="flex items-center justify-between px-3 py-2" style={{ borderTop: '1px solid var(--theme-border)' }}>
+                          <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>{r.label}</span>
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => setFullscreenIdx(i)}
+                              className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                              style={{ color: 'var(--theme-text-muted)' }}
+                              data-testid={`fullscreen-btn-${i}`}>
+                              <Maximize2 className="h-4 w-4" />
+                            </button>
+                            <button onClick={() => downloadRender(r, i)}
+                              className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                              style={{ color: 'var(--theme-text-muted)' }}
+                              data-testid={`download-render-${i}`}>
+                              <Download className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
 
-            {/* BUDGET SECTION with 3 tiers */}
+              {renders.length === 0 && (
+                <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+                  <CardContent className="py-8 text-center">
+                    <p style={{ color: 'var(--theme-text-muted)' }}>Няма генерирани рендери. Опитайте отново.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* BUDGET SECTION */}
             {budgetTiers.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <ShoppingCart className="h-5 w-5 text-[#F97316]" />
                   <h3 className="font-black text-sm" style={{ color: 'var(--theme-text)' }}>БЮДЖЕТ МАТЕРИАЛИ + ДИРЕКТНИ ЛИНКОВЕ</h3>
                 </div>
-
-                {/* Tier selection */}
                 <div className="grid grid-cols-3 gap-2" data-testid="budget-tiers">
                   {budgetTiers.map(tier => (
-                    <BudgetTierCard
-                      key={tier.tier}
-                      tier={tier}
-                      isActive={activeTier === tier.tier}
-                      onClick={() => setActiveTier(tier.tier)}
-                    />
+                    <BudgetTierCard key={tier.tier} tier={tier} isActive={activeTier === tier.tier} onClick={() => setActiveTier(tier.tier)} />
                   ))}
                 </div>
-
-                {/* Active tier materials with links */}
                 {currentTierData && (
                   <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
                     <CardHeader className="pb-2">
@@ -689,25 +820,23 @@ export const AIDesignerPage = () => {
                         <CardTitle className="text-sm" style={{ color: 'var(--theme-text)' }}>
                           {currentTierData.tier_name} — {currentTierData.materials?.length || 0} материала
                         </CardTitle>
-                        <span className="text-[#F97316] font-black text-xl">{currentTierData.total_eur}€</span>
+                        <span className="text-[#F97316] font-black text-xl">{currentTierData.total_eur}EUR</span>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <div className="space-y-0">
-                        {(currentTierData.materials || []).map((m, i) => (
-                          <ProductLink key={i} material={m} />
-                        ))}
+                        {(currentTierData.materials || []).map((m, i) => <ProductLink key={i} material={m} />)}
                       </div>
                       {results?.budget?.labor_estimate_eur && (
                         <div className="flex items-center justify-between pt-3 mt-3" style={{ borderTop: '2px solid var(--theme-border)' }}>
                           <span className="text-sm font-medium" style={{ color: 'var(--theme-text-muted)' }}>Труд (ориентировъчно):</span>
-                          <span className="text-[#F97316] font-bold">{results.budget.labor_estimate_eur}€</span>
+                          <span className="text-[#F97316] font-bold">{results.budget.labor_estimate_eur}EUR</span>
                         </div>
                       )}
                       <div className="flex items-center justify-between pt-2 mt-2" style={{ borderTop: '2px solid var(--theme-border)' }}>
                         <span className="font-bold" style={{ color: 'var(--theme-text)' }}>ОБЩО:</span>
                         <span className="text-[#F97316] font-black text-2xl">
-                          {(currentTierData.total_eur || 0) + (results?.budget?.labor_estimate_eur || 0)}€
+                          {(currentTierData.total_eur || 0) + (results?.budget?.labor_estimate_eur || 0)}EUR
                         </span>
                       </div>
                       <p className="text-[9px] mt-2 text-center" style={{ color: 'var(--theme-text-subtle)' }}>
@@ -720,26 +849,24 @@ export const AIDesignerPage = () => {
             )}
 
             {/* Share section */}
-            {showShare && results?.id && <SharePanel projectId={results.id} onClose={() => setShowShare(false)} />}
+            {showShare && results?.id && (
+              <ShareMenu
+                projectId={results.id}
+                budget={currentTierData?.total_eur}
+                onClose={() => setShowShare(false)}
+              />
+            )}
 
-            {/* Action buttons */}
-            <div className="grid grid-cols-3 gap-2">
+            {/* Action buttons: PDF + Share + Save */}
+            <div className="grid grid-cols-3 gap-2" data-testid="result-actions">
+              <Button className="h-12 bg-[#10B981] hover:bg-[#059669] text-white font-bold text-sm"
+                onClick={handleDownloadPDF} disabled={pdfLoading} data-testid="pdf-btn">
+                {pdfLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <FileText className="mr-1.5 h-4 w-4" />}
+                {pdfLoading ? 'PDF...' : 'PDF'}
+              </Button>
               <Button className="h-12 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-sm"
                 onClick={() => setShowShare(!showShare)} data-testid="share-btn">
                 <Share2 className="mr-1.5 h-4 w-4" /> Сподели
-              </Button>
-              <Button className="h-12 bg-[#10B981] hover:bg-[#059669] text-white font-bold text-sm"
-                onClick={() => {
-                  const afterImg = angles[activeAngle]?.image_base64;
-                  if (afterImg) {
-                    const link = document.createElement('a');
-                    link.href = `data:image/png;base64,${afterImg}`;
-                    link.download = `temadom-3d-${results?.id || 'design'}.png`;
-                    link.click();
-                    toast.success('Изтеглено!');
-                  }
-                }} data-testid="download-btn">
-                <Download className="mr-1.5 h-4 w-4" /> Свали
               </Button>
               <Button className="h-12 font-bold text-sm"
                 style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}
@@ -758,6 +885,11 @@ export const AIDesignerPage = () => {
           </div>
         )}
       </div>
+
+      {/* Fullscreen Viewer */}
+      {fullscreenIdx !== null && renders.length > 0 && (
+        <FullscreenViewer renders={renders} startIndex={fullscreenIdx} onClose={() => setFullscreenIdx(null)} />
+      )}
     </div>
   );
 };
