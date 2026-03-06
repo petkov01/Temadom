@@ -2660,18 +2660,91 @@ async def generate_photo_design(
     reno_instruction = notes or "complete renovation with modern finishes"
 
     try:
-        # Step 1: Generate 3 separate 3D renders — one per uploaded photo
+        # Step 1: Use GPT-4o Vision to analyze EACH photo — identify room, elements, layout
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         renders = []
+
+        ROOM_ELEMENT_MAP = {
+            "bathroom": "вана, душ кабина, тоалетна, мивка, огледало, плочки, бойлер",
+            "kitchen": "шкафове, плот, хладилник, печка, мивка, аспиратор, гранитогрес",
+            "living_room": "диван, маса, TV, килим, лампа, библиотека",
+            "bedroom": "легло, гардероб, нощно шкафче, матрак, килим",
+            "corridor": "закачалка, шкаф, огледало, осветление",
+            "balcony": "парапет, настилка, мебели, растения",
+            "stairs": "стъпала, парапет, осветление",
+            "facade": "мазилка, дограма, покрив",
+            "other": "мебели, декор, осветление"
+        }
+        expected_elements = ROOM_ELEMENT_MAP.get(room_type, "мебели, декор")
+
         for idx, photo_b64 in enumerate(photos_b64):
             label = photo_labels[idx] if idx < len(photo_labels) else f"Снимка {idx+1}"
             try:
-                render_prompt = f"""Realistic 3D interior design render based on this photo.
-Keep the EXACT same room dimensions ({width}m x {length}m, height {height}m), layout, geometry and perspective.
-Apply a modern renovation: {reno_instruction}
-Style: {style_desc}.
-Budget level: {budget_eur}EUR — materials should match this budget.
-Photorealistic, high quality, sharp details, professional interior photography, natural lighting, 8K."""
+                # Step 1a: Vision analysis of the uploaded photo
+                vision_chat = LlmChat(
+                    api_key=EMERGENT_LLM_KEY,
+                    session_id=f"photo-vision-{uuid.uuid4()}",
+                    system_message=f"""Ти си експерт по интериорен дизайн. Анализирай ТОЧНО какво виждаш на снимката.
+
+ЗАДАЧА: Опиши подробно помещението на снимката.
+Клиентът казва, че това е: {room_type_name}
+Очаквани елементи за {room_type_name}: {expected_elements}
+
+Отговори САМО в JSON:
+{{"room_type": "bathroom/kitchen/living_room/bedroom/...",
+"room_type_bg": "баня/кухня/хол/спалня/...",
+"confirmed_match": true/false,
+"elements_visible": ["вана", "мивка", "плочки", ...],
+"colors": ["бял", "сив", ...],
+"layout_description": "Правоъгълно помещение с вана вляво, мивка вдясно...",
+"dimensions_estimate": "приблизително 3x2 метра",
+"condition": "стара/нова/за ремонт",
+"camera_angle": "от вратата/от ъгъла/фронтално"}}"""
+                ).with_model("openai", "gpt-4o")
+
+                vision_msg = UserMessage(
+                    text=f"Анализирай тази снимка. Клиентът твърди, че е {room_type_name}. Потвърди или коригирай. Опиши ВСИЧКИ видими елементи.",
+                    file_contents=[ImageContent(image_base64=photo_b64)]
+                )
+                vision_response = await vision_chat.send_message(vision_msg)
+
+                # Parse vision analysis
+                room_analysis = {}
+                try:
+                    json_match = re_module.search(r'\{[\s\S]*\}', vision_response)
+                    if json_match:
+                        room_analysis = json_module.loads(json_match.group(0))
+                except Exception:
+                    room_analysis = {"room_type_bg": room_type_name, "elements_visible": [], "layout_description": ""}
+
+                detected_room = room_analysis.get("room_type_bg", room_type_name)
+                elements = ", ".join(room_analysis.get("elements_visible", [expected_elements]))
+                layout_desc = room_analysis.get("layout_description", "")
+                colors = ", ".join(room_analysis.get("colors", []))
+                camera_angle = room_analysis.get("camera_angle", "")
+
+                logging.info(f"Photo Designer: Vision detected '{detected_room}' for photo {idx+1} (user said: {room_type_name})")
+
+                # Step 1b: Generate 3D render with PRECISE room-aware prompt
+                render_prompt = f"""Photorealistic 3D interior design render of a {detected_room} ({room_type_name}).
+
+CRITICAL — THIS IS A {detected_room.upper()}! Generate ONLY a {detected_room}!
+Visible elements: {elements}
+{f"Layout: {layout_desc}" if layout_desc else ""}
+{f"Current colors: {colors}" if colors else ""}
+{f"Camera angle: {camera_angle}" if camera_angle else ""}
+
+Room dimensions: {width}m x {length}m, ceiling height {height}m.
+KEEP the EXACT same room shape, proportions and camera perspective.
+
+RENOVATION STYLE: {style_desc}
+{f"Notes: {reno_instruction}" if notes else "Apply modern renovation with high-quality finishes."}
+
+IMPORTANT RULES:
+- This MUST be a {detected_room}, NOT any other room type
+- Keep all structural elements (walls, doors, windows) in same positions
+- Replace old finishes with new modern materials matching {style_desc} style
+- Professional interior photography, natural lighting, 8K quality"""
 
                 img_result = await image_gen.generate_images(
                     prompt=render_prompt,
@@ -2686,7 +2759,7 @@ Photorealistic, high quality, sharp details, professional interior photography, 
                         "image_base64": img_b64,
                         "original_base64": photo_b64
                     })
-                    logging.info(f"Photo Designer: render {idx+1} ({label}) generated OK")
+                    logging.info(f"Photo Designer: render {idx+1} ({label}) generated as '{detected_room}' OK")
             except Exception as img_err:
                 logging.error(f"Photo Designer render {idx+1} error: {img_err}")
                 continue
