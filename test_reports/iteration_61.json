@@ -1,0 +1,90 @@
+{
+  "summary": "Iteration 61: Testing Affiliate Link Monetization features. All 9 backend tests passed. Frontend verification confirmed affiliate link pills with correct data-testids and tracking params. Community posts auto-detect product keywords (плочки, мивка, etc.) and store mentions (Praktiker, eMAG, etc.) to generate affiliate links with utm_source=temadom or ref=temadom tracking.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "=== BACKEND TESTS (9/9 passed) ===",
+    "✅ GET /api/ returns 200 - API health check",
+    "✅ POST /api/test-ai returns {status: 'AI OK', model: 'gpt-4o-mini'}",
+    "✅ POST /api/community/posts with 'плочки' returns affiliate_links array",
+    "✅ POST /api/community/posts with 'Praktiker' mention targets Praktiker store",
+    "✅ POST /api/community/posts without keywords returns empty affiliate_links",
+    "✅ Various product keywords (мивка, ламинат, боя) trigger affiliate links",
+    "✅ GET /api/community/posts returns posts with affiliate_links field",
+    "✅ Affiliate URLs contain correct tracking params (utm_source=temadom, ref=temadom)",
+    "✅ Existing test post found with affiliate links",
+    "",
+    "=== FRONTEND VERIFICATION ===",
+    "✅ Community page loads with data-testid='community-page'",
+    "✅ 25 posts visible on community page",
+    "✅ 3 affiliate link pills found with data-testid='aff-link-{postId}-{index}' pattern",
+    "✅ ExternalLink icons (svg) present inside affiliate pills",
+    "✅ Affiliate pill example: 'плочки Praktiker' with utm_source=temadom tracking",
+    "✅ Affiliate pill example: 'плочки eMAG' with ref=temadom tracking",
+    "✅ AI Designer page budget input working (placeholder 'Напр. 5000')"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iter61_affiliate_links.py",
+    "/app/test_reports/pytest/pytest_results_iter61.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All affiliate features verified:",
+    "1. ✅ AFFILIATE_CONFIG exists with ref_id='temadom' and 9 stores (Praktiker, Jysk, Mr.Bricolage, HomeMax, Bauhaus, eMAG, IKEA, Teknoimpex, Technomarket)",
+    "2. ✅ make_affiliate_url() function adds tracking params based on store config",
+    "3. ✅ Community POST auto-detects product keywords: плочки, фаянс, теракот, мивка, тоалетна, душ, вана, батерия, смесител, бойлер, ламинат, паркет, боя, шкаф, мебели, осветление, лампа, огледало, кухня, климатик, радиатор",
+    "4. ✅ Community POST auto-detects store mentions: praktiker, jysk, mr.bricolage, мр бриколаж, homemax, хоум макс, bauhaus, баухаус, ikea, икеа, emag, имаг, teknoimpex, technomarket, техномаркет",
+    "5. ✅ Frontend CommunityPage.jsx imports ExternalLink icon from lucide-react",
+    "6. ✅ Affiliate link pills have data-testid='aff-link-{postId}-{index}' for testing",
+    "7. ✅ Budget materials in AI Designer include affiliate tracking in product_url",
+    "8. ✅ Non-intrusive design - only first matched keyword generates links, max 2 stores"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter61_affiliate_links.py"
+  ],
+  "success_rate": {
+    "backend": "100% (9/9 tests passed)",
+    "frontend": "100% (all affiliate UI elements verified)"
+  },
+  "test_credentials": "testfix@test.bg / Test123!",
+  "seed_data_creation": "Created test posts with product mentions during testing (auto-deleted)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 61 verified affiliate link monetization: 1) AFFILIATE_CONFIG at server.py line ~82 with ref_id='temadom', 2) make_affiliate_url() at line ~97 adds tracking params, 3) Community posts auto-detect product/store keywords at line ~5158, 4) Frontend shows affiliate pills with ExternalLink icons and correct data-testids. Product scraping is still MOCKED for most stores (/api/scrape/*).",
+  "features_tested": {
+    "affiliate_config": {
+      "status": "PASS",
+      "ref_id": "temadom",
+      "stores": ["Praktiker", "Jysk", "Mr.Bricolage", "HomeMax", "Bauhaus", "eMAG", "IKEA", "Teknoimpex", "Technomarket"]
+    },
+    "make_affiliate_url": {
+      "status": "PASS",
+      "location": "server.py line ~97",
+      "behavior": "Adds utm_source=temadom or ref=temadom based on store config"
+    },
+    "community_post_detection": {
+      "status": "PASS",
+      "product_keywords_detected": ["плочки", "мивка", "ламинат", "боя"],
+      "store_mentions_detected": ["Praktiker", "eMAG"]
+    },
+    "frontend_affiliate_pills": {
+      "status": "PASS",
+      "data_testid_pattern": "aff-link-{postId}-{index}",
+      "external_link_icon": "Present"
+    },
+    "budget_materials_affiliate": {
+      "status": "PASS",
+      "note": "product_url includes affiliate tracking via make_affiliate_url()"
+    }
+  },
+  "mocked_apis": {
+    "Product scraping": "/api/scrape/* - scraping logic is placeholder for most stores"
+  }
+}

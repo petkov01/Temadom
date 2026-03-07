@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { MessageSquare, Heart, Send, Trash2, Image as ImageIcon, Share2,
   ChevronDown, Filter, PlusCircle, X, User, Building2, Clock, Bookmark,
-  Euro, CalendarDays, Briefcase, Eye } from 'lucide-react';
+  Euro, CalendarDays, Briefcase, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -360,6 +360,24 @@ const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
 
         {/* Text */}
         <p className="text-sm mb-3 whitespace-pre-wrap" style={{ color: 'var(--theme-text)' }}>{post.text}</p>
+
+        {/* Affiliate product suggestions (auto-detected, non-intrusive) */}
+        {post.affiliate_links?.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3" data-testid={`affiliate-links-${post.id}`}>
+            {post.affiliate_links.map((link, li) => (
+              <a key={li} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all hover:scale-105 hover:shadow-sm"
+                style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)', border: '1px solid var(--theme-border)' }}
+                data-testid={`aff-link-${post.id}-${li}`}>
+                <ExternalLink className="h-3 w-3 text-[#F97316]" />
+                <span>{link.search_term}</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
+                  {link.store}
+                </span>
+              </a>
+            ))}
+          </div>
+        )}
 
         {/* Project data */}
         {post.project_data && (

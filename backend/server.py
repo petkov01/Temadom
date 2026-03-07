@@ -77,6 +77,34 @@ PAYMENT_PACKAGES = {
 app = FastAPI(title="Maistori Marketplace API")
 api_router = APIRouter(prefix="/api")
 
+# ==================== AFFILIATE CONFIG ====================
+# Affiliate ref parameters for each store (monetization)
+AFFILIATE_CONFIG = {
+    "ref_id": "temadom",  # Default affiliate/referral ID
+    "stores": {
+        "Praktiker":     {"param": "utm_source", "ref": "temadom", "extra": "&utm_medium=affiliate&utm_campaign=temadom"},
+        "Mr.Bricolage":  {"param": "ref", "ref": "temadom"},
+        "Jysk":          {"param": "utm_source", "ref": "temadom", "extra": "&utm_medium=affiliate"},
+        "HomeMax":       {"param": "ref", "ref": "temadom"},
+        "Bauhaus":       {"param": "utm_source", "ref": "temadom", "extra": "&utm_medium=affiliate"},
+        "eMAG":          {"param": "ref", "ref": "temadom"},
+        "IKEA":          {"param": "utm_source", "ref": "temadom", "extra": "&utm_medium=affiliate"},
+        "Teknoimpex":    {"param": "ref", "ref": "temadom"},
+        "Technomarket":  {"param": "ref", "ref": "temadom"},
+    }
+}
+
+def make_affiliate_url(url: str, store_name: str = "") -> str:
+    """Add affiliate tracking parameters to any store URL."""
+    if not url or not url.startswith("http"):
+        return url
+    config = AFFILIATE_CONFIG["stores"].get(store_name, {})
+    param = config.get("param", "ref")
+    ref = config.get("ref", AFFILIATE_CONFIG["ref_id"])
+    extra = config.get("extra", "")
+    separator = "&" if "?" in url else "?"
+    return f"{url}{separator}{param}={ref}{extra}"
+
 # Categories for construction/renovation
 CATEGORIES = [
     {"id": "electricity", "name": "Електричество", "icon": "Zap"},
@@ -2928,7 +2956,7 @@ IMPORTANT RULES:
         except Exception:
             budget_data = {"budget_tiers": [], "labor_estimate_eur": 0}
 
-        # Post-process: Generate REAL search URLs from search_query + store
+        # Post-process: Generate REAL search URLs with AFFILIATE tracking
         from urllib.parse import quote as url_quote
         for tier in budget_data.get("budget_tiers", []):
             for mat in tier.get("materials", []):
@@ -2937,18 +2965,17 @@ IMPORTANT RULES:
                 encoded_q = url_quote(search_q, safe='')
                 real_url = STORE_SEARCH_URLS.get(store, "")
                 if real_url:
-                    mat["product_url"] = f"{real_url}{encoded_q}"
+                    base_url = f"{real_url}{encoded_q}"
                 else:
-                    # Fallback to eMAG search
-                    mat["product_url"] = f"https://www.emag.bg/search/{encoded_q}"
+                    base_url = f"https://www.emag.bg/search/{encoded_q}"
                     if not store:
                         mat["store"] = "eMAG"
-                # Remove any AI-hallucinated URLs
-                if "product_id" in mat:
-                    del mat["product_id"]
-                if "available" in mat:
-                    del mat["available"]
-        logging.info(f"Photo Designer: Budget generated with real search URLs")
+                # Apply affiliate tracking
+                mat["product_url"] = make_affiliate_url(base_url, mat.get("store", store))
+                # Remove any AI-hallucinated fields
+                for key in ["product_id", "available"]:
+                    mat.pop(key, None)
+        logging.info(f"Photo Designer: Budget with affiliate search URLs")
 
         # Save project to DB
         design_id = str(uuid.uuid4())
@@ -4964,7 +4991,7 @@ async def scrape_store(store_key: str, query: str) -> list:
                                     "name": name[:100],
                                     "price_bgn": price_num,
                                     "price_eur": round(price_num / 1.96, 2) if price_num > 0 else 0,
-                                    "url": full_link,
+                                    "url": make_affiliate_url(full_link, store["name"]),
                                     "store": store["name"],
                                     "available": True,
                                     "scraped": True,
@@ -5128,6 +5155,57 @@ async def create_post(request: Request, user: dict = Depends(get_current_user)):
     if not text and not project_id and not images_b64:
         raise HTTPException(status_code=400, detail="Добавете текст, снимка или проект")
 
+    # Auto-detect product/store mentions → generate affiliate links
+    affiliate_links = []
+    text_lower = text.lower()
+    # Product keywords that indicate a potential product mention
+    PRODUCT_KEYWORDS = {
+        "плочки": "плочки", "фаянс": "фаянс", "теракот": "теракота", "гранитогрес": "гранитогрес",
+        "мивка": "мивка", "тоалетна": "тоалетна", "душ": "душ кабина", "вана": "вана",
+        "батерия": "батерия за баня", "смесител": "смесител", "бойлер": "бойлер",
+        "ламинат": "ламинат", "паркет": "паркет", "боя": "боя за стени",
+        "шкаф": "шкаф", "мебели": "мебели", "осветление": "LED осветление",
+        "лампа": "лампа", "огледало": "огледало", "кухня": "кухня обзавеждане",
+        "климатик": "климатик", "радиатор": "радиатор",
+    }
+    STORE_NAMES_MAP = {
+        "praktiker": "Praktiker", "jysk": "Jysk", "mr.bricolage": "Mr.Bricolage",
+        "мр бриколаж": "Mr.Bricolage", "homemax": "HomeMax", "хоум макс": "HomeMax",
+        "bauhaus": "Bauhaus", "баухаус": "Bauhaus", "ikea": "IKEA", "икеа": "IKEA",
+        "emag": "eMAG", "имаг": "eMAG", "teknoimpex": "Teknoimpex",
+        "technomarket": "Technomarket", "техномаркет": "Technomarket",
+    }
+    from urllib.parse import quote as url_quote_comm
+    # Detect store mentions
+    mentioned_store = None
+    for key, store_name in STORE_NAMES_MAP.items():
+        if key in text_lower:
+            mentioned_store = store_name
+            break
+    # Detect product mentions → create affiliate search links
+    for keyword, search_term in PRODUCT_KEYWORDS.items():
+        if keyword in text_lower:
+            target_stores = [mentioned_store] if mentioned_store else ["Praktiker", "eMAG", "Mr.Bricolage"]
+            for store in target_stores[:2]:
+                store_search_base = {
+                    "Praktiker": "https://praktiker.bg/search?q=",
+                    "Mr.Bricolage": "https://mr-bricolage.bg/search?q=",
+                    "Jysk": "https://jysk.bg/search?q=",
+                    "HomeMax": "https://www.home-max.bg/search/?q=",
+                    "Bauhaus": "https://bauhaus.bg/search/",
+                    "eMAG": "https://www.emag.bg/search/",
+                    "IKEA": "https://www.ikea.bg/search/?q=",
+                }.get(store, f"https://www.emag.bg/search/")
+                encoded = url_quote_comm(search_term, safe='')
+                aff_url = make_affiliate_url(f"{store_search_base}{encoded}", store)
+                affiliate_links.append({
+                    "keyword": keyword,
+                    "search_term": search_term,
+                    "store": store,
+                    "url": aff_url,
+                })
+            break  # Only first matched keyword to keep it non-intrusive
+
     post = {
         "id": str(uuid.uuid4()),
         "user_id": user["id"],
@@ -5142,6 +5220,7 @@ async def create_post(request: Request, user: dict = Depends(get_current_user)):
         "comments": [],
         "likes_count": 0,
         "comments_count": 0,
+        "affiliate_links": affiliate_links,  # Auto-detected product links
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
 
