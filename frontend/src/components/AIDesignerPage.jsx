@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Loader2, X, Upload, CheckCircle, Share2, RotateCcw,
   Copy, Facebook, Twitter, MessageCircle, Mail, Link2, Phone, ArrowLeft, ArrowRight,
-  Plus, Trash2, Download, Maximize2, Ruler } from 'lucide-react';
+  Plus, Trash2, Download, Maximize2, Ruler, Store, ExternalLink } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -620,12 +620,93 @@ export const AIDesignerPage = () => {
                   })}
                 </div>
 
-                {/* Budget info */}
-                {roomResult.budget?.summary && (
-                  <div className="p-3 rounded-lg text-xs" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }}
-                    data-testid={`budget-info-${ri}`}>
-                    <p className="font-bold mb-1" style={{ color: 'var(--theme-text)' }}>Бюджет за материали: {Number(roomResult.budgetEur).toLocaleString()} EUR</p>
-                    <p>{roomResult.budget.summary}</p>
+                {/* Budget info + Materials with links */}
+                {roomResult.budget && (
+                  <div className="space-y-3" data-testid={`budget-info-${ri}`}>
+                    {/* Summary */}
+                    {roomResult.budget.summary && (
+                      <div className="p-3 rounded-lg text-xs" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }}>
+                        <p className="font-bold mb-1" style={{ color: 'var(--theme-text)' }}>Бюджет за материали: {Number(roomResult.budgetEur).toLocaleString()} EUR</p>
+                        <p>{roomResult.budget.summary}</p>
+                        {roomResult.budget.labor_estimate_eur > 0 && (
+                          <p className="mt-1 text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>
+                            Приблизителна цена за труд: {roomResult.budget.labor_estimate_eur.toLocaleString()} EUR (не е включена в бюджета)
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Budget Tiers with Materials */}
+                    {roomResult.budget.budget_tiers && roomResult.budget.budget_tiers.length > 0 && (
+                      <div className="space-y-3">
+                        {roomResult.budget.budget_tiers.map((tier, ti) => (
+                          <Card key={ti} className="overflow-hidden" style={{ background: 'var(--theme-card-bg)', border: `2px solid ${ti === 1 ? '#F97316' : 'var(--theme-border)'}` }}
+                            data-testid={`budget-tier-${ri}-${ti}`}>
+                            <CardContent className="p-0">
+                              {/* Tier header */}
+                              <div className="flex items-center justify-between px-4 py-3" style={{
+                                background: ti === 0 ? 'rgba(16,185,129,0.08)' : ti === 1 ? 'rgba(249,115,22,0.08)' : 'rgba(139,92,246,0.08)'
+                              }}>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-black" style={{
+                                    color: ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6'
+                                  }}>
+                                    {tier.tier_name || tier.tier}
+                                  </span>
+                                  {ti === 1 && (
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#F97316] text-white font-bold">Препоръчан</span>
+                                  )}
+                                </div>
+                                <span className="text-sm font-black" style={{
+                                  color: ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6'
+                                }}>
+                                  {tier.total_eur?.toLocaleString()} EUR
+                                </span>
+                              </div>
+
+                              {/* Materials list */}
+                              {tier.materials && tier.materials.length > 0 && (
+                                <div className="divide-y" style={{ borderColor: 'var(--theme-border)' }}>
+                                  {tier.materials.map((mat, mi) => (
+                                    <div key={mi} className="flex items-center justify-between px-4 py-2.5 hover:bg-[#F97316]/5 transition-colors"
+                                      data-testid={`material-${ri}-${ti}-${mi}`}>
+                                      <div className="flex-1 min-w-0 mr-3">
+                                        <p className="text-xs font-bold truncate" style={{ color: 'var(--theme-text)' }}>{mat.name}</p>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                          {mat.category && (
+                                            <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text-subtle)' }}>
+                                              {mat.category}
+                                            </span>
+                                          )}
+                                          {mat.quantity && (
+                                            <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>{mat.quantity}</span>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-3 flex-shrink-0">
+                                        <span className="text-xs font-black text-[#F97316]">{mat.price_eur} EUR</span>
+                                        {mat.product_url && mat.product_url.startsWith('http') ? (
+                                          <a href={mat.product_url} target="_blank" rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold text-white hover:opacity-90 transition-opacity"
+                                            style={{ background: ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6' }}
+                                            data-testid={`material-link-${ri}-${ti}-${mi}`}>
+                                            <Store className="h-2.5 w-2.5" /> {mat.store || 'Магазин'}
+                                          </a>
+                                        ) : mat.store ? (
+                                          <span className="text-[10px] px-2 py-1 rounded-md font-bold" style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)' }}>
+                                            {mat.store}
+                                          </span>
+                                        ) : null}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
