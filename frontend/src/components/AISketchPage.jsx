@@ -508,7 +508,7 @@ export const AISketchPage = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h1 className="text-lg md:text-xl font-bold text-white">IA CAD v5.2</h1>
+            <h1 className="text-lg md:text-xl font-bold" style={{ color: 'var(--theme-text)' }}>IA CAD v5.2</h1>
             <p className="theme-text-subtle text-[10px]">Handles: Drag Край/Център/Ротация | Shift: Орт | Ctrl+Z/Y</p>
           </div>
           <div className="flex gap-2" data-testid="mode-tabs">
@@ -557,14 +557,14 @@ export const AISketchPage = () => {
                     <div className="flex items-center gap-1.5">
                       <span className="theme-text-subtle text-[10px]">Ет:</span>
                       <button onClick={() => setCurrentFloor(p => Math.max(0, p - 1))} className="theme-text-muted hover:text-white text-xs px-1  rounded">-</button>
-                      <span className="text-white text-xs font-bold w-4 text-center" data-testid="floor-indicator">{currentFloor}</span>
+                      <span style={{ color: 'var(--theme-text)' }} className="text-xs font-bold w-4 text-center" data-testid="floor-indicator">{currentFloor}</span>
                       <button onClick={() => setCurrentFloor(p => p + 1)} className="theme-text-muted hover:text-white text-xs px-1  rounded" data-testid="floor-up-btn">+</button>
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="theme-text-subtle text-[10px]">м/кв:</span>
                       <Input type="number" value={scale} min={0.1} step={0.1}
                         onChange={e => setScale(Math.max(0.1, +e.target.value || 1))}
-                        className="w-14 h-6 text-[10px]   text-white px-1" data-testid="scale-input" />
+                        className="w-14 h-6 text-[10px] px-1" style={{ color: 'var(--theme-text)' }} data-testid="scale-input" />
                     </div>
                   </div>
                 </div>
@@ -575,7 +575,7 @@ export const AISketchPage = () => {
             <div className="grid lg:grid-cols-[1fr_1fr] gap-3 mb-3">
               <Card className=" ">
                 <CardHeader className="pb-1 pt-2 px-3">
-                  <CardTitle className="text-white text-sm flex items-center gap-2">
+                  <CardTitle className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
                     <Ruler className="h-4 w-4 text-[#d4a43a]" /> 2D Чертеж
                     <Badge className="bg-[#28A745]/15 text-[#28A745] text-[9px] ml-auto">Ет. {currentFloor}</Badge>
                     {objCount > 0 && <Badge className="bg-[#d4a43a]/15 text-[#d4a43a] text-[9px]">{objCount} обекта</Badge>}
@@ -598,7 +598,7 @@ export const AISketchPage = () => {
 
               <Card className=" ">
                 <CardHeader className="pb-1 pt-2 px-3">
-                  <CardTitle className="text-white text-sm flex items-center gap-2">
+                  <CardTitle className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
                     <Eye className="h-4 w-4 text-[#4DA6FF]" /> 360° Live Preview
                     {objCount > 0 && <Badge className="bg-[#28A745]/15 text-[#28A745] text-[9px] ml-auto">{objCount}</Badge>}
                   </CardTitle>
@@ -653,7 +653,7 @@ export const AISketchPage = () => {
             {showContract && (
               <Card className=" border-[#d4a43a]/30 mb-3">
                 <CardHeader className="pb-2 pt-3 px-3">
-                  <CardTitle className="text-white text-sm flex items-center justify-between">
+                  <CardTitle className="text-sm flex items-center justify-between" style={{ color: 'var(--theme-text)' }}>
                     <span>Договор за строителство</span>
                     <button onClick={() => setShowContract(false)} className="theme-text-subtle hover:text-white"><X className="h-4 w-4" /></button>
                   </CardTitle>
@@ -748,7 +748,7 @@ export const AISketchPage = () => {
                       ))}
                     </div>
                     <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Бележки..."
-                      className="  text-white min-h-[60px] text-sm mt-3" data-testid="sketch-notes" />
+                      className="min-h-[60px] text-sm mt-3" style={{ color: 'var(--theme-text)' }} data-testid="sketch-notes" />
                   </CardContent>
                 </Card>
                 <Button className="w-full bg-[#d4a43a] hover:bg-[#b8922e] text-white h-11" onClick={handleAnalyze}
@@ -761,7 +761,7 @@ export const AISketchPage = () => {
                 <Card className=" ">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-white text-sm flex items-center gap-2"><Eye className="h-4 w-4 text-[#4DA6FF]" />360 3D</CardTitle>
+                      <CardTitle className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}><Eye className="h-4 w-4 text-[#4DA6FF]" />360 3D</CardTitle>
                       <div className="flex gap-2">
                         {uploadRes.glb_base64 && <Button size="sm" onClick={downloadGlb} className="bg-[#28A745] text-white h-7 text-xs" data-testid="download-glb-btn"><Download className="mr-1 h-3 w-3" />.glb</Button>}
                         {uploadRes.id && <Button size="sm" onClick={shareProject} className="bg-[#4DA6FF] text-white h-7 text-xs" data-testid="share-project-btn"><Share2 className="mr-1 h-3 w-3" />Сподели</Button>}

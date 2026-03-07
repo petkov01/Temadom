@@ -37,7 +37,7 @@ const PACKAGES = [
   { id: 3, label: 'Апартамент', price: 199, maxRooms: 5 },
 ];
 
-const PHOTO_LABELS = ['Общ план', 'Ъгъл 1', 'Ъгъл 2'];
+const PHOTO_LABELS = ['Снимка на помещението'];
 
 const EST_TIME_PER_ROOM = 90; // seconds per room
 
@@ -45,8 +45,8 @@ const emptyRoom = () => ({
   id: Date.now() + Math.random(),
   roomType: 'living_room',
   style: 'modern',
-  photos: [null, null, null],
-  photoUrls: [null, null, null],
+  photos: [null],
+  photoUrls: [null],
   notes: '',
   length: '4.0',
   width: '3.0',
@@ -243,18 +243,18 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
           </div>
         </div>
 
-        {/* Photo upload grid */}
+        {/* Photo upload — single photo */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <Label className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Снимки на помещението</Label>
+            <Label className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Снимка на помещението</Label>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3">
           {PHOTO_LABELS.map((label, pIdx) => (
             <div key={pIdx}>
               <Label className="text-[10px] mb-1 block text-center" style={{ color: 'var(--theme-text-subtle)' }}>{label}</Label>
               {room.photoUrls[pIdx] ? (
-                <div className="relative aspect-[4/3] rounded-lg overflow-hidden group border-2 border-[#10B981]/40">
-                  <img src={room.photoUrls[pIdx]} alt="" className="w-full h-full object-cover" />
+                <div className="relative rounded-lg overflow-hidden group border-2 border-[#10B981]/40" style={{ maxHeight: '300px' }}>
+                  <img src={room.photoUrls[pIdx]} alt="" className="w-full h-full object-contain" style={{ maxHeight: '300px' }} />
                   <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <button onClick={() => removePhoto(pIdx)}
                     className="absolute top-2 right-2 bg-red-500/90 text-white rounded-full p-1.5"
@@ -262,7 +262,7 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
                     <X className="h-4 w-4" />
                   </button>
                   <div className="absolute bottom-0 left-0 right-0 bg-[#10B981]/80 text-white text-center text-xs py-1 font-bold">
-                    {label} — Качено
+                    Качено
                   </div>
                 </div>
               ) : (
@@ -504,7 +504,7 @@ export const AIDesignerPage = () => {
             </h1>
           </div>
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
-            Качи снимки + размери + бюджет → получи 3x PNG рендери
+            Качи снимка + размери + бюджет → получи 3D рендер
           </p>
         </div>
 
@@ -513,7 +513,7 @@ export const AIDesignerPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs" style={{ color: 'var(--theme-text-muted)' }}>
             <div className="flex items-start gap-2">
               <span className="w-5 h-5 rounded-full bg-[#c9953a]/15 text-[#c9953a] text-[10px] font-bold flex items-center justify-center flex-shrink-0">1</span>
-              <p><strong style={{ color: 'var(--theme-text)' }}>Качете снимки</strong> — 1-3 снимки от различни ъгли на помещението</p>
+              <p><strong style={{ color: 'var(--theme-text)' }}>Качете снимка</strong> — 1 снимка на помещението</p>
             </div>
             <div className="flex items-start gap-2">
               <span className="w-5 h-5 rounded-full bg-[#3B82F6]/15 text-[#3B82F6] text-[10px] font-bold flex items-center justify-center flex-shrink-0">2</span>
@@ -581,7 +581,7 @@ export const AIDesignerPage = () => {
                   <div className="w-full" data-testid="progress-bar">
                     <div className="flex justify-between items-end mb-2">
                       <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
-                      {pct < 10 ? 'Качване на снимките...' : pct < 25 ? 'Анализ на снимките...' : pct < 65 ? 'Генериране на 3D рендер...' : pct < 75 ? 'Изчисляване на бюджет...' : pct < 95 ? 'Запазване на проекта...' : 'Готово!'}
+                      {pct < 10 ? 'Качване на снимката...' : pct < 25 ? 'Анализ на снимката...' : pct < 65 ? 'Генериране на 3D рендер...' : pct < 75 ? 'Изчисляване на бюджет...' : pct < 95 ? 'Запазване на проекта...' : 'Готово!'}
                     </span>
                       <span className="text-[#c9953a] font-black text-2xl">{Math.round(pct)}%</span>
                     </div>

@@ -947,7 +947,7 @@ const LandingPage = () => {
         <div className="relative z-10 max-w-5xl mx-auto px-4 pt-6 md:pt-10 flex flex-col items-center">
           {/* Centered Hero Logo — LARGE like reference (1/3 viewport) */}
           <div className="hero-scale-in mb-4">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-64 sm:h-80 md:h-[26rem] w-auto mx-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 40px rgba(246, 195, 106, 0.9))' : 'drop-shadow(0 4px 20px rgba(0,0,0,0.3)) brightness(0.85) contrast(1.15)' }} />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-64 sm:h-80 md:h-[26rem] w-auto mx-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 40px rgba(246, 195, 106, 0.9))' : 'drop-shadow(0 6px 20px rgba(0,0,0,0.4)) contrast(1.3) saturate(1.2)' }} />
           </div>
 
           {/* BEFORE / AFTER Showcase */}
@@ -980,7 +980,7 @@ const LandingPage = () => {
           </div>
 
           {/* Main headline */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-center mb-4 leading-tight max-w-3xl hero-fade-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-center mb-4 leading-tight max-w-3xl hero-fade-3" style={{ color: text }}>
             Ремонт без стрес —{' '}
             <span className="gradient-text">AI проектиране</span>
           </h1>
