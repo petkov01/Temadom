@@ -117,13 +117,33 @@ STORE_CONFIGS = {
         "name": "HomeMax",
         "base_url": "https://www.homemax.bg",
         "search_url": "https://www.homemax.bg/catalogsearch/result/?q={query}",
-        "type": "search_url",
+        "type": "playwright",
+        "extract_fn": "_extract_homemax",
+        "wait_selector": ".product-item, .product-card, li.item",
     },
     "praktis": {
         "name": "Praktis",
         "base_url": "https://praktis.bg",
         "search_url": "https://praktis.bg/search?q={query}",
-        "type": "search_url",
+        "type": "playwright",
+        "extract_fn": "_extract_praktis",
+        "wait_selector": ".product-card, .product, .product-item",
+    },
+    "bauhaus": {
+        "name": "Bauhaus",
+        "base_url": "https://www.bauhaus.bg",
+        "search_url": "https://www.bauhaus.bg/catalogsearch/result/?q={query}",
+        "type": "playwright",
+        "extract_fn": "_extract_bauhaus",
+        "wait_selector": ".product-item, .product-card, li.item",
+    },
+    "jysk": {
+        "name": "Jysk",
+        "base_url": "https://jysk.bg",
+        "search_url": "https://jysk.bg/catalogsearch/result/?q={query}",
+        "type": "playwright",
+        "extract_fn": "_extract_jysk",
+        "wait_selector": ".product-card, .product, .productlist-item",
     },
 }
 
@@ -131,41 +151,41 @@ STORE_CONFIGS = {
 # Videnov (scraped) for furniture/fixtures; search URL stores for building materials
 ROOM_CATEGORIES = {
     "bathroom": [
-        {"query": "плочки баня", "category": "Плочки", "stores": ["praktiker", "mrbricolage", "bauhaus"]},
-        {"query": "мебели баня шкаф", "category": "Мебели за баня", "stores": ["videnov"]},
-        {"query": "смесител баня", "category": "Смесители", "stores": ["videnov"]},
-        {"query": "душ кабина", "category": "Душ кабини", "stores": ["videnov", "praktiker"]},
-        {"query": "LED осветление баня", "category": "Осветление", "stores": ["praktiker", "emag"]},
-        {"query": "мивка баня", "category": "Мивки", "stores": ["videnov"]},
-        {"query": "огледало баня LED", "category": "Огледала", "stores": ["videnov"]},
-        {"query": "тоалетна чиния", "category": "Санитария", "stores": ["videnov", "praktiker"]},
+        {"query": "плочки баня", "category": "Плочки", "stores": ["praktiker", "mrbricolage", "bauhaus", "praktis"]},
+        {"query": "мебели баня шкаф", "category": "Мебели за баня", "stores": ["videnov", "homemax", "jysk"]},
+        {"query": "смесител баня", "category": "Смесители", "stores": ["videnov", "praktiker", "homemax"]},
+        {"query": "душ кабина", "category": "Душ кабини", "stores": ["videnov", "praktiker", "homemax"]},
+        {"query": "LED осветление баня", "category": "Осветление", "stores": ["praktiker", "emag", "bauhaus"]},
+        {"query": "мивка баня", "category": "Мивки", "stores": ["videnov", "homemax"]},
+        {"query": "огледало баня LED", "category": "Огледала", "stores": ["videnov", "emag"]},
+        {"query": "тоалетна чиния", "category": "Санитария", "stores": ["videnov", "praktiker", "homemax"]},
     ],
     "kitchen": [
-        {"query": "кухня модулна", "category": "Кухненски мебели", "stores": ["videnov"]},
-        {"query": "кухненски плот", "category": "Плотове", "stores": ["praktiker", "mrbricolage"]},
-        {"query": "смесител кухня", "category": "Смесители", "stores": ["videnov"]},
-        {"query": "кухненска мивка вграждане", "category": "Мивки", "stores": ["videnov"]},
-        {"query": "LED осветление кухня", "category": "Осветление", "stores": ["praktiker", "emag"]},
-        {"query": "гранитогрес 60x60", "category": "Настилки", "stores": ["praktiker", "mrbricolage", "bauhaus"]},
-        {"query": "аспиратор кухня", "category": "Уреди", "stores": ["emag", "praktiker"]},
+        {"query": "кухня модулна", "category": "Кухненски мебели", "stores": ["videnov", "homemax"]},
+        {"query": "кухненски плот", "category": "Плотове", "stores": ["praktiker", "mrbricolage", "bauhaus"]},
+        {"query": "смесител кухня", "category": "Смесители", "stores": ["videnov", "homemax"]},
+        {"query": "кухненска мивка вграждане", "category": "Мивки", "stores": ["videnov", "homemax"]},
+        {"query": "LED осветление кухня", "category": "Осветление", "stores": ["praktiker", "emag", "bauhaus"]},
+        {"query": "гранитогрес 60x60", "category": "Настилки", "stores": ["praktiker", "mrbricolage", "bauhaus", "praktis"]},
+        {"query": "аспиратор кухня", "category": "Уреди", "stores": ["emag", "praktiker", "homemax"]},
     ],
     "living_room": [
-        {"query": "диван ъглов", "category": "Мека мебел", "stores": ["videnov"]},
-        {"query": "маса хол холна", "category": "Маси", "stores": ["videnov"]},
-        {"query": "килим хол", "category": "Килими", "stores": ["videnov", "jysk"]},
-        {"query": "LED лампа полилей", "category": "Осветление", "stores": ["videnov", "emag"]},
-        {"query": "ламиниран паркет", "category": "Настилки", "stores": ["praktiker", "mrbricolage", "bauhaus"]},
-        {"query": "латексова боя стена", "category": "Бои", "stores": ["praktiker", "mrbricolage", "bauhaus"]},
-        {"query": "TV шкаф мебел", "category": "ТВ мебели", "stores": ["videnov"]},
+        {"query": "диван ъглов", "category": "Мека мебел", "stores": ["videnov", "jysk", "homemax"]},
+        {"query": "маса хол холна", "category": "Маси", "stores": ["videnov", "jysk"]},
+        {"query": "килим хол", "category": "Килими", "stores": ["videnov", "jysk", "homemax"]},
+        {"query": "LED лампа полилей", "category": "Осветление", "stores": ["videnov", "emag", "homemax"]},
+        {"query": "ламиниран паркет", "category": "Настилки", "stores": ["praktiker", "mrbricolage", "bauhaus", "praktis"]},
+        {"query": "латексова боя стена", "category": "Бои", "stores": ["praktiker", "mrbricolage", "bauhaus", "praktis"]},
+        {"query": "TV шкаф мебел", "category": "ТВ мебели", "stores": ["videnov", "jysk", "homemax"]},
     ],
     "bedroom": [
-        {"query": "легло спалня", "category": "Легла", "stores": ["videnov"]},
-        {"query": "гардероб", "category": "Гардероби", "stores": ["videnov"]},
-        {"query": "матрак двоен", "category": "Матраци", "stores": ["videnov"]},
-        {"query": "нощно шкафче", "category": "Нощни шкафчета", "stores": ["videnov"]},
-        {"query": "LED осветление спалня", "category": "Осветление", "stores": ["videnov", "emag"]},
-        {"query": "ламиниран паркет", "category": "Настилки", "stores": ["praktiker", "mrbricolage", "bauhaus"]},
-        {"query": "латексова боя стена", "category": "Бои", "stores": ["praktiker", "mrbricolage"]},
+        {"query": "легло спалня", "category": "Легла", "stores": ["videnov", "jysk", "homemax"]},
+        {"query": "гардероб", "category": "Гардероби", "stores": ["videnov", "jysk", "homemax"]},
+        {"query": "матрак двоен", "category": "Матраци", "stores": ["videnov", "jysk"]},
+        {"query": "нощно шкафче", "category": "Нощни шкафчета", "stores": ["videnov", "jysk"]},
+        {"query": "LED осветление спалня", "category": "Осветление", "stores": ["videnov", "emag", "homemax"]},
+        {"query": "ламиниран паркет", "category": "Настилки", "stores": ["praktiker", "mrbricolage", "bauhaus", "praktis"]},
+        {"query": "латексова боя стена", "category": "Бои", "stores": ["praktiker", "mrbricolage", "praktis"]},
     ],
     "corridor": [
         {"query": "шкаф антре", "category": "Мебели за антре", "stores": ["videnov"]},
@@ -343,11 +363,121 @@ async def _extract_emag(page) -> list:
     }''')
 
 
+async def _extract_homemax(page) -> list:
+    """Extract products from HomeMax search results page (Magento-based)."""
+    return await page.evaluate('''() => {
+        const results = [];
+        const items = document.querySelectorAll('.product-item, li.item.product, .product-card');
+        for (let i = 0; i < Math.min(items.length, 10); i++) {
+            const el = items[i];
+            const link = el.querySelector('a.product-item-link, a[class*=product-link], a[href*="/"]');
+            const priceEl = el.querySelector('.price, [data-price-amount], .special-price .price, .regular-price .price');
+            const img = el.querySelector('img.product-image-photo, img[class*=product]');
+            const name = link ? link.textContent.trim() : '';
+            const href = link ? link.href : '';
+            if (name && href) {
+                results.push({
+                    name: name.substring(0, 120),
+                    price_text: priceEl ? priceEl.textContent.trim().substring(0, 60) : '',
+                    url: href.startsWith('http') ? href : 'https://www.homemax.bg' + href,
+                    image: img ? (img.src || img.dataset?.src || '') : '',
+                    store: 'HomeMax'
+                });
+            }
+        }
+        return results;
+    }''')
+
+
+async def _extract_praktis(page) -> list:
+    """Extract products from Praktis search results page."""
+    return await page.evaluate('''() => {
+        const results = [];
+        const items = document.querySelectorAll('.product-card, .product, .product-item, [class*=product-box]');
+        for (let i = 0; i < Math.min(items.length, 10); i++) {
+            const el = items[i];
+            const link = el.querySelector('a[href*="/p/"], a[href*="product"], a.product-link, a:first-of-type');
+            const title = el.querySelector('[class*=title], [class*=name], h3, h4, .product-name');
+            const priceEl = el.querySelector('[class*=price], .price');
+            const img = el.querySelector('img');
+            const name = title ? title.textContent.trim() : (link ? link.textContent.trim() : '');
+            const href = link ? link.href : '';
+            if (name && href && name.length > 3) {
+                results.push({
+                    name: name.substring(0, 120),
+                    price_text: priceEl ? priceEl.textContent.trim().substring(0, 60) : '',
+                    url: href.startsWith('http') ? href : 'https://praktis.bg' + href,
+                    image: img ? (img.src || img.dataset?.src || '') : '',
+                    store: 'Praktis'
+                });
+            }
+        }
+        return results;
+    }''')
+
+
+async def _extract_bauhaus(page) -> list:
+    """Extract products from Bauhaus search results page (Magento-based)."""
+    return await page.evaluate('''() => {
+        const results = [];
+        const items = document.querySelectorAll('.product-item, li.item.product, .product-card, [class*=product-item]');
+        for (let i = 0; i < Math.min(items.length, 10); i++) {
+            const el = items[i];
+            const link = el.querySelector('a.product-item-link, a[class*=product-link], a[href]');
+            const priceEl = el.querySelector('.price, [data-price-amount], .special-price .price, .regular-price .price');
+            const img = el.querySelector('img.product-image-photo, img[class*=product], img');
+            const name = link ? link.textContent.trim() : '';
+            const href = link ? link.href : '';
+            if (name && href && name.length > 3) {
+                results.push({
+                    name: name.substring(0, 120),
+                    price_text: priceEl ? priceEl.textContent.trim().substring(0, 60) : '',
+                    url: href.startsWith('http') ? href : 'https://www.bauhaus.bg' + href,
+                    image: img ? (img.src || img.dataset?.src || '') : '',
+                    store: 'Bauhaus'
+                });
+            }
+        }
+        return results;
+    }''')
+
+
+async def _extract_jysk(page) -> list:
+    """Extract products from Jysk search results page."""
+    return await page.evaluate('''() => {
+        const results = [];
+        const items = document.querySelectorAll('.product-card, .productlist-item, .product, [class*=product-tile]');
+        for (let i = 0; i < Math.min(items.length, 10); i++) {
+            const el = items[i];
+            const link = el.querySelector('a[href*="/p/"], a[href*="product"], a.product-link, a:first-of-type');
+            const title = el.querySelector('[class*=title], [class*=name], h3, h4, .product-name');
+            const priceEl = el.querySelector('[class*=price], .price, [class*=amount]');
+            const img = el.querySelector('img');
+            const name = title ? title.textContent.trim() : (link ? link.textContent.trim() : '');
+            const href = link ? link.href : '';
+            if (name && href && name.length > 3) {
+                results.push({
+                    name: name.substring(0, 120),
+                    price_text: priceEl ? priceEl.textContent.trim().substring(0, 60) : '',
+                    url: href.startsWith('http') ? href : 'https://jysk.bg' + href,
+                    image: img ? (img.src || img.dataset?.src || '') : '',
+                    store: 'Jysk'
+                });
+            }
+        }
+        return results;
+    }''')
+
+
 EXTRACT_FNS = {
     "_extract_mrbricolage": _extract_mrbricolage,
     "_extract_videnov": _extract_videnov,
     "_extract_praktiker": _extract_praktiker,
     "_extract_emag": _extract_emag,
+    "_extract_homemax": _extract_homemax,
+    "_extract_praktis": _extract_praktis,
+    "_extract_bauhaus": _extract_bauhaus,
+    "_extract_jysk": _extract_jysk,
 }
 
 

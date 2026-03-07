@@ -1298,6 +1298,73 @@ async def search_users(q: str = "", user: dict = Depends(get_current_user)):
         for u in results
     ]}
 
+# ============== CHAT ENHANCEMENTS ==============
+
+@api_router.post("/chat/typing")
+async def send_typing_indicator(data: dict, user: dict = Depends(get_current_user)):
+    """Update typing status for a conversation"""
+    conversation_id = data.get("conversation_id")
+    is_typing = data.get("is_typing", False)
+    if not conversation_id:
+        raise HTTPException(status_code=400, detail="conversation_id required")
+    
+    await db.typing_status.update_one(
+        {"user_id": user["id"], "conversation_id": conversation_id},
+        {"$set": {
+            "user_id": user["id"],
+            "conversation_id": conversation_id,
+            "is_typing": is_typing,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    return {"ok": True}
+
+@api_router.get("/chat/typing/{conversation_id}")
+async def get_typing_status(conversation_id: str, user: dict = Depends(get_current_user)):
+    """Check if the other user is typing"""
+    cutoff = (datetime.now(timezone.utc) - timedelta(seconds=5)).isoformat()
+    other_typing = await db.typing_status.find_one({
+        "conversation_id": conversation_id,
+        "user_id": {"$ne": user["id"]},
+        "is_typing": True,
+        "updated_at": {"$gte": cutoff}
+    }, {"_id": 0})
+    return {"is_typing": bool(other_typing)}
+
+@api_router.post("/chat/online")
+async def update_online_status(user: dict = Depends(get_current_user)):
+    """Heartbeat to track online status"""
+    await db.online_status.update_one(
+        {"user_id": user["id"]},
+        {"$set": {
+            "user_id": user["id"],
+            "last_seen": datetime.now(timezone.utc).isoformat(),
+            "name": user.get("name", "")
+        }},
+        upsert=True
+    )
+    return {"ok": True}
+
+@api_router.get("/chat/online/{user_id}")
+async def get_online_status(user_id: str):
+    """Check if a specific user is online (active within 2 minutes)"""
+    cutoff = (datetime.now(timezone.utc) - timedelta(minutes=2)).isoformat()
+    status = await db.online_status.find_one(
+        {"user_id": user_id, "last_seen": {"$gte": cutoff}},
+        {"_id": 0}
+    )
+    return {"online": bool(status), "last_seen": status["last_seen"] if status else None}
+
+@api_router.post("/messages/{message_id}/read")
+async def mark_message_read(message_id: str, user: dict = Depends(get_current_user)):
+    """Mark a specific message as read with timestamp"""
+    result = await db.messages.update_one(
+        {"id": message_id, "receiver_id": user["id"]},
+        {"$set": {"read": True, "read_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"ok": result.modified_count > 0}
+
 # ============== PDF GENERATION ==============
 
 @api_router.post("/calculator/pdf")
