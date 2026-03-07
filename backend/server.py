@@ -120,7 +120,7 @@ def update_task_progress(task_id: str, progress: int, message: str = ""):
 
 @api_router.get("/ai-designer/task/{task_id}")
 async def get_task_status(task_id: str):
-    """Poll task status for async AI generation."""
+    """Poll task status for async AI generation. Returns lightweight progress only."""
     task = _tasks.get(task_id)
     if not task:
         raise HTTPException(status_code=404, detail="Задачата не е намерена")
@@ -131,13 +131,46 @@ async def get_task_status(task_id: str):
         "message": task.get("message", ""),
     }
     if task["status"] == "done":
-        response["result"] = task["result"]
-        # Clean up after delivery (keep for 5 min for retries)
+        # Only return design_id, NOT the heavy base64 result
+        result = task.get("result", {})
+        response["design_id"] = result.get("id", "")
+        response["renders_count"] = result.get("renders_count", 0)
         aio.get_event_loop().call_later(300, lambda: _tasks.pop(task_id, None))
     elif task["status"] == "error":
         response["error"] = task.get("error", "Неизвестна грешка")
         aio.get_event_loop().call_later(60, lambda: _tasks.pop(task_id, None))
     return response
+
+@api_router.get("/ai-designer/result/{design_id}")
+async def get_design_result(design_id: str):
+    """Fetch full AI design result by ID (separate from polling for mobile)."""
+    design = await db.ai_designs.find_one({"id": design_id}, {"_id": 0})
+    if not design:
+        raise HTTPException(status_code=404, detail="Дизайнът не е намерен")
+    
+    # Reconstruct renders array from render_X_b64 / original_X_b64 fields
+    photo_labels = ["Общ план", "Ъгъл 1", "Ъгъл 2"]
+    renders = []
+    for i in range(design.get("renders_count", 0)):
+        render_b64 = design.get(f"render_{i}_b64", "")
+        original_b64 = design.get(f"original_{i}_b64", "")
+        if render_b64:
+            renders.append({
+                "index": i,
+                "label": photo_labels[i] if i < len(photo_labels) else f"Ъгъл {i}",
+                "image_base64": render_b64,
+                "original_base64": original_b64,
+            })
+    
+    return {
+        "id": design.get("id", design_id),
+        "renders": renders,
+        "budget": design.get("budget_data", {}),
+        "style": design.get("style", ""),
+        "dimensions": design.get("dimensions", {}),
+        "photos_count": design.get("photos_count", 0),
+        "renders_count": design.get("renders_count", 0),
+    }
 
 # ==================== AFFILIATE CONFIG ====================
 # Affiliate ref parameters for each store (monetization)

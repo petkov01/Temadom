@@ -428,7 +428,7 @@ export const AIDesignerPage = () => {
         const taskId = submitRes.data.task_id;
         if (!taskId) throw new Error('Няма task_id от сървъра');
 
-        // Step 2: Poll for result every 3 seconds
+        // Step 2: Poll for progress every 3 seconds (lightweight, no base64)
         let result = null;
         for (let poll = 0; poll < 100; poll++) { // max 5 minutes
           await new Promise(r => setTimeout(r, 3000));
@@ -438,14 +438,18 @@ export const AIDesignerPage = () => {
             setUploadPct(task.progress || 0);
 
             if (task.status === 'done') {
-              result = task.result;
+              // Fetch full result (with base64 images) from separate endpoint
+              const designId = task.design_id;
+              if (!designId) throw new Error('Няма design_id');
+              const resultRes = await axios.get(`${API}/ai-designer/result/${designId}`, { timeout: 120000 });
+              result = resultRes.data;
               break;
             } else if (task.status === 'error') {
               throw new Error(task.error || 'Грешка при генериране');
             }
           } catch (pollErr) {
             if (pollErr.response?.status === 404) continue;
-            if (pollErr.message?.includes('Грешка')) throw pollErr;
+            if (pollErr.message?.includes('Грешка') || pollErr.message?.includes('design_id')) throw pollErr;
           }
         }
 
