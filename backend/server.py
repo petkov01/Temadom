@@ -225,7 +225,7 @@ async def register(user_data: UserCreate):
         raise HTTPException(status_code=400, detail="Този имейл вече е регистриран")
     
     # Validate user_type
-    if user_data.user_type not in ("client", "company", "master", "designer"):
+    if user_data.user_type not in ("client", "company", "master"):
         raise HTTPException(status_code=400, detail="Невалиден тип потребител")
     
     # Validate bulstat for companies
@@ -266,7 +266,7 @@ async def register(user_data: UserCreate):
     await db.users.insert_one(user_dict)
     
     # Create company/master/designer profile
-    if user_data.user_type in ("company", "master", "designer"):
+    if user_data.user_type in ("company", "master"):
         profile = {
             "id": str(uuid.uuid4()),
             "user_id": user_dict["id"],
@@ -2271,7 +2271,7 @@ async def get_subscription_plans():
 async def activate_subscription(data: dict, user: dict = Depends(get_current_user)):
     """Activate subscription (test mode - always succeeds)"""
     plan = data.get("plan", "basic")
-    if user["user_type"] not in ("company", "master", "designer"):
+    if user["user_type"] not in ("company", "master"):
         raise HTTPException(status_code=400, detail="Само фирми, майстори и дизайнери могат да имат абонамент")
     
     expires = datetime.now(timezone.utc) + timedelta(days=30)
@@ -5756,6 +5756,8 @@ from routes.products import router as products_router
 app.include_router(products_router)
 
 from routes.google_auth import router as google_auth_router
+from routes import google_auth as google_auth_module
+google_auth_module.init(JWT_SECRET, db)
 app.include_router(google_auth_router)
 
 from routes.telegram import router as telegram_router
