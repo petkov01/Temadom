@@ -258,17 +258,11 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="glass-nav sticky top-0 z-50 overflow-visible">
+    <nav className="glass-nav sticky top-0 z-50">
+      {/* Top: Compact navigation bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20 lg:h-24">
-          {/* Left: Logo */}
-          <div className="flex items-start">
-            <Link to="/" className="flex items-center gap-2.5 -mt-2" data-testid="logo-link">
-              <img src="/logo-temadom.png" alt="TemaDom" className="h-48 lg:h-52 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
-            </Link>
-          </div>
-
-          {/* Right: Nav links + Language + Auth */}
+        <div className="flex justify-between items-center" style={{ height: '40px' }}>
+          {/* Left: Nav links (desktop) */}
           <div className="hidden lg:flex items-center gap-1">
             <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
               Главна
@@ -456,6 +450,13 @@ const Navbar = () => {
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
+        </div>
+
+        {/* Centered Logo below task bar */}
+        <div className="flex justify-center" style={{ padding: '0 0 12px 0' }}>
+          <Link to="/" data-testid="logo-link">
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-16 lg:h-[64px] w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 4px 12px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
+          </Link>
         </div>
       </div>
 
@@ -934,8 +935,8 @@ const LandingPage = () => {
           <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full blur-[140px] translate-y-1/4 -translate-x-1/4" style={{ background: 'rgba(255,138,0,0.04)' }} />
           <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" style={{ background: 'rgba(16,185,129,0.03)' }} />
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 pt-2 pb-8 md:pt-4 md:pb-12 flex flex-col items-center">
-          {/* Logo */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 pt-2 pb-8 md:pt-2 md:pb-12 flex flex-col items-center">
+          {/* Hero Logo */}
           <div className="-mb-8 md:-mb-12 animate-slideUp">
             <img src="/logo-temadom.png" alt="TemaDom" className="h-[28rem] md:h-[36rem] w-auto mx-auto animate-float logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' : 'drop-shadow(0 4px 20px rgba(0,0,0,0.3)) brightness(0.8) contrast(1.2)' }} />
           </div>
