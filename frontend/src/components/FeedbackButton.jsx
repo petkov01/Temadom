@@ -76,7 +76,7 @@ export const FeedbackButton = () => {
                       className={`h-8 w-8 transition-colors ${
                         i <= (hoverRating || rating)
                           ? 'fill-[#FF8C42] text-[#FF8C42]'
-                          : 'text-[#3A4A5C]'
+                          : 'theme-text-subtle'
                       }`}
                     />
                   </button>

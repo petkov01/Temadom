@@ -552,7 +552,7 @@ export const Scanner3DPage = () => {
   return (
     <div className="min-h-screen " data-testid="scanner-3d-page">
       {/* Header */}
-      <div className="bg-gradient-to-b from-[#0F1923] to-[#1E2A38] border-b ">
+      <div className="border-b" style={{ background: 'var(--theme-bg)' }}>
         <div className="max-w-6xl mx-auto px-4 py-8 text-center">
           <div className="inline-flex items-center gap-2 bg-[#8C56FF]/15 border border-[#8C56FF]/30 rounded-full px-5 py-2 mb-5">
             <Move3D className="h-4 w-4 text-[#8C56FF]" />

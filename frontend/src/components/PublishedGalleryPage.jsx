@@ -153,7 +153,7 @@ export const PublishedGalleryPage = () => {
                   onClick={() => openProject(project.id)}
                   data-testid={`gallery-card-${project.id}`}
                 >
-                  <div className="h-44 bg-gradient-to-br from-[#1E2A38] to-[#253545] flex items-center justify-center relative overflow-hidden">
+                  <div className="h-44 flex items-center justify-center relative overflow-hidden" style={{ background: 'var(--theme-bg-surface)' }}>
                     {project.generated_images?.[0]?.image_base64 ? (
                       <img 
                         src={`data:image/png;base64,${project.generated_images[0].image_base64}`}
