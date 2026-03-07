@@ -507,7 +507,9 @@ export const AIDesignerPage = () => {
                 <CardContent className="py-8 px-6">
                   <div className="w-full" data-testid="progress-bar">
                     <div className="flex justify-between items-end mb-2">
-                      <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>AI генерира 3D рендери...</span>
+                      <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
+                      {pct < 30 ? 'Анализ на снимките...' : pct < 60 ? 'Търсене на реални продукти от магазини...' : pct < 85 ? 'Генериране на 3D рендери...' : 'Финализиране на бюджета...'}
+                    </span>
                       <span className="text-[#F97316] font-black text-2xl">{Math.round(pct)}%</span>
                     </div>
                     <div className="h-4 rounded-full overflow-hidden" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-border)' }}>
@@ -656,6 +658,12 @@ export const AIDesignerPage = () => {
                                   {ti === 1 && (
                                     <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#F97316] text-white font-bold">Препоръчан</span>
                                   )}
+                                  {tier.materials && tier.materials.some(m => m.verified) && (
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold"
+                                      data-testid={`verified-count-${ri}-${ti}`}>
+                                      {tier.materials.filter(m => m.verified).length} реални продукта
+                                    </span>
+                                  )}
                                 </div>
                                 <span className="text-sm font-black" style={{
                                   color: ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6'
@@ -671,7 +679,15 @@ export const AIDesignerPage = () => {
                                     <div key={mi} className="flex items-center justify-between px-4 py-2.5 hover:bg-[#F97316]/5 transition-colors"
                                       data-testid={`material-${ri}-${ti}-${mi}`}>
                                       <div className="flex-1 min-w-0 mr-3">
-                                        <p className="text-xs font-bold truncate" style={{ color: 'var(--theme-text)' }}>{mat.name}</p>
+                                        <div className="flex items-center gap-1.5">
+                                          <p className="text-xs font-bold truncate" style={{ color: 'var(--theme-text)' }}>{mat.name}</p>
+                                          {mat.verified && (
+                                            <span className="flex-shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-700"
+                                              data-testid={`verified-badge-${ri}-${ti}-${mi}`}>
+                                              <CheckCircle className="h-2.5 w-2.5" /> Реален
+                                            </span>
+                                          )}
+                                        </div>
                                         <div className="flex items-center gap-2 mt-0.5">
                                           {mat.category && (
                                             <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text-subtle)' }}>
@@ -688,9 +704,9 @@ export const AIDesignerPage = () => {
                                         {mat.product_url && mat.product_url.startsWith('http') ? (
                                           <a href={mat.product_url} target="_blank" rel="noopener noreferrer"
                                             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[10px] font-bold text-white hover:opacity-90 transition-all hover:scale-105"
-                                            style={{ background: ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6' }}
+                                            style={{ background: mat.verified ? '#059669' : (ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6') }}
                                             data-testid={`material-link-${ri}-${ti}-${mi}`}>
-                                            <ExternalLink className="h-2.5 w-2.5" /> Търси в {mat.store || 'Магазин'}
+                                            <ExternalLink className="h-2.5 w-2.5" /> {mat.verified ? `Купи от ${mat.store || 'Магазин'}` : `Търси в ${mat.store || 'Магазин'}`}
                                           </a>
                                         ) : mat.store ? (
                                           <span className="text-[10px] px-2 py-1 rounded-md font-bold" style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)' }}>

@@ -2949,34 +2949,74 @@ IMPORTANT RULES:
                 logging.error(f"Photo Designer render {idx+1} error: {img_err}")
                 continue
 
-        # Step 2: Generate budget with 3 tiers and REAL search links to stores
-        # Store search URL patterns (verified working)
+        # Step 2: Scrape REAL products from Bulgarian stores
+        from services.scraper import get_products_for_room, format_products_for_prompt
+        logging.info(f"Photo Designer: Scraping real products for {room_type} (budget: {budget_eur}€)")
+        
+        real_products_by_category = {}
+        try:
+            real_products_by_category = await get_products_for_room(room_type, int(budget_eur), db=db)
+            logging.info(f"Photo Designer: Found {sum(len(v) for v in real_products_by_category.values())} products in {len(real_products_by_category)} categories")
+        except Exception as scrape_err:
+            logging.warning(f"Photo Designer: Scraping failed, using fallback: {scrape_err}")
+
+        # Build the real products context for GPT
+        real_products_context = format_products_for_prompt(real_products_by_category, int(budget_eur)) if real_products_by_category else ""
+
+        # Build a flat list of all scraped products for post-processing
+        all_real_products = []
+        for cat, prods in real_products_by_category.items():
+            for p in prods:
+                if p.get("scraped"):
+                    all_real_products.append({**p, "category": cat})
+
+        # Store search URL patterns for fallback
         STORE_SEARCH_URLS = {
-            "Praktiker": "https://praktiker.bg/search?q=",
-            "Mr.Bricolage": "https://mr-bricolage.bg/search?q=",
-            "Jysk": "https://jysk.bg/search?q=",
-            "HomeMax": "https://www.home-max.bg/search/?q=",
-            "Bauhaus": "https://bauhaus.bg/search/",
+            "Praktiker": "https://praktiker.bg/bg/search?q=",
+            "Mr.Bricolage": "https://www.mr-bricolage.bg/search?q=",
+            "Jysk": "https://jysk.bg/catalogsearch/result/?q=",
+            "HomeMax": "https://www.homemax.bg/catalogsearch/result/?q=",
+            "Bauhaus": "https://www.bauhaus.bg/catalogsearch/result/?q=",
             "eMAG": "https://www.emag.bg/search/",
             "IKEA": "https://www.ikea.bg/search/?q=",
-            "Teknoimpex": "https://teknoimpex.bg/search?q=",
+            "Videnov": "https://videnov.bg/search?keyword=",
+            "Praktis": "https://praktis.bg/search?q=",
         }
 
-        budget_chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"photo-budget-{uuid.uuid4()}",
-            system_message=f"""Ти си експерт по строителни материали в България. Клиентът има бюджет от {budget_eur}€.
+        # System prompt: Use real products when available
+        budget_system = f"""Ти си експерт по строителни материали в България. Клиентът има бюджет от {budget_eur}€.
 
 Генерирай БЮДЖЕТ с 3 варианта (Иконом, Среден, Премиум) СПРЯМО БЮДЖЕТА на клиента:
 - Иконом: до {int(int(budget_eur)*0.6)}€ (60% от бюджета)
 - Среден: до {budget_eur}€ (100% от бюджета)  
 - Премиум: до {int(int(budget_eur)*1.5)}€ (150% от бюджета)
 
-За всеки материал задай КОНКРЕТНА КЛЮЧОВА ДУМА ЗА ТЪРСЕНЕ (search_query), по която клиентът може да го намери в магазина.
+"""
+        if real_products_context:
+            budget_system += f"""КРИТИЧНО ВАЖНО: Имаш достъп до РЕАЛНИ продукти от български магазини.
+За мебели и обзавеждане ЗАДЪЛЖИТЕЛНО използвай продуктите от списъка — те са с реални цени и налични в момента.
+За строителни материали (бои, настилки, плочки) можеш да предложиш типови продукти с realistic цени.
 
-МАГАЗИНИ (избери 1 за всеки материал):
-- Praktiker, Mr.Bricolage, Jysk, HomeMax, Bauhaus, eMAG
+{real_products_context}
 
+За всеки материал от реалния списък включи:
+- "real_product": true
+- "product_url": точния URL от списъка
+- "store": магазина от списъка
+- "price_eur": точната цена от списъка
+
+За материали БЕЗ реален продукт:
+- "real_product": false  
+- "store": препоръчан магазин (Praktiker, Mr.Bricolage, Bauhaus, eMAG)
+- "search_query": ключова дума за търсене
+"""
+        else:
+            budget_system += """МАГАЗИНИ (избери 1 за всеки материал):
+- Praktiker, Mr.Bricolage, Jysk, HomeMax, Bauhaus, eMAG, Videnov
+За всеки материал задай search_query за търсене в магазина.
+"""
+
+        budget_system += f"""
 Отговори САМО в JSON:
 {{
   "budget_tiers": [
@@ -2986,12 +3026,14 @@ IMPORTANT RULES:
       "total_eur": 0,
       "materials": [
         {{
-          "name": "Гранитогрес 60x60 сив",
+          "name": "Точно име на продукта",
           "category": "Настилки",
           "quantity": "15 m²",
           "price_eur": 0,
-          "store": "Praktiker",
-          "search_query": "гранитогрес 60x60 сив"
+          "store": "Videnov",
+          "real_product": true,
+          "product_url": "https://videnov.bg/...",
+          "search_query": ""
         }}
       ]
     }},
@@ -3002,13 +3044,18 @@ IMPORTANT RULES:
   "client_budget_eur": {budget_eur},
   "summary": "Кратко описание"
 }}"""
+
+        budget_chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"photo-budget-{uuid.uuid4()}",
+            system_message=budget_system
         ).with_model("openai", "gpt-4o")
 
         budget_msg = UserMessage(
             text=f"""Генерирай бюджет за ремонт на {room_type_name} ({width}м x {length}м x {height}м).
 БЮДЖЕТ: {budget_eur}€. Стил: {style_desc}. {f'Бележки: {notes}' if notes else ''}
 3 ВАРИАНТА: Иконом до {int(int(budget_eur)*0.6)}€, Среден до {budget_eur}€, Премиум до {int(int(budget_eur)*1.5)}€.
-Всеки с 8-12 материала. За всеки материал задай search_query за магазина."""
+Всеки с 8-12 материала. ИЗПОЛЗВАЙ реалните продукти от списъка за мебели/обзавеждане!"""
         )
         budget_response = await budget_chat.send_message(budget_msg)
 
@@ -3022,26 +3069,40 @@ IMPORTANT RULES:
         except Exception:
             budget_data = {"budget_tiers": [], "labor_estimate_eur": 0}
 
-        # Post-process: Generate REAL search URLs with AFFILIATE tracking
+        # Post-process: Set URLs for all materials
         from urllib.parse import quote as url_quote
+        real_product_map = {p["name"].lower().strip(): p for p in all_real_products}
+
         for tier in budget_data.get("budget_tiers", []):
             for mat in tier.get("materials", []):
-                store = mat.get("store", "")
-                search_q = mat.get("search_query", mat.get("name", ""))
-                encoded_q = url_quote(search_q, safe='')
-                real_url = STORE_SEARCH_URLS.get(store, "")
-                if real_url:
-                    base_url = f"{real_url}{encoded_q}"
+                is_real = mat.get("real_product", False)
+                existing_url = mat.get("product_url", "")
+
+                if is_real and existing_url and existing_url.startswith("http"):
+                    # Real product from scraping — apply affiliate tracking
+                    mat["product_url"] = make_affiliate_url(existing_url, mat.get("store", ""))
+                    mat["verified"] = True
                 else:
-                    base_url = f"https://www.emag.bg/search/{encoded_q}"
-                    if not store:
-                        mat["store"] = "eMAG"
-                # Apply affiliate tracking
-                mat["product_url"] = make_affiliate_url(base_url, mat.get("store", store))
-                # Remove any AI-hallucinated fields
-                for key in ["product_id", "available"]:
+                    # Not a real product — generate search URL
+                    store = mat.get("store", "")
+                    search_q = mat.get("search_query", mat.get("name", ""))
+                    encoded_q = url_quote(search_q, safe='')
+                    base_url = STORE_SEARCH_URLS.get(store, "")
+                    if base_url:
+                        mat["product_url"] = make_affiliate_url(f"{base_url}{encoded_q}", store)
+                    else:
+                        mat["product_url"] = make_affiliate_url(f"https://www.emag.bg/search/{encoded_q}", "eMAG")
+                        if not store:
+                            mat["store"] = "eMAG"
+                    mat["verified"] = False
+
+                # Cleanup hallucinated fields
+                for key in ["product_id", "available", "real_product"]:
                     mat.pop(key, None)
-        logging.info(f"Photo Designer: Budget with affiliate search URLs")
+
+        real_count = sum(1 for t in budget_data.get("budget_tiers", []) for m in t.get("materials", []) if m.get("verified"))
+        total_count = sum(len(t.get("materials", [])) for t in budget_data.get("budget_tiers", []))
+        logging.info(f"Photo Designer: Budget generated with {real_count}/{total_count} verified real products")
 
         # Save project to DB
         design_id = str(uuid.uuid4())
@@ -5566,9 +5627,17 @@ app.include_router(api_router)
 from routes.notifications import router as notifications_router
 app.include_router(notifications_router)
 
+from routes.products import router as products_router
+app.include_router(products_router)
+
 @app.on_event("startup")
 async def start_background_tasks():
     asyncio.create_task(check_subscriptions_background())
+    # Create TTL index for product cache
+    try:
+        await db.product_cache.create_index("expires_at", expireAfterSeconds=0)
+    except Exception:
+        pass
 
 logging.basicConfig(
     level=logging.INFO,
@@ -5578,4 +5647,6 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
+    from services.scraper import close_browser
+    await close_browser()
     client.close()
