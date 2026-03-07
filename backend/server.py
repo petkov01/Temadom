@@ -1154,17 +1154,25 @@ async def get_conversations(user: dict = Depends(get_current_user)):
     ]).to_list(50)
     
     result = []
+    cutoff = (datetime.now(timezone.utc) - timedelta(minutes=2)).isoformat()
     for conv in conversations:
         msg = conv["last_message"]
         other_id = msg["receiver_id"] if msg["sender_id"] == user["id"] else msg["sender_id"]
         other_user = await db.users.find_one({"id": other_id}, {"_id": 0, "password_hash": 0})
+        
+        # Check online status
+        online_doc = await db.online_status.find_one(
+            {"user_id": other_id, "last_seen": {"$gte": cutoff}},
+            {"_id": 0}
+        )
         
         result.append({
             "conversation_id": conv["_id"],
             "other_user": {
                 "id": other_user["id"] if other_user else other_id,
                 "name": other_user.get("name", "Неизвестен") if other_user else "Неизвестен",
-                "user_type": other_user.get("user_type", "") if other_user else ""
+                "user_type": other_user.get("user_type", "") if other_user else "",
+                "is_online": bool(online_doc)
             },
             "last_message": msg.get("content", ""),
             "last_message_at": msg.get("created_at"),

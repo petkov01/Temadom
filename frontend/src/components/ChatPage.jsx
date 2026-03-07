@@ -134,6 +134,15 @@ const ChatPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Heartbeat to track online status
+  useEffect(() => {
+    if (!token) return;
+    const sendHeartbeat = () => axios.post(`${API}/chat/online`, {}, { headers: { Authorization: `Bearer ${token}` } }).catch(() => {});
+    sendHeartbeat();
+    const hb = setInterval(sendHeartbeat, 30000);
+    return () => clearInterval(hb);
+  }, [token]);
+
   // User search with debounce
   useEffect(() => {
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
@@ -331,6 +340,9 @@ const ChatPage = () => {
                         <Avatar className="h-9 w-9">
                           <AvatarFallback className="bg-[#FF8C42]/10 text-[#FF8C42] text-sm">{conv.other_user.name?.charAt(0) || '?'}</AvatarFallback>
                         </Avatar>
+                        {conv.other_user.is_online && (
+                          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2" style={{ borderColor: 'var(--theme-card-bg)' }} />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
