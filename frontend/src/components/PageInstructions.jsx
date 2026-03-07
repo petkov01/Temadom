@@ -57,7 +57,7 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
   return (
     <div className="mb-8" data-testid="page-instructions">
       <div
-        className="glass rounded-xl p-4 cursor-pointer hover:border-[#FF8C42]/30 transition-all"
+        className="glass rounded-xl p-4 cursor-pointer hover:border-[#d4a43a]/30 transition-all"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center justify-between">
@@ -74,7 +74,7 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
             {videoUrl && (
               <button
                 onClick={(e) => { e.stopPropagation(); setVideoOpen(true); }}
-                className="flex items-center gap-1.5 bg-[#FF8C42]/15 text-[#FF8C42] text-xs font-medium px-3 py-1.5 rounded-full hover:bg-[#FF8C42]/25 transition-colors"
+                className="flex items-center gap-1.5 bg-[#d4a43a]/15 text-[#d4a43a] text-xs font-medium px-3 py-1.5 rounded-full hover:bg-[#d4a43a]/25 transition-colors"
                 data-testid="watch-video-btn"
               >
                 <Play className="h-3.5 w-3.5" />
@@ -96,7 +96,7 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
               <div className="space-y-2">
                 {steps.map((step, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-[#FF8C42]/15 text-[#FF8C42] text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="w-6 h-6 rounded-full bg-[#d4a43a]/15 text-[#d4a43a] text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                       {i + 1}
                     </span>
                     <p className="theme-text-muted text-sm">{step}</p>
@@ -150,12 +150,12 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
                 const Icon = step.icon;
                 return (
                   <div key={i} className="flex items-start gap-4 group" data-testid={`tutorial-step-${i}`}>
-                    <div className="w-12 h-12 rounded-xl bg-[#FF8C42]/15 flex items-center justify-center flex-shrink-0 group-hover:bg-[#FF8C42]/25 transition-colors">
-                      <Icon className="h-6 w-6 text-[#FF8C42]" />
+                    <div className="w-12 h-12 rounded-xl bg-[#d4a43a]/15 flex items-center justify-center flex-shrink-0 group-hover:bg-[#d4a43a]/25 transition-colors">
+                      <Icon className="h-6 w-6 text-[#d4a43a]" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[#FF8C42] text-xs font-bold bg-[#FF8C42]/10 rounded-full px-2 py-0.5">Стъпка {i + 1}</span>
+                        <span className="text-[#d4a43a] text-xs font-bold bg-[#d4a43a]/10 rounded-full px-2 py-0.5">Стъпка {i + 1}</span>
                         <h4 className="text-white font-medium text-sm">{step.title}</h4>
                       </div>
                       <p className="theme-text-muted text-sm">{step.desc}</p>
@@ -167,7 +167,7 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
             <div className="p-4 border-t  text-center">
               <button
                 onClick={() => setVideoOpen(false)}
-                className="bg-[#FF8C42] hover:bg-[#e67a30] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors"
+                className="bg-[#d4a43a] hover:bg-[#b8922e] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors"
               >
                 Разбрах, да започнем!
               </button>

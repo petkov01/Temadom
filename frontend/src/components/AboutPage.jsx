@@ -102,11 +102,11 @@ const AboutPage = () => {
       {/* Hero */}
       <section className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-[#FF8C42]/50 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute top-0 left-0 w-96 h-96 bg-[#d4a43a]/50 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-600 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
         </div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-6" style={{ color: 'var(--theme-text)' }}>{c.heroTitle1}<span className="text-[#FF8C42]">{c.heroTitle2}</span></h1>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-6" style={{ color: 'var(--theme-text)' }}>{c.heroTitle1}<span className="text-[#d4a43a]">{c.heroTitle2}</span></h1>
           <p className="text-lg max-w-3xl mx-auto leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>{c.heroDesc}</p>
         </div>
       </section>
@@ -141,7 +141,7 @@ const AboutPage = () => {
       <section className="py-16" style={{ background: 'var(--theme-bg)' }}>
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
-            <Shield className="h-12 w-12 text-[#FF8C42] mx-auto mb-4" />
+            <Shield className="h-12 w-12 text-[#d4a43a] mx-auto mb-4" />
             <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: 'var(--theme-text)' }}>{c.solutionTitle}</h2>
             <p style={{ color: 'var(--theme-text-muted)' }}>{c.solutionSub}</p>
           </div>
@@ -149,7 +149,7 @@ const AboutPage = () => {
             {c.solutions.map((s, i) => {
               const Icon = sIcons[i];
               return (
-                <Card key={i} className="hover:border-[#FF8C42]/30 transition-colors" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+                <Card key={i} className="hover:border-[#d4a43a]/30 transition-colors" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
                   <CardContent className="p-5 flex items-start gap-5">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${sColors[i]}15` }}>
                       <Icon className="h-6 w-6" style={{ color: sColors[i] }} />
@@ -172,7 +172,7 @@ const AboutPage = () => {
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <div className="flex items-center gap-3 mb-6">
-                <Users className="h-7 w-7 text-[#FF8C42]" />
+                <Users className="h-7 w-7 text-[#d4a43a]" />
                 <h2 className="text-xl font-bold" style={{ color: 'var(--theme-text)' }}>{c.forClients}</h2>
               </div>
               <div className="space-y-3">
@@ -186,7 +186,7 @@ const AboutPage = () => {
             </div>
             <div>
               <div className="flex items-center gap-3 mb-6">
-                <Building2 className="h-7 w-7 text-[#FF8C42]" />
+                <Building2 className="h-7 w-7 text-[#d4a43a]" />
                 <h2 className="text-xl font-bold" style={{ color: 'var(--theme-text)' }}>{c.forCompanies}</h2>
               </div>
               <div className="space-y-3">
@@ -203,7 +203,7 @@ const AboutPage = () => {
       </section>
 
       {/* Mission */}
-      <section className="py-16 bg-gradient-to-br from-[#FF8C42] to-[#EA580C]">
+      <section className="py-16 bg-gradient-to-br from-[#d4a43a] to-[#b8922e]">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <Award className="h-14 w-14 mx-auto mb-6 text-white/90" />
           <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-white">{c.missionTitle}</h2>
@@ -221,7 +221,7 @@ const AboutPage = () => {
           <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--theme-text)' }}>{c.ctaTitle}</h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/register">
-              <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-lg px-8 py-3 text-white" data-testid="about-register-btn">
+              <Button className="bg-[#d4a43a] hover:bg-[#b8922e] text-lg px-8 py-3 text-white" data-testid="about-register-btn">
                 <ArrowRight className="mr-2 h-5 w-5" /> {c.ctaStart}
               </Button>
             </Link>

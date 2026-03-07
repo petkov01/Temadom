@@ -475,10 +475,10 @@ export const AISketchPage = () => {
           </div>
           <div className="flex gap-2" data-testid="mode-tabs">
             <button onClick={() => { setMode('draw'); setUploadRes(null); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'draw' ? 'bg-[#FF8C42] text-white' : ' theme-text-muted border '}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'draw' ? 'bg-[#d4a43a] text-white' : ' theme-text-muted border '}`}
               data-testid="mode-draw">CAD</button>
             <button onClick={() => setMode('upload')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'upload' ? 'bg-[#FF8C42] text-white' : ' theme-text-muted border '}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'upload' ? 'bg-[#d4a43a] text-white' : ' theme-text-muted border '}`}
               data-testid="mode-upload"><Upload className="h-3.5 w-3.5 inline mr-1" />Качи</button>
           </div>
         </div>
@@ -496,7 +496,7 @@ export const AISketchPage = () => {
                       return (
                         <button key={t.id} onClick={() => setTool(t.id)}
                           className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-all ${
-                            tool === t.id ? 'bg-[#FF8C42] text-white shadow-lg shadow-[#FF8C42]/20' : ' theme-text-muted hover:text-white hover:bg-[#2A3A4C]'
+                            tool === t.id ? 'bg-[#d4a43a] text-white shadow-lg shadow-[#d4a43a]/20' : ' theme-text-muted hover:text-white hover:bg-[#2A3A4C]'
                           }`} data-testid={`tool-${t.id}`}>
                           {I && <I className="h-3 w-3" />}<span className="hidden sm:inline">{t.label}</span>
                         </button>
@@ -538,9 +538,9 @@ export const AISketchPage = () => {
               <Card className=" ">
                 <CardHeader className="pb-1 pt-2 px-3">
                   <CardTitle className="text-white text-sm flex items-center gap-2">
-                    <Ruler className="h-4 w-4 text-[#FF8C42]" /> 2D Чертеж
+                    <Ruler className="h-4 w-4 text-[#d4a43a]" /> 2D Чертеж
                     <Badge className="bg-[#28A745]/15 text-[#28A745] text-[9px] ml-auto">Ет. {currentFloor}</Badge>
-                    {objCount > 0 && <Badge className="bg-[#FF8C42]/15 text-[#FF8C42] text-[9px]">{objCount} обекта</Badge>}
+                    {objCount > 0 && <Badge className="bg-[#d4a43a]/15 text-[#d4a43a] text-[9px]">{objCount} обекта</Badge>}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-2">
@@ -595,7 +595,7 @@ export const AISketchPage = () => {
             <Card className="  mb-3">
               <CardContent className="px-3 py-3 space-y-2">
                 <div className="flex gap-2">
-                  <Button size="sm" className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white text-xs h-10 font-bold"
+                  <Button size="sm" className="flex-1 bg-[#d4a43a] hover:bg-[#b8922e] text-white text-xs h-10 font-bold"
                     onClick={exportPlanPdf} data-testid="export-plan-pdf">
                     <FileText className="mr-1.5 h-4 w-4" /> PDF План + Сметка
                   </Button>
@@ -613,7 +613,7 @@ export const AISketchPage = () => {
 
             {/* Contract Dialog */}
             {showContract && (
-              <Card className=" border-[#FF8C42]/30 mb-3">
+              <Card className=" border-[#d4a43a]/30 mb-3">
                 <CardHeader className="pb-2 pt-3 px-3">
                   <CardTitle className="text-white text-sm flex items-center justify-between">
                     <span>Договор за строителство</span>
@@ -696,14 +696,14 @@ export const AISketchPage = () => {
                             onChange={e => handleUpload(idx, e)} data-testid={`sketch-upload-${idx}`} />
                           {previews[idx] ? (
                             <div className="relative group">
-                              <div className="aspect-square rounded-lg overflow-hidden border-2 border-[#FF8C42]/30">
+                              <div className="aspect-square rounded-lg overflow-hidden border-2 border-[#d4a43a]/30">
                                 <img src={previews[idx]} alt="" className="w-full h-full object-cover" /></div>
                               <button onClick={() => { setSketches(p => { const n = [...p]; n[idx] = null; return n; }); setPreviews(p => { const n = [...p]; n[idx] = null; return n; }); }}
                                 className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100"><X className="h-3 w-3" /></button>
                             </div>
                           ) : (
                             <button onClick={() => fileRefs[idx].current?.click()}
-                              className="aspect-square w-full rounded-lg border-2 border-dashed  hover:border-[#FF8C42]/50 flex flex-col items-center justify-center gap-1 /50"
+                              className="aspect-square w-full rounded-lg border-2 border-dashed  hover:border-[#d4a43a]/50 flex flex-col items-center justify-center gap-1 /50"
                               data-testid={`sketch-upload-btn-${idx}`}><Upload className="h-5 w-5 theme-text-subtle" /><span className="theme-text-subtle text-[10px]">{idx + 1}</span></button>
                           )}
                         </div>
@@ -713,7 +713,7 @@ export const AISketchPage = () => {
                       className="  text-white min-h-[60px] text-sm mt-3" data-testid="sketch-notes" />
                   </CardContent>
                 </Card>
-                <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white h-11" onClick={handleAnalyze}
+                <Button className="w-full bg-[#d4a43a] hover:bg-[#b8922e] text-white h-11" onClick={handleAnalyze}
                   disabled={!sketches.filter(Boolean).length || loading} data-testid="analyze-btn">
                   {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />CV анализира...</> : <><Ruler className="mr-2 h-4 w-4" />Генерирай 3D</>}
                 </Button>
@@ -738,7 +738,7 @@ export const AISketchPage = () => {
                   <Card className=" ">
                     <CardContent className="pt-4">
                       <div className="grid grid-cols-4 gap-3">
-                        {[{ v: uploadRes.summary.walls_detected, l: 'Стени', c: '#FF8C42' }, { v: uploadRes.summary.stairs_detected, l: 'Стълби', c: '#4DA6FF' }, { v: uploadRes.summary.dimensions_found, l: 'OCR', c: '#28A745' }, { v: uploadRes.summary.floor_area_sqm || '-', l: 'м2', c: '#8C56FF' }].map((s, i) => (
+                        {[{ v: uploadRes.summary.walls_detected, l: 'Стени', c: '#d4a43a' }, { v: uploadRes.summary.stairs_detected, l: 'Стълби', c: '#4DA6FF' }, { v: uploadRes.summary.dimensions_found, l: 'OCR', c: '#28A745' }, { v: uploadRes.summary.floor_area_sqm || '-', l: 'м2', c: '#8C56FF' }].map((s, i) => (
                           <div key={i} className=" rounded-lg p-2.5 text-center">
                             <p className="text-lg font-bold" style={{ color: s.c }}>{s.v}</p><p className="theme-text-subtle text-[9px]">{s.l}</p>
                           </div>
@@ -747,7 +747,7 @@ export const AISketchPage = () => {
                     </CardContent>
                   </Card>
                 )}
-                <div className="flex justify-center"><Button className="bg-[#FF8C42] text-white" onClick={reset} data-testid="new-sketch-btn"><RotateCcw className="mr-2 h-4 w-4" />Нов проект</Button></div>
+                <div className="flex justify-center"><Button className="bg-[#d4a43a] text-white" onClick={reset} data-testid="new-sketch-btn"><RotateCcw className="mr-2 h-4 w-4" />Нов проект</Button></div>
               </div>
             )}
           </div>

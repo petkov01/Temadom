@@ -29,8 +29,8 @@
   --radius: 0.625rem;
 
   /* Premium dark palette */
-  --td-orange: #ff8a00;
-  --td-orange-end: #ff5a00;
+  --td-orange: #d4a43a;
+  --td-orange-end: #c49030;
   --td-gold: #f6c36a;
   --td-gold-end: #e0a94a;
   --td-green: #10B981;
@@ -57,8 +57,8 @@
   --theme-scrollbar-thumb: #252a36;
   --theme-gold: #f6c36a;
   --theme-gold-glow: rgba(246,195,106,0.2);
-  --theme-orange: #ff8a00;
-  --theme-orange-glow: rgba(255,138,0,0.25);
+  --theme-orange: #d4a43a;
+  --theme-orange-glow: rgba(212,164,58,0.25);
 }
 
 html.light-mode {
@@ -102,8 +102,8 @@ html.light-mode {
   --theme-scrollbar-thumb: #d1d5e0;
   --theme-gold: #d4a23a;
   --theme-gold-glow: rgba(212,162,58,0.15);
-  --theme-orange: #e67a00;
-  --theme-orange-glow: rgba(230,122,0,0.2);
+  --theme-orange: #b8922e;
+  --theme-orange-glow: rgba(184,146,46,0.2);
 }
 
 * { box-sizing: border-box; }
@@ -127,6 +127,11 @@ h1, h2, h3, h4, h5, h6 {
 @layer base {
   * { @apply border-border; }
   body { @apply bg-background text-foreground; }
+}
+
+/* Logo visibility in light mode */
+html.light-mode .logo-glow {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)) brightness(0.85) contrast(1.1) !important;
 }
 
 /* Premium Scrollbar */
@@ -171,7 +176,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ==================== BUTTONS ==================== */
 .btn-primary {
-  background: linear-gradient(135deg, #ff8a00, #ff5a00);
+  background: linear-gradient(135deg, #d4a43a, #c49030);
   color: white;
   font-weight: 700;
   padding: 0.75rem 1.5rem;
@@ -183,7 +188,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(255,138,0,0.4);
+  box-shadow: 0 8px 30px rgba(212,164,58,0.4);
   filter: brightness(1.1);
 }
 .btn-primary:active { transform: translateY(0); }

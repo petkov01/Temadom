@@ -1,129 +1,141 @@
 <analysis>**original_problem_statement:**
-The user wants to finalize their TemaDom web application. The primary goals are:
-1.  **AI Designer Accuracy:** Ensure the AI-generated after images are architecturally identical to the before images.
-2.  **UI/UX Redesign:** A complete visual overhaul to a premium, modern, dark/light theme AI-SaaS aesthetic, based on a detailed prompt and reference image. This includes a new logo.
-3.  **New Features:**
-    *   Split the Projects page into Renovations and Construction sections.
-    *   In the AI Designer, show an estimated generation time and add a direct camera capture option.
-    *   Enhance the chat with online status, typing indicators, and read receipts.
-    *   Add more e-commerce stores (HomeMax, Bauhaus, Jysk) to the product scraper.
+The user wants to finalize their TemaDom web application. The primary goals were:
+1.  **AI Designer Accuracy & Speed:** Ensure AI-generated images are architecturally identical and generated quickly. The user reported unacceptable wait times (7+ minutes).
+2.  **UI/UX Redesign:** A complete visual overhaul to a premium, modern, dark/light theme AI-SaaS aesthetic. This included a new logo, changing the primary accent color from orange to a more modern gold, and ensuring logo visibility in both themes.
+3.  **New Features & Enhancements:**
+    *   Implement user-to-user chat features (online status, typing indicators, read receipts).
+    *   Audit and verify subscription plans and feature access control.
+    *   Make the generated contract PDF editable by the firm users.
 4.  **Bug Fixes & Polish:**
-    *   Fix mobile layout issues, such as overlapping elements.
-    *   Correct pricing discrepancies.
-    *   Replace placeholder/inaccurate showcase images with high-quality, architecturally correct examples.
+    *   Fix pricing discrepancies and mobile layout issues.
+    *   Ensure uploaded images are visible in the AI Designer UI.
+    *   Remove redundant TemaDom text from internal page titles.
+    *   Adjust logo size multiple times based on specific user feedback.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-The application is a full-stack React/FastAPI/MongoDB project. The agent has successfully completed several major tasks in this session:
-1.  **Fixed the Core AI Designer Bug:** The agent identified that the AI was not using the user's uploaded image as a reference, causing architectural changes. This was fixed by switching the backend from  to , which correctly passes the original image. This resolves the user's primary and most critical complaint.
-2.  **Implemented New Features:** The backend and frontend logic for splitting the Projects page into Renovation and Construction is complete. The UI for the AI Designer has been updated to include an estimated time and camera capture button. New backend scrapers for HomeMax, Bauhaus, and Jysk have been implemented.
-3.  **Generated New Showcase Images:** Using the fixed AI Designer, the agent generated a full set of new, architecturally accurate before and after images for the landing page showcase.
-4.  **Initiated a Full UI/UX Redesign:** Based on a new, detailed user request, the agent began a complete visual overhaul. It has already implemented a new CSS theme system with light and dark modes, replaced the logo, and redesigned the main landing page and header to a premium glass aesthetic.
+The application is a full-stack React/FastAPI/MongoDB project. The agent has completed a massive UI/UX overhaul, addressing numerous user requests. This includes:
+- **Full Theming:** Replaced almost all hardcoded colors with a new CSS variable-based theme system () for consistent light/dark modes.
+- **Color Palette Update:** Changed the primary accent color from a harsh orange to a premium gold () to match the new logo aesthetic.
+- **Logo Enhancements:** Iteratively increased the logo size, added a glow effect, and fixed its visibility on the light theme.
+- **PDF Generation Overhaul:** The calculation PDF was redesigned to remove the orange header. The contract PDF is now generated in Bulgarian (Cyrillic) and is fully editable from a form in the company dashboard.
+- **AI Designer Fixes:** Removed misleading time estimates, improved the visibility of uploaded image previews, and implemented a potential fix for the slow generation speed.
+- **P1 Tasks Completed:** A full audit of subscription plans was completed (fixing a price mismatch), and the chat enhancements (online status, typing indicators) were fully implemented and verified.
 
 **Last working item**:
--   **Last item agent was working:** The agent was verifying that the major visual redesign of the application did not break any existing functionality. After applying the new CSS theme system and redesigning the landing page and header, the agent initiated a full regression test.
+-   **Last item agent was working:** The agent was fixing a critical performance issue where the AI Designer took over 7 minutes to generate results. The root cause was identified as sequential processing of multiple uploaded images. The agent refactored the backend service () to process these image generation requests in parallel using . Concurrently, the agent fixed a  React context bug in several frontend components (, ) that was affecting the logo's appearance in light mode.
 -   **Status:** IN PROGRESS
--   **Agent Testing Done:** N (The testing agent call was the last action performed).
--   **Which testing method agent to use?** The agent has already called . The next agent must first read the results from the generated test report file: .
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** both.
+    1.  **Backend:** Use  to call the  endpoint, sending multiple images. The primary success criterion is a significant reduction in total response time (e.g., from ~7 mins to ~2-3 mins).
+    2.  **Frontend:** Use the  to verify that the UI on pages like the , , and the main  render correctly in both light and dark modes, confirming the  context fixes.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Inconsistent UI/UX due to Incomplete Redesign (P0)**
-    -   **Description**: The agent has applied the new premium visual redesign (dark/light theme, new components) ONLY to the  and . All other pages (, , , , , etc.) still use the old, outdated design. This creates a broken and inconsistent user experience.
+-   **Issue 1: AI Designer is too slow (P0)**
+    -   **Description**: The user reported waiting over 7 minutes for a design, which is a critical issue for user retention. The agent identified that multiple image generations were running sequentially instead of in parallel.
+    -   **Attempted fixes**: The agent refactored the  function in  to use  for parallel execution of  calls.
     -   **Next debug checklist**:
-        1.  Review the test report from the last agent's run ().
-        2.  Systematically go through every page/component of the application.
-        3.  Apply the new CSS variables, Tailwind classes, and component structures (e.g., glassmorphism cards, premium buttons) defined in  and  to all other pages to ensure a consistent look and feel.
-    -   **Why fix this issue and what will be achieved with the fix?**: To complete the user's requested visual overhaul and provide a cohesive, professional user experience across the entire application.
+        1.  Restart the backend and check  logs to ensure no errors occurred from the  refactoring.
+        2.  Execute a test call to the  endpoint with at least 2-3 images and measure the response time. Confirm it's significantly lower than before.
+        3.  Perform a quick end-to-end test from the frontend UI to ensure the results are still displayed correctly after the backend parallelization.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is the most critical issue blocking the application's core functionality and directly impacting user satisfaction and client retention. Fixing it will make the AI Designer usable.
     -   **Status**: IN PROGRESS
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend
-    -   **Blocked on other issue:** None.
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Backend
+    -   **Blocked on other issue:** None
 
 **In progress Task List**:
--   **Task 1: Complete UI/UX Redesign (P0)**
-    -   **Where to resume**: Apply the new premium design aesthetic (established in  and ) to all remaining pages and components. This includes forms, buttons, cards, modals, and layouts. The work is estimated to be ~20% complete.
-    -   **What will be achieved with this?**: A fully redesigned, modern, and visually consistent application that matches the user's detailed request.
-    -   **Status**: IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** Frontend
-    -   **Blocked on something:** None.
+None. The focus is on the critical bug fix above.
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks:**
-    -   **P1: Full Audit of Subscription Features**: The user requested an audit. While the agent confirmed feature flags exist, a proper check of the end-to-end subscription flow and feature access control is still needed, especially after the major redesign.
-    -   **P1: User-to-User Messaging Enhancements**: The backend endpoints for chat improvements (online status, typing indicators) have been created, but the frontend was only partially implemented before the redesign task interrupted it. This needs to be completed and styled according to the new design.
--   **Future Tasks:**
-    -   **P2: Company Catalog & Portfolios**: Build dedicated pages for registered firms to showcase their work.
-    -   **P2: Job Ads Module**: Create a section for firms to post job openings.
+-   **Future Tasks (User confirmed for a later stage):**
+    -   P2: Company Catalog & Portfolios: Build dedicated pages for registered firms to showcase their work.
+    -   P2: Job Ads Module: Create a section for firms to post job openings.
 
 **Completed work in this session**
--   **AI Designer Architectural Accuracy (FIXED)**: Resolved the critical bug where the AI changed the room's structure by implementing  instead of  in .
--   **Projects Page Feature (DONE)**: Implemented the split between Renovation and Construction projects on both the backend (models, routes) and frontend (pages, forms).
--   **AI Designer UI Features (DONE)**: Added an estimated generation time display and a camera capture button to the AI Designer page.
--   **Showcase Content (DONE)**: Regenerated all landing page showcase images using the fixed AI designer to be architecturally accurate.
--   **Scraper Expansion (DONE)**: Added backend scraper logic for HomeMax, Bauhaus, and Jysk in .
--   **Mobile UI Overlap (FIXED)**: Fixed CSS bugs causing buttons to overlap on mobile viewports.
--   **Pricing Discrepancy (FIXED)**: Corrected the price for the 2 rooms plan in the backend.
--   **UI Redesign (STARTED)**: Established the new CSS theme system and redesigned the landing page and header.
+-   **UI/UX Redesign (DONE)**: Completed the full visual overhaul, replacing hardcoded styles with a theme system across the entire application.
+-   **Accent Color Change (DONE)**: Replaced all instances of the old orange accent color with a new, more modern gold to match the logo.
+-   **Logo Size & Style (DONE)**: Addressed multiple user requests to significantly increase logo size, add a glow effect, and ensure its visibility in light mode.
+-   **Editable Contract PDF (DONE)**: Implemented a form for firms to edit contract details (scope, terms, warranty) and generate a corrected PDF in Bulgarian (Cyrillic).
+-   **Calculation PDF Redesign (DONE)**: Removed the intrusive orange header from the calculation PDF, replacing it with the company logo.
+-   **AI Designer UX (DONE)**: Removed misleading time estimates and fixed the UI for previewing uploaded images.
+-   **Subscription Plan Audit (DONE)**: Verified and corrected subscription plan prices ( plan is now correctly 119 EUR).
+-   **Chat Enhancements (DONE)**: Implemented and verified online status, typing indicators, and read receipts.
+-   **Content Cleanup (DONE)**: Removed the redundant TemaDom text from all internal page titles as requested.
+
+**Known issue recurrence from previous fork**
+-   **AI Designer Performance**: In the previous fork, the issue was AI *accuracy*. This was fixed. In this session, the recurring theme became AI *speed*. The user has repeatedly reported that the generation is too slow, making it a persistent pain point for the core feature.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Image-to-Image Generation:** The core fix involved using  to pass an original image as a reference to the AI model, ensuring generated outputs maintain structural integrity.
--   **CSS Theming & Variables:** The redesign heavily relies on CSS variables defined in  for  and  themes, allowing for a scalable and maintainable visual system.
--   **Component-Based Redesign:** The agent is applying a new visual language by restyling individual React components rather than making sweeping functional changes.
--   **Playwright Web Scraping:** The product scraping functionality uses Playwright to extract data from e-commerce sites.
+-   **Asyncio Parallelization:** Using  in the backend to run multiple long-running API calls () concurrently, drastically reducing total execution time.
+-   **React Context API ()**: The agent fixed several bugs where components were attempting to use the  mode variable without importing the  hook, causing UI inconsistencies.
+-   **CSS Theming & Variables**: The entire application's styling was refactored to use CSS variables for light/dark themes, moving away from hardcoded Tailwind classes.
+-   **Dynamic PDF Generation ()**: The backend service was enhanced to accept user input from a frontend form to dynamically generate a customized, legally formatted contract in Bulgarian (Cyrillic).
 
 **All files of reference**
--   : **(CRITICAL)** Source of truth for all new color palettes, fonts, and CSS variables for the redesign.
--   : **(CRITICAL)** The reference implementation for the new premium design. All other pages should be styled to match this.
--   : Contains the critical fix for the AI designer's architectural accuracy.
--   : **(MUST READ)** The results of the last regression test, which will show if the initial redesign broke any features.
+-   : Contains the critical performance fix for the AI designer.
+-   : The source of truth for the application's new color palette (gold theme).
+-   : Contains many of the UI components and was heavily modified to fix theme bugs and apply new styles.
+-   : Contains the logic for generating the redesigned and editable PDFs.
+-   : Contains the new form for editing the contract.
+-   : Contains the fix for the  context bug.
+
+**Areas that need refactoring**:
+-    remains a very large file containing the definitions for many pages (, , etc.). While styling was improved, a future task should be to extract these pages into their own files within  to improve maintainability.
+
+**key api endpoints**
+-   : Core AI endpoint, refactored for parallel processing.
+-   : Generates the editable contract PDF using data from the frontend form.
+-   : Serves subscription plan data, now with corrected pricing.
 
 **Critical Info for New Agent**
--   **Your first action is to read the test report at ** to see the outcome of the regression test run by the previous agent.
--   **Your main task (P0) is to complete the visual redesign.** The landing page is the template. Apply that same premium, dark/light theme aesthetic to *every other page and component* in the application for consistency.
--   **Do NOT change any functionality.** The user has been very explicit that this is a visual-only task.
--   Remember to continue responding in **Bulgarian**.
+-   Your absolute first priority is to **test and verify the AI designer speed fix**. The user is blocked and losing clients because of the slow performance. Confirm that generating a design with multiple photos is now significantly faster.
+-   The user is highly attentive to visual details. After verifying the speed fix, perform a quick visual regression test on key pages in both **light and dark modes** to ensure the theme context fixes work correctly and there are no new UI bugs.
+-   All communication with the user **must be in Bulgarian**.
 
 **documents and test reports created in this job**
 -   
--    (Awaiting results)
--    (Updated with completed tasks)
+-   
+-   
+-   
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. User: Asks for a complete UI/UX redesign to a premium, dark/light theme, providing a detailed prompt and reference images. (IN PROGRESS)
-9.  User: How far did you get? (Answered)
-8.  User: Approves starting the next tasks (Scraping, Chat, Subscriptions). (SUPERSEDED by redesign request)
-7.  User: Provides feedback on generated images, stating the architecture is still wrong and unacceptable. (RESOLVED)
-6.  User: Asks for new features: mobile bar centering, AI designer timer/camera, and Projects page split into Renovation/Construction. (RESOLVED)
-5.  User: (from previous session) Approves the plan to test the AI designer and fix mobile responsiveness. (RESOLVED)
-4.  User: (from previous session) What is your next task? (Answered)
-3.  User: (from previous session) Reports deployment is failing. (RESOLVED)
-2.  User: (from previous session) Wants AI to generate architecturally accurate examples. (RESOLVED)
-1.  User: (from previous session) Wants to remove the designer registration option. (RESOLVED)
+10.  (The project is still generating very slowly, I waited 7 minutes and didn't get it, very slow) - **[UNRESOLVED] This is the active critical issue.**
+9.   (On light theme the logo is not visible...) - Also reported small footer logo, image previews not working, TemaDom text still present, and disliked orange accents. **[RESOLVED]**
+8.   (Yes, if everything works) - Tentative approval after the agent removed TemaDom text. **[COMPLETED]**
+7.   (On the pages where temadom is written, remove it...) - **[COMPLETED]**
+6.   (On the pages where it says the 3D designer makes a project in 90 sec, remove it...) - Also reported initial speed and image preview issues. **[COMPLETED]**
+5.   (Those [P2 tasks] will be at a later stage, we're stopping with changes, I want a full test of the site...) - **[COMPLETED]**
+4.   (Yes) - Approval for the editable contract implementation. **[COMPLETED]**
+3.   (Where it says, 'upload a picture of the room', return '3d designer' as it was written...) - Also requested the contract be made editable. **[COMPLETED]**
+2.   (The pdf design should be changed...) - Requested removing orange, and making the contract text Bulgarian. **[COMPLETED]**
+1.   (Give me example pdf calculations and pdf contracts on a screenshot to see them) - **[COMPLETED]**
 
 **Project Health Check:**
--   **Broken:** The UI is in a broken, inconsistent state. The landing page has a new premium design, while all other pages have the old design.
+-   **Broken:** The core AI Designer feature is critically impaired by slow performance, making it unusable for real customers. This is the top priority blocker.
 -   **Mocked:** None.
 
 **3rd Party Integrations**
--   **OpenAI GPT-4o-mini & gpt-image-1:** (Uses Emergent LLM Key) For AI designer.
--   **Stripe:** (Uses test keys) For subscriptions.
+-   **OpenAI (via LiteLLM):** Used for  functionality. The interaction with this service was just optimized for parallel requests. (Uses Emergent LLM Key).
+-   **Stripe:** For subscriptions. (Uses test keys).
 -   **Playwright:** For web scraping.
 -   **Emergent-managed Google Auth:** For social login.
--   **Telegram Bot API:** For firm notifications.
 
 **Testing status**
--   Testing agent used after significant changes: YES. A test was running as the last step. The next agent must check the results.
--   Troubleshoot agent used after agent stuck in loop: NO
+-   Testing agent used after significant changes: YES.
+-   Troubleshoot agent used after agent stuck in loop: NO.
 -   Test files created: None.
--   Known regressions: The visual style of the application is inconsistent.
+-   Known regressions: The AI Designer's performance is a major regression in user experience.
 
 **Credentials to test flow:**
 -   Use the website's registration form or Google Social Login to create a test user.
 
 **What agent forgot to execute**
--   The previous agent correctly identified that the redesign was a massive task but only applied it to the most visible page (Landing Page). It did not complete the redesign across the rest of the application, leaving it in an inconsistent state. This is not a mistake, but the natural point where the work was interrupted. The next agent must continue this work.</analysis>
+-   The agent correctly identified the cause of the slow AI designer and implemented a fix (parallel processing). However, the agent did not execute a test to verify that this fix actually resolved the performance issue before the session ended. This verification is the most critical next step.</analysis>

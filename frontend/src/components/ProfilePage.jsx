@@ -18,7 +18,7 @@ const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
 const PLAN_DISPLAY = {
   basic: { name: 'БАЗОВ', color: '#4DA6FF', price: 15 },
-  pro: { name: 'ПРО', color: '#F97316', price: 35 },
+  pro: { name: 'ПРО', color: '#c9953a', price: 35 },
   premium: { name: 'PREMIUM', color: '#8B5CF6', price: 75 },
 };
 
@@ -246,7 +246,7 @@ const PaymentSection = () => {
       <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm" style={{ color: 'var(--theme-text)' }}>
-            <CreditCard className="inline h-4 w-4 text-[#F97316] mr-2" /> Абонаментни планове
+            <CreditCard className="inline h-4 w-4 text-[#c9953a] mr-2" /> Абонаментни планове
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -288,7 +288,7 @@ const PaymentSection = () => {
                     <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>{new Date(tx.created_at).toLocaleDateString('bg-BG')}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-bold" style={{ color: '#F97316' }}>{tx.amount} {tx.currency?.toUpperCase()}</p>
+                    <p className="text-xs font-bold" style={{ color: '#c9953a' }}>{tx.amount} {tx.currency?.toUpperCase()}</p>
                     <Badge className={`text-[9px] ${tx.payment_status === 'paid' ? 'bg-[#10B981]/15 text-[#10B981]' : 'bg-yellow-500/15 text-yellow-600'}`}>
                       {tx.payment_status === 'paid' ? 'Платено' : 'Очаква'}
                     </Badge>
@@ -409,7 +409,7 @@ const ProfilePage = () => {
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--theme-bg)' }}>
-        <div className="animate-spin h-8 w-8 border-2 border-[#F97316] border-t-transparent rounded-full" />
+        <div className="animate-spin h-8 w-8 border-2 border-[#c9953a] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -424,18 +424,18 @@ const ProfilePage = () => {
         {/* Profile Header with Avatar */}
         <div className="text-center mb-6">
           <div className="relative inline-block mb-4">
-            <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-[#F97316]/30 shadow-xl mx-auto"
+            <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-[#c9953a]/30 shadow-xl mx-auto"
               style={{ background: 'var(--theme-bg-surface)' }} data-testid="avatar-container">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" data-testid="avatar-image" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <User className="h-12 w-12 text-[#F97316]" />
+                  <User className="h-12 w-12 text-[#c9953a]" />
                 </div>
               )}
             </div>
             <button
-              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-[#F97316] text-white flex items-center justify-center shadow-lg hover:bg-[#EA580C] transition-colors"
+              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-[#c9953a] text-white flex items-center justify-center shadow-lg hover:bg-[#b8922e] transition-colors"
               onClick={() => fileRef.current?.click()}
               disabled={uploadingAvatar}
               data-testid="upload-avatar-btn"
@@ -448,7 +448,7 @@ const ProfilePage = () => {
           <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }} data-testid="profile-name">{profile.name}</h1>
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{profile.email}</p>
           <div className="flex items-center justify-center gap-2 mt-2">
-            <Badge className={`text-xs ${isCompany ? 'bg-[#F97316]/15 text-[#F97316]' : 'bg-[#4DA6FF]/15 text-[#4DA6FF]'}`}>
+            <Badge className={`text-xs ${isCompany ? 'bg-[#c9953a]/15 text-[#c9953a]' : 'bg-[#4DA6FF]/15 text-[#4DA6FF]'}`}>
               {isCompany ? 'Фирма' : 'Клиент'}
             </Badge>
             {profile.subscription_active && (
@@ -494,7 +494,7 @@ const ProfilePage = () => {
                 <CardTitle className="text-sm flex items-center justify-between" style={{ color: 'var(--theme-text)' }}>
                   <span>Лична информация</span>
                   {!editing ? (
-                    <Button size="sm" variant="ghost" className="text-[#F97316] hover:text-[#FF8C42] text-xs h-7"
+                    <Button size="sm" variant="ghost" className="text-[#c9953a] hover:text-[#d4a43a] text-xs h-7"
                       onClick={() => setEditing(true)} data-testid="edit-profile-btn">
                       <Edit2 className="h-3.5 w-3.5 mr-1" /> Редактирай
                     </Button>
@@ -602,7 +602,7 @@ const ProfilePage = () => {
                       <p className="text-xs font-medium" style={{ color: 'var(--theme-text)' }}>{isCompany ? 'Фирма' : 'Клиент'}</p>
                     </div>
                     <div>
-                      <CreditCard className="h-5 w-5 text-[#F97316] mx-auto mb-1" />
+                      <CreditCard className="h-5 w-5 text-[#c9953a] mx-auto mb-1" />
                       <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>Абонамент</p>
                       <p className="text-xs font-medium" style={{ color: 'var(--theme-text)' }}>{profile.subscription_active ? 'PREMIUM' : 'Безплатен'}</p>
                     </div>
@@ -637,7 +637,7 @@ const ProfilePage = () => {
                           <div className="flex items-center gap-3 text-[10px] mt-0.5" style={{ color: 'var(--theme-text-subtle)' }}>
                             <span>{p.dimensions?.width}×{p.dimensions?.length}м</span>
                             <span>{p.style}</span>
-                            {p.budget_eur && <span className="text-[#F97316] font-bold">€{p.budget_eur}</span>}
+                            {p.budget_eur && <span className="text-[#c9953a] font-bold">€{p.budget_eur}</span>}
                             <span>{new Date(p.created_at).toLocaleDateString('bg-BG')}</span>
                           </div>
                         </div>
@@ -681,19 +681,19 @@ const ProfilePage = () => {
               <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
-                    <Gift className="h-4 w-4 text-[#F97316]" /> Вашият реферален код
+                    <Gift className="h-4 w-4 text-[#c9953a]" /> Вашият реферален код
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {referral && (
                     <>
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 p-3 rounded-lg text-center font-mono text-xl font-black tracking-widest text-[#F97316]"
+                        <div className="flex-1 p-3 rounded-lg text-center font-mono text-xl font-black tracking-widest text-[#c9953a]"
                           style={{ background: 'rgba(249,115,22,0.08)', border: '2px dashed rgba(249,115,22,0.3)' }}
                           data-testid="referral-code">
                           {referral.referral_code}
                         </div>
-                        <Button size="sm" className="bg-[#F97316] hover:bg-[#EA580C] text-white h-12 px-4"
+                        <Button size="sm" className="bg-[#c9953a] hover:bg-[#b8922e] text-white h-12 px-4"
                           onClick={copyReferralLink} data-testid="copy-referral-btn">
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -718,7 +718,7 @@ const ProfilePage = () => {
                       {/* Stats */}
                       <div className="grid grid-cols-2 gap-3 pt-2">
                         <div className="p-3 rounded-lg text-center" style={{ background: 'var(--theme-bg-surface)' }}>
-                          <p className="text-2xl font-black text-[#F97316]">{referral.referral_count}</p>
+                          <p className="text-2xl font-black text-[#c9953a]">{referral.referral_count}</p>
                           <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>Поканени</p>
                         </div>
                         <div className="p-3 rounded-lg text-center" style={{ background: 'var(--theme-bg-surface)' }}>
@@ -767,7 +767,7 @@ const ProfilePage = () => {
                     <Input value={refCode} onChange={e => setRefCode(e.target.value.toUpperCase())}
                       placeholder="Въведете код..." className="font-mono uppercase tracking-wider"
                       maxLength={10} data-testid="apply-ref-input" />
-                    <Button className="bg-[#F97316] hover:bg-[#EA580C] text-white px-4"
+                    <Button className="bg-[#c9953a] hover:bg-[#b8922e] text-white px-4"
                       onClick={applyReferralCode} disabled={applyingRef || !refCode.trim()}
                       data-testid="apply-ref-btn">
                       {applyingRef ? '...' : 'Приложи'}
@@ -792,7 +792,7 @@ const ProfilePage = () => {
                       <p className="text-sm font-medium" style={{ color: 'var(--theme-text)' }}>Тип акаунт</p>
                       <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{isCompany ? 'Фирмен профил' : 'Клиентски профил'}</p>
                     </div>
-                    <Badge className={isCompany ? 'bg-[#F97316]/15 text-[#F97316]' : 'bg-[#4DA6FF]/15 text-[#4DA6FF]'}>
+                    <Badge className={isCompany ? 'bg-[#c9953a]/15 text-[#c9953a]' : 'bg-[#4DA6FF]/15 text-[#4DA6FF]'}>
                       {isCompany ? 'Фирма' : 'Клиент'}
                     </Badge>
                   </div>
@@ -819,7 +819,7 @@ const ProfilePage = () => {
                 <CardContent>
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)' }}>
-                      <p className="text-xl font-black text-[#F97316]">{projects.length}</p>
+                      <p className="text-xl font-black text-[#c9953a]">{projects.length}</p>
                       <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>3D проекта</p>
                     </div>
                     <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)' }}>

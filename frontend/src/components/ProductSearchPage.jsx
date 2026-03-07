@@ -27,11 +27,11 @@ const ProductCard = ({ product }) => (
     data-testid={`product-card-${product.name?.slice(0, 20)}`}>
     <div className="flex items-start justify-between gap-3">
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold truncate group-hover:text-[#F97316] transition-colors"
+        <p className="text-sm font-bold truncate group-hover:text-[#c9953a] transition-colors"
           style={{ color: 'var(--theme-text)' }}>{product.name}</p>
         <div className="flex items-center gap-2 mt-1.5">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold"
-            style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
+            style={{ background: 'rgba(249,115,22,0.1)', color: '#c9953a' }}>
             <Store className="h-2.5 w-2.5" /> {product.store}
           </span>
           {product.search_query && (
@@ -44,13 +44,13 @@ const ProductCard = ({ product }) => (
       </div>
       <div className="text-right flex-shrink-0">
         {product.price_eur > 0 ? (
-            <p className="text-lg font-black text-[#F97316]">{product.price_eur} <span className="text-xs">EUR</span></p>
+            <p className="text-lg font-black text-[#c9953a]">{product.price_eur} <span className="text-xs">EUR</span></p>
         ) : (
           <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>Виж цена</p>
         )}
       </div>
     </div>
-    <div className="flex items-center gap-1 mt-2 text-[10px] font-medium text-[#F97316] opacity-0 group-hover:opacity-100 transition-opacity">
+    <div className="flex items-center gap-1 mt-2 text-[10px] font-medium text-[#c9953a] opacity-0 group-hover:opacity-100 transition-opacity">
       <ExternalLink className="h-3 w-3" /> Отвори в магазина
     </div>
   </a>
@@ -161,8 +161,8 @@ export const ProductSearchPage = () => {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4"
             style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)' }}>
-            <Sparkles className="h-4 w-4 text-[#F97316]" />
-            <span className="text-xs font-bold text-[#F97316]">AI-powered</span>
+            <Sparkles className="h-4 w-4 text-[#c9953a]" />
+            <span className="text-xs font-bold text-[#c9953a]">AI-powered</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-black" style={{ color: 'var(--theme-text)' }}>
             Търси продукти по снимка
@@ -180,7 +180,7 @@ export const ProductSearchPage = () => {
                 onClick={() => imgRef.current?.click()}
                 onDragOver={e => e.preventDefault()}
                 onDrop={e => { e.preventDefault(); handleImage(e.dataTransfer.files?.[0]); }}
-                className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all hover:border-[#F97316] hover:bg-[#F97316]/5"
+                className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all hover:border-[#c9953a] hover:bg-[#c9953a]/5"
                 style={{ borderColor: 'var(--theme-border)' }}
                 data-testid="upload-zone">
                 <Camera className="h-10 w-10 mx-auto mb-3" style={{ color: 'var(--theme-text-subtle)' }} />
@@ -221,7 +221,7 @@ export const ProductSearchPage = () => {
               </div>
             </div>
 
-            <Button className="w-full mt-4 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3 text-base"
+            <Button className="w-full mt-4 bg-[#c9953a] hover:bg-[#b8922e] text-white font-bold py-3 text-base"
               onClick={handleSearch} disabled={loading || (!image && !textQuery.trim())}
               data-testid="search-btn">
               {loading ? (
@@ -236,7 +236,7 @@ export const ProductSearchPage = () => {
         {/* Results */}
         {loading && (
           <div className="mt-6 text-center py-12">
-            <Loader2 className="h-10 w-10 mx-auto animate-spin text-[#F97316] mb-3" />
+            <Loader2 className="h-10 w-10 mx-auto animate-spin text-[#c9953a] mb-3" />
             <p className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>AI разпознава продукти...</p>
             <p className="text-xs mt-1" style={{ color: 'var(--theme-text-muted)' }}>Търсене в 21 магазина, моля изчакайте</p>
           </div>
@@ -247,7 +247,7 @@ export const ProductSearchPage = () => {
             {/* Summary + Share */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-1">
               <p className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>
-                <ShoppingCart className="inline h-4 w-4 text-[#F97316] mr-1.5" />
+                <ShoppingCart className="inline h-4 w-4 text-[#c9953a] mr-1.5" />
                 {results.total_products} продукта от {results.stores_count} магазина
               </p>
               <ShareResults results={results} />
@@ -258,7 +258,7 @@ export const ProductSearchPage = () => {
               <div className="flex gap-1 flex-wrap px-1">
                 {results.queries.slice(0, 6).map((q, i) => (
                   <span key={i} className="px-2 py-0.5 rounded-md text-[10px] font-medium"
-                    style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
+                    style={{ background: 'rgba(249,115,22,0.1)', color: '#c9953a' }}>
                     {q}
                   </span>
                 ))}
@@ -270,7 +270,7 @@ export const ProductSearchPage = () => {
               products.length > 0 && (
                 <div key={query}>
                   <div className="flex items-center gap-2 mb-2 px-1">
-                    <Tag className="h-3.5 w-3.5 text-[#F97316]" />
+                    <Tag className="h-3.5 w-3.5 text-[#c9953a]" />
                     <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>"{query}"</span>
                     <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>({products.length})</span>
                   </div>

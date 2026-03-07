@@ -17,11 +17,11 @@ const ICONS = {
 
 const COLORS = {
   like: '#EF4444',
-  offer: '#F97316',
+  offer: '#c9953a',
   comment: '#4DA6FF',
   referral: '#10B981',
   payment: '#8B5CF6',
-  default: '#F97316',
+  default: '#c9953a',
 };
 
 const timeAgo = (d) => {
@@ -95,7 +95,7 @@ export const NotificationBell = () => {
             <span className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>Уведомления</span>
             <div className="flex gap-1">
               {unread > 0 && (
-                <button onClick={markAllRead} className="text-[10px] font-medium text-[#F97316] hover:underline px-2 py-1"
+                <button onClick={markAllRead} className="text-[10px] font-medium text-[#c9953a] hover:underline px-2 py-1"
                   data-testid="mark-all-read">
                   <Check className="inline h-3 w-3 mr-0.5" /> Прочети всички
                 </button>
@@ -117,7 +117,7 @@ export const NotificationBell = () => {
               const color = COLORS[n.type] || COLORS.default;
               return (
                 <div key={n.id}
-                  className={`flex items-start gap-2.5 px-4 py-3 transition-colors hover:bg-black/3 dark:hover:bg-white/3 ${!n.read ? 'bg-[#F97316]/[0.03]' : ''}`}
+                  className={`flex items-start gap-2.5 px-4 py-3 transition-colors hover:bg-black/3 dark:hover:bg-white/3 ${!n.read ? 'bg-[#c9953a]/[0.03]' : ''}`}
                   style={{ borderBottom: '1px solid var(--theme-border)' }}
                   data-testid={`notif-${n.id}`}>
                   <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${color}15` }}>
@@ -132,7 +132,7 @@ export const NotificationBell = () => {
                     style={{ color: 'var(--theme-text-subtle)' }}>
                     <Trash2 className="h-3 w-3" />
                   </button>
-                  {!n.read && <div className="w-2 h-2 rounded-full bg-[#F97316] flex-shrink-0 mt-2" />}
+                  {!n.read && <div className="w-2 h-2 rounded-full bg-[#c9953a] flex-shrink-0 mt-2" />}
                 </div>
               );
             })

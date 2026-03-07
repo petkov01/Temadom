@@ -43,7 +43,7 @@ const BlogArticle = () => {
     return (
       <div className="min-h-screen" style={{background: "var(--theme-bg-surface)"}} data-testid="blog-article">
         <article className="max-w-4xl mx-auto px-4 py-8">
-          <Link to="/blog" className="text-[#FF8C42] hover:text-[#FF8C42] text-sm flex items-center gap-1 mb-6">
+          <Link to="/blog" className="text-[#d4a43a] hover:text-[#d4a43a] text-sm flex items-center gap-1 mb-6">
             <ArrowLeft className="h-4 w-4" /> Към блога
           </Link>
 
@@ -60,7 +60,7 @@ const BlogArticle = () => {
           <Separator className="mb-8" />
 
           {/* Render content as formatted HTML */}
-          <div className="prose prose-slate max-w-none prose-headings:text-[var(--theme-text)] prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-p:text-[var(--theme-text-muted)] prose-p:leading-relaxed prose-strong:text-[var(--theme-text)] prose-table:border-collapse prose-td:border prose-td:border-[var(--theme-border)] prose-td:p-3 prose-th:border prose-th:border-[var(--theme-border)] prose-th:p-3 prose-li:text-[var(--theme-text-muted)] prose-a:text-[#FF8C42]">
+          <div className="prose prose-slate max-w-none prose-headings:text-[var(--theme-text)] prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-p:text-[var(--theme-text-muted)] prose-p:leading-relaxed prose-strong:text-[var(--theme-text)] prose-table:border-collapse prose-td:border prose-td:border-[var(--theme-border)] prose-td:p-3 prose-th:border prose-th:border-[var(--theme-border)] prose-th:p-3 prose-li:text-[var(--theme-text-muted)] prose-a:text-[#d4a43a]">
             {detailedArticle.content.split('\n').map((line, i) => {
               const trimmed = line.trim();
               if (!trimmed) return null;
@@ -99,18 +99,18 @@ const BlogArticle = () => {
                 );
               }
               
-              return <p key={i} className="theme-text-muted leading-relaxed my-2" dangerouslySetInnerHTML={{ __html: trimmed.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[#FF8C42] hover:underline">$1</a>') }} />;
+              return <p key={i} className="theme-text-muted leading-relaxed my-2" dangerouslySetInnerHTML={{ __html: trimmed.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[#d4a43a] hover:underline">$1</a>') }} />;
             })}
           </div>
 
           {/* CTA */}
-          <Card className="bg-[#FF8C42]/5 border-[#FF8C42]/20 mt-10">
+          <Card className="bg-[#d4a43a]/5 border-[#d4a43a]/20 mt-10">
             <CardContent className="p-6 text-center">
-              <Calculator className="h-8 w-8 text-[#FF8C42] mx-auto mb-3" />
+              <Calculator className="h-8 w-8 text-[#d4a43a] mx-auto mb-3" />
               <h3 className="text-xl font-bold mb-2">Изчислете вашата оферта безплатно</h3>
               <p className="theme-text-muted mb-4">28 професии, 28 области, актуални цени 2026</p>
               <Link to="/calculator">
-                <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" data-testid="article-calc-btn">
+                <Button className="bg-[#d4a43a] hover:bg-[#b8922e]" data-testid="article-calc-btn">
                   <Calculator className="mr-2 h-4 w-4" /> Към калкулатора
                 </Button>
               </Link>
@@ -122,7 +122,7 @@ const BlogArticle = () => {
             <h2 className="text-xl font-bold theme-text mb-4">Свързани статии</h2>
             <div className="grid sm:grid-cols-2 gap-3">
               {SEO_BLOG_ARTICLES.filter(a => a.slug !== slug).slice(0, 6).map(a => (
-                <Link key={a.slug} to={`/blog/${a.slug}`} className="text-sm text-[#FF8C42] hover:underline flex items-center gap-1">
+                <Link key={a.slug} to={`/blog/${a.slug}`} className="text-sm text-[#d4a43a] hover:underline flex items-center gap-1">
                   <ArrowLeft className="h-3 w-3 rotate-180" /> {a.title.substring(0, 60)}...
                 </Link>
               ))}
@@ -152,12 +152,12 @@ const BlogArticle = () => {
   return (
     <div className="min-h-screen" style={{background: "var(--theme-bg-surface)"}} data-testid="blog-article">
       <article className="max-w-4xl mx-auto px-4 py-8">
-        <Link to="/blog" className="text-[#FF8C42] hover:text-[#FF8C42] text-sm flex items-center gap-1 mb-6">
+        <Link to="/blog" className="text-[#d4a43a] hover:text-[#d4a43a] text-sm flex items-center gap-1 mb-6">
           <ArrowLeft className="h-4 w-4" /> Към блога
         </Link>
 
         <header className="mb-8">
-          <Badge className="bg-[#FF8C42]/10 text-[#FF8C42] mb-3">{article.type === 'profession' ? 'Професия' : article.type === 'region' ? 'Регион' : 'Строителство'}</Badge>
+          <Badge className="bg-[#d4a43a]/10 text-[#d4a43a] mb-3">{article.type === 'profession' ? 'Професия' : article.type === 'region' ? 'Регион' : 'Строителство'}</Badge>
           <h1 className="text-3xl sm:text-4xl font-bold theme-text mb-4">{article.h1}</h1>
           <p className="text-lg theme-text-muted">{article.description}</p>
           <div className="flex items-center gap-4 mt-4 text-sm theme-text-subtle">
@@ -190,7 +190,7 @@ const BlogArticle = () => {
                     <tr key={key} className={i % 2 === 0 ? '' : ''}>
                       <td className="p-3 font-medium">{r.name}</td>
                       <td className="p-3 text-center">{(profession.basePrice.labor * r.multiplier).toFixed(2)}</td>
-                      <td className="p-3 text-center font-semibold text-[#FF8C42]">{(profession.basePrice.full * r.multiplier).toFixed(2)}</td>
+                      <td className="p-3 text-center font-semibold text-[#d4a43a]">{(profession.basePrice.full * r.multiplier).toFixed(2)}</td>
                       <td className="p-3 text-center theme-text-muted">{(profession.basePrice.full * r.multiplier * 1.9558).toFixed(2)}</td>
                     </tr>
                   ))}
@@ -215,11 +215,11 @@ const BlogArticle = () => {
                   {SEO_PROFESSIONS.map((p, i) => (
                     <tr key={p.id} className={i % 2 === 0 ? '' : ''}>
                       <td className="p-3 font-medium">
-                        <Link to={`/blog/ceni-${p.slug}-2026`} className="text-[#FF8C42] hover:underline">{p.name}</Link>
+                        <Link to={`/blog/ceni-${p.slug}-2026`} className="text-[#d4a43a] hover:underline">{p.name}</Link>
                       </td>
                       <td className="p-3 text-center">{p.unit}</td>
                       <td className="p-3 text-center">{(p.basePrice.labor * region.multiplier).toFixed(2)}</td>
-                      <td className="p-3 text-center font-semibold text-[#FF8C42]">{(p.basePrice.full * region.multiplier).toFixed(2)}</td>
+                      <td className="p-3 text-center font-semibold text-[#d4a43a]">{(p.basePrice.full * region.multiplier).toFixed(2)}</td>
                       <td className="p-3 text-center theme-text-muted">{(p.basePrice.full * region.multiplier * 1.9558).toFixed(2)}</td>
                     </tr>
                   ))}
@@ -244,7 +244,7 @@ const BlogArticle = () => {
                   {regions.sort((a,b) => b[1].multiplier - a[1].multiplier).map(([key, r], i) => (
                     <tr key={key} className={i % 2 === 0 ? '' : ''}>
                       <td className="p-3 font-medium">
-                        <Link to={`/region/${r.slug}`} className="text-[#FF8C42] hover:underline">{r.name}</Link>
+                        <Link to={`/region/${r.slug}`} className="text-[#d4a43a] hover:underline">{r.name}</Link>
                       </td>
                       <td className="p-3 text-center">x{r.multiplier.toFixed(2)}</td>
                       <td className="p-3 text-center">{(6 * r.multiplier).toFixed(2)}</td>
@@ -272,7 +272,7 @@ const BlogArticle = () => {
               'Изтеглете PDF оферта за сравнение с реални оферти'
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-3">
-                <span className="bg-[#FF8C42]/10 text-[#FF8C42] w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{i+1}</span>
+                <span className="bg-[#d4a43a]/10 text-[#d4a43a] w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{i+1}</span>
                 <p className="theme-text-muted">{step}</p>
               </div>
             ))}
@@ -304,13 +304,13 @@ const BlogArticle = () => {
         </section>
 
         {/* CTA */}
-        <Card className="bg-[#FF8C42]/5 border-[#FF8C42]/20">
+        <Card className="bg-[#d4a43a]/5 border-[#d4a43a]/20">
           <CardContent className="p-6 text-center">
-            <Calculator className="h-8 w-8 text-[#FF8C42] mx-auto mb-3" />
+            <Calculator className="h-8 w-8 text-[#d4a43a] mx-auto mb-3" />
             <h3 className="text-xl font-bold mb-2">Изчислете вашата оферта безплатно</h3>
             <p className="theme-text-muted mb-4">28 професии, 28 области, актуални цени 2026</p>
             <Link to="/calculator">
-              <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" data-testid="article-calc-btn">
+              <Button className="bg-[#d4a43a] hover:bg-[#b8922e]" data-testid="article-calc-btn">
                 <Calculator className="mr-2 h-4 w-4" /> Към калкулатора
               </Button>
             </Link>
@@ -322,7 +322,7 @@ const BlogArticle = () => {
           <h2 className="text-xl font-bold theme-text mb-4">Свързани статии</h2>
           <div className="grid sm:grid-cols-2 gap-3">
             {BLOG_ARTICLES.filter(a => a.slug !== slug).slice(0, 6).map(a => (
-              <Link key={a.slug} to={`/blog/${a.slug}`} className="text-sm text-[#FF8C42] hover:underline flex items-center gap-1">
+              <Link key={a.slug} to={`/blog/${a.slug}`} className="text-sm text-[#d4a43a] hover:underline flex items-center gap-1">
                 <ArrowLeft className="h-3 w-3 rotate-180" /> {a.title.substring(0, 60)}...
               </Link>
             ))}

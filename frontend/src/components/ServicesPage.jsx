@@ -409,8 +409,8 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
           <button className="w-full text-left">
             <CardHeader className="hover:opacity-80 transition-colors cursor-pointer">
               <div className="flex items-start gap-4">
-                <div className="bg-[#FF8C42]/10 p-3 rounded-xl">
-                  <Icon className="h-6 w-6 text-[#FF8C42]" />
+                <div className="bg-[#d4a43a]/10 p-3 rounded-xl">
+                  <Icon className="h-6 w-6 text-[#d4a43a]" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
@@ -425,7 +425,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                     <span className="flex items-center gap-1" style={{ color: 'var(--theme-text-subtle)' }}>
                       <Clock className="h-4 w-4" /> {service.timeEstimate}
                     </span>
-                    <span className="text-[#FF8C42] font-medium">{service.priceRange}</span>
+                    <span className="text-[#d4a43a] font-medium">{service.priceRange}</span>
                   </div>
                 </div>
               </div>
@@ -447,7 +447,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                 <ol className="space-y-2 mb-6">
                   {service.steps.map((step, idx) => (
                     <li key={idx} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-[#FF8C42]/10 text-[#FF8C42] rounded-full flex items-center justify-center text-sm font-medium">
+                      <span className="flex-shrink-0 w-6 h-6 bg-[#d4a43a]/10 text-[#d4a43a] rounded-full flex items-center justify-center text-sm font-medium">
                         {idx + 1}
                       </span>
                       <span style={{ color: 'var(--theme-text-muted)' }}>{step}</span>
@@ -498,7 +498,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                       <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{isEn ? 'Find a verified specialist' : 'Намерете проверен специалист'}</p>
                     </div>
                     <Link to="/companies">
-                      <Button className="bg-[#FF8C42] hover:bg-[#e67a30]">
+                      <Button className="bg-[#d4a43a] hover:bg-[#b8922e]">
                         {isEn ? 'Find company' : 'Намери фирма'} <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
@@ -551,7 +551,7 @@ const ServicesPage = () => {
                 variant={categoryFilter === cat ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCategoryFilter(cat)}
-                className={categoryFilter === cat ? "bg-[#FF8C42] hover:bg-[#e67a30]" : ""}
+                className={categoryFilter === cat ? "bg-[#d4a43a] hover:bg-[#b8922e]" : ""}
               >
                 {cat === 'all' ? (isEn ? 'All' : 'Всички') : cat}
               </Button>

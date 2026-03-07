@@ -263,10 +263,10 @@ const ChatPage = () => {
       <div className="max-w-6xl mx-auto px-4 py-4 md:py-6">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
-            <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-[#FF8C42]" />
+            <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-[#d4a43a]" />
             Съобщения
           </h1>
-          <Button onClick={() => setShowNewChat(!showNewChat)} className="bg-[#FF8C42] hover:bg-[#e67a30] text-sm" size="sm" data-testid="new-chat-btn">
+          <Button onClick={() => setShowNewChat(!showNewChat)} className="bg-[#d4a43a] hover:bg-[#b8922e] text-sm" size="sm" data-testid="new-chat-btn">
             <Plus className="h-4 w-4 mr-1" /> Нов
           </Button>
         </div>
@@ -292,10 +292,10 @@ const ChatPage = () => {
                   <div className="mt-2 max-h-48 overflow-y-auto space-y-1">
                     {searchResults.map(u => (
                       <button key={u.id} onClick={() => startChatWithUser(u)}
-                        className="w-full text-left p-2 rounded-lg hover:bg-[#FF8C42]/10 transition-colors flex items-center gap-2"
+                        className="w-full text-left p-2 rounded-lg hover:bg-[#d4a43a]/10 transition-colors flex items-center gap-2"
                         data-testid={`search-result-${u.id}`}>
                         <Avatar className="h-7 w-7">
-                          <AvatarFallback className="bg-[#FF8C42]/10 text-[#FF8C42] text-xs">{u.name?.charAt(0) || '?'}</AvatarFallback>
+                          <AvatarFallback className="bg-[#d4a43a]/10 text-[#d4a43a] text-xs">{u.name?.charAt(0) || '?'}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-medium truncate" style={{ color: 'var(--theme-text)' }}>{u.name}</p>
@@ -332,13 +332,13 @@ const ChatPage = () => {
                     style={{
                       borderColor: 'var(--theme-border)',
                       background: activeConversation === conv.conversation_id ? 'rgba(249,115,22,0.08)' : 'transparent',
-                      borderLeft: activeConversation === conv.conversation_id ? '3px solid #F97316' : '3px solid transparent',
+                      borderLeft: activeConversation === conv.conversation_id ? '3px solid #c9953a' : '3px solid transparent',
                     }}
                     data-testid={`conversation-${conv.conversation_id}`}>
                     <div className="flex items-center gap-2.5">
                       <div className="relative">
                         <Avatar className="h-9 w-9">
-                          <AvatarFallback className="bg-[#FF8C42]/10 text-[#FF8C42] text-sm">{conv.other_user.name?.charAt(0) || '?'}</AvatarFallback>
+                          <AvatarFallback className="bg-[#d4a43a]/10 text-[#d4a43a] text-sm">{conv.other_user.name?.charAt(0) || '?'}</AvatarFallback>
                         </Avatar>
                         {conv.other_user.is_online && (
                           <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2" style={{ borderColor: 'var(--theme-card-bg)' }} />
@@ -354,7 +354,7 @@ const ChatPage = () => {
                             {conv.last_message || 'Снимка'}
                           </p>
                           {conv.unread_count > 0 && (
-                            <span className="bg-[#F97316] text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center flex-shrink-0">
+                            <span className="bg-[#c9953a] text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center flex-shrink-0">
                               {conv.unread_count}
                             </span>
                           )}
@@ -379,7 +379,7 @@ const ChatPage = () => {
                   </Button>
                   <div className="relative">
                     <Avatar className="h-9 w-9">
-                      <AvatarFallback className="bg-[#FF8C42]/10 text-[#FF8C42]">{otherUser?.name?.charAt(0) || '?'}</AvatarFallback>
+                      <AvatarFallback className="bg-[#d4a43a]/10 text-[#d4a43a]">{otherUser?.name?.charAt(0) || '?'}</AvatarFallback>
                     </Avatar>
                     {otherOnline && (
                       <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2" style={{ borderColor: 'var(--theme-card-bg)' }} data-testid="online-indicator" />
@@ -425,7 +425,7 @@ const ChatPage = () => {
                         )}
                         <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                           <div className={`max-w-[80%] md:max-w-[70%] rounded-2xl px-3.5 py-2 ${
-                            isMine ? 'bg-[#F97316] text-white rounded-br-sm' : 'rounded-bl-sm'
+                            isMine ? 'bg-[#c9953a] text-white rounded-br-sm' : 'rounded-bl-sm'
                           }`} style={!isMine ? { background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)', color: 'var(--theme-text)' } : {}}>
                             {msg.image && (
                               <img src={msg.image} alt="Снимка" className="max-w-full rounded-lg mb-1.5 max-h-56 object-contain cursor-pointer"
@@ -454,9 +454,9 @@ const ChatPage = () => {
                     <div className="flex justify-start">
                       <div className="rounded-2xl rounded-bl-sm px-4 py-2.5" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
                         <div className="flex gap-1 items-center">
-                          <span className="w-2 h-2 bg-[#FF8C42] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <span className="w-2 h-2 bg-[#FF8C42] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <span className="w-2 h-2 bg-[#FF8C42] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                          <span className="w-2 h-2 bg-[#d4a43a] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-2 h-2 bg-[#d4a43a] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-2 h-2 bg-[#d4a43a] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
                       </div>
                     </div>
@@ -480,14 +480,14 @@ const ChatPage = () => {
                 <div className="p-2.5 border-t" style={{ borderColor: 'var(--theme-border)' }}>
                   <form onSubmit={handleSend} className="flex gap-2 items-center">
                     <button type="button" onClick={() => imageInputRef.current?.click()}
-                      className="p-2 transition-colors hover:text-[#FF8C42] flex-shrink-0" style={{ color: 'var(--theme-text-muted)' }} data-testid="chat-image-btn">
+                      className="p-2 transition-colors hover:text-[#d4a43a] flex-shrink-0" style={{ color: 'var(--theme-text-muted)' }} data-testid="chat-image-btn">
                       <Image className="h-5 w-5" />
                     </button>
                     <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
                     <Input value={newMessage} 
                       onChange={(e) => { setNewMessage(e.target.value); handleTyping(); }}
                       placeholder="Напишете..." className="flex-1 text-sm" maxLength={2000} data-testid="message-input" />
-                    <Button type="submit" className="bg-[#FF8C42] hover:bg-[#e67a30] flex-shrink-0" size="sm"
+                    <Button type="submit" className="bg-[#d4a43a] hover:bg-[#b8922e] flex-shrink-0" size="sm"
                       disabled={(!newMessage.trim() && !imagePreview) || sending} data-testid="send-message-submit">
                       <Send className="h-4 w-4" />
                     </Button>
@@ -500,7 +500,7 @@ const ChatPage = () => {
                   <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-30" />
                   <h3 className="font-medium mb-1 text-sm" style={{ color: 'var(--theme-text)' }}>Изберете разговор</h3>
                   <p className="text-xs mb-4">или започнете нов с бутона "Нов"</p>
-                  <Button onClick={() => setShowNewChat(true)} variant="outline" size="sm" className="border-[#FF8C42] text-[#FF8C42]" data-testid="start-new-chat-btn">
+                  <Button onClick={() => setShowNewChat(true)} variant="outline" size="sm" className="border-[#d4a43a] text-[#d4a43a]" data-testid="start-new-chat-btn">
                     <Plus className="h-4 w-4 mr-1" /> Нов разговор
                   </Button>
                 </div>

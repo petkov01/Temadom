@@ -95,7 +95,7 @@ const TermsPage = () => {
                 <p><strong>Безплатен старт:</strong> Първите 3 контакта на клиенти са безплатни за всяка нова фирма.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-[#FF8C42]/50" />
+                <span className="w-2 h-2 rounded-full bg-[#d4a43a]/50" />
                 <p><strong>Единичен контакт:</strong> 25 EUR за достъп до контактната информация на конкретен клиент.</p>
               </div>
               <div className="flex items-center gap-3">
@@ -111,7 +111,7 @@ const TermsPage = () => {
                 <p><strong>5 безплатни калкулации</strong> за всяка нова фирма.</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-[#FF8C42]/50" />
+                <span className="w-2 h-2 rounded-full bg-[#d4a43a]/50" />
                 <p><strong>10 EUR</strong> за 5 допълнителни калкулации след изчерпване на безплатните.</p>
               </div>
               <div className="flex items-center gap-3">

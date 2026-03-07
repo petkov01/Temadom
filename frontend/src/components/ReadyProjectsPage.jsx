@@ -65,7 +65,7 @@ export const ReadyProjectsPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{background: "var(--theme-bg-secondary)"}}>
-        <Loader2 className="h-8 w-8 animate-spin text-[#FF8C42]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#d4a43a]" />
       </div>
     );
   }
@@ -94,7 +94,7 @@ export const ReadyProjectsPage = () => {
             <h3 className="text-white font-bold text-lg mb-2">Все още няма проекти</h3>
             <p className="theme-text-subtle text-sm mb-6">Бъдете първи! Качете проект от AI Sketch или Помещения.</p>
             <div className="flex gap-3 justify-center">
-              <Button className="bg-[#FF8C42] text-white" onClick={() => window.location.href = '/ai-sketch'}>
+              <Button className="bg-[#d4a43a] text-white" onClick={() => window.location.href = '/ai-sketch'}>
                 AI Sketch
               </Button>
               <Button className="bg-[#8C56FF] text-white" onClick={() => window.location.href = '/room-scan'}>
@@ -108,7 +108,7 @@ export const ReadyProjectsPage = () => {
               <Card key={project.id} className="  overflow-hidden" data-testid={`project-${project.id}`}>
                 {/* Author */}
                 <div className="px-5 pt-4 pb-2 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#FF8C42]/20 flex items-center justify-center text-[#FF8C42] font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-[#d4a43a]/20 flex items-center justify-center text-[#d4a43a] font-bold text-sm">
                     {(project.author_name || 'A')[0].toUpperCase()}
                   </div>
                   <div>

@@ -112,8 +112,8 @@ const HotspotMarker = ({ hotspot, onSelect, isActive, selectedOption }) => {
           flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold 
           transition-all duration-300 cursor-pointer whitespace-nowrap select-none
           ${isActive 
-            ? 'bg-[#FF8C42] text-white scale-110 shadow-lg shadow-[#FF8C42]/40' 
-            : 'bg-black/70 text-white hover:bg-[#FF8C42]/80 hover:scale-105 backdrop-blur-sm'
+            ? 'bg-[#d4a43a] text-white scale-110 shadow-lg shadow-[#d4a43a]/40' 
+            : 'bg-black/70 text-white hover:bg-[#d4a43a]/80 hover:scale-105 backdrop-blur-sm'
           }
         `}
         style={{ border: isActive ? '2px solid #fff' : '1px solid rgba(255,255,255,0.3)' }}
@@ -286,7 +286,7 @@ const UploadStep = ({ photos, setPhotos, onComplete }) => {
 
       {/* Tips */}
       <div className=" rounded-xl border  p-4 mt-4">
-        <p className="text-xs font-medium text-[#FF8C42] mb-2">Съвети за по-добър резултат:</p>
+        <p className="text-xs font-medium text-[#d4a43a] mb-2">Съвети за по-добър резултат:</p>
         <ul className="text-xs theme-text-muted space-y-1.5">
           <li className="flex items-start gap-2"><CheckCircle className="h-3 w-3 text-[#28A745] mt-0.5 flex-shrink-0" /> Снимайте при дневна светлина за най-добро качество</li>
           <li className="flex items-start gap-2"><CheckCircle className="h-3 w-3 text-[#28A745] mt-0.5 flex-shrink-0" /> Дръжте камерата на нивото на очите</li>
@@ -322,7 +322,7 @@ const SwapPanel = ({ activeHotspot, selections, setSelections, onClose }) => {
               onClick={() => setSelections((prev) => ({ ...prev, [activeHotspot]: opt }))}
               className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all text-left ${
                 isSelected
-                  ? 'bg-[#FF8C42]/20 border border-[#FF8C42]/50'
+                  ? 'bg-[#d4a43a]/20 border border-[#d4a43a]/50'
                   : 'border border-transparent hover:opacity-80'
               }`}
               data-testid={`swap-option-${opt.id}`}
@@ -332,10 +332,10 @@ const SwapPanel = ({ activeHotspot, selections, setSelections, onClose }) => {
                 style={{ backgroundColor: opt.color }}
               />
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${isSelected ? 'text-[#FF8C42]' : 'text-white'}`}>{opt.name}</p>
+                <p className={`text-sm font-medium ${isSelected ? 'text-[#d4a43a]' : 'text-white'}`}>{opt.name}</p>
                 <p className="text-xs theme-text-muted">{opt.price} EUR</p>
               </div>
-              {isSelected && <CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" />}
+              {isSelected && <CheckCircle className="h-4 w-4 text-[#d4a43a] flex-shrink-0" />}
             </button>
           );
         })}
@@ -366,7 +366,7 @@ const ResultsSummary = ({ selections, onPDF, onShare, onSave, projectId }) => {
                   <p className="theme-text-subtle text-xs">{opt.name}</p>
                 </div>
               </div>
-              <span className="text-[#FF8C42] font-bold text-sm">{opt.price} EUR</span>
+              <span className="text-[#d4a43a] font-bold text-sm">{opt.price} EUR</span>
             </div>
           );
         })}
@@ -393,7 +393,7 @@ const ResultsSummary = ({ selections, onPDF, onShare, onSave, projectId }) => {
         </Button>
         <Button
           onClick={onShare}
-          className="bg-[#FF8C42] hover:bg-[#e67a30] text-white text-xs h-10"
+          className="bg-[#d4a43a] hover:bg-[#b8922e] text-white text-xs h-10"
           data-testid="share-btn"
         >
           <Share2 className="mr-1 h-3.5 w-3.5" /> Сподели
@@ -653,10 +653,10 @@ export const Scanner3DPage = () => {
                     onClick={() => setActiveHotspot(activeHotspot === hs.id ? null : hs.id)}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm transition-all ${
                       activeHotspot === hs.id
-                        ? 'bg-[#FF8C42] text-white'
+                        ? 'bg-[#d4a43a] text-white'
                         : sel
-                        ? ' text-[#FF8C42] border border-[#FF8C42]/30'
-                        : ' theme-text-muted border  hover:border-[#FF8C42]/30'
+                        ? ' text-[#d4a43a] border border-[#d4a43a]/30'
+                        : ' theme-text-muted border  hover:border-[#d4a43a]/30'
                     }`}
                     data-testid={`chip-${hs.id}`}
                   >

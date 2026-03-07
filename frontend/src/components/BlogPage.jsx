@@ -10,7 +10,7 @@ import { BLOG_ARTICLES } from '@/data/seoData';
 import { SEO_BLOG_ARTICLES } from '@/data/blogArticles';
 
 const typeLabels = { overview: 'Обзор', category: 'Категория', profession: 'Професия', region: 'Регион', article: 'Статия' };
-const typeColors = { overview: 'bg-blue-100 text-blue-800', category: 'bg-green-100 text-green-800', profession: 'bg-[#FF8C42]/10 text-[#FF8C42]', region: 'bg-[#8C56FF]/10 text-purple-800', article: 'bg-amber-100 text-amber-800' };
+const typeColors = { overview: 'bg-blue-100 text-blue-800', category: 'bg-green-100 text-green-800', profession: 'bg-[#d4a43a]/10 text-[#d4a43a]', region: 'bg-[#8C56FF]/10 text-purple-800', article: 'bg-amber-100 text-amber-800' };
 
 const catLabels = { 'ремонт': 'Ремонт', 'покриви': 'Покриви', 'изолация': 'Изолация', 'инсталации': 'Инсталации', 'груб строеж': 'Груб строеж', 'строителство': 'Строителство', 'съвети': 'Съвети', 'довършителни': 'Довършителни', 'подове': 'Подове' };
 
@@ -77,7 +77,7 @@ const BlogPage = () => {
               ? [['all','All'],['article','Articles'],['profession','Professions'],['region','Regions'],['overview','Overviews']]
               : [['all','Всички'],['article','Статии'],['profession','Професии'],['region','Региони'],['overview','Обзори']]
             ).map(([v,l]) => (
-              <Button key={v} variant={filter===v?'default':'outline'} size="sm" className={filter===v?'bg-[#FF8C42] hover:bg-[#e67a30]':''} onClick={() => setFilter(v)}>{l}</Button>
+              <Button key={v} variant={filter===v?'default':'outline'} size="sm" className={filter===v?'bg-[#d4a43a] hover:bg-[#b8922e]':''} onClick={() => setFilter(v)}>{l}</Button>
             ))}
           </div>
         </div>
@@ -100,7 +100,7 @@ const BlogPage = () => {
                   </div>
                   <h2 className="font-bold mb-2 line-clamp-2" style={{ color: 'var(--theme-text)' }}>{article.title}</h2>
                   <p className="text-sm line-clamp-2" style={{ color: 'var(--theme-text-muted)' }}>{article.description}</p>
-                  <div className="mt-3 flex items-center text-[#FF8C42] text-sm font-medium">
+                  <div className="mt-3 flex items-center text-[#d4a43a] text-sm font-medium">
                     Прочети повече <ArrowRight className="h-3 w-3 ml-1" />
                   </div>
                 </CardContent>

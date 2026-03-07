@@ -917,7 +917,7 @@ const ProfessionsPage = () => {
                 key={cat}
                 variant={selectedCategory === cat ? 'default' : 'outline'}
                 size="sm"
-                className={selectedCategory === cat ? 'bg-[#FF8C42] hover:bg-[#e67a30]' : ''}
+                className={selectedCategory === cat ? 'bg-[#d4a43a] hover:bg-[#b8922e]' : ''}
                 onClick={() => setSelectedCategory(cat)}
                 data-testid={`filter-${cat}`}
               >
@@ -944,7 +944,7 @@ const ProfessionsPage = () => {
                 className="w-full text-left p-5 flex items-center gap-4"
                 onClick={() => setExpandedId(isExpanded ? null : prof.id)}
               >
-                <div className="bg-[#FF8C42]/10 text-[#FF8C42] p-3 rounded-xl">
+                <div className="bg-[#d4a43a]/10 text-[#d4a43a] p-3 rounded-xl">
                   {prof.icon}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -1036,7 +1036,7 @@ const ProfessionsPage = () => {
           <p className="mb-6" style={{ color: 'var(--theme-text-muted)' }}>Публикувайте проект и получете оферти от проверени фирми с реални отзиви</p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/register">
-              <Button className="bg-[#FF8C42] hover:bg-[#e67a30] px-6" data-testid="professions-register-btn">
+              <Button className="bg-[#d4a43a] hover:bg-[#b8922e] px-6" data-testid="professions-register-btn">
                 <ArrowRight className="mr-2 h-4 w-4" />
                 Публикувай проект
               </Button>

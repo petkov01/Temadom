@@ -122,7 +122,7 @@ const NewPostForm = ({ onPost }) => {
         {/* Selected project */}
         {selectedProject && (
           <div className="flex items-center gap-2 mb-3 p-2 rounded-lg" style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.2)' }}>
-            <Bookmark className="h-4 w-4 text-[#F97316] flex-shrink-0" />
+            <Bookmark className="h-4 w-4 text-[#c9953a] flex-shrink-0" />
             <span className="text-xs font-medium flex-1" style={{ color: 'var(--theme-text)' }}>
               Проект: {selectedProject.room_type} | {selectedProject.style}
             </span>
@@ -140,7 +140,7 @@ const NewPostForm = ({ onPost }) => {
                 className="w-full flex items-center gap-2 px-3 py-2 text-left text-xs hover:bg-black/5 dark:hover:bg-white/5"
                 style={{ borderBottom: '1px solid var(--theme-border)', color: 'var(--theme-text)' }}
                 data-testid={`pick-project-${p.id}`}>
-                <Bookmark className="h-3 w-3 text-[#F97316]" />
+                <Bookmark className="h-3 w-3 text-[#c9953a]" />
                 {p.room_type} | {p.style} | {new Date(p.created_at).toLocaleDateString('bg-BG')}
               </button>
             ))}
@@ -152,7 +152,7 @@ const NewPostForm = ({ onPost }) => {
             {/* Image upload */}
             <button onClick={() => imgRef.current?.click()}
               className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              style={{ color: images.length > 0 ? '#F97316' : 'var(--theme-text-muted)' }}
+              style={{ color: images.length > 0 ? '#c9953a' : 'var(--theme-text-muted)' }}
               data-testid="add-image-btn">
               <ImageIcon className="h-4.5 w-4.5" />
             </button>
@@ -161,7 +161,7 @@ const NewPostForm = ({ onPost }) => {
             {/* Project link */}
             <button onClick={loadProjects}
               className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              style={{ color: selectedProject ? '#F97316' : 'var(--theme-text-muted)' }}
+              style={{ color: selectedProject ? '#c9953a' : 'var(--theme-text-muted)' }}
               data-testid="link-project-btn">
               <Bookmark className="h-4.5 w-4.5" />
             </button>
@@ -171,14 +171,14 @@ const NewPostForm = ({ onPost }) => {
             {/* Type pills */}
             {POST_TYPES.filter(t => t.id !== 'all').map(t => (
               <button key={t.id} onClick={() => setType(t.id)}
-                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${type === t.id ? 'bg-[#F97316] text-white' : ''}`}
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${type === t.id ? 'bg-[#c9953a] text-white' : ''}`}
                 style={type !== t.id ? { background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)', border: '1px solid var(--theme-border)' } : {}}
                 data-testid={`post-type-${t.id}`}>
                 {t.name}
               </button>
             ))}
           </div>
-          <Button size="sm" className="bg-[#F97316] hover:bg-[#EA580C] text-white font-bold px-4"
+          <Button size="sm" className="bg-[#c9953a] hover:bg-[#b8922e] text-white font-bold px-4"
             onClick={submit} disabled={posting || (!text.trim() && !selectedProject && images.length === 0)} data-testid="submit-post-btn">
             {posting ? '...' : <><Send className="h-3.5 w-3.5 mr-1.5" /> Публикувай</>}
           </Button>
@@ -192,7 +192,7 @@ const NewPostForm = ({ onPost }) => {
 const Comment = ({ comment }) => (
   <div className="flex gap-2 py-2" style={{ borderTop: '1px solid var(--theme-border)' }}>
     <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-      style={{ background: comment.user_type === 'company' ? '#F97316' : '#4DA6FF' }}>
+      style={{ background: comment.user_type === 'company' ? '#c9953a' : '#4DA6FF' }}>
       {comment.user_avatar ? (
         <img src={`data:image/jpeg;base64,${comment.user_avatar}`} alt="" className="w-7 h-7 rounded-full object-cover" />
       ) : (
@@ -244,7 +244,7 @@ const OffersSection = ({ postId, isCompany }) => {
           <Briefcase className="h-3 w-3" /> {offers.length} оферти
         </span>
         {isCompany && !showForm && (
-          <button onClick={() => setShowForm(true)} className="text-[10px] font-bold text-[#F97316] hover:underline" data-testid={`make-offer-btn-${postId}`}>
+          <button onClick={() => setShowForm(true)} className="text-[10px] font-bold text-[#c9953a] hover:underline" data-testid={`make-offer-btn-${postId}`}>
             + Направи оферта
           </button>
         )}
@@ -265,7 +265,7 @@ const OffersSection = ({ postId, isCompany }) => {
             data-testid={`offer-msg-${postId}`} />
           <div className="flex justify-end gap-2">
             <button onClick={() => setShowForm(false)} className="text-xs px-3 py-1.5 rounded-lg" style={{ color: 'var(--theme-text-muted)' }}>Отказ</button>
-            <Button size="sm" className="bg-[#F97316] hover:bg-[#EA580C] text-white text-xs px-4" onClick={submit} disabled={sending || !msg.trim()}
+            <Button size="sm" className="bg-[#c9953a] hover:bg-[#b8922e] text-white text-xs px-4" onClick={submit} disabled={sending || !msg.trim()}
               data-testid={`submit-offer-${postId}`}>
               {sending ? '...' : 'Изпрати оферта'}
             </Button>
@@ -275,7 +275,7 @@ const OffersSection = ({ postId, isCompany }) => {
 
       {offers.slice(0, 3).map(o => (
         <div key={o.id} className="flex items-start gap-2 py-2 px-1" style={{ borderTop: '1px solid var(--theme-border)' }}>
-          <div className="w-7 h-7 rounded-full bg-[#F97316] flex items-center justify-center flex-shrink-0">
+          <div className="w-7 h-7 rounded-full bg-[#c9953a] flex items-center justify-center flex-shrink-0">
             {o.company_avatar ? <img src={`data:image/jpeg;base64,${o.company_avatar}`} alt="" className="w-7 h-7 rounded-full object-cover" /> : <Building2 className="h-3.5 w-3.5 text-white" />}
           </div>
           <div className="flex-1 min-w-0">
@@ -285,7 +285,7 @@ const OffersSection = ({ postId, isCompany }) => {
             </div>
             <p className="text-[11px] mt-0.5" style={{ color: 'var(--theme-text-muted)' }}>{o.message}</p>
             <div className="flex items-center gap-3 mt-1">
-              {o.price_eur > 0 && <span className="text-[10px] font-bold text-[#F97316]"><Euro className="inline h-2.5 w-2.5" /> {o.price_eur} EUR</span>}
+              {o.price_eur > 0 && <span className="text-[10px] font-bold text-[#c9953a]"><Euro className="inline h-2.5 w-2.5" /> {o.price_eur} EUR</span>}
               {o.timeline_days > 0 && <span className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}><CalendarDays className="inline h-2.5 w-2.5" /> {o.timeline_days} дни</span>}
             </div>
           </div>
@@ -315,7 +315,7 @@ const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
   };
 
   const typeBadge = { text: null, project: 'Проект', question: 'Въпрос', before_after: 'Преди/След', offer: 'Оферта' };
-  const typeColor = { project: '#F97316', question: '#4DA6FF', before_after: '#10B981', offer: '#8B5CF6' };
+  const typeColor = { project: '#c9953a', question: '#4DA6FF', before_after: '#10B981', offer: '#8B5CF6' };
 
   return (
     <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid={`post-${post.id}`}>
@@ -324,7 +324,7 @@ const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ background: post.user_type === 'company' ? '#F97316' : '#4DA6FF' }}>
+              style={{ background: post.user_type === 'company' ? '#c9953a' : '#4DA6FF' }}>
               {post.user_avatar ? (
                 <img src={`data:image/jpeg;base64,${post.user_avatar}`} alt="" className="w-10 h-10 rounded-full object-cover" />
               ) : (
@@ -335,7 +335,7 @@ const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
               <div className="flex items-center gap-2">
                 <span className="font-bold text-sm" style={{ color: 'var(--theme-text)' }}>{post.user_name}</span>
                 {post.user_type !== 'client' && (
-                  <Badge className="text-[9px] px-1.5 py-0" style={{ background: '#F97316', color: 'white' }}>
+                  <Badge className="text-[9px] px-1.5 py-0" style={{ background: '#c9953a', color: 'white' }}>
                     {post.user_type === 'company' ? 'Фирма' : 'Майстор'}
                   </Badge>
                 )}
@@ -369,9 +369,9 @@ const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all hover:scale-105 hover:shadow-sm"
                 style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)', border: '1px solid var(--theme-border)' }}
                 data-testid={`aff-link-${post.id}-${li}`}>
-                <ExternalLink className="h-3 w-3 text-[#F97316]" />
+                <ExternalLink className="h-3 w-3 text-[#c9953a]" />
                 <span>{link.search_term}</span>
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: 'rgba(249,115,22,0.1)', color: '#c9953a' }}>
                   {link.store}
                 </span>
               </a>
@@ -382,7 +382,7 @@ const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
         {/* Project data */}
         {post.project_data && (
           <div className="rounded-lg p-3 mb-3" style={{ background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.2)' }}>
-            <p className="text-xs font-bold text-[#F97316]">
+            <p className="text-xs font-bold text-[#c9953a]">
               Проект: {post.project_data.room_type} | {post.project_data.style} | {post.project_data.budget_eur} EUR
             </p>
           </div>
@@ -430,7 +430,7 @@ const PostCard = ({ post, onLike, onComment, onDelete, userId }) => {
                   placeholder="Напишете коментар..." className="flex-1 text-xs rounded-lg px-3 py-2"
                   style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text)', border: '1px solid var(--theme-border)' }}
                   data-testid={`comment-input-${post.id}`} />
-                <Button size="sm" className="bg-[#F97316] text-white px-3" onClick={handleComment} disabled={submitting || !commentText.trim()}
+                <Button size="sm" className="bg-[#c9953a] text-white px-3" onClick={handleComment} disabled={submitting || !commentText.trim()}
                   data-testid={`submit-comment-${post.id}`}>
                   <Send className="h-3.5 w-3.5" />
                 </Button>
@@ -500,7 +500,7 @@ export const CommunityPage = () => {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl md:text-3xl font-black" style={{ color: 'var(--theme-text)' }}>
-            <MessageSquare className="inline h-7 w-7 text-[#F97316] mr-2" />
+            <MessageSquare className="inline h-7 w-7 text-[#c9953a] mr-2" />
             Общност
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--theme-text-muted)' }}>Споделяйте проекти, задавайте въпроси, свързвайте се</p>
@@ -518,7 +518,7 @@ export const CommunityPage = () => {
         <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1" data-testid="post-filters">
           {POST_TYPES.map(t => (
             <button key={t.id} onClick={() => { setFilter(t.id); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${filter === t.id ? 'bg-[#F97316] text-white' : ''}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${filter === t.id ? 'bg-[#c9953a] text-white' : ''}`}
               style={filter !== t.id ? { background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)', border: '1px solid var(--theme-border)' } : {}}
               data-testid={`filter-${t.id}`}>
               {t.name}

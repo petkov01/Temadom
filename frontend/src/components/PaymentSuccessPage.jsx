@@ -43,7 +43,7 @@ const PaymentSuccessPage = () => {
         <CardContent className="py-12 text-center space-y-4">
           {status === 'checking' && (
             <>
-              <Loader2 className="h-12 w-12 mx-auto animate-spin text-[#F97316]" />
+              <Loader2 className="h-12 w-12 mx-auto animate-spin text-[#c9953a]" />
               <h2 className="text-lg font-bold" style={{ color: 'var(--theme-text)' }}>Проверка на плащането...</h2>
               <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>Моля изчакайте</p>
             </>
@@ -53,7 +53,7 @@ const PaymentSuccessPage = () => {
               <CheckCircle className="h-16 w-16 mx-auto text-[#10B981]" />
               <h2 className="text-xl font-black" style={{ color: 'var(--theme-text)' }}>Плащането е успешно!</h2>
               <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>Вашият абонамент е активиран. Благодарим ви!</p>
-              <Button className="bg-[#F97316] hover:bg-[#EA580C] text-white mt-4" onClick={() => nav('/profile')} data-testid="go-to-profile">
+              <Button className="bg-[#c9953a] hover:bg-[#b8922e] text-white mt-4" onClick={() => nav('/profile')} data-testid="go-to-profile">
                 Към профила
               </Button>
             </>

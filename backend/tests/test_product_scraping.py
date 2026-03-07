@@ -18,7 +18,7 @@ import time
 # Use environment variable for backend URL
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://ai-designer-final.preview.emergentagent.com"
+    BASE_URL = "https://temadom-speed.preview.emergentagent.com"
 
 
 class TestProductStores:

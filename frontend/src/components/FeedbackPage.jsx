@@ -110,7 +110,7 @@ export const FeedbackPage = () => {
         <div className="grid grid-cols-3 gap-4 mb-8">
           <Card className="text-center" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)' }}>
             <CardContent className="p-5">
-              <Star className="h-8 w-8 text-[#FF8C42] mx-auto mb-2" />
+              <Star className="h-8 w-8 text-[#d4a43a] mx-auto mb-2" />
               <p className="text-3xl font-bold" style={{ color: 'var(--theme-text)' }}>{avgRating}</p>
               <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>Средна оценка</p>
             </CardContent>
@@ -147,7 +147,7 @@ export const FeedbackPage = () => {
             <Card style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)' }} className="mb-6">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
-                  <MessageSquare className="h-5 w-5 text-[#FF8C42]" />
+                  <MessageSquare className="h-5 w-5 text-[#d4a43a]" />
                   Оценете платформата
                 </CardTitle>
               </CardHeader>
@@ -158,7 +158,7 @@ export const FeedbackPage = () => {
                     {[1, 2, 3, 4, 5].map(i => (
                       <button key={i} onMouseEnter={() => setHoverRating(i)} onMouseLeave={() => setHoverRating(0)} onClick={() => setRating(i)}
                         className="p-1 transition-transform hover:scale-110" data-testid={`star-${i}`}>
-                        <Star className={`h-10 w-10 ${i <= (hoverRating || rating) ? 'fill-[#FF8C42] text-[#FF8C42]' : 'text-slate-600'}`} />
+                        <Star className={`h-10 w-10 ${i <= (hoverRating || rating) ? 'fill-[#d4a43a] text-[#d4a43a]' : 'text-slate-600'}`} />
                       </button>
                     ))}
                   </div>
@@ -166,7 +166,7 @@ export const FeedbackPage = () => {
                 <div>
                   <label className="text-sm block mb-1" style={{ color: 'var(--theme-text-muted)' }}>Вашето име</label>
                   <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="По избор"
-                    className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C42]"
+                    className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d4a43a]"
                     style={{ background: 'var(--theme-bg)', border: '1px solid var(--theme-border)', color: 'var(--theme-text)' }}
                     data-testid="feedback-name-input" />
                 </div>
@@ -175,11 +175,11 @@ export const FeedbackPage = () => {
                   <textarea value={text} onChange={(e) => setText(e.target.value)}
                     placeholder="Какво ви хареса? Какво може да подобрим?"
                     rows={4}
-                    className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C42] resize-none"
+                    className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d4a43a] resize-none"
                     style={{ background: 'var(--theme-bg)', border: '1px solid var(--theme-border)', color: 'var(--theme-text)' }}
                     data-testid="feedback-text-input" />
                 </div>
-                <Button onClick={handleSubmit} disabled={submitting} className="bg-[#FF8C42] hover:bg-[#e67a30] text-white w-full" data-testid="feedback-submit-btn">
+                <Button onClick={handleSubmit} disabled={submitting} className="bg-[#d4a43a] hover:bg-[#b8922e] text-white w-full" data-testid="feedback-submit-btn">
                   <Send className="mr-2 h-4 w-4" />
                   {submitting ? 'Изпращане...' : 'Изпрати обратна връзка'}
                 </Button>
@@ -198,7 +198,7 @@ export const FeedbackPage = () => {
                             <span className="font-medium text-sm" style={{ color: 'var(--theme-text)' }}>{fb.name}</span>
                             <div className="flex">
                               {[1,2,3,4,5].map(s => (
-                                <Star key={s} className={`h-3.5 w-3.5 ${s <= fb.rating ? 'fill-[#FF8C42] text-[#FF8C42]' : 'text-slate-600'}`} />
+                                <Star key={s} className={`h-3.5 w-3.5 ${s <= fb.rating ? 'fill-[#d4a43a] text-[#d4a43a]' : 'text-slate-600'}`} />
                               ))}
                             </div>
                           </div>
@@ -253,11 +253,11 @@ export const FeedbackPage = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="flex items-center gap-2 text-base" style={{ color: 'var(--theme-text)' }}>
-                        <TrendingUp className="h-5 w-5 text-[#FF8C42]" />
+                        <TrendingUp className="h-5 w-5 text-[#d4a43a]" />
                         AI Анализ на предложенията
                       </CardTitle>
                       <Button onClick={runAiAnalysis} disabled={analyzingAI} size="sm" 
-                        className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" data-testid="ai-analyze-btn">
+                        className="bg-[#d4a43a] hover:bg-[#b8922e] text-white" data-testid="ai-analyze-btn">
                         {analyzingAI ? 'Анализиране...' : 'Анализирай с AI'}
                       </Button>
                     </div>

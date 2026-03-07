@@ -75,7 +75,7 @@ export const FeedbackButton = () => {
                     <Star
                       className={`h-8 w-8 transition-colors ${
                         i <= (hoverRating || rating)
-                          ? 'fill-[#FF8C42] text-[#FF8C42]'
+                          ? 'fill-[#d4a43a] text-[#d4a43a]'
                           : 'theme-text-subtle'
                       }`}
                     />
@@ -91,7 +91,7 @@ export const FeedbackButton = () => {
                 placeholder="Вашето име (по избор)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full  border  rounded-lg px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:border-[#FF8C42] focus:outline-none transition-colors"
+                className="w-full  border  rounded-lg px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:border-[#d4a43a] focus:outline-none transition-colors"
                 data-testid="feedback-name"
               />
             </div>
@@ -103,7 +103,7 @@ export const FeedbackButton = () => {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={3}
-                className="w-full  border  rounded-lg px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:border-[#FF8C42] focus:outline-none transition-colors resize-none"
+                className="w-full  border  rounded-lg px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:border-[#d4a43a] focus:outline-none transition-colors resize-none"
                 data-testid="feedback-text"
               />
             </div>
@@ -112,7 +112,7 @@ export const FeedbackButton = () => {
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              className="w-full bg-[#d4a43a] hover:bg-[#b8922e] text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
               data-testid="feedback-submit"
             >
               <Send className="h-4 w-4" />

@@ -183,7 +183,7 @@ export const PublishedGalleryPage = () => {
                       <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {project.views || 0}</span>
                       <span>{project.generated_images?.length || 0} варианта</span>
                       <button 
-                        className="flex items-center gap-1 hover:text-[#FF8C42] transition-colors"
+                        className="flex items-center gap-1 hover:text-[#d4a43a] transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();
                           const url = `${SITE_URL}/ai-gallery?project=${project.id}`;
@@ -227,7 +227,7 @@ export const PublishedGalleryPage = () => {
                 <div>
                   <h2 className="text-xl font-bold theme-text">{selectedProject.room_type || 'AI Дизайн проект'}</h2>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedProject.style && <Badge className="bg-[#FF8C42]/10 text-[#FF8C42]">{selectedProject.style}</Badge>}
+                    {selectedProject.style && <Badge className="bg-[#d4a43a]/10 text-[#d4a43a]">{selectedProject.style}</Badge>}
                     {selectedProject.material_class && <Badge className="bg-[#4DA6FF]/10 text-[#4DA6FF]">{selectedProject.material_class}</Badge>}
                     {selectedProject.dimensions && (
                       <Badge variant="outline" className=" theme-text-muted">
@@ -256,18 +256,18 @@ export const PublishedGalleryPage = () => {
                     )}
                   </div>
                   <div>
-                    <p className="text-[#FF8C42] text-xs mb-2 uppercase tracking-wider font-medium">След (AI Дизайн)</p>
+                    <p className="text-[#d4a43a] text-xs mb-2 uppercase tracking-wider font-medium">След (AI Дизайн)</p>
                     {selectedProject.generated_images?.map((gen, gi) => (
                       <div key={gi} className="mb-3">
                         <p className="theme-text-subtle text-[10px] mb-1">Вариант {gi + 1}</p>
                         {gen.angles?.map((ang, ai) => (
-                          <div key={ai} className="rounded-lg overflow-hidden border border-[#FF8C42]/30 mb-1">
+                          <div key={ai} className="rounded-lg overflow-hidden border border-[#d4a43a]/30 mb-1">
                             <img src={`data:image/png;base64,${ang.image_base64}`} alt={`V${gi+1} A${ai+1}`} className="w-full" />
                             <p className="text-center text-[10px] theme-text-subtle py-1">{ang.angle_label}</p>
                           </div>
                         ))}
                         {!gen.angles && gen.image_base64 && (
-                          <div className="rounded-lg overflow-hidden border border-[#FF8C42]/30">
+                          <div className="rounded-lg overflow-hidden border border-[#d4a43a]/30">
                             <img src={`data:image/png;base64,${gen.image_base64}`} alt={`V${gi+1}`} className="w-full" />
                           </div>
                         )}
@@ -281,7 +281,7 @@ export const PublishedGalleryPage = () => {
                   <Card className=" ">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-white text-sm flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-[#FF8C42]" />
+                        <FileText className="h-4 w-4 text-[#d4a43a]" />
                         Количествена сметка ({selectedProject.materials.materials.length} позиции)
                       </CardTitle>
                     </CardHeader>

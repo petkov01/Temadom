@@ -60,14 +60,14 @@ const AnalyticsDashboard = () => {
     <div className="min-h-screen bg-slate-900 flex items-center justify-center" data-testid="analytics-login">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <Lock className="h-8 w-8 text-[#FF8C42] mx-auto mb-2" />
+          <Lock className="h-8 w-8 text-[#d4a43a] mx-auto mb-2" />
           <CardTitle>Аналитикс</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <Input type="password" placeholder="Парола за достъп" value={password} onChange={e => setPassword(e.target.value)} data-testid="analytics-password" />
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30]" type="submit" disabled={loading} data-testid="analytics-login-btn">
+            <Button className="w-full bg-[#d4a43a] hover:bg-[#b8922e]" type="submit" disabled={loading} data-testid="analytics-login-btn">
               {loading ? 'Зареждане...' : 'Вход'}
             </Button>
           </form>
@@ -96,7 +96,7 @@ const AnalyticsDashboard = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { icon: <Eye className="h-5 w-5" />, label: 'Посещения (днес)', value: data.pageviews_today, color: 'text-blue-600' },
-            { icon: <Calculator className="h-5 w-5" />, label: 'Калкулации', value: data.calculator_uses, color: 'text-[#FF8C42]' },
+            { icon: <Calculator className="h-5 w-5" />, label: 'Калкулации', value: data.calculator_uses, color: 'text-[#d4a43a]' },
             { icon: <FileDown className="h-5 w-5" />, label: 'PDF изтегляния', value: data.pdf_downloads, color: 'text-green-600' },
             { icon: <CreditCard className="h-5 w-5" />, label: 'Плащания', value: data.payments, color: 'text-[#8C56FF]' }
           ].map((m, i) => (
@@ -121,7 +121,7 @@ const AnalyticsDashboard = () => {
           </Card>
           <Card>
             <CardContent className="p-4">
-              <Users className="h-5 w-5 text-[#FF8C42] mb-2" />
+              <Users className="h-5 w-5 text-[#d4a43a] mb-2" />
               <p className="text-2xl font-bold">{data.total_companies}</p>
               <p className="text-xs theme-text-subtle">Фирми</p>
             </CardContent>
@@ -180,7 +180,7 @@ const AnalyticsDashboard = () => {
               {data.top_regions?.map((r, i) => (
                 <div key={i} className="flex items-center justify-between  rounded-lg p-3">
                   <span className="text-sm font-medium theme-text-muted">{r.region}</span>
-                  <Badge className="bg-[#FF8C42]/10 text-[#FF8C42] text-xs">{r.count}</Badge>
+                  <Badge className="bg-[#d4a43a]/10 text-[#d4a43a] text-xs">{r.count}</Badge>
                 </div>
               ))}
               {(!data.top_regions || data.top_regions.length === 0) && <p className="text-sm theme-text-muted">Няма данни</p>}

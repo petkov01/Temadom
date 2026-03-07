@@ -112,13 +112,13 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
   }, [estimate]);
 
   return (
-    <Card className="border-[#FF8C42]/20 bg-[#FF8C42]/5/50">
+    <Card className="border-[#d4a43a]/20 bg-[#d4a43a]/5/50">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
-          <button className="w-full p-4 flex items-center justify-between text-left hover:bg-[#FF8C42]/10/50 transition-colors rounded-t-lg">
+          <button className="w-full p-4 flex items-center justify-between text-left hover:bg-[#d4a43a]/10/50 transition-colors rounded-t-lg">
             <div className="flex items-center gap-3">
-              <div className="bg-[#FF8C42]/10 p-2 rounded-lg">
-                <Calculator className="h-5 w-5 text-[#FF8C42]" />
+              <div className="bg-[#d4a43a]/10 p-2 rounded-lg">
+                <Calculator className="h-5 w-5 text-[#d4a43a]" />
               </div>
               <div>
                 <h4 className="font-semibold text-white">Добави оценка на бюджета</h4>
@@ -138,7 +138,7 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
 
         <CollapsibleContent>
           <CardContent className="pt-0 px-4 pb-4">
-            <div className="border-t border-[#FF8C42]/20 pt-4">
+            <div className="border-t border-[#d4a43a]/20 pt-4">
               {/* Region selector */}
               <div className="mb-4">
                 <Label className="text-sm">Регион</Label>
@@ -175,7 +175,7 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
                 </div>
                 <Collapsible>
                   <CollapsibleTrigger asChild>
-                    <Button variant="ghost" size="sm" className="mt-2 text-[#FF8C42]">
+                    <Button variant="ghost" size="sm" className="mt-2 text-[#d4a43a]">
                       Още услуги...
                     </Button>
                   </CollapsibleTrigger>

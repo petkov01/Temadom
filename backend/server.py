@@ -3013,58 +3013,11 @@ async def generate_photo_design(
                     logging.warning(f"Retry {attempt+1}/{max_retries} after error: {e}. Waiting {delay}s...")
                     await aio.sleep(delay)
 
-        for idx, photo_b64 in enumerate(photos_b64):
+        # Process ALL photos in PARALLEL for maximum speed
+        async def process_single_photo(idx, photo_b64):
             label = photo_labels[idx] if idx < len(photo_labels) else f"Снимка {idx+1}"
             try:
-                # Step 1a: Vision analysis of the uploaded photo (gpt-4o-mini — faster!)
-                async def run_vision(photo_data=photo_b64, room_type_n=room_type_name, exp_elem=expected_elements):
-                    vision_chat = LlmChat(
-                        api_key=EMERGENT_LLM_KEY,
-                        session_id=f"photo-vision-{uuid.uuid4()}",
-                        system_message=f"""Ти си експерт по интериорен дизайн. Анализирай ТОЧНО какво виждаш на снимката.
-
-ЗАДАЧА: Опиши подробно помещението на снимката.
-Клиентът казва, че това е: {room_type_n}
-Очаквани елементи за {room_type_n}: {exp_elem}
-
-Отговори САМО в JSON:
-{{"room_type": "bathroom/kitchen/living_room/bedroom/...",
-"room_type_bg": "баня/кухня/хол/спалня/...",
-"confirmed_match": true/false,
-"elements_visible": ["вана", "мивка", "плочки", ...],
-"colors": ["бял", "сив", ...],
-"layout_description": "Правоъгълно помещение с вана вляво, мивка вдясно...",
-"dimensions_estimate": "приблизително 3x2 метра",
-"condition": "стара/нова/за ремонт",
-"camera_angle": "от вратата/от ъгъла/фронтално"}}"""
-                    ).with_model("openai", "gpt-4o-mini")
-
-                    vision_msg = UserMessage(
-                        text=f"Анализирай тази снимка. Клиентът твърди, че е {room_type_n}. Потвърди или коригирай. Опиши ВСИЧКИ видими елементи.",
-                        file_contents=[ImageContent(image_base64=photo_data)]
-                    )
-                    return await vision_chat.send_message(vision_msg)
-
-                vision_response = await retry_with_backoff(run_vision, max_retries=3, base_delay=2)
-
-                # Parse vision analysis
-                room_analysis = {}
-                try:
-                    json_match = re_module.search(r'\{[\s\S]*\}', vision_response)
-                    if json_match:
-                        room_analysis = json_module.loads(json_match.group(0))
-                except Exception:
-                    room_analysis = {"room_type_bg": room_type_name, "elements_visible": [], "layout_description": ""}
-
-                detected_room = room_analysis.get("room_type_bg", room_type_name)
-                elements = ", ".join(room_analysis.get("elements_visible", [expected_elements]))
-                layout_desc = room_analysis.get("layout_description", "")
-                colors = ", ".join(room_analysis.get("colors", []))
-                camera_angle = room_analysis.get("camera_angle", "")
-
-                logging.info(f"Photo Designer: Vision detected '{detected_room}' for photo {idx+1} (user said: {room_type_name})")
-
-                # Step 1b: Generate 3D render using IMAGE EDIT (preserves architecture 1:1)
+                # Simplified prompt - skip vision analysis to save ~10sec per photo
                 render_prompt = f"""ARCHITECTURAL RENOVATION — transform this EXACT room into a {style_desc} interior.
 
 ABSOLUTE RULES — DO NOT VIOLATE:
@@ -3075,29 +3028,37 @@ ABSOLUTE RULES — DO NOT VIOLATE:
 5. DO NOT add or remove any structural elements (walls, columns, windows, doors)
 
 RENOVATION:
-- Room: {detected_room} ({room_type_name}), {width}m x {length}m, height {height}m
+- Room: {room_type_name}, {width}m x {length}m, height {height}m
 - Style: {style_desc}
 {f"- Client notes: {reno_instruction}" if notes else "- Apply complete modern renovation with high-quality finishes"}
 - Replace old materials with modern {style_desc} finishes
 - Add stylish furniture and decor matching the {style_desc} aesthetic
-- Professional interior photography lighting, ultra-realistic, 8K quality"""
+- Professional interior photography lighting, ultra-realistic"""
 
-                # Decode original photo bytes for image_edit
                 original_photo_bytes = base64.b64decode(photo_b64)
+                
+                # Compress image if too large (reduce to max 1MB for faster processing)
+                from PIL import Image as PILImage
+                img_pil = PILImage.open(io.BytesIO(original_photo_bytes))
+                if img_pil.width > 1024 or img_pil.height > 1024:
+                    img_pil.thumbnail((1024, 1024), PILImage.LANCZOS)
+                buf = io.BytesIO()
+                img_pil.save(buf, format='JPEG', quality=80)
+                compressed_bytes = buf.getvalue()
+                logging.info(f"Photo {idx+1}: compressed from {len(original_photo_bytes)}B to {len(compressed_bytes)}B")
 
-                async def run_image_edit(prompt=render_prompt, img_bytes=original_photo_bytes):
+                async def run_image_edit():
                     import litellm as litellm_module
                     proxy_url = "https://integrations.emergentagent.com/llm"
                     result = await litellm_module.aimage_edit(
-                        image=img_bytes,
-                        prompt=prompt,
+                        image=compressed_bytes,
+                        prompt=render_prompt,
                         model="gpt-image-1",
                         n=1,
                         quality="low",
                         api_key=EMERGENT_LLM_KEY,
                         api_base=proxy_url,
                     )
-                    # Extract image bytes from response
                     img_data_list = []
                     for img_obj in result.data:
                         if hasattr(img_obj, 'b64_json') and img_obj.b64_json:
@@ -3109,19 +3070,28 @@ RENOVATION:
                                     img_data_list.append(await resp.read())
                     return img_data_list
 
-                img_result = await retry_with_backoff(run_image_edit, max_retries=3, base_delay=3)
+                img_result = await retry_with_backoff(run_image_edit, max_retries=2, base_delay=2)
                 if img_result and len(img_result) > 0:
                     img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
-                    renders.append({
+                    logging.info(f"Photo Designer: render {idx+1} ({label}) generated OK")
+                    return {
                         "index": idx,
                         "label": label,
                         "image_base64": img_b64,
                         "original_base64": photo_b64
-                    })
-                    logging.info(f"Photo Designer: render {idx+1} ({label}) generated as '{detected_room}' OK")
+                    }
             except Exception as img_err:
                 logging.error(f"Photo Designer render {idx+1} error: {img_err}")
-                continue
+            return None
+
+        # Run ALL photos in parallel
+        import asyncio as aio_module
+        logging.info(f"Photo Designer: Processing {len(photos_b64)} photos IN PARALLEL")
+        parallel_results = await aio_module.gather(
+            *[process_single_photo(i, p) for i, p in enumerate(photos_b64)]
+        )
+        renders = [r for r in parallel_results if r is not None]
+        logging.info(f"Photo Designer: {len(renders)}/{len(photos_b64)} renders completed")
 
         # Step 2: Scrape REAL products from Bulgarian stores
         from services.scraper import get_products_for_room, format_products_for_prompt

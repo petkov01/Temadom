@@ -47,7 +47,7 @@ const RegionalPage = () => {
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Quick stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-[#FF8C42]">x{region.multiplier.toFixed(2)}</p><p className="text-xs theme-text-subtle">Ценови коефициент</p></CardContent></Card>
+          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-[#d4a43a]">x{region.multiplier.toFixed(2)}</p><p className="text-xs theme-text-subtle">Ценови коефициент</p></CardContent></Card>
           <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold theme-text">28</p><p className="text-xs theme-text-subtle">Професии</p></CardContent></Card>
           <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold theme-text">{region.population}</p><p className="text-xs theme-text-subtle">Население</p></CardContent></Card>
           <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-green-600">{(6 * region.multiplier).toFixed(1)}€</p><p className="text-xs theme-text-subtle">Боядисване/м²</p></CardContent></Card>
@@ -71,11 +71,11 @@ const RegionalPage = () => {
                 {SEO_PROFESSIONS.map((p, i) => (
                   <tr key={p.id} className={i % 2 === 0 ? '' : ''}>
                     <td className="p-3 font-medium">
-                      <Link to={`/blog/ceni-${p.slug}-2026`} className="text-[#FF8C42] hover:underline">{p.name}</Link>
+                      <Link to={`/blog/ceni-${p.slug}-2026`} className="text-[#d4a43a] hover:underline">{p.name}</Link>
                     </td>
                     <td className="p-3 text-center theme-text-subtle">{p.unit}</td>
                     <td className="p-3 text-center">{(p.basePrice.labor * region.multiplier).toFixed(2)}</td>
-                    <td className="p-3 text-center font-semibold text-[#FF8C42]">{(p.basePrice.full * region.multiplier).toFixed(2)}</td>
+                    <td className="p-3 text-center font-semibold text-[#d4a43a]">{(p.basePrice.full * region.multiplier).toFixed(2)}</td>
                     <td className="p-3 text-center theme-text-muted">{(p.basePrice.full * region.multiplier * 1.9558).toFixed(2)}</td>
                   </tr>
                 ))}
@@ -86,7 +86,7 @@ const RegionalPage = () => {
 
         {/* Example calculation */}
         <h2 className="text-2xl font-bold theme-text mb-4">Примерна калкулация за апартамент 60 м² в {region.name}</h2>
-        <Card className="mb-8 bg-[#FF8C42]/5 border-[#FF8C42]/20">
+        <Card className="mb-8 bg-[#d4a43a]/5 border-[#d4a43a]/20">
           <CardContent className="p-6">
             <div className="space-y-3">
               {[
@@ -105,7 +105,7 @@ const RegionalPage = () => {
               <Separator />
               <div className="flex justify-between items-center text-lg">
                 <span className="font-bold theme-text">ОБЩА СУМА</span>
-                <span className="font-bold text-[#FF8C42]">
+                <span className="font-bold text-[#d4a43a]">
                   {(6 * region.multiplier * 120 + 7 * region.multiplier * 120 + 12 * region.multiplier * 60 + 14 * region.multiplier * 25 + 18 * region.multiplier * 10 + 22 * region.multiplier * 15).toFixed(0)} EUR
                 </span>
               </div>
@@ -116,7 +116,7 @@ const RegionalPage = () => {
         {/* CTA */}
         <div className="text-center mb-8">
           <Link to="/calculator">
-            <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-lg px-8 py-3" data-testid="region-calc-btn">
+            <Button className="bg-[#d4a43a] hover:bg-[#b8922e] text-lg px-8 py-3" data-testid="region-calc-btn">
               <Calculator className="mr-2 h-5 w-5" /> Изчисли цена за {region.name}
             </Button>
           </Link>
@@ -126,7 +126,7 @@ const RegionalPage = () => {
         <h2 className="text-xl font-bold theme-text mb-4">Сравни с други области</h2>
         <div className="grid sm:grid-cols-3 md:grid-cols-4 gap-3">
           {otherRegions.slice(0, 8).map(([k, r]) => (
-            <Link key={k} to={`/region/${r.slug}`} className="text-sm text-[#FF8C42] hover:underline flex items-center gap-1">
+            <Link key={k} to={`/region/${r.slug}`} className="text-sm text-[#d4a43a] hover:underline flex items-center gap-1">
               <MapPin className="h-3 w-3" /> {r.name} (x{r.multiplier.toFixed(2)})
             </Link>
           ))}

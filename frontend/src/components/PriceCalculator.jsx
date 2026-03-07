@@ -513,8 +513,8 @@ const PriceCalculator = () => {
       <div className="min-h-screen flex items-center justify-center py-16 px-4" style={{background: "var(--theme-bg-secondary)"}} data-testid="calculator-auth-guard">
         <div className="max-w-md w-full text-center">
           <div className="rounded-2xl shadow-lg p-8" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
-            <div className="bg-[#FF8C42]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Lock className="h-8 w-8 text-[#FF8C42]" />
+            <div className="bg-[#d4a43a]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Lock className="h-8 w-8 text-[#d4a43a]" />
             </div>
             <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--theme-text)' }}>
               {t('calc_auth_title')}
@@ -525,7 +525,7 @@ const PriceCalculator = () => {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => navigate('/register')}
-                className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                className="flex-1 bg-[#d4a43a] hover:bg-[#b8922e] text-white font-medium py-3 px-6 rounded-lg transition-colors"
                 data-testid="calculator-register-btn"
               >
                 {t('calc_auth_register')}
@@ -551,8 +551,8 @@ const PriceCalculator = () => {
         {/* Header */}
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="bg-[#FF8C42]/10 p-3 rounded-full">
-              <Calculator className="h-8 w-8 text-[#FF8C42]" />
+            <div className="bg-[#d4a43a]/10 p-3 rounded-full">
+              <Calculator className="h-8 w-8 text-[#d4a43a]" />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--theme-text)' }}>
               {t('calc_title')}
@@ -588,13 +588,13 @@ const PriceCalculator = () => {
                         onClick={() => addItem(key)}
                         className={`p-4 rounded-lg border-2 transition-all duration-200 text-left hover:shadow-md ${
                           isSelected 
-                            ? 'border-orange-400 bg-[#FF8C42]/5' 
+                            ? 'border-orange-400 bg-[#d4a43a]/5' 
                             : 'hover:border-orange-300'
                         }`}
                         style={!isSelected ? { borderColor: 'var(--theme-border)' } : {}}
                         data-testid={`add-${key}`}
                       >
-                        <Icon className={`h-6 w-6 mb-2 ${isSelected ? 'text-[#FF8C42]' : ''}`} style={!isSelected ? { color: 'var(--theme-text-subtle)' } : {}} />
+                        <Icon className={`h-6 w-6 mb-2 ${isSelected ? 'text-[#d4a43a]' : ''}`} style={!isSelected ? { color: 'var(--theme-text-subtle)' } : {}} />
                         <p className="font-medium text-sm">{category.name}</p>
                         <p className="text-xs mt-1" style={{ color: 'var(--theme-text-subtle)' }}>{category.unit}</p>
                       </button>
@@ -669,7 +669,7 @@ const PriceCalculator = () => {
                         onClick={() => setPricingType(key)}
                         className={`p-4 rounded-lg border-2 text-left transition-all ${
                           pricingType === key 
-                            ? 'border-orange-500 bg-[#FF8C42]/5' 
+                            ? 'border-orange-500 bg-[#d4a43a]/5' 
                             : 'hover:border-orange-300'
                         }`}
                         style={pricingType !== key ? { borderColor: 'var(--theme-border)' } : {}}
@@ -692,7 +692,7 @@ const PriceCalculator = () => {
                         onClick={() => setQualityLevel(key)}
                         className={`p-4 rounded-lg border-2 text-center transition-all ${
                           qualityLevel === key 
-                            ? 'border-orange-500 bg-[#FF8C42]/5' 
+                            ? 'border-orange-500 bg-[#d4a43a]/5' 
                             : 'hover:border-orange-300'
                         }`}
                         style={qualityLevel !== key ? { borderColor: 'var(--theme-border)' } : {}}
@@ -730,10 +730,10 @@ const PriceCalculator = () => {
 
           {/* Right: Price Summary */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24 border-2 border-[#FF8C42]/20">
-              <CardHeader className="bg-[#FF8C42]/5">
+            <Card className="sticky top-24 border-2 border-[#d4a43a]/20">
+              <CardHeader className="bg-[#d4a43a]/5">
                 <CardTitle className="flex items-center gap-2">
-                  <Euro className="h-5 w-5 text-[#FF8C42]" />
+                  <Euro className="h-5 w-5 text-[#d4a43a]" />
                   Обща цена
                 </CardTitle>
                 <CardDescription>
@@ -798,7 +798,7 @@ const PriceCalculator = () => {
                     {/* Download PDF button */}
                     {calculation.total > 0 && (
                       <Button 
-                        className="w-full mt-4 bg-[#FF8C42] hover:bg-[#e67a30]"
+                        className="w-full mt-4 bg-[#d4a43a] hover:bg-[#b8922e]"
                         onClick={async () => {
                           try {
                             const res = await axios.post(`${CALC_API}/calculator/pdf`, {

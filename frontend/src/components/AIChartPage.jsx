@@ -293,7 +293,7 @@ export const AIChartPage = () => {
                 <CardHeader className="pb-2 cursor-pointer" onClick={() => setShowMaterials(!showMaterials)}>
                   <CardTitle className="text-white text-sm flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-[#FF8C42]" />
+                      <Building2 className="h-4 w-4 text-[#d4a43a]" />
                       Материали ({materials.length} позиции)
                     </span>
                     {showMaterials ? <ChevronUp className="h-4 w-4 theme-text-muted" /> : <ChevronDown className="h-4 w-4 theme-text-muted" />}
@@ -321,14 +321,14 @@ export const AIChartPage = () => {
                               <td className="py-2 pr-2 text-center theme-text-muted">{m.unit}</td>
                               <td className="py-2 pr-2 text-center">{m.quantity}</td>
                               <td className="py-2 pr-2 text-right theme-text-muted">{m.price_per_unit}</td>
-                              <td className="py-2 text-right font-medium text-[#FF8C42]">{m.total}</td>
+                              <td className="py-2 text-right font-medium text-[#d4a43a]">{m.total}</td>
                             </tr>
                           ))}
                         </tbody>
                         <tfoot>
-                          <tr className="border-t-2 border-[#FF8C42]/30">
+                          <tr className="border-t-2 border-[#d4a43a]/30">
                             <td colSpan={5} className="py-2 text-right font-bold text-white">Материали общо:</td>
-                            <td className="py-2 text-right font-bold text-[#FF8C42]">{summary.materials_total} EUR</td>
+                            <td className="py-2 text-right font-bold text-[#d4a43a]">{summary.materials_total} EUR</td>
                           </tr>
                         </tfoot>
                       </table>
@@ -395,7 +395,7 @@ export const AIChartPage = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                   <div>
                     <p className="theme-text-muted text-xs">Материали</p>
-                    <p className="text-[#FF8C42] font-bold text-lg">{summary.materials_total || 0} EUR</p>
+                    <p className="text-[#d4a43a] font-bold text-lg">{summary.materials_total || 0} EUR</p>
                   </div>
                   <div>
                     <p className="theme-text-muted text-xs">Труд</p>

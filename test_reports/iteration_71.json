@@ -69,7 +69,7 @@
     "frontend": "100% (All UI flows verified)"
   },
   "test_credentials": {
-    "backend_url": "https://ai-designer-final.preview.emergentagent.com"
+    "backend_url": "https://temadom-speed.preview.emergentagent.com"
   },
   "seed_data_creation": "Created TEST_ prefixed users during API tests",
   "retest_needed": false,

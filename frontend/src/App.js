@@ -188,14 +188,14 @@ const AuthGate = ({ children }) => {
   return (
     <div className="relative min-h-screen flex items-center justify-center" style={{ background: 'var(--theme-bg)' }}>
       <div className="rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="auth-gate-modal">
-        <div className="w-16 h-16 bg-[#F97316]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Lock className="h-8 w-8 text-[#F97316]" />
+        <div className="w-16 h-16 bg-[#c9953a]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Lock className="h-8 w-8 text-[#c9953a]" />
         </div>
         <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>Само за регистрирани</h3>
         <p className="text-sm mb-6" style={{ color: 'var(--theme-text-muted)' }}>Регистрирайте се безплатно, за да използвате тази функция.</p>
         <div className="flex gap-3">
           <button onClick={() => navigate('/login')} className="flex-1 py-3 rounded-xl font-medium text-sm transition-colors" style={{ border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }} data-testid="auth-gate-login">Вход</button>
-          <button onClick={() => navigate('/register')} className="flex-1 py-3 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-sm" data-testid="auth-gate-register">Регистрация</button>
+          <button onClick={() => navigate('/register')} className="flex-1 py-3 rounded-xl bg-[#c9953a] hover:bg-[#b8922e] text-white font-bold text-sm" data-testid="auth-gate-register">Регистрация</button>
         </div>
       </div>
     </div>
@@ -206,6 +206,7 @@ const AuthGate = ({ children }) => {
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { t, lang, switchLang } = useLanguage();
+  const { dark } = useTheme();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -263,7 +264,7 @@ const Navbar = () => {
           {/* Left: Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
-              <img src="/logo-temadom.png" alt="TemaDom" className="h-32 lg:h-40 w-auto" style={{ filter: 'drop-shadow(0 0 18px rgba(246, 195, 106, 0.85))' }} />
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-32 lg:h-40 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 18px rgba(246, 195, 106, 0.85))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
             </Link>
           </div>
 
@@ -363,7 +364,7 @@ const Navbar = () => {
                       key={l.code}
                       onClick={() => { switchLang(l.code); setLangOpen(false); }}
                       className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${
-                        l.code === lang ? 'bg-[#FF8C42]/10 text-[#FF8C42] font-medium' : ''
+                        l.code === lang ? 'bg-[#d4a43a]/10 text-[#d4a43a] font-medium' : ''
                       }`}
                       style={l.code !== lang ? { color: 'var(--theme-text-muted)' } : {}}
                       data-testid={`lang-option-${l.code}`}
@@ -435,7 +436,7 @@ const Navbar = () => {
                       key={l.code}
                       onClick={() => { switchLang(l.code); setLangOpen(false); }}
                       className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm ${
-                        l.code === lang ? 'bg-[#FF8C42]/10 text-[#FF8C42] font-medium' : ''
+                        l.code === lang ? 'bg-[#d4a43a]/10 text-[#d4a43a] font-medium' : ''
                       }`}
                       style={l.code !== lang ? { color: 'var(--theme-text-muted)' } : {}}
                     >
@@ -464,16 +465,16 @@ const Navbar = () => {
             {/* Mobile Live Counter */}
             <MobileLiveStats />
             <div className="h-px" style={{ background: 'var(--theme-nav-border)' }} />
-            <Link to="/projects" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/projects" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <FolderSearch className="h-4 w-4" /> {t('nav_projects')}
             </Link>
-            <Link to="/companies" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/companies" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <Building2 className="h-4 w-4" /> Фирми и Майстори
             </Link>
-            <Link to="/calculator" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/calculator" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <Calculator className="h-4 w-4" /> {t('nav_calculator')}
             </Link>
-            <Link to="/ai-sketch" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-sketch">
+            <Link to="/ai-sketch" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ai-sketch">
               <FileText className="h-4 w-4" /> AI Sketch (скици)
             </Link>
             <Link to="/room-scan" className="block py-2 flex items-center gap-2 hover:text-[#8C56FF]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-room-scan">
@@ -482,27 +483,27 @@ const Navbar = () => {
             <Link to="/ready-projects" className="block py-2 flex items-center gap-2 hover:text-[#28A745]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ready-projects">
               <FolderSearch className="h-4 w-4" /> Готови проекти
             </Link>
-            <Link to="/subscriptions" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/subscriptions" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <ShoppingCart className="h-4 w-4" /> Абонаменти
             </Link>
-            <Link to="/services" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/services" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <Hammer className="h-4 w-4" /> {t('nav_services')}
             </Link>
-            <Link to="/blog" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-blog">
+            <Link to="/blog" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-blog">
               <BookOpen className="h-4 w-4" /> {t('nav_blog')}
             </Link>
-            <Link to="/about" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/about" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <Info className="h-4 w-4" /> {t('nav_about')}
             </Link>
             {user ? (
               <>
-                <Link to="/profile" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/profile" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
                   <User className="h-4 w-4" /> Профил
                 </Link>
-                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
+                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
                   <LayoutGrid className="h-4 w-4" /> {t('nav_dashboard')}
                 </Link>
-                <Link to="/messages" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/messages" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
                   <MessageSquare className="h-4 w-4" /> {t('nav_messages')}
                 </Link>
                 <Button variant="ghost" className="w-full justify-start hover:bg-black/5 dark:hover:bg-white/10" style={{ color: 'var(--theme-text-muted)' }} onClick={() => { logout(); setMobileMenuOpen(false); }}>
@@ -515,7 +516,7 @@ const Navbar = () => {
                   <Button variant="outline" className="w-full" style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }}>{t('nav_login')}</Button>
                 </Link>
                 <Link to="/register" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white">{t('nav_register_short')}</Button>
+                  <Button className="w-full bg-[#d4a43a] hover:bg-[#b8922e] text-white">{t('nav_register_short')}</Button>
                 </Link>
               </div>
             )}
@@ -649,52 +650,52 @@ const LiveCounter = () => {
 // ============== FOOTER ==============
 const Footer = () => {
   const { t } = useLanguage();
+  const { dark } = useTheme();
   return (
   <footer className="py-12 mt-auto" style={{ background: 'var(--theme-nav-bg)', borderTop: '1px solid var(--theme-nav-border)', color: 'var(--theme-text)' }}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <div className="mb-4 flex flex-col items-start">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-14 w-auto" style={{ filter: 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' }} />
-            <p className="text-[#FF8C42] text-xs font-bold tracking-wider uppercase mt-2">{t('footer_tagline')}</p>
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-20 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 10px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.3)) brightness(0.85)' }} />
           </div>
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             {t('footer_desc')}
           </p>
         </div>
         <div>
-          <h4 className="font-semibold mb-4 text-[#FF8C42]">{t('footer_clients')}</h4>
+          <h4 className="font-semibold mb-4 text-[#d4a43a]">{t('footer_clients')}</h4>
           <ul className="space-y-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
-            <li><Link to="/register" className="hover:text-[#FF8C42] transition-colors">{t('footer_publish')}</Link></li>
-            <li><Link to="/companies" className="hover:text-[#FF8C42] transition-colors">{t('footer_find_company')}</Link></li>
-            <li><Link to="/services" className="hover:text-[#FF8C42] transition-colors">{t('footer_services')}</Link></li>
-            <li><Link to="/calculator" className="hover:text-[#FF8C42] transition-colors">{t('footer_calculator')}</Link></li>
-            <li><Link to="/professions" className="hover:text-[#FF8C42] transition-colors">{t('footer_professions_guide')}</Link></li>
+            <li><Link to="/register" className="hover:text-[#d4a43a] transition-colors">{t('footer_publish')}</Link></li>
+            <li><Link to="/companies" className="hover:text-[#d4a43a] transition-colors">{t('footer_find_company')}</Link></li>
+            <li><Link to="/services" className="hover:text-[#d4a43a] transition-colors">{t('footer_services')}</Link></li>
+            <li><Link to="/calculator" className="hover:text-[#d4a43a] transition-colors">{t('footer_calculator')}</Link></li>
+            <li><Link to="/professions" className="hover:text-[#d4a43a] transition-colors">{t('footer_professions_guide')}</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-4 text-[#FF8C42]">{t('footer_for_companies')}</h4>
+          <h4 className="font-semibold mb-4 text-[#d4a43a]">{t('footer_for_companies')}</h4>
           <ul className="space-y-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
-            <li><Link to="/register" className="hover:text-[#FF8C42] transition-colors">{t('footer_register_link')}</Link></li>
-            <li><Link to="/projects" className="hover:text-[#FF8C42] transition-colors">{t('footer_view_projects')}</Link></li>
-            <li><Link to="/subscriptions" className="hover:text-[#FF8C42] transition-colors">Абонаменти</Link></li>
-            <li><Link to="/ai-sketch" className="hover:text-[#FF8C42] transition-colors">AI Sketch</Link></li>
-            <li><Link to="/room-scan" className="hover:text-[#FF8C42] transition-colors">Помещения</Link></li>
-            <li><Link to="/ready-projects" className="hover:text-[#FF8C42] transition-colors">Готови проекти</Link></li>
+            <li><Link to="/register" className="hover:text-[#d4a43a] transition-colors">{t('footer_register_link')}</Link></li>
+            <li><Link to="/projects" className="hover:text-[#d4a43a] transition-colors">{t('footer_view_projects')}</Link></li>
+            <li><Link to="/subscriptions" className="hover:text-[#d4a43a] transition-colors">Абонаменти</Link></li>
+            <li><Link to="/ai-sketch" className="hover:text-[#d4a43a] transition-colors">AI Sketch</Link></li>
+            <li><Link to="/room-scan" className="hover:text-[#d4a43a] transition-colors">Помещения</Link></li>
+            <li><Link to="/ready-projects" className="hover:text-[#d4a43a] transition-colors">Готови проекти</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-4 text-[#FF8C42]">{t('footer_info')}</h4>
+          <h4 className="font-semibold mb-4 text-[#d4a43a]">{t('footer_info')}</h4>
           <ul className="space-y-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
-            <li><Link to="/about" className="hover:text-[#FF8C42] transition-colors">{t('footer_about')}</Link></li>
-            <li><Link to="/terms" className="hover:text-[#FF8C42] transition-colors">{t('footer_terms')}</Link></li>
+            <li><Link to="/about" className="hover:text-[#d4a43a] transition-colors">{t('footer_about')}</Link></li>
+            <li><Link to="/terms" className="hover:text-[#d4a43a] transition-colors">{t('footer_terms')}</Link></li>
             <li className="text-[#4DA6FF]">info@temadom.com</li>
           </ul>
         </div>
       </div>
       <Separator className="my-8" style={{ background: 'var(--theme-nav-border)' }} />
       <div className="flex flex-col items-center gap-3">
-        <img src="/logo-temadom.png" alt="TemaDom" className="h-12 w-auto" style={{ filter: 'drop-shadow(0 0 6px rgba(246, 195, 106, 0.4))' }} />
+        <img src="/logo-temadom.png" alt="TemaDom" className="h-16 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) brightness(0.85)' }} />
         <p className="text-center text-sm" style={{ color: 'var(--theme-text-subtle)' }}>
           © 2025-2026 TemaDom. {t('footer_rights')}
         </p>
@@ -712,7 +713,7 @@ const StarRating = ({ rating, size = 'sm' }) => {
       {[1, 2, 3, 4, 5].map(i => (
         <Star 
           key={i} 
-           className={`${sizeClass} ${i <= rating ? 'fill-[#FF8C42] text-[#FF8C42]' : ''}`}
+           className={`${sizeClass} ${i <= rating ? 'fill-[#d4a43a] text-[#d4a43a]' : ''}`}
           style={i > rating ? { color: 'var(--theme-border)' } : {}}
         />
       ))}
@@ -728,7 +729,7 @@ const PLANS = [
     limits: ['Без PDF договори', 'Без AI скици', 'Без Telegram известия'],
   },
   {
-    name: 'ПРО', monthly: 35, color: '#F97316', badge: '90% ИЗБИРАТ ТОЗИ!',
+    name: 'ПРО', monthly: 35, color: '#c9953a', badge: '90% ИЗБИРАТ ТОЗИ!',
     features: ['Всичко от БАЗОВ', 'Telegram известия', 'PDF договори', 'AI скици', 'Количествени сметки', 'Неограничени оферти', 'Приоритетно показване'],
     limits: ['Без 10-мин. предимство'],
   },
@@ -792,7 +793,7 @@ const FirmSubscriptionsSection = ({ dark, text, muted, accent, border, navigate 
           <div className="grid grid-cols-3 gap-2 text-center">
             {[
               { name: 'PREMIUM', color: '#8B5CF6', time: '10:00 ч. — ПЪРВИ' },
-              { name: 'ПРО', color: '#F97316', time: '10:10 ч. — известие' },
+              { name: 'ПРО', color: '#c9953a', time: '10:10 ч. — известие' },
               { name: 'БАЗОВ', color: '#4DA6FF', time: 'Ръчно търсене' },
             ].map(n => (
               <div key={n.name} className="rounded-lg p-2" style={{ background: `${n.color}20`, border: `1px solid ${n.color}30` }}>
@@ -936,7 +937,7 @@ const LandingPage = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
           {/* Logo */}
           <div className="mb-2 animate-slideUp">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-[28rem] md:h-[36rem] w-auto mx-auto animate-float" style={{ filter: 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' }} />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-[28rem] md:h-[36rem] w-auto mx-auto animate-float logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' : 'drop-shadow(0 4px 20px rgba(0,0,0,0.3)) brightness(0.8) contrast(1.2)' }} />
           </div>
 
           {/* Counter badge */}
@@ -1074,7 +1075,7 @@ const LandingPage = () => {
             ].map(r => (
               <button key={r.id} onClick={() => navigate(`/room-scan?room=${r.id}`)}
                 className="px-4 py-2.5 rounded-full text-sm font-bold border-2 transition-all hover:scale-105 active:scale-95"
-                style={{ borderColor: accent, color: accent, background: dark ? '#F9731610' : '#FFF7ED' }}
+                style={{ borderColor: accent, color: accent, background: dark ? '#c9953a10' : '#FFF7ED' }}
                 data-testid={`quick-btn-${r.id}`}>
                 {r.icon} {r.label}
               </button>
@@ -1106,7 +1107,7 @@ const LandingPage = () => {
               <div ref={showcaseRef} className="flex gap-4 md:gap-6 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {[
               {
-                room: 'БАНЯ', roomId: 'bathroom', dims: '3.5 x 3.0м', tierTotal: 2000, price: '69', tier: '1 помещение', color: '#F97316',
+                room: 'БАНЯ', roomId: 'bathroom', dims: '3.5 x 3.0м', tierTotal: 2000, price: '69', tier: '1 помещение', color: '#c9953a',
                 before: '/showcase/before_bathroom.jpg', after: '/showcase/after_bathroom.jpg',
                 products: [
                   { name: 'Керамогранит 30x60', price: '500', store: 'HomeMax', url: 'https://www.homemax.bg/catalogsearch/result/?q=%D0%BA%D0%B5%D1%80%D0%B0%D0%BC%D0%BE%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%82+30x60&ref=temadom' },
@@ -1234,7 +1235,7 @@ const LandingPage = () => {
           <p className="text-center mb-10 text-sm" style={{ color: muted }}>3 лесни стъпки до вашия нов интериор</p>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: '1', title: 'Снимайте помещението', desc: 'Качете 1-3 снимки на стаята, която искате да обновите. AI анализира точната архитектура — стени, прозорци, врати, размери.', icon: Camera, color: '#F97316' },
+              { step: '1', title: 'Снимайте помещението', desc: 'Качете 1-3 снимки на стаята, която искате да обновите. AI анализира точната архитектура — стени, прозорци, врати, размери.', icon: Camera, color: '#c9953a' },
               { step: '2', title: 'Изберете стил и материали', desc: 'Изберете от 10 стила (модерен, скандинавски, лофт...) и клас материали. Опишете какво точно искате да промените.', icon: Palette, color: '#3B82F6' },
               { step: '3', title: 'Получете 3D рендер + бюджет', desc: 'AI генерира реалистичен дизайн, който запазва ТОЧНАТА архитектура. Получавате бюджет с цени и директни линкове към 9 магазина.', icon: Check, color: '#10B981' },
             ].map((s, i) => (
@@ -1296,7 +1297,7 @@ const LandingPage = () => {
           <p className="text-center mb-8 text-sm" style={{ color: muted }}>Избери стил — AI генерира реалистичен рендер</p>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3" data-testid="style-tiles">
             {[
-              { name: 'Модерен', c: '#F97316' }, { name: 'Скандинавски', c: '#3B82F6' },
+              { name: 'Модерен', c: '#c9953a' }, { name: 'Скандинавски', c: '#3B82F6' },
               { name: 'Лофт', c: '#78716C' }, { name: 'Класически', c: '#D97706' },
               { name: 'Минималистичен', c: '#6B7280' }, { name: 'Бохо', c: '#EC4899' },
               { name: 'Индустриален', c: '#374151' }, { name: 'Арт Деко', c: '#A855F7' },
@@ -1354,7 +1355,7 @@ const LandingPage = () => {
                   const idx = (reviewIdx + offset) % reviews.reviews.length;
                   const r = reviews.reviews[idx];
                   if (!r) return null;
-                  const colors = ['#F97316', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'];
+                  const colors = ['#c9953a', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'];
                   const avatarColor = colors[idx % colors.length];
                   return (
                     <div key={`${idx}-${offset}`}
@@ -1389,7 +1390,7 @@ const LandingPage = () => {
                 {(() => {
                   const r = reviews.reviews[reviewIdx % reviews.reviews.length];
                   if (!r) return null;
-                  const colors = ['#F97316', '#10B981', '#3B82F6', '#8B5CF6'];
+                  const colors = ['#c9953a', '#10B981', '#3B82F6', '#8B5CF6'];
                   const avatarColor = colors[reviewIdx % colors.length];
                   return (
                     <div className="rounded-xl p-5" style={{ background: bgCard, border: `1px solid ${border}` }}>
@@ -1502,7 +1503,7 @@ const ProjectCard = ({ project }) => {
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start mb-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge className={isConstruction ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#FF8C42]/10 text-[#FF8C42]'}>{project.category_name}</Badge>
+            <Badge className={isConstruction ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#d4a43a]/10 text-[#d4a43a]'}>{project.category_name}</Badge>
             {isConstruction && project.property_type && (
               <Badge className="bg-[#3B82F6]/10 text-[#3B82F6] text-[10px]">
                 {PROPERTY_TYPE_LABELS[project.property_type] || project.property_type}
@@ -1518,7 +1519,7 @@ const ProjectCard = ({ project }) => {
             <Lock className="h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} />
           )}
         </div>
-        <CardTitle className="text-lg group-hover:text-[#FF8C42] transition-colors line-clamp-2">
+        <CardTitle className="text-lg group-hover:text-[#d4a43a] transition-colors line-clamp-2">
           {project.title}
         </CardTitle>
       </CardHeader>
@@ -1542,7 +1543,7 @@ const ProjectCard = ({ project }) => {
           
           {/* Show estimated budget if available */}
           {project.estimated_budget && (
-            <div className="flex items-center gap-2 text-[#FF8C42] font-medium">
+            <div className="flex items-center gap-2 text-[#d4a43a] font-medium">
               <Calculator className="h-4 w-4" />
               <span>~{project.estimated_budget} € {t('projects_estimate')}</span>
             </div>
@@ -1567,7 +1568,7 @@ const ProjectCard = ({ project }) => {
         
         <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: '1px solid var(--theme-border)' }}>
           <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{project.views} {t('projects_views')}</span>
-          <span className={`text-sm font-medium group-hover:underline ${isConstruction ? 'text-[#10B981]' : 'text-[#FF8C42]'}`}>
+          <span className={`text-sm font-medium group-hover:underline ${isConstruction ? 'text-[#10B981]' : 'text-[#d4a43a]'}`}>
             {t('projects_details')}
           </span>
         </div>
@@ -1667,7 +1668,7 @@ const ProjectsPage = () => {
             onClick={() => handleSectionChange('renovation')}
             className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${sectionType === 'renovation' ? 'shadow-md' : 'hover:opacity-80'}`}
             style={{
-              background: sectionType === 'renovation' ? '#F97316' : 'transparent',
+              background: sectionType === 'renovation' ? '#c9953a' : 'transparent',
               color: sectionType === 'renovation' ? 'white' : 'var(--theme-text-muted)'
             }}
             data-testid="section-renovation-tab">
@@ -1691,8 +1692,8 @@ const ProjectsPage = () => {
         <div className="mb-6 p-4 rounded-xl" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
           {sectionType === 'renovation' ? (
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#F97316]/15 flex items-center justify-center flex-shrink-0">
-                <Paintbrush className="h-5 w-5 text-[#F97316]" />
+              <div className="w-10 h-10 rounded-lg bg-[#c9953a]/15 flex items-center justify-center flex-shrink-0">
+                <Paintbrush className="h-5 w-5 text-[#c9953a]" />
               </div>
               <div>
                 <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--theme-text)' }}>Проекти за ремонт</h3>
@@ -1775,7 +1776,7 @@ const ProjectsPage = () => {
               data-testid="city-filter"
             />
             
-            <Button type="submit" className="bg-[#FF8C42] hover:bg-[#e67a30]" data-testid="search-btn">
+            <Button type="submit" className="bg-[#d4a43a] hover:bg-[#b8922e]" data-testid="search-btn">
               <Filter className="mr-2 h-4 w-4" /> {t('projects_filter')}
             </Button>
           </form>
@@ -2007,7 +2008,7 @@ const ProjectDetailPage = () => {
 
           <CardHeader>
             <div className="flex justify-between items-start mb-4">
-              <Badge className="bg-[#FF8C42]/10 text-[#FF8C42] text-sm">{project.category_name}</Badge>
+              <Badge className="bg-[#d4a43a]/10 text-[#d4a43a] text-sm">{project.category_name}</Badge>
               <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
                 {project.images?.length > 0 && (
                   <span className="flex items-center gap-1">
@@ -2053,15 +2054,15 @@ const ProjectDetailPage = () => {
 
             {/* Estimated Budget from Calculator */}
             {project.estimated_budget && (
-              <div className="bg-[#FF8C42]/5 border border-[#FF8C42]/20 rounded-lg p-4 mb-8">
+              <div className="bg-[#d4a43a]/5 border border-[#d4a43a]/20 rounded-lg p-4 mb-8">
                 <div className="flex items-center gap-3 mb-2">
-                  <Calculator className="h-5 w-5 text-[#FF8C42]" />
-                  <h4 className="font-semibold text-[#FF8C42]">{t('pd_calc_estimate')}</h4>
+                  <Calculator className="h-5 w-5 text-[#d4a43a]" />
+                  <h4 className="font-semibold text-[#d4a43a]">{t('pd_calc_estimate')}</h4>
                 </div>
-                <p className="text-3xl font-bold text-[#FF8C42]">
+                <p className="text-3xl font-bold text-[#d4a43a]">
                   ~{project.estimated_budget} €
                 </p>
-                <p className="text-sm text-[#FF8C42] mt-1">
+                <p className="text-sm text-[#d4a43a] mt-1">
                   ≈ {Math.round(project.estimated_budget * 1.95)} лв. ({t('pd_approx_bgn')})
                 </p>
               </div>
@@ -2097,7 +2098,7 @@ const ProjectDetailPage = () => {
                   {project.client_email && (
                     <div className="flex items-center gap-3">
                       <Mail className="h-5 w-5" style={{ color: 'var(--theme-text-muted)' }} />
-                      <a href={`mailto:${project.client_email}`} className="text-[#FF8C42] hover:underline">
+                      <a href={`mailto:${project.client_email}`} className="text-[#d4a43a] hover:underline">
                         {project.client_email}
                       </a>
                     </div>
@@ -2215,11 +2216,11 @@ const CompaniesPage = () => {
         {/* How it works info */}
         <div className="mb-6 p-4 rounded-xl border" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)' }} data-testid="companies-how-it-works">
           <h3 className="font-semibold text-sm mb-3 flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
-            <Info className="h-4 w-4 text-[#FF8C42]" /> Как работи?
+            <Info className="h-4 w-4 text-[#d4a43a]" /> Как работи?
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="flex items-start gap-2">
-              <span className="w-6 h-6 rounded-full bg-[#FF8C42]/15 text-[#FF8C42] text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <span className="w-6 h-6 rounded-full bg-[#d4a43a]/15 text-[#d4a43a] text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
               <p style={{ color: 'var(--theme-text-muted)' }}>Търсете фирми и майстори по категория, град или тип. Филтрите ви помагат да стесните избора.</p>
             </div>
             <div className="flex items-start gap-2">
@@ -2244,7 +2245,7 @@ const CompaniesPage = () => {
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all"
                 style={{
-                  background: activeTab === tab.id ? '#F97316' : 'transparent',
+                  background: activeTab === tab.id ? '#c9953a' : 'transparent',
                   color: activeTab === tab.id ? 'white' : (dark ? '#94A3B8' : '#64748B'),
                 }}
                 data-testid={`tab-${tab.id}`}>
@@ -2277,7 +2278,7 @@ const CompaniesPage = () => {
               data-testid="filter-city"
             />
             
-            <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" data-testid="filter-search-btn">
+            <Button className="bg-[#d4a43a] hover:bg-[#b8922e]" data-testid="filter-search-btn">
               <Search className="mr-2 h-4 w-4" /> Търсене
             </Button>
           </div>
@@ -2303,11 +2304,11 @@ const CompaniesPage = () => {
               {professionals.map(pro => (
                 <Link key={pro.id} to={`/companies/${pro.id}`}>
                   <Card className="p-6 hover:shadow-lg transition-all duration-300 h-full border-l-4" 
-                    style={{ borderLeftColor: pro.user_type === 'master' ? '#4DA6FF' : '#FF8C42' }}
+                    style={{ borderLeftColor: pro.user_type === 'master' ? '#4DA6FF' : '#d4a43a' }}
                     data-testid={`pro-card-${pro.id}`}>
                     <div className="flex items-center gap-4 mb-4">
                       <Avatar className="h-14 w-14">
-                        <AvatarFallback className={`text-lg ${pro.user_type === 'master' ? 'bg-[#4DA6FF]/10 text-[#4DA6FF]' : 'bg-[#FF8C42]/10 text-[#FF8C42]'}`}>
+                        <AvatarFallback className={`text-lg ${pro.user_type === 'master' ? 'bg-[#4DA6FF]/10 text-[#4DA6FF]' : 'bg-[#d4a43a]/10 text-[#d4a43a]'}`}>
                           {pro.company_name?.charAt(0) || 'P'}
                         </AvatarFallback>
                       </Avatar>
@@ -2319,7 +2320,7 @@ const CompaniesPage = () => {
                               <MapPin className="h-3 w-3" /> {pro.city}
                             </span>
                           )}
-                          <Badge variant="outline" className={`text-[10px] ${pro.user_type === 'master' ? 'border-[#4DA6FF]/30 text-[#4DA6FF]' : 'border-[#FF8C42]/30 text-[#FF8C42]'}`}>
+                          <Badge variant="outline" className={`text-[10px] ${pro.user_type === 'master' ? 'border-[#4DA6FF]/30 text-[#4DA6FF]' : 'border-[#d4a43a]/30 text-[#d4a43a]'}`}>
                             {pro.user_type === 'master' ? 'Майстор' : 'Фирма'}
                           </Badge>
                         </div>
@@ -2437,7 +2438,7 @@ const CompanyDetailPage = () => {
           <CardHeader>
             <div className="flex items-center gap-6">
               <Avatar className="h-20 w-20">
-                <AvatarFallback className="bg-[#FF8C42]/10 text-[#FF8C42] text-2xl">
+                <AvatarFallback className="bg-[#d4a43a]/10 text-[#d4a43a] text-2xl">
                   {company.company_name?.charAt(0) || 'F'}
                 </AvatarFallback>
               </Avatar>
@@ -2507,7 +2508,7 @@ const CompanyDetailPage = () => {
             </div>
             {user?.user_type === 'client' && (
               <Button 
-                className="bg-[#FF8C42] hover:bg-[#e67a30]"
+                className="bg-[#d4a43a] hover:bg-[#b8922e]"
                 onClick={() => setReviewDialogOpen(true)}
                 data-testid="add-review-btn"
               >
@@ -2563,7 +2564,7 @@ const CompanyDetailPage = () => {
                       className="focus:outline-none"
                     >
                       <Star 
-                        className={`h-8 w-8 ${i <= reviewData.rating ? 'fill-[#FF8C42] text-[#FF8C42]' : ''}`}
+                        className={`h-8 w-8 ${i <= reviewData.rating ? 'fill-[#d4a43a] text-[#d4a43a]' : ''}`}
                         style={i > reviewData.rating ? { color: 'var(--theme-border)' } : {}}
                       />
                     </button>
@@ -2586,7 +2587,7 @@ const CompanyDetailPage = () => {
             <DialogFooter>
               <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>{t('cd_cancel')}</Button>
               <Button 
-                className="bg-[#FF8C42] hover:bg-[#e67a30]"
+                className="bg-[#d4a43a] hover:bg-[#b8922e]"
                 onClick={handleSubmitReview}
                 disabled={!reviewData.comment || submitting}
               >
@@ -2608,6 +2609,7 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { dark } = useTheme();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
@@ -2629,7 +2631,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-md" data-testid="login-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-14 w-auto" style={{ filter: 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' }} />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-16 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) brightness(0.85)' }} />
           </div>
           <CardTitle className="text-2xl">{t('login_title')}</CardTitle>
           <CardDescription>{t('login_subtitle')}</CardDescription>
@@ -2660,7 +2662,7 @@ const LoginPage = () => {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-[#FF8C42] hover:bg-[#e67a30]"
+              className="w-full bg-[#d4a43a] hover:bg-[#b8922e]"
               disabled={loading}
               data-testid="login-submit"
             >
@@ -2693,7 +2695,7 @@ const LoginPage = () => {
         <CardFooter className="justify-center">
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             {t('login_no_account')}{' '}
-            <Link to="/register" className="text-[#FF8C42] hover:underline">
+            <Link to="/register" className="text-[#d4a43a] hover:underline">
               {t('login_register')}
             </Link>
           </p>
@@ -2736,7 +2738,7 @@ const GoogleAuthCallback = () => {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--theme-bg)' }}>
       <div className="text-center">
-        <div className="animate-spin h-8 w-8 border-2 border-[#FF8C42] border-t-transparent rounded-full mx-auto mb-4" />
+        <div className="animate-spin h-8 w-8 border-2 border-[#d4a43a] border-t-transparent rounded-full mx-auto mb-4" />
         <p style={{ color: 'var(--theme-text-muted)' }}>Влизане с Google...</p>
       </div>
     </div>
@@ -2756,6 +2758,7 @@ const RegisterPage = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { dark } = useTheme();
   const [userType, setUserType] = useState('client');
   const [formData, setFormData] = useState({
     name: '',
@@ -2819,7 +2822,7 @@ const RegisterPage = () => {
       <Card className="w-full max-w-md" data-testid="register-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-14 w-auto" style={{ filter: 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' }} />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-16 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) brightness(0.85)' }} />
           </div>
           <CardTitle className="text-2xl">{t('reg_title')}</CardTitle>
           <CardDescription>{t('reg_subtitle')}</CardDescription>
@@ -2844,18 +2847,18 @@ const RegisterPage = () => {
                 <p className="text-sm font-bold text-[#4DA6FF] mb-1">Платформата е нова!</p>
                 <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
                   Платформата стартира и непрекъснато се подобрява. Ако забележите грешки или имате предложения, 
-                  моля <a href="/feedback" className="text-[#FF8C42] underline">информирайте ни</a> — заедно правим платформата по-добра!
+                  моля <a href="/feedback" className="text-[#d4a43a] underline">информирайте ни</a> — заедно правим платформата по-добра!
                 </p>
               </div>
             </div>
           </div>
 
           {(userType === 'company' || userType === 'master') && (
-            <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-lg p-4 mb-4" data-testid="register-promo-banner">
+            <div className="bg-[#d4a43a]/10 border border-[#d4a43a]/20 rounded-lg p-4 mb-4" data-testid="register-promo-banner">
               <div className="flex items-start gap-3">
                 <span className="text-2xl flex-shrink-0">&#9889;</span>
                 <div>
-                  <p className="text-sm font-bold text-[#FF8C42] mb-1">
+                  <p className="text-sm font-bold text-[#d4a43a] mb-1">
                     {t('reg_promo_title')}
                   </p>
                   <p className="text-xs leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>
@@ -3016,7 +3019,7 @@ const RegisterPage = () => {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-[#FF8C42] hover:bg-[#e67a30]"
+              className="w-full bg-[#d4a43a] hover:bg-[#b8922e]"
               disabled={loading}
               data-testid="register-submit"
             >
@@ -3047,7 +3050,7 @@ const RegisterPage = () => {
         <CardFooter className="justify-center">
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             Имате профил?{' '}
-            <Link to="/login" className="text-[#FF8C42] hover:underline">
+            <Link to="/login" className="text-[#d4a43a] hover:underline">
               {t('reg_login')}
             </Link>
           </p>
@@ -3074,7 +3077,7 @@ const TelegramConnectCard = ({ user, token }) => {
   const plan = user?.subscription_plan || 'basic';
   const tierInfo = {
     premium: { label: 'PREMIUM', color: '#8C56FF', desc: 'Получавате известия ПЪРВИ — 10 мин. преди ПРО!', stars: 3 },
-    pro: { label: 'ПРО', color: '#FF8C42', desc: 'Известия за нови проекти (10 мин. след PREMIUM)', stars: 2 },
+    pro: { label: 'ПРО', color: '#d4a43a', desc: 'Известия за нови проекти (10 мин. след PREMIUM)', stars: 2 },
     basic: { label: 'БАЗОВ', color: '#4DA6FF', desc: 'Надградете до ПРО или PREMIUM за Telegram известия', stars: 1 },
   };
   const tier = tierInfo[plan] || tierInfo.basic;
@@ -3101,7 +3104,7 @@ const TelegramConnectCard = ({ user, token }) => {
                 <span className="text-slate-400">PREMIUM: 0 мин.</span>
               </div>
               <div className="flex items-center gap-1 text-xs">
-                <span className="inline-block w-2 h-2 rounded-full bg-[#FF8C42]" />
+                <span className="inline-block w-2 h-2 rounded-full bg-[#d4a43a]" />
                 <span className="text-slate-400">ПРО: +10 мин.</span>
               </div>
               <div className="flex items-center gap-1 text-xs">
@@ -3280,7 +3283,7 @@ const CompanyDashboard = () => {
                     <Boxes className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--theme-text-muted)' }} />
                     <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--theme-text)' }}>{t('dash_no_contacts')}</h3>
                     <p className="mb-4" style={{ color: 'var(--theme-text-muted)' }}>{t('dash_no_contacts_sub')}</p>
-                    <Button onClick={() => navigate('/projects')} className="bg-[#FF8C42] hover:bg-[#e67a30]">
+                    <Button onClick={() => navigate('/projects')} className="bg-[#d4a43a] hover:bg-[#b8922e]">
                       {t('dash_view_projects')}
                     </Button>
                   </div>
@@ -3304,7 +3307,7 @@ const CompanyDashboard = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <Mail className="h-4 w-4" style={{ color: 'var(--theme-text-subtle)' }} />
-                            <a href={`mailto:${lead.client_email}`} className="text-[#FF8C42] hover:underline">
+                            <a href={`mailto:${lead.client_email}`} className="text-[#d4a43a] hover:underline">
                               {lead.client_email}
                             </a>
                           </div>
@@ -3459,7 +3462,7 @@ const ClientDashboard = () => {
             <p style={{ color: 'var(--theme-text-muted)' }}>{t('cl_manage')}</p>
           </div>
           <Button 
-            className="bg-[#FF8C42] hover:bg-[#e67a30]"
+            className="bg-[#d4a43a] hover:bg-[#b8922e]"
             onClick={() => setCreateDialogOpen(true)}
             data-testid="create-project-btn"
           >
@@ -3475,7 +3478,7 @@ const ClientDashboard = () => {
                 <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--theme-text-muted)' }}>{t('cl_no_projects')}</h3>
                 <p className="mb-4" style={{ color: 'var(--theme-text-subtle)' }}>{t('cl_no_projects_sub')}</p>
                 <Button 
-                  className="bg-[#FF8C42] hover:bg-[#e67a30]"
+                  className="bg-[#d4a43a] hover:bg-[#b8922e]"
                   onClick={() => setCreateDialogOpen(true)}
                 >
                   Създай проект
@@ -3531,7 +3534,7 @@ const ClientDashboard = () => {
                   }}
                   className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${newProject.section_type === 'renovation' ? 'shadow-md' : ''}`}
                   style={{
-                    background: newProject.section_type === 'renovation' ? '#F97316' : 'transparent',
+                    background: newProject.section_type === 'renovation' ? '#c9953a' : 'transparent',
                     color: newProject.section_type === 'renovation' ? 'white' : 'var(--theme-text-muted)'
                   }}
                   data-testid="create-section-renovation">
@@ -3735,7 +3738,7 @@ const ClientDashboard = () => {
             <DialogFooter>
               <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>{t('cd_cancel')}</Button>
               <Button 
-                className="bg-[#FF8C42] hover:bg-[#e67a30]"
+                className="bg-[#d4a43a] hover:bg-[#b8922e]"
                 onClick={handleCreateProject}
                 disabled={submitting}
                 data-testid="submit-project-btn"
@@ -3805,7 +3808,7 @@ const PaymentSuccessPage = () => {
             <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
             <h2 className="text-2xl font-bold mb-2">{t('pay_success')}</h2>
             <p className="text-slate-400 mb-6">{t('pay_thanks')}</p>
-            <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" onClick={() => navigate('/dashboard')}>
+            <Button className="bg-[#d4a43a] hover:bg-[#b8922e]" onClick={() => navigate('/dashboard')}>
               {t('pay_to_dash')}
             </Button>
           </>
@@ -3816,7 +3819,7 @@ const PaymentSuccessPage = () => {
             <AlertCircle className="h-16 w-16 mx-auto mb-4 text-red-500" />
             <h2 className="text-2xl font-bold mb-2">{t('pay_failed')}</h2>
             <p className="text-slate-400 mb-6">{t('pay_retry')}</p>
-            <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" onClick={() => navigate('/projects')}>
+            <Button className="bg-[#d4a43a] hover:bg-[#b8922e]" onClick={() => navigate('/projects')}>
               {t('pay_back')}
             </Button>
           </>
@@ -3824,10 +3827,10 @@ const PaymentSuccessPage = () => {
         
         {status === 'timeout' && (
           <>
-            <AlertCircle className="h-16 w-16 mx-auto mb-4 text-[#FF8C42]" />
+            <AlertCircle className="h-16 w-16 mx-auto mb-4 text-[#d4a43a]" />
             <h2 className="text-2xl font-bold mb-2">{t('pay_timeout')}</h2>
             <p className="text-slate-400 mb-6">{t('pay_check_email')}</p>
-            <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" onClick={() => navigate('/dashboard')}>
+            <Button className="bg-[#d4a43a] hover:bg-[#b8922e]" onClick={() => navigate('/dashboard')}>
               {t('pay_to_dash')}
             </Button>
           </>
@@ -3847,7 +3850,7 @@ const PaymentCancelPage = () => {
         <AlertCircle className="h-16 w-16 mx-auto mb-4 text-slate-400" />
         <h2 className="text-2xl font-bold mb-2">{t('pay_cancelled')}</h2>
         <p className="text-slate-400 mb-6">{t('pay_can_retry')}</p>
-        <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" onClick={() => navigate('/projects')}>
+        <Button className="bg-[#d4a43a] hover:bg-[#b8922e]" onClick={() => navigate('/projects')}>
           {t('pay_back')}
         </Button>
       </Card>
@@ -3890,7 +3893,7 @@ const AdsPage = () => {
             <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>Обяви</h1>
             <p style={{ color: 'var(--theme-text-muted)' }}>Безплатни обяви за строителство и ремонти</p>
           </div>
-          <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" onClick={() => user ? setShowCreate(true) : navigate('/login')} data-testid="create-ad-btn">
+          <Button className="bg-[#d4a43a] hover:bg-[#b8922e]" onClick={() => user ? setShowCreate(true) : navigate('/login')} data-testid="create-ad-btn">
             + Нова обява
           </Button>
         </div>
@@ -3904,10 +3907,10 @@ const AdsPage = () => {
           videoUrl="https://temadom.com/videos/ads"
         />
 
-        <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-lg p-4 mb-6" data-testid="test-mode-banner">
+        <div className="bg-[#d4a43a]/10 border border-[#d4a43a]/20 rounded-lg p-4 mb-6" data-testid="test-mode-banner">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-[#FF8C42]" />
-            <span className="text-sm font-medium text-[#FF8C42]">Тестов режим — всички обяви са безплатни</span>
+            <AlertCircle className="h-5 w-5 text-[#d4a43a]" />
+            <span className="text-sm font-medium text-[#d4a43a]">Тестов режим — всички обяви са безплатни</span>
           </div>
         </div>
 
@@ -3934,7 +3937,7 @@ const AdsPage = () => {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowCreate(false)}>Отказ</Button>
-              <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" onClick={handleCreate} data-testid="submit-ad-btn">Публикувай</Button>
+              <Button className="bg-[#d4a43a] hover:bg-[#b8922e]" onClick={handleCreate} data-testid="submit-ad-btn">Публикувай</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -4004,7 +4007,7 @@ const SubscriptionsPage = () => {
 
   const planConfig = {
     basic: { color: '#4DA6FF', stars: 1, badge: null, ring: '' },
-    pro: { color: '#FF8C42', stars: 2, badge: '90% ИЗБИРАТ ТОЗИ!', ring: 'border-[#FF8C42] ring-2 ring-[#FF8C42]/20 scale-[1.03]' },
+    pro: { color: '#d4a43a', stars: 2, badge: '90% ИЗБИРАТ ТОЗИ!', ring: 'border-[#d4a43a] ring-2 ring-[#d4a43a]/20 scale-[1.03]' },
     premium: { color: '#8C56FF', stars: 3, badge: 'КРАЛСКИ!', ring: 'border-[#8C56FF] ring-1 ring-[#8C56FF]/20' },
   };
 
@@ -4027,7 +4030,7 @@ const SubscriptionsPage = () => {
         {/* How notification timing works */}
         <div className="rounded-xl p-5 mb-8 max-w-3xl mx-auto" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="notification-explainer">
           <h3 className="font-bold text-sm mb-3 flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
-            <Clock className="h-4 w-4 text-[#FF8C42]" /> Как работят известията за нови обяви?
+            <Clock className="h-4 w-4 text-[#d4a43a]" /> Как работят известията за нови обяви?
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <div className="bg-[#8C56FF]/10 border border-[#8C56FF]/20 rounded-lg p-3 text-center">
@@ -4035,8 +4038,8 @@ const SubscriptionsPage = () => {
               <p className="mt-1" style={{ color: 'var(--theme-text)' }}>10:00 ч. — вижда обявата ПЪРВИ</p>
               <p className="mt-0.5" style={{ color: 'var(--theme-text-subtle)' }}>10 мин. преди ПРО!</p>
             </div>
-            <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-lg p-3 text-center">
-              <p className="text-[#FF8C42] font-bold">ПРО</p>
+            <div className="bg-[#d4a43a]/10 border border-[#d4a43a]/20 rounded-lg p-3 text-center">
+              <p className="text-[#d4a43a] font-bold">ПРО</p>
               <p className="mt-1" style={{ color: 'var(--theme-text)' }}>10:10 ч. — получава известие</p>
               <p className="mt-0.5" style={{ color: 'var(--theme-text-subtle)' }}>Едновременно с всички ПРО</p>
             </div>
@@ -4046,7 +4049,7 @@ const SubscriptionsPage = () => {
               <p className="mt-0.5" style={{ color: 'var(--theme-text-subtle)' }}>Без автоматични известия</p>
             </div>
           </div>
-          <p className="text-center text-[#FF8C42] font-bold text-xs mt-3">PREMIUM взима 80% от договорите!</p>
+          <p className="text-center text-[#d4a43a] font-bold text-xs mt-3">PREMIUM взима 80% от договорите!</p>
         </div>
 
         {/* Subscription plans */}
@@ -4150,11 +4153,11 @@ const SubscriptionsPage = () => {
             { name: '2 помещения', price: '119 EUR', features: ['2 видеа → 8 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
             { name: 'Апартамент', price: '199 EUR', features: ['До 5 видеа → 20 ъгъла', 'PDF за всяко помещение', 'Пълна сметка + 3D', 'Приоритетна обработка'] },
           ].map((plan, i) => (
-            <Card key={i} className={`relative ${plan.popular ? 'border-[#F97316] bg-[#F97316]/5' : ''}`} style={!plan.popular ? { background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' } : {}}>
-              {plan.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F97316] text-white text-[10px] font-bold px-3 py-0.5 rounded-full">ПОПУЛЯРЕН</div>}
+            <Card key={i} className={`relative ${plan.popular ? 'border-[#c9953a] bg-[#c9953a]/5' : ''}`} style={!plan.popular ? { background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' } : {}}>
+              {plan.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c9953a] text-white text-[10px] font-bold px-3 py-0.5 rounded-full">ПОПУЛЯРЕН</div>}
               <CardContent className="p-5">
                 <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--theme-text)' }}>{plan.name}</h3>
-                <p className="text-2xl font-black text-[#F97316] mb-4">{plan.price}</p>
+                <p className="text-2xl font-black text-[#c9953a] mb-4">{plan.price}</p>
                 <div className="space-y-2 mb-5">
                   {plan.features.map((f, fi) => (
                     <div key={fi} className="flex items-center gap-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
@@ -4162,7 +4165,7 @@ const SubscriptionsPage = () => {
                     </div>
                   ))}
                 </div>
-                <Button className={`w-full ${plan.popular ? 'bg-[#F97316] hover:bg-[#EA580C]' : ''} text-white`}
+                <Button className={`w-full ${plan.popular ? 'bg-[#c9953a] hover:bg-[#b8922e]' : ''} text-white`}
                   style={!plan.popular ? { background: 'var(--theme-bg-surface)', color: 'var(--theme-text)' } : {}}
                   onClick={() => navigate('/room-scan')}>
                   Започни

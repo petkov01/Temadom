@@ -372,7 +372,7 @@ const AddPortfolioForm = ({ onSubmit, onCancel, loading }) => {
       <div className="flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={onCancel}>Отказ</Button>
         <Button 
-          className="bg-[#FF8C42] hover:bg-[#e67a30]"
+          className="bg-[#d4a43a] hover:bg-[#b8922e]"
           onClick={handleSubmit}
           disabled={loading}
           data-testid="submit-portfolio"
@@ -410,7 +410,7 @@ const PortfolioGallery = ({ projects, isOwner, onAddProject, onDeleteProject }) 
         </div>
         {isOwner && (
           <Button 
-            className="bg-[#FF8C42] hover:bg-[#e67a30]"
+            className="bg-[#d4a43a] hover:bg-[#b8922e]"
             onClick={() => setAddDialogOpen(true)}
             data-testid="add-portfolio-btn"
           >

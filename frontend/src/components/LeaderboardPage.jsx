@@ -23,7 +23,7 @@ const Avatar = ({ src, name, size = 'md' }) => {
   const sz = size === 'lg' ? 'h-12 w-12' : 'h-9 w-9';
   if (src) return <img src={src.startsWith('data:') ? src : `data:image/jpeg;base64,${src}`} alt={name} className={`${sz} rounded-full object-cover`} />;
   return (
-    <div className={`${sz} rounded-full flex items-center justify-center bg-[#F97316]/10 text-[#F97316] font-bold text-sm`}>
+    <div className={`${sz} rounded-full flex items-center justify-center bg-[#c9953a]/10 text-[#c9953a] font-bold text-sm`}>
       {(name || '?')[0]}
     </div>
   );
@@ -47,7 +47,7 @@ const ClientRow = ({ entry, isTop3 }) => (
       </div>
     </div>
     <div className="text-right">
-      <p className="text-sm font-black text-[#F97316]">{entry.score}</p>
+      <p className="text-sm font-black text-[#c9953a]">{entry.score}</p>
       <p className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>точки</p>
     </div>
   </div>
@@ -76,7 +76,7 @@ const CompanyRow = ({ entry, isTop3 }) => (
       </div>
     </div>
     <div className="text-right">
-      <p className="text-sm font-black text-[#F97316]">{entry.score}</p>
+      <p className="text-sm font-black text-[#c9953a]">{entry.score}</p>
       <p className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>точки</p>
     </div>
   </div>
@@ -113,8 +113,8 @@ const LeaderboardPage = () => {
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-3"
             style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)' }}>
-            <Trophy className="h-4 w-4 text-[#F97316]" />
-            <span className="text-xs font-bold text-[#F97316]">Класация</span>
+            <Trophy className="h-4 w-4 text-[#c9953a]" />
+            <span className="text-xs font-bold text-[#c9953a]">Класация</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-black" style={{ color: 'var(--theme-text)' }}>Leaderboard</h1>
           <p className="text-sm mt-1" style={{ color: 'var(--theme-text-muted)' }}>Топ дизайнери и фирми</p>
@@ -124,13 +124,13 @@ const LeaderboardPage = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid var(--theme-border)' }}>
             <button onClick={() => setTab('clients')}
-              className={`px-4 py-2 text-xs font-bold flex items-center gap-1.5 transition-colors ${tab === 'clients' ? 'bg-[#F97316] text-white' : ''}`}
+              className={`px-4 py-2 text-xs font-bold flex items-center gap-1.5 transition-colors ${tab === 'clients' ? 'bg-[#c9953a] text-white' : ''}`}
               style={tab !== 'clients' ? { background: 'var(--theme-card-bg)', color: 'var(--theme-text-muted)' } : {}}
               data-testid="tab-clients">
               <User className="h-3.5 w-3.5" /> Клиенти
             </button>
             <button onClick={() => setTab('companies')}
-              className={`px-4 py-2 text-xs font-bold flex items-center gap-1.5 transition-colors ${tab === 'companies' ? 'bg-[#F97316] text-white' : ''}`}
+              className={`px-4 py-2 text-xs font-bold flex items-center gap-1.5 transition-colors ${tab === 'companies' ? 'bg-[#c9953a] text-white' : ''}`}
               style={tab !== 'companies' ? { background: 'var(--theme-card-bg)', color: 'var(--theme-text-muted)' } : {}}
               data-testid="tab-companies">
               <Building2 className="h-3.5 w-3.5" /> Фирми
@@ -139,7 +139,7 @@ const LeaderboardPage = () => {
           <div className="flex gap-1">
             {PERIODS.map(p => (
               <button key={p.id} onClick={() => setPeriod(p.id)}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-colors ${period === p.id ? 'bg-[#F97316]/10 text-[#F97316]' : ''}`}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-colors ${period === p.id ? 'bg-[#c9953a]/10 text-[#c9953a]' : ''}`}
                 style={period !== p.id ? { color: 'var(--theme-text-muted)' } : {}}
                 data-testid={`period-${p.id}`}>
                 {p.label}
@@ -153,7 +153,7 @@ const LeaderboardPage = () => {
           {loading ? (
             <Card style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
               <CardContent className="py-12 text-center">
-                <Trophy className="h-8 w-8 mx-auto mb-2 animate-pulse text-[#F97316]" />
+                <Trophy className="h-8 w-8 mx-auto mb-2 animate-pulse text-[#c9953a]" />
                 <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>Зареждане...</p>
               </CardContent>
             </Card>

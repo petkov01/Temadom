@@ -79,7 +79,7 @@ const BeforeAfterSlider = ({ before, after, label }) => {
         </div>
       </div>
       <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded">ПРЕДИ</div>
-      <div className="absolute top-2 right-2 px-2 py-0.5 bg-[#F97316]/90 text-white text-[10px] font-bold rounded">СЛЕД</div>
+      <div className="absolute top-2 right-2 px-2 py-0.5 bg-[#c9953a]/90 text-white text-[10px] font-bold rounded">СЛЕД</div>
     </div>
   );
 };
@@ -102,13 +102,13 @@ const ShareMenu = ({ projectId, onClose }) => {
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <h4 className="font-bold text-sm flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
-            <Share2 className="h-4 w-4 text-[#F97316]" /> Сподели проект
+            <Share2 className="h-4 w-4 text-[#c9953a]" /> Сподели проект
           </h4>
           <button onClick={onClose} style={{ color: 'var(--theme-text-muted)' }}><X className="h-4 w-4" /></button>
         </div>
         <div className="flex gap-2 mb-3">
           <Input value={shareUrl} readOnly className="text-xs flex-1" data-testid="share-url-input" />
-          <Button size="sm" className="bg-[#F97316] hover:bg-[#EA580C] text-white px-3" onClick={copyLink} data-testid="copy-link-btn">
+          <Button size="sm" className="bg-[#c9953a] hover:bg-[#b8922e] text-white px-3" onClick={copyLink} data-testid="copy-link-btn">
             {copied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </Button>
         </div>
@@ -160,7 +160,7 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
         {/* Room header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#F97316]/15 flex items-center justify-center text-[#F97316] text-sm font-black">{index + 1}</div>
+            <div className="w-8 h-8 rounded-lg bg-[#c9953a]/15 flex items-center justify-center text-[#c9953a] text-sm font-black">{index + 1}</div>
             <span className="font-bold text-sm" style={{ color: 'var(--theme-text)' }}>
               {total > 1 ? `Стая ${index + 1}: ${roomTypeName}` : roomTypeName}
             </span>
@@ -194,7 +194,7 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
         {/* DIMENSIONS */}
         <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
           <div className="flex items-center gap-1.5 mb-2">
-            <Ruler className="h-3.5 w-3.5 text-[#F97316]" />
+            <Ruler className="h-3.5 w-3.5 text-[#c9953a]" />
             <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Размери на помещението</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -222,7 +222,7 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
         {/* BUDGET INPUT */}
         <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
           <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-[#F97316] font-black text-sm">EUR</span>
+            <span className="text-[#c9953a] font-black text-sm">EUR</span>
             <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Бюджет за материали и обзавеждане</span>
           </div>
           <p className="text-[10px] mb-2" style={{ color: 'var(--theme-text-subtle)' }}>
@@ -239,7 +239,7 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
               className="h-11 text-sm font-bold pr-14"
               data-testid={`budget-input-${index}`}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#F97316]">EUR</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#c9953a]">EUR</span>
           </div>
         </div>
 
@@ -248,35 +248,35 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
           <div className="flex items-center justify-between mb-2">
             <Label className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Снимки на помещението</Label>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {PHOTO_LABELS.map((label, pIdx) => (
             <div key={pIdx}>
               <Label className="text-[10px] mb-1 block text-center" style={{ color: 'var(--theme-text-subtle)' }}>{label}</Label>
               {room.photoUrls[pIdx] ? (
                 <div className="relative aspect-[4/3] rounded-lg overflow-hidden group border-2 border-[#10B981]/40">
-                  <img src={room.photoUrls[pIdx]} alt={label} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <img src={room.photoUrls[pIdx]} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <button onClick={() => removePhoto(pIdx)}
-                    className="absolute top-1 right-1 bg-red-500/90 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-2 right-2 bg-red-500/90 text-white rounded-full p-1.5"
                     data-testid={`remove-photo-${index}-${pIdx}`}>
-                    <X className="h-3.5 w-3.5" />
+                    <X className="h-4 w-4" />
                   </button>
-                  <div className="absolute bottom-0 left-0 right-0 bg-[#10B981]/80 text-white text-center text-[9px] py-0.5 font-bold">
-                    Качено
+                  <div className="absolute bottom-0 left-0 right-0 bg-[#10B981]/80 text-white text-center text-xs py-1 font-bold">
+                    {label} — Качено
                   </div>
                 </div>
               ) : (
                 <div className="space-y-1">
                   <button onClick={() => refs.current[pIdx]?.click()}
-                    className="w-full aspect-video rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 hover:border-[#F97316]/40 transition-colors"
+                    className="w-full aspect-video rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 hover:border-[#c9953a]/40 transition-colors"
                     style={{ borderColor: 'var(--theme-border)' }}
                     data-testid={`upload-photo-${index}-${pIdx}`}>
                     <Upload className="h-4 w-4" style={{ color: 'var(--theme-text-subtle)' }} />
                     <span className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>Галерия</span>
                   </button>
                   <button onClick={() => refs.current[pIdx + 10]?.click()}
-                    className="w-full py-1.5 rounded-lg text-[9px] font-bold flex items-center justify-center gap-1 transition-colors hover:bg-[#F97316]/10"
-                    style={{ background: 'var(--theme-bg-surface)', color: '#F97316', border: '1px solid var(--theme-border)' }}
+                    className="w-full py-1.5 rounded-lg text-[9px] font-bold flex items-center justify-center gap-1 transition-colors hover:bg-[#c9953a]/10"
+                    style={{ background: 'var(--theme-bg-surface)', color: '#c9953a', border: '1px solid var(--theme-border)' }}
                     data-testid={`capture-photo-${index}-${pIdx}`}>
                     <Camera className="h-3 w-3" />
                     Снимай
@@ -469,9 +469,9 @@ export const AIDesignerPage = () => {
         {/* Header */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-2 mb-2">
-            <Camera className="h-7 w-7 text-[#F97316]" />
+            <Camera className="h-7 w-7 text-[#c9953a]" />
             <h1 className="text-2xl md:text-3xl font-black tracking-tight" style={{ color: 'var(--theme-text)' }}>
-              TEMADOM <span className="text-[#F97316]">3D DESIGNER</span>
+              <span className="text-[#c9953a]">3D DESIGNER</span>
             </h1>
           </div>
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
@@ -483,7 +483,7 @@ export const AIDesignerPage = () => {
         <div className="mb-6 p-4 rounded-xl border" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)' }} data-testid="designer-how-it-works">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs" style={{ color: 'var(--theme-text-muted)' }}>
             <div className="flex items-start gap-2">
-              <span className="w-5 h-5 rounded-full bg-[#F97316]/15 text-[#F97316] text-[10px] font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <span className="w-5 h-5 rounded-full bg-[#c9953a]/15 text-[#c9953a] text-[10px] font-bold flex items-center justify-center flex-shrink-0">1</span>
               <p><strong style={{ color: 'var(--theme-text)' }}>Качете снимки</strong> — 1-3 снимки от различни ъгли на помещението</p>
             </div>
             <div className="flex items-start gap-2">
@@ -511,17 +511,17 @@ export const AIDesignerPage = () => {
                   className={`p-4 rounded-xl text-center transition-all ${pkg.id === p.id ? 'scale-[1.03] shadow-lg' : 'hover:shadow-md'}`}
                   style={{
                     background: 'var(--theme-card-bg)',
-                    border: `2px solid ${pkg.id === p.id ? '#F97316' : 'var(--theme-border)'}`,
+                    border: `2px solid ${pkg.id === p.id ? '#c9953a' : 'var(--theme-border)'}`,
                     boxShadow: pkg.id === p.id ? '0 0 20px rgba(249,115,22,0.2)' : 'none'
                   }}
                   data-testid={`pkg-${p.id}`}>
-                  <p className={`text-2xl font-black ${pkg.id === p.id ? 'text-[#F97316]' : ''}`}
+                  <p className={`text-2xl font-black ${pkg.id === p.id ? 'text-[#c9953a]' : ''}`}
                     style={pkg.id !== p.id ? { color: 'var(--theme-text)' } : {}}>
                     {p.price}<span className="text-xs">EUR</span>
                   </p>
                   <p className="text-xs mt-1" style={{ color: 'var(--theme-text-muted)' }}>{p.label}</p>
                   <p className="text-[9px] mt-0.5" style={{ color: 'var(--theme-text-subtle)' }}>до {p.maxRooms} стаи</p>
-                  {pkg.id === p.id && <div className="w-8 h-0.5 bg-[#F97316] mx-auto mt-2 rounded-full" />}
+                  {pkg.id === p.id && <div className="w-8 h-0.5 bg-[#c9953a] mx-auto mt-2 rounded-full" />}
                 </button>
               ))}
             </div>
@@ -537,10 +537,10 @@ export const AIDesignerPage = () => {
             {/* Add Room button */}
             {rooms.length < pkg.maxRooms && (
               <button onClick={addRoom}
-                className="w-full py-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 hover:border-[#F97316]/40"
+                className="w-full py-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 hover:border-[#c9953a]/40"
                 style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }}
                 data-testid="add-room-btn">
-                <Plus className="h-5 w-5 text-[#F97316]" />
+                <Plus className="h-5 w-5 text-[#c9953a]" />
                 <span className="text-sm font-bold">Добави стая ({rooms.length}/{pkg.maxRooms})</span>
               </button>
             )}
@@ -554,27 +554,27 @@ export const AIDesignerPage = () => {
                       <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
                       {pct < 20 ? 'Качване и анализ на снимките...' : pct < 45 ? 'AI обработва архитектурата на стаята...' : pct < 70 ? 'Генериране на 3D рендер (запазване на архитектурата 1:1)...' : pct < 90 ? 'Търсене на реални продукти от магазини...' : 'Финализиране на бюджета...'}
                     </span>
-                      <span className="text-[#F97316] font-black text-2xl">{Math.round(pct)}%</span>
+                      <span className="text-[#c9953a] font-black text-2xl">{Math.round(pct)}%</span>
                     </div>
                     <div className="h-4 rounded-full overflow-hidden" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-border)' }}>
                       <div className="h-full rounded-full transition-all duration-700 ease-out"
-                        style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #F97316, #10B981)' }} />
+                        style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #c9953a, #10B981)' }} />
                     </div>
                   </div>
                   {uploadPct > 0 && uploadPct < 100 && (
                     <div className="mt-3">
                       <div className="flex justify-between text-[10px] mb-1">
                         <span style={{ color: 'var(--theme-text-muted)' }}>Качване...</span>
-                        <span className="text-[#F97316] font-bold">{uploadPct}%</span>
+                        <span className="text-[#c9953a] font-bold">{uploadPct}%</span>
                       </div>
                       <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--theme-bg-secondary)' }}>
-                        <div className="h-full bg-[#F97316] rounded-full transition-all" style={{ width: `${uploadPct}%` }} />
+                        <div className="h-full bg-[#c9953a] rounded-full transition-all" style={{ width: `${uploadPct}%` }} />
                       </div>
                     </div>
                   )}
                   <div className="flex flex-col items-center gap-2 mt-6">
                     <div className="flex items-center gap-3">
-                      <Loader2 className="h-6 w-6 animate-spin text-[#F97316]" />
+                      <Loader2 className="h-6 w-6 animate-spin text-[#c9953a]" />
                       <span className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
                         {rooms.length > 1 ? `Генериране на ${rooms.filter(r => r.photos.some(p => p)).length} помещения...` : 'Генериране на 3D рендер...'}
                       </span>
@@ -595,7 +595,7 @@ export const AIDesignerPage = () => {
                 {/* Generate button */}
                 <Button className="w-full h-16 text-lg font-black shadow-xl rounded-xl"
                   style={{
-                    background: rooms.some(r => r.photos.some(p => p)) ? 'linear-gradient(135deg, #F97316, #EA580C)' : 'var(--theme-bg-surface)',
+                    background: rooms.some(r => r.photos.some(p => p)) ? 'linear-gradient(135deg, #c9953a, #b8922e)' : 'var(--theme-bg-surface)',
                     color: rooms.some(r => r.photos.some(p => p)) ? 'white' : 'var(--theme-text-muted)',
                     boxShadow: rooms.some(r => r.photos.some(p => p)) ? '0 0 40px rgba(249,115,22,0.3)' : 'none',
                   }}
@@ -615,7 +615,7 @@ export const AIDesignerPage = () => {
               <div key={ri} className="space-y-3" data-testid={`result-room-${ri}`}>
                 {/* Room header */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="w-8 h-8 rounded-lg bg-[#F97316]/15 flex items-center justify-center text-[#F97316] text-sm font-black">{ri + 1}</div>
+                  <div className="w-8 h-8 rounded-lg bg-[#c9953a]/15 flex items-center justify-center text-[#c9953a] text-sm font-black">{ri + 1}</div>
                   <h3 className="font-bold text-sm" style={{ color: 'var(--theme-text)' }}>{roomResult.roomName}</h3>
                   <Badge className="bg-[#10B981]/15 text-[#10B981] text-[10px]">{roomResult.renders.length} PNG</Badge>
                   {roomResult.dimensions && (
@@ -624,7 +624,7 @@ export const AIDesignerPage = () => {
                     </span>
                   )}
                   {roomResult.budgetEur && (
-                    <span className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
+                    <span className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background: 'rgba(249,115,22,0.1)', color: '#c9953a' }}>
                       {Number(roomResult.budgetEur).toLocaleString()} EUR
                     </span>
                   )}
@@ -657,7 +657,7 @@ export const AIDesignerPage = () => {
                                 a.click();
                                 toast.success('PNG изтеглено!');
                               }}
-                                className="p-1.5 rounded-lg hover:bg-[#F97316]/10"
+                                className="p-1.5 rounded-lg hover:bg-[#c9953a]/10"
                                 style={{ color: 'var(--theme-text-muted)' }}
                                 data-testid={`download-render-${ri}-${i}`}>
                                 <Download className="h-3.5 w-3.5" />
@@ -666,7 +666,7 @@ export const AIDesignerPage = () => {
                                 const win = window.open('', '_blank');
                                 win.document.write(`<html><head><title>TemaDom 3D</title><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body><img src="${afterImg}" /></body></html>`);
                               }}
-                                className="p-1.5 rounded-lg hover:bg-[#F97316]/10"
+                                className="p-1.5 rounded-lg hover:bg-[#c9953a]/10"
                                 style={{ color: 'var(--theme-text-muted)' }}
                                 data-testid={`fullscreen-render-${ri}-${i}`}>
                                 <Maximize2 className="h-3.5 w-3.5" />
@@ -699,7 +699,7 @@ export const AIDesignerPage = () => {
                     {roomResult.budget.budget_tiers && roomResult.budget.budget_tiers.length > 0 && (
                       <div className="space-y-3">
                         {roomResult.budget.budget_tiers.map((tier, ti) => (
-                          <Card key={ti} className="overflow-hidden" style={{ background: 'var(--theme-card-bg)', border: `2px solid ${ti === 1 ? '#F97316' : 'var(--theme-border)'}` }}
+                          <Card key={ti} className="overflow-hidden" style={{ background: 'var(--theme-card-bg)', border: `2px solid ${ti === 1 ? '#c9953a' : 'var(--theme-border)'}` }}
                             data-testid={`budget-tier-${ri}-${ti}`}>
                             <CardContent className="p-0">
                               {/* Tier header */}
@@ -708,12 +708,12 @@ export const AIDesignerPage = () => {
                               }}>
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs font-black" style={{
-                                    color: ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6'
+                                    color: ti === 0 ? '#10B981' : ti === 1 ? '#c9953a' : '#8B5CF6'
                                   }}>
                                     {tier.tier_name || tier.tier}
                                   </span>
                                   {ti === 1 && (
-                                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#F97316] text-white font-bold">Препоръчан</span>
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#c9953a] text-white font-bold">Препоръчан</span>
                                   )}
                                   {tier.materials && tier.materials.some(m => m.verified) && (
                                     <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold"
@@ -723,7 +723,7 @@ export const AIDesignerPage = () => {
                                   )}
                                 </div>
                                 <span className="text-sm font-black" style={{
-                                  color: ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6'
+                                  color: ti === 0 ? '#10B981' : ti === 1 ? '#c9953a' : '#8B5CF6'
                                 }}>
                                   {tier.total_eur?.toLocaleString()} EUR
                                 </span>
@@ -733,7 +733,7 @@ export const AIDesignerPage = () => {
                               {tier.materials && tier.materials.length > 0 && (
                                 <div className="divide-y" style={{ borderColor: 'var(--theme-border)' }}>
                                   {tier.materials.map((mat, mi) => (
-                                    <div key={mi} className="flex items-center justify-between px-4 py-2.5 hover:bg-[#F97316]/5 transition-colors"
+                                    <div key={mi} className="flex items-center justify-between px-4 py-2.5 hover:bg-[#c9953a]/5 transition-colors"
                                       data-testid={`material-${ri}-${ti}-${mi}`}>
                                       <div className="flex-1 min-w-0 mr-3">
                                         <div className="flex items-center gap-1.5">
@@ -757,11 +757,11 @@ export const AIDesignerPage = () => {
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-3 flex-shrink-0">
-                                        <span className="text-xs font-black text-[#F97316]">{mat.price_eur} EUR</span>
+                                        <span className="text-xs font-black text-[#c9953a]">{mat.price_eur} EUR</span>
                                         {mat.product_url && mat.product_url.startsWith('http') ? (
                                           <a href={mat.product_url} target="_blank" rel="noopener noreferrer"
                                             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[10px] font-bold text-white hover:opacity-90 transition-all hover:scale-105"
-                                            style={{ background: mat.verified ? '#059669' : (ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6') }}
+                                            style={{ background: mat.verified ? '#059669' : (ti === 0 ? '#10B981' : ti === 1 ? '#c9953a' : '#8B5CF6') }}
                                             data-testid={`material-link-${ri}-${ti}-${mi}`}>
                                             <ExternalLink className="h-2.5 w-2.5" /> {mat.verified ? `Купи от ${mat.store || 'Магазин'}` : `Търси в ${mat.store || 'Магазин'}`}
                                           </a>
@@ -792,7 +792,7 @@ export const AIDesignerPage = () => {
 
             {/* Action buttons */}
             <div className="flex gap-3 justify-center" data-testid="result-actions">
-              <Button className="h-12 px-8 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold"
+              <Button className="h-12 px-8 bg-[#c9953a] hover:bg-[#b8922e] text-white font-bold"
                 onClick={() => setShowShare(!showShare)} data-testid="share-btn">
                 <Share2 className="mr-2 h-4 w-4" /> Сподели
               </Button>
