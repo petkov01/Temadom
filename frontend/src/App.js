@@ -274,7 +274,14 @@ const Navbar = () => {
             <ThemeToggle />
           </div>
 
-          {/* Center: Navigation links (desktop) */}
+          {/* Center: Logo (absolute center) */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <Link to="/" data-testid="nav-center-logo">
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-10 sm:h-12 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246,195,106,0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.2)) brightness(0.85) contrast(1.15)' }} />
+            </Link>
+          </div>
+
+          {/* Center-right: Navigation links (desktop) */}
           <div className="hidden lg:flex items-center gap-1 ml-6">
             <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
               Начало
@@ -468,6 +475,9 @@ const Navbar = () => {
             {/* Mobile Live Counter */}
             <MobileLiveStats />
             <div className="h-px" style={{ background: 'var(--theme-nav-border)' }} />
+            <Link to="/" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a] font-medium" style={{ color: 'var(--theme-gold)' }} onClick={() => setMobileMenuOpen(false)}>
+              <Home className="h-4 w-4" /> Начало
+            </Link>
             <Link to="/projects" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <FolderSearch className="h-4 w-4" /> {t('nav_projects')}
             </Link>
@@ -662,9 +672,6 @@ const Footer = () => {
           <div className="mb-4 flex flex-col items-start">
             <img src="/logo-temadom.png" alt="TemaDom" className="h-48 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 10px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.3)) brightness(0.85)' }} />
           </div>
-          <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
-            {t('footer_desc')}
-          </p>
         </div>
         <div>
           <h4 className="font-semibold mb-4 text-[#d4a43a]">{t('footer_clients')}</h4>
@@ -923,8 +930,8 @@ const LandingPage = () => {
   const bgCard = dark ? '#161a23' : '#ffffff';
   const border = dark ? '#252a36' : '#d1d5e0';
   const text = dark ? '#ffffff' : '#111318';
-  const muted = dark ? '#c9ced6' : '#6b7280';
-  const subtle = dark ? '#8f96a3' : '#9ca3af';
+  const muted = dark ? '#c9ced6' : '#4b5563';
+  const subtle = dark ? '#8f96a3' : '#6b7280';
   const gold = dark ? '#f6c36a' : '#d4a23a';
   const accent = '#ff8a00';
 
@@ -948,7 +955,7 @@ const LandingPage = () => {
             <div className="ba-showcase p-3 md:p-4 rounded-2xl" style={{ background: dark ? 'rgba(22,26,35,0.6)' : 'rgba(255,255,255,0.5)', border: `1px solid ${dark ? 'rgba(212,162,58,0.15)' : 'rgba(0,0,0,0.08)'}` }}>
               {/* Before image */}
               <div className="ba-image">
-                <img src="/showcase/before_bathroom.jpg?v=2" alt="Преди ремонт" />
+                <img src="/showcase/before_bathroom.jpg?v=3" alt="Преди ремонт" />
                 <span className="ba-label left-3" style={{ background: 'rgba(0,0,0,0.65)', color: '#fff', border: '1px solid rgba(212,162,58,0.4)' }}>ПРЕДИ</span>
               </div>
 
@@ -966,7 +973,7 @@ const LandingPage = () => {
 
               {/* After image */}
               <div className="ba-image">
-                <img src="/showcase/after_bathroom.jpg?v=2" alt="След AI дизайн" />
+                <img src="/showcase/after_bathroom.jpg?v=3" alt="След AI дизайн" />
                 <span className="ba-label right-3" style={{ background: 'linear-gradient(135deg, #d4a23a, #f6c36a)', color: '#0f1115' }}>СЛЕД</span>
               </div>
             </div>
