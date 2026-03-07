@@ -17,87 +17,76 @@ TemaDom е уеб платформа за строителство и ремон
 - AI Designer (GPT-4o-mini + gpt-image-1), Real product scraping (Playwright)
 - Free chat between users with search/discovery
 - AI-powered suggestion analysis (GPT)
-- Telegram bot configured, Blog, Community
-- Multi-language (BG/EN), Theme toggle, ScrollToTop
-- Merged "Фирми и Майстори" with tabs, Public pages
+- Telegram bot, Blog, Community, Multi-language (BG/EN), Theme toggle
 
-### Phase 4 (Feb 2026)
-- New showcase with 6 unique projects and correct pricing
-- "Как работи" sections on Landing, Companies, AI Designer pages
-- AI Designer accuracy: prompts for strict architectural preservation
-- Designer registration removed (only Client/Company/Master)
-- Text contrast fixes with theme CSS variables
-- Deployment fixes: health endpoints, lazy loading, requirements.txt
-
-### Phase 5 (Mar 2026)
-- **AI Designer image_edit**: Switched to `litellm.aimage_edit` for 1:1 architectural preservation
-- **Showcase overhaul**: All 6 showcase before/after pairs regenerated
-- **Projects page split**: Ремонти/Строителство sections with tab navigation
-- **AI Designer UX**: Estimated time display, live timer, camera capture
-- **Mobile responsiveness**: Bottom bar centered, chatbot/feedback repositioned
-- **Backend pricing fix**: design_2room corrected from 129 to 119 EUR
+### Phase 4-5 (Feb-Mar 2026)
+- AI Designer accuracy, showcase, projects page, mobile responsiveness
+- Pricing fixes, deployment fixes
 
 ### Phase 6 (Mar 7, 2026)
-- **Complete UI/UX Redesign**: Full dark/light theme with CSS variables
-  - Replaced all hardcoded dark colors with CSS variables
-  - Theme utility classes: .theme-text, .theme-text-muted, .theme-text-subtle, .theme-bg-surface etc.
-  - Pages redesigned: LandingPage, LoginPage, RegisterPage, ClientDashboard, CompanyDashboard, ProjectsPage, SubscriptionsPage, AdsPage, AboutPage, ServicesPage, PriceCalculator, BlogPage, BlogArticle, RegionalPage, PricesByRegionPage, AIChartPage, AISketchPage, Scanner3DPage, PublishedGalleryPage, ReadyProjectsPage, PortfolioGallery, FeedbackButton, Chatbot, TermsPage, CommunityPage, ProfilePage
-- **Logo enhancement**: Massive logo with golden glow drop-shadow effect
-- **P1: Subscription Audit (DONE)**: Verified end-to-end flow
-- **P1: Chat Enhancements (DONE)**: Online status, typing indicators, read receipts
-- **P1: Scraping Expansion (DONE)**: 21 stores total
-- **Editable Contract PDF**: Bulgarian Cyrillic, editable fields
-- **Calculation PDF Redesign**: Logo-based header instead of orange
-- **Content Cleanup**: Removed "TemaDom" from internal page titles
+- Complete UI/UX Redesign with CSS variables dark/light theme
+- Logo enhancement with golden glow
+- Subscription audit, Chat enhancements, Scraping expansion (21 stores)
+- Editable Contract PDF (Bulgarian Cyrillic)
+- Content cleanup
 
-### Phase 7 (Mar 7, 2026) - AI Designer Speed Fix
-- **CRITICAL FIX: AI Designer Performance**
-  - Root cause: Sequential processing of photos + scraping + budget generation
-  - Fix 1: `/photo-generate` — photos + product scraping now run IN PARALLEL via `asyncio.gather`
-  - Fix 2: `/generate` — all 4 camera angles run IN PARALLEL instead of sequentially
-  - Fix 3: Fixed `io` module scope bug in `process_single_photo`
-  - **Result: Generation time reduced from 7+ minutes to ~41 seconds (90%+ improvement)**
-- **Theme Context Fix**: Verified `useTheme` hook works correctly across all components in both light/dark modes
-- **Testing**: 100% pass rate — 10/10 backend, all frontend tests passed (iteration_78)
+### Phase 7 (Mar 7, 2026) - AI Designer Speed & Reliability Fix
+- **CRITICAL: Async Task System for AI Designer**
+  - Backend returns `task_id` immediately (< 2 seconds response)
+  - Frontend polls `/api/ai-designer/task/{id}` every 3s for real progress
+  - Progress steps: 5% → 10% → 20% → 60% → 70% → 90% → 100%
+  - Eliminates proxy timeouts, no more 5-7 minute hangs
+  - Total generation: ~30-40 seconds
+- **Parallel Processing**: Photos + product scraping run concurrently via `asyncio.gather`
+- **Navbar Logo Fix**: Reduced from h-32/h-40 (squished) to h-12/h-16 with `object-contain`
+- **Testing**: 100% pass (iterations 78-79)
 
 ## Architecture
 ```
 /app/
 backend/
-  server.py          # Main FastAPI (5900+ lines)
-  models/__init__.py # Pydantic models with construction fields
+  server.py          # Main FastAPI (6000+ lines)
+  models/__init__.py # Pydantic models
   routes/            # google_auth, telegram, payments, products
-  services/          # scraper.py, ai_designer_service.py
+  services/          # scraper.py, telegram.py
 frontend/
   src/
-    App.js          # Main app (4260+ lines)
-    index.css       # CSS variables for dark/light theme system
+    App.js          # Main app (4270+ lines)
+    index.css       # CSS variables for dark/light theme
     components/     # AIDesignerPage, ChatPage, PriceCalculator, etc.
 ```
+
+## Key API Endpoints
+- `POST /api/ai-designer/photo-generate` → returns `{task_id}` immediately
+- `GET /api/ai-designer/task/{task_id}` → poll for progress/result
+- `POST /api/ai-designer/generate` → parallelized camera angles
+- `POST /api/contract/generate` → editable contract PDF
+- `GET /api/subscriptions/plans` → subscription plan data
 
 ## Prioritized Backlog
 
 ### P1 (High) - ALL COMPLETED
-- ~~Subscription feature audit~~ ✅
+- ~~Subscription audit~~ ✅
 - ~~Chat enhancements~~ ✅
-- ~~Scraping expansion (21 stores)~~ ✅
-- ~~AI Designer speed fix~~ ✅ (41s from 7+ mins)
+- ~~Scraping expansion~~ ✅
+- ~~AI Designer speed fix~~ ✅ (async + parallel)
+- ~~Navbar logo fix~~ ✅
 
 ### P2 (Medium)
-- Backend refactoring (break up server.py into route modules)
-- Frontend refactoring (extract pages from App.js into separate files)
+- Backend refactoring (break up server.py)
+- Frontend refactoring (extract pages from App.js)
 - SEO optimization
 - Company catalog & portfolio pages
 
 ### P3 (Future)
 - Job ads module
-- Facebook login (when credentials available)
+- Facebook login
 - Advanced analytics dashboard
 
 ## 3rd Party Integrations
-- OpenAI GPT-4o-mini & gpt-image-1 (Emergent LLM Key) - image_edit for AI Designer
+- OpenAI GPT-4o & gpt-image-1 (Emergent LLM Key)
 - Stripe (test keys) for subscriptions
 - Playwright for web scraping
 - Google OAuth (Emergent Auth) for social login
-- Telegram Bot API for firm notifications
-- litellm.aimage_edit for 1:1 architectural preservation
+- Telegram Bot API for notifications
+- litellm.aimage_edit for AI Designer
