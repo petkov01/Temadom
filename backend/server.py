@@ -3721,7 +3721,10 @@ async def export_cad_contract(request: Request):
     address = data.get("address", "_____________________")
     total_eur = data.get("total_eur", "___________")
     total_bgn = data.get("total_bgn", "___________")
-    description = data.get("description", "Izpalnenie na stroitelno-montazhni raboti soglasno prilozhena kolichestvena smetka.")
+    description = data.get("description", "Изпълнение на строително-монтажни работи съгласно приложена количествена сметка.")
+    deadline_days = data.get("deadline_days", "____________")
+    payment_terms = data.get("payment_terms", "30% аванс, 40% при 50% готовност, 30% при приемане")
+    warranty_years = data.get("warranty_years", "5")
     today = datetime.now().strftime("%d.%m.%Y")
 
     buf = io.BytesIO()
@@ -3763,14 +3766,14 @@ async def export_cad_contract(request: Request):
 
     story.append(Paragraph("II. ЦЕНА И ПЛАЩАНЕ", h2_s))
     story.append(Paragraph(f"3. Обща стойност: <b>{total_eur} EUR ({total_bgn} BGN)</b>.", body_s))
-    story.append(Paragraph("4. Плащането се извършва на три части: 30% аванс, 40% при 50% готовност, 30% при приемане.", body_s))
+    story.append(Paragraph(f"4. Плащането се извършва: {payment_terms}.", body_s))
 
     story.append(Paragraph("III. СРОК", h2_s))
-    story.append(Paragraph("5. Срокът за изпълнение е ____________ работни дни от датата на подписване.", body_s))
+    story.append(Paragraph(f"5. Срокът за изпълнение е {deadline_days} работни дни от датата на подписване.", body_s))
     story.append(Paragraph("6. Срокът може да бъде удължен при лоши климатични условия или форсмажорни обстоятелства.", body_s))
 
     story.append(Paragraph("IV. ГАРАНЦИЯ", h2_s))
-    story.append(Paragraph("7. Изпълнителят предоставя гаранция за извършените работи в срок от 5 (пет) години.", body_s))
+    story.append(Paragraph(f"7. Изпълнителят предоставя гаранция за извършените работи в срок от {warranty_years} ({warranty_years}) години.", body_s))
 
     story.append(Paragraph("V. ОТГОВОРНОСТИ", h2_s))
     story.append(Paragraph("8. Изпълнителят отговаря за качеството на материалите и извършените работи.", body_s))

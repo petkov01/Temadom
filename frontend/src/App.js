@@ -984,7 +984,7 @@ const LandingPage = () => {
               className="group relative px-8 py-4 rounded-xl text-white text-lg font-bold overflow-hidden transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 animate-orangePulse"
               style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)' }}>
               <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Camera className="mr-2 h-6 w-6 inline" /> Качи снимки на помещението
+              <Camera className="mr-2 h-6 w-6 inline" /> 3D Дизайнер
             </button>
             <button onClick={() => navigate('/ai-sketch')} data-testid="hero-sketch-btn"
               className="relative px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 btn-gold">

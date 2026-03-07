@@ -442,7 +442,9 @@ export const AISketchPage = () => {
   // PDF Export: Contract
   const [showContract, setShowContract] = useState(false);
   const [contractData, setContractData] = useState({
-    company_name: '', company_bulstat: '', client_name: '', client_egn: '', address: '', description: ''
+    company_name: '', company_bulstat: '', client_name: '', client_egn: '', address: '', description: '',
+    deadline_days: '', payment_terms: '30% аванс, 40% при 50% готовност, 30% при приемане',
+    warranty_years: '5'
   });
 
   const exportContract = async () => {
@@ -452,7 +454,7 @@ export const AISketchPage = () => {
         ...contractData,
         total_eur: costs.totalEur,
         total_bgn: costs.totalBgn,
-        description: contractData.description || 'Stroitelno-montazhni raboti soglasno prilozhena smetka.'
+        description: contractData.description || 'Изпълнение на строително-монтажни работи съгласно приложена количествена сметка.'
       }, { responseType: 'blob' });
       const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
       const a = document.createElement('a'); a.href = url; a.download = 'temadom-contract.pdf'; a.click();
@@ -623,28 +625,52 @@ export const AISketchPage = () => {
                     <div>
                       <label className="text-[9px] theme-text-subtle block mb-0.5">Изпълнител (фирма)</label>
                       <Input value={contractData.company_name} onChange={e => setContractData(p => ({ ...p, company_name: e.target.value }))}
-                        placeholder="Име на фирма" className="h-7 text-xs   text-white" data-testid="contract-company" />
+                        placeholder="Име на фирма" className="h-7 text-xs" data-testid="contract-company" />
                     </div>
                     <div>
                       <label className="text-[9px] theme-text-subtle block mb-0.5">БУЛСТАТ</label>
                       <Input value={contractData.company_bulstat} onChange={e => setContractData(p => ({ ...p, company_bulstat: e.target.value }))}
-                        placeholder="БУЛСТАТ" className="h-7 text-xs   text-white" data-testid="contract-bulstat" />
+                        placeholder="БУЛСТАТ" className="h-7 text-xs" data-testid="contract-bulstat" />
                     </div>
                     <div>
                       <label className="text-[9px] theme-text-subtle block mb-0.5">Възложител (клиент)</label>
                       <Input value={contractData.client_name} onChange={e => setContractData(p => ({ ...p, client_name: e.target.value }))}
-                        placeholder="Име на клиент" className="h-7 text-xs   text-white" data-testid="contract-client" />
+                        placeholder="Име на клиент" className="h-7 text-xs" data-testid="contract-client" />
                     </div>
                     <div>
                       <label className="text-[9px] theme-text-subtle block mb-0.5">ЕГН/БУЛСТАТ</label>
                       <Input value={contractData.client_egn} onChange={e => setContractData(p => ({ ...p, client_egn: e.target.value }))}
-                        placeholder="ЕГН/БУЛСТАТ" className="h-7 text-xs   text-white" data-testid="contract-egn" />
+                        placeholder="ЕГН/БУЛСТАТ" className="h-7 text-xs" data-testid="contract-egn" />
+                    </div>
+                  </div>
+                  <div className="mb-2">
+                    <label className="text-[9px] theme-text-subtle block mb-0.5">Адрес на обекта</label>
+                    <Input value={contractData.address} onChange={e => setContractData(p => ({ ...p, address: e.target.value }))}
+                      placeholder="Адрес на обекта" className="h-7 text-xs" data-testid="contract-address" />
+                  </div>
+                  <div className="mb-2">
+                    <label className="text-[9px] theme-text-subtle block mb-0.5">Описание на работите</label>
+                    <textarea value={contractData.description} onChange={e => setContractData(p => ({ ...p, description: e.target.value }))}
+                      placeholder="Опишете дейностите по договора..."
+                      className="w-full h-14 text-xs rounded-md border px-2 py-1 resize-none" style={{ background: 'var(--theme-bg-surface)', borderColor: 'var(--theme-border)', color: 'var(--theme-text)' }}
+                      data-testid="contract-description" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div>
+                      <label className="text-[9px] theme-text-subtle block mb-0.5">Срок (работни дни)</label>
+                      <Input value={contractData.deadline_days} onChange={e => setContractData(p => ({ ...p, deadline_days: e.target.value }))}
+                        placeholder="напр. 30" className="h-7 text-xs" data-testid="contract-deadline" />
+                    </div>
+                    <div>
+                      <label className="text-[9px] theme-text-subtle block mb-0.5">Гаранция (години)</label>
+                      <Input value={contractData.warranty_years} onChange={e => setContractData(p => ({ ...p, warranty_years: e.target.value }))}
+                        placeholder="5" className="h-7 text-xs" data-testid="contract-warranty" />
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="text-[9px] theme-text-subtle block mb-0.5">Адрес на обекта</label>
-                    <Input value={contractData.address} onChange={e => setContractData(p => ({ ...p, address: e.target.value }))}
-                      placeholder="Адрес на обекта" className="h-7 text-xs   text-white" data-testid="contract-address" />
+                    <label className="text-[9px] theme-text-subtle block mb-0.5">Условия за плащане</label>
+                    <Input value={contractData.payment_terms} onChange={e => setContractData(p => ({ ...p, payment_terms: e.target.value }))}
+                      placeholder="30% аванс, 40% при 50% готовност, 30% при приемане" className="h-7 text-xs" data-testid="contract-payment" />
                   </div>
                   <Button className="w-full bg-[#4DA6FF] hover:bg-[#3B8FE0] text-white h-8 text-xs"
                     onClick={exportContract} data-testid="generate-contract-pdf">
