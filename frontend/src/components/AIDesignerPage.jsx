@@ -725,6 +725,12 @@ export const AIDesignerPage = () => {
                     )}
 
                     {/* Budget Tiers with Materials */}
+                    {roomResult.budget._fallback && (
+                      <div className="px-3 py-2 rounded-lg mb-2 text-xs" style={{ background: 'rgba(249,115,22,0.12)', color: '#f97316', border: '1px solid rgba(249,115,22,0.3)' }}
+                        data-testid={`budget-fallback-notice-${ri}`}>
+                        Бюджетът е ориентировъчен (от база данни). AI генерацията на бюджет беше пропусната за икономия на кредити.
+                      </div>
+                    )}
                     {roomResult.budget.budget_tiers && roomResult.budget.budget_tiers.length > 0 && (
                       <div className="space-y-3">
                         {roomResult.budget.budget_tiers.map((tier, ti) => (

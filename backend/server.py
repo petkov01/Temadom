@@ -15,8 +15,21 @@ import bcrypt
 import jwt
 import httpx
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
-from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
-from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+import hashlib
+
+# Safe LlmChat import with fallback
+try:
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+    from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+    _LLM_AVAILABLE = True
+except ImportError as _llm_import_err:
+    logging.warning(f"LlmChat import failed — AI analysis will be skipped: {_llm_import_err}")
+    LlmChat = None
+    UserMessage = None
+    ImageContent = None
+    OpenAIImageGeneration = None
+    _LLM_AVAILABLE = False
+
 import json as json_module
 import re as re_module
 import base64
@@ -2741,6 +2754,230 @@ AI_MATERIAL_CLASS = {
     "premium": "премиум клас материали - висококачествени, луксозни"
 }
 
+# ==================== LLM RESPONSE CACHE ====================
+_llm_cache = {}  # hash(prompt) -> response
+
+def _cache_key(prompt_text: str) -> str:
+    return hashlib.md5(prompt_text.encode('utf-8')).hexdigest()
+
+def _get_cached(prompt_text: str):
+    key = _cache_key(prompt_text)
+    return _llm_cache.get(key)
+
+def _set_cached(prompt_text: str, response):
+    key = _cache_key(prompt_text)
+    _llm_cache[key] = response
+    # Keep cache size under 200 entries
+    if len(_llm_cache) > 200:
+        oldest = next(iter(_llm_cache))
+        _llm_cache.pop(oldest, None)
+
+# ==================== PREDEFINED BG PRICES ====================
+BG_ROOM_PRICES = {
+    "bathroom": {
+        "economy": [
+            {"name": "PVC шкаф + мивка за баня", "category": "Мебели", "quantity": "1 бр.", "price_eur": 145, "store": "HomeMax", "search_query": "шкаф мивка баня", "verified": False},
+            {"name": "Смесител за мивка", "category": "ВиК", "quantity": "1 бр.", "price_eur": 45, "store": "Praktiker", "search_query": "смесител за мивка", "verified": False},
+            {"name": "Душ комплект", "category": "ВиК", "quantity": "1 бр.", "price_eur": 55, "store": "Mr.Bricolage", "search_query": "душ комплект", "verified": False},
+            {"name": "Тоалетна чиния с казанче", "category": "Санитария", "quantity": "1 бр.", "price_eur": 89, "store": "Praktiker", "search_query": "тоалетна чиния", "verified": False},
+            {"name": "Плочки за под 33x33", "category": "Настилки", "quantity": "8 m²", "price_eur": 72, "store": "Bauhaus", "search_query": "плочки за баня под", "verified": False},
+            {"name": "Фаянс за стени 25x40", "category": "Облицовки", "quantity": "15 m²", "price_eur": 105, "store": "Praktiker", "search_query": "фаянс за баня", "verified": False},
+            {"name": "Огледало за баня 60x80", "category": "Аксесоари", "quantity": "1 бр.", "price_eur": 35, "store": "Jysk", "search_query": "огледало баня", "verified": False},
+            {"name": "LED осветление за баня", "category": "Осветление", "quantity": "1 бр.", "price_eur": 25, "store": "Praktiker", "search_query": "осветление баня", "verified": False},
+        ],
+        "medium": [
+            {"name": "Мебелен комплект за баня с мивка", "category": "Мебели", "quantity": "1 бр.", "price_eur": 289, "store": "HomeMax", "search_query": "мебели за баня комплект", "verified": False},
+            {"name": "Термостатен смесител", "category": "ВиК", "quantity": "1 бр.", "price_eur": 89, "store": "Praktiker", "search_query": "термостатен смесител", "verified": False},
+            {"name": "Душ кабина 90x90", "category": "ВиК", "quantity": "1 бр.", "price_eur": 199, "store": "Bauhaus", "search_query": "душ кабина", "verified": False},
+            {"name": "Тоалетна чиния окачена", "category": "Санитария", "quantity": "1 бр.", "price_eur": 159, "store": "Praktiker", "search_query": "окачена тоалетна", "verified": False},
+            {"name": "Гранитогрес за под 60x60", "category": "Настилки", "quantity": "8 m²", "price_eur": 136, "store": "Bauhaus", "search_query": "гранитогрес баня", "verified": False},
+            {"name": "Керамични плочки за стени", "category": "Облицовки", "quantity": "15 m²", "price_eur": 195, "store": "Mr.Bricolage", "search_query": "плочки стени баня", "verified": False},
+            {"name": "Огледало с LED подсветка", "category": "Аксесоари", "quantity": "1 бр.", "price_eur": 79, "store": "HomeMax", "search_query": "огледало LED баня", "verified": False},
+            {"name": "Електрически бойлер 80л", "category": "ВиК", "quantity": "1 бр.", "price_eur": 149, "store": "Praktiker", "search_query": "бойлер 80 литра", "verified": False},
+            {"name": "Аксесоари за баня комплект", "category": "Аксесоари", "quantity": "1 к-т", "price_eur": 45, "store": "Jysk", "search_query": "аксесоари баня комплект", "verified": False},
+        ],
+        "premium": [
+            {"name": "Дизайнерски мебели за баня", "category": "Мебели", "quantity": "1 бр.", "price_eur": 549, "store": "HomeMax", "search_query": "дизайнерски мебели баня", "verified": False},
+            {"name": "Grohe смесител за мивка", "category": "ВиК", "quantity": "1 бр.", "price_eur": 189, "store": "Praktiker", "search_query": "Grohe смесител", "verified": False},
+            {"name": "Хидромасажна душ кабина", "category": "ВиК", "quantity": "1 бр.", "price_eur": 499, "store": "Bauhaus", "search_query": "хидромасажна душ кабина", "verified": False},
+            {"name": "Конзолна тоалетна Villeroy & Boch", "category": "Санитария", "quantity": "1 бр.", "price_eur": 349, "store": "Praktiker", "search_query": "конзолна тоалетна премиум", "verified": False},
+            {"name": "Мраморни плочки за под", "category": "Настилки", "quantity": "8 m²", "price_eur": 280, "store": "Bauhaus", "search_query": "мраморни плочки", "verified": False},
+            {"name": "Дизайнерски плочки за стени", "category": "Облицовки", "quantity": "15 m²", "price_eur": 375, "store": "Mr.Bricolage", "search_query": "дизайнерски плочки баня", "verified": False},
+            {"name": "Smart огледало с тъч подсветка", "category": "Аксесоари", "quantity": "1 бр.", "price_eur": 199, "store": "HomeMax", "search_query": "smart огледало баня", "verified": False},
+            {"name": "Подово отопление за баня", "category": "Отопление", "quantity": "8 m²", "price_eur": 240, "store": "Praktiker", "search_query": "подово отопление баня", "verified": False},
+            {"name": "Премиум аксесоари хром", "category": "Аксесоари", "quantity": "1 к-т", "price_eur": 129, "store": "Bauhaus", "search_query": "аксесоари баня хром премиум", "verified": False},
+        ],
+    },
+    "kitchen": {
+        "economy": [
+            {"name": "Кухненски шкафове комплект 2м", "category": "Мебели", "quantity": "1 к-т", "price_eur": 299, "store": "HomeMax", "search_query": "кухненски шкафове", "verified": False},
+            {"name": "Кухненски плот ламинат", "category": "Мебели", "quantity": "2 м", "price_eur": 65, "store": "Praktiker", "search_query": "кухненски плот", "verified": False},
+            {"name": "Смесител за кухня", "category": "ВиК", "quantity": "1 бр.", "price_eur": 39, "store": "Praktiker", "search_query": "смесител кухня", "verified": False},
+            {"name": "Мивка за кухня инокс", "category": "ВиК", "quantity": "1 бр.", "price_eur": 49, "store": "Mr.Bricolage", "search_query": "мивка кухня инокс", "verified": False},
+            {"name": "Плочки за кухня", "category": "Облицовки", "quantity": "6 m²", "price_eur": 48, "store": "Bauhaus", "search_query": "плочки кухня", "verified": False},
+            {"name": "Ламинат за под", "category": "Настилки", "quantity": "12 m²", "price_eur": 96, "store": "Praktiker", "search_query": "ламинат", "verified": False},
+            {"name": "LED лента под шкафове", "category": "Осветление", "quantity": "2 м", "price_eur": 15, "store": "Praktiker", "search_query": "LED лента кухня", "verified": False},
+            {"name": "Абсорбатор стенен", "category": "Електроуреди", "quantity": "1 бр.", "price_eur": 79, "store": "eMAG", "search_query": "абсорбатор", "verified": False},
+        ],
+        "medium": [
+            {"name": "Кухня по поръчка 3м", "category": "Мебели", "quantity": "1 к-т", "price_eur": 699, "store": "HomeMax", "search_query": "кухня по поръчка", "verified": False},
+            {"name": "Каменен плот 3м", "category": "Мебели", "quantity": "3 м", "price_eur": 249, "store": "Praktiker", "search_query": "каменен плот кухня", "verified": False},
+            {"name": "Извлекаем смесител за кухня", "category": "ВиК", "quantity": "1 бр.", "price_eur": 89, "store": "Praktiker", "search_query": "извлекаем смесител кухня", "verified": False},
+            {"name": "Гранитна мивка", "category": "ВиК", "quantity": "1 бр.", "price_eur": 159, "store": "Bauhaus", "search_query": "гранитна мивка кухня", "verified": False},
+            {"name": "Стъклен гръб за кухня", "category": "Облицовки", "quantity": "3 m²", "price_eur": 135, "store": "Mr.Bricolage", "search_query": "стъклен гръб кухня", "verified": False},
+            {"name": "Гранитогрес за под", "category": "Настилки", "quantity": "12 m²", "price_eur": 180, "store": "Bauhaus", "search_query": "гранитогрес кухня", "verified": False},
+            {"name": "Вграден абсорбатор", "category": "Електроуреди", "quantity": "1 бр.", "price_eur": 149, "store": "eMAG", "search_query": "вграден абсорбатор", "verified": False},
+            {"name": "LED осветление за кухня", "category": "Осветление", "quantity": "1 к-т", "price_eur": 59, "store": "Praktiker", "search_query": "LED осветление кухня", "verified": False},
+        ],
+        "premium": [
+            {"name": "Премиум кухня по поръчка 4м", "category": "Мебели", "quantity": "1 к-т", "price_eur": 1499, "store": "HomeMax", "search_query": "луксозна кухня по поръчка", "verified": False},
+            {"name": "Кварцов плот", "category": "Мебели", "quantity": "4 м", "price_eur": 599, "store": "Bauhaus", "search_query": "кварцов плот кухня", "verified": False},
+            {"name": "Дизайнерски смесител", "category": "ВиК", "quantity": "1 бр.", "price_eur": 199, "store": "Praktiker", "search_query": "дизайнерски смесител кухня", "verified": False},
+            {"name": "Подплотова мивка Blanco", "category": "ВиК", "quantity": "1 бр.", "price_eur": 299, "store": "Bauhaus", "search_query": "Blanco мивка", "verified": False},
+            {"name": "Мозайка за гръб", "category": "Облицовки", "quantity": "3 m²", "price_eur": 195, "store": "Mr.Bricolage", "search_query": "мозайка кухня премиум", "verified": False},
+            {"name": "Подово отопление", "category": "Отопление", "quantity": "12 m²", "price_eur": 360, "store": "Praktiker", "search_query": "подово отопление", "verified": False},
+            {"name": "Smart абсорбатор", "category": "Електроуреди", "quantity": "1 бр.", "price_eur": 349, "store": "eMAG", "search_query": "smart абсорбатор", "verified": False},
+            {"name": "Дизайнерско осветление", "category": "Осветление", "quantity": "1 к-т", "price_eur": 199, "store": "HomeMax", "search_query": "дизайнерско осветление кухня", "verified": False},
+        ],
+    },
+    "living_room": {
+        "economy": [
+            {"name": "Ламинат 8мм", "category": "Настилки", "quantity": "20 m²", "price_eur": 140, "store": "Praktiker", "search_query": "ламинат 8мм", "verified": False},
+            {"name": "Латексова боя за стени", "category": "Бои", "quantity": "20 m²", "price_eur": 35, "store": "Mr.Bricolage", "search_query": "латекс боя стени", "verified": False},
+            {"name": "Диван тройка", "category": "Мебели", "quantity": "1 бр.", "price_eur": 349, "store": "Jysk", "search_query": "диван тройка", "verified": False},
+            {"name": "ТВ шкаф", "category": "Мебели", "quantity": "1 бр.", "price_eur": 99, "store": "Jysk", "search_query": "ТВ шкаф", "verified": False},
+            {"name": "Маса за хол", "category": "Мебели", "quantity": "1 бр.", "price_eur": 59, "store": "Jysk", "search_query": "маса хол", "verified": False},
+            {"name": "Килим 160x230", "category": "Декор", "quantity": "1 бр.", "price_eur": 49, "store": "Jysk", "search_query": "килим хол", "verified": False},
+            {"name": "Полилей за хол", "category": "Осветление", "quantity": "1 бр.", "price_eur": 39, "store": "Praktiker", "search_query": "полилей хол", "verified": False},
+        ],
+        "medium": [
+            {"name": "Паркет дъб 3-лентов", "category": "Настилки", "quantity": "20 m²", "price_eur": 360, "store": "Bauhaus", "search_query": "паркет дъб", "verified": False},
+            {"name": "Латекс премиум + грунд", "category": "Бои", "quantity": "20 m²", "price_eur": 65, "store": "Praktiker", "search_query": "латекс премиум", "verified": False},
+            {"name": "Ъглов диван с лежанка", "category": "Мебели", "quantity": "1 бр.", "price_eur": 699, "store": "HomeMax", "search_query": "ъглов диван", "verified": False},
+            {"name": "ТВ модул с шкафове", "category": "Мебели", "quantity": "1 бр.", "price_eur": 249, "store": "HomeMax", "search_query": "ТВ модул", "verified": False},
+            {"name": "Холна маса стъкло/дърво", "category": "Мебели", "quantity": "1 бр.", "price_eur": 129, "store": "Jysk", "search_query": "холна маса дизайн", "verified": False},
+            {"name": "Килим вълнен", "category": "Декор", "quantity": "1 бр.", "price_eur": 149, "store": "Jysk", "search_query": "килим вълнен хол", "verified": False},
+            {"name": "Дизайнерско осветление", "category": "Осветление", "quantity": "1 к-т", "price_eur": 119, "store": "HomeMax", "search_query": "осветление хол дизайн", "verified": False},
+        ],
+        "premium": [
+            {"name": "Масивен паркет дъб", "category": "Настилки", "quantity": "20 m²", "price_eur": 700, "store": "Bauhaus", "search_query": "масивен паркет", "verified": False},
+            {"name": "Декоративна мазилка", "category": "Бои", "quantity": "20 m²", "price_eur": 200, "store": "Mr.Bricolage", "search_query": "декоративна мазилка", "verified": False},
+            {"name": "Дизайнерски диван кожа", "category": "Мебели", "quantity": "1 бр.", "price_eur": 1499, "store": "HomeMax", "search_query": "дизайнерски диван кожа", "verified": False},
+            {"name": "Дизайнерски ТВ модул", "category": "Мебели", "quantity": "1 бр.", "price_eur": 499, "store": "HomeMax", "search_query": "луксозен ТВ модул", "verified": False},
+            {"name": "Дизайнерска холна маса", "category": "Мебели", "quantity": "1 бр.", "price_eur": 299, "store": "HomeMax", "search_query": "дизайнерска холна маса", "verified": False},
+            {"name": "Ръчно тъкан килим", "category": "Декор", "quantity": "1 бр.", "price_eur": 399, "store": "Jysk", "search_query": "ръчно тъкан килим", "verified": False},
+            {"name": "Арт деко осветление", "category": "Осветление", "quantity": "1 к-т", "price_eur": 299, "store": "HomeMax", "search_query": "луксозно осветление", "verified": False},
+        ],
+    },
+    "bedroom": {
+        "economy": [
+            {"name": "Легло с ракла 160x200", "category": "Мебели", "quantity": "1 бр.", "price_eur": 199, "store": "Jysk", "search_query": "легло ракла", "verified": False},
+            {"name": "Матрак 160x200", "category": "Мебели", "quantity": "1 бр.", "price_eur": 129, "store": "Jysk", "search_query": "матрак 160", "verified": False},
+            {"name": "Гардероб двукрил", "category": "Мебели", "quantity": "1 бр.", "price_eur": 199, "store": "Jysk", "search_query": "гардероб двукрил", "verified": False},
+            {"name": "Нощни шкафчета 2 бр.", "category": "Мебели", "quantity": "2 бр.", "price_eur": 58, "store": "Jysk", "search_query": "нощно шкафче", "verified": False},
+            {"name": "Ламинат 8мм", "category": "Настилки", "quantity": "16 m²", "price_eur": 112, "store": "Praktiker", "search_query": "ламинат спалня", "verified": False},
+            {"name": "Латексова боя", "category": "Бои", "quantity": "16 m²", "price_eur": 28, "store": "Praktiker", "search_query": "латекс боя", "verified": False},
+            {"name": "Плафон за спалня", "category": "Осветление", "quantity": "1 бр.", "price_eur": 25, "store": "Praktiker", "search_query": "плафон спалня", "verified": False},
+        ],
+        "medium": [
+            {"name": "Тапицирано легло 160x200", "category": "Мебели", "quantity": "1 бр.", "price_eur": 399, "store": "HomeMax", "search_query": "тапицирано легло", "verified": False},
+            {"name": "Ортопедичен матрак", "category": "Мебели", "quantity": "1 бр.", "price_eur": 299, "store": "Jysk", "search_query": "ортопедичен матрак", "verified": False},
+            {"name": "Гардероб с плъзгащи врати", "category": "Мебели", "quantity": "1 бр.", "price_eur": 449, "store": "HomeMax", "search_query": "гардероб плъзгащи врати", "verified": False},
+            {"name": "Нощни шкафчета дизайн", "category": "Мебели", "quantity": "2 бр.", "price_eur": 119, "store": "HomeMax", "search_query": "дизайнерски нощни шкафчета", "verified": False},
+            {"name": "Паркет дъб 3-лентов", "category": "Настилки", "quantity": "16 m²", "price_eur": 288, "store": "Bauhaus", "search_query": "паркет спалня", "verified": False},
+            {"name": "Интериорна боя + грунд", "category": "Бои", "quantity": "16 m²", "price_eur": 52, "store": "Praktiker", "search_query": "интериорна боя", "verified": False},
+            {"name": "Нощни лампи 2 бр.", "category": "Осветление", "quantity": "2 бр.", "price_eur": 69, "store": "HomeMax", "search_query": "нощни лампи", "verified": False},
+        ],
+        "premium": [
+            {"name": "Дизайнерско легло с табла", "category": "Мебели", "quantity": "1 бр.", "price_eur": 899, "store": "HomeMax", "search_query": "дизайнерско легло", "verified": False},
+            {"name": "Премиум матрак мемори", "category": "Мебели", "quantity": "1 бр.", "price_eur": 599, "store": "Jysk", "search_query": "премиум матрак мемори", "verified": False},
+            {"name": "Walk-in гардероб система", "category": "Мебели", "quantity": "1 к-т", "price_eur": 999, "store": "HomeMax", "search_query": "walk-in гардероб", "verified": False},
+            {"name": "Дизайнерски нощни шкафчета", "category": "Мебели", "quantity": "2 бр.", "price_eur": 249, "store": "HomeMax", "search_query": "луксозни нощни шкафчета", "verified": False},
+            {"name": "Масивен паркет", "category": "Настилки", "quantity": "16 m²", "price_eur": 560, "store": "Bauhaus", "search_query": "масивен паркет спалня", "verified": False},
+            {"name": "Декоративна мазилка", "category": "Бои", "quantity": "16 m²", "price_eur": 160, "store": "Mr.Bricolage", "search_query": "декоративна мазилка", "verified": False},
+            {"name": "Дизайнерско осветление к-т", "category": "Осветление", "quantity": "1 к-т", "price_eur": 249, "store": "HomeMax", "search_query": "дизайнерско осветление спалня", "verified": False},
+        ],
+    },
+}
+
+# Default fallback for room types not in the table
+BG_DEFAULT_PRICES = {
+    "economy": [
+        {"name": "Ламинат 8мм", "category": "Настилки", "quantity": "15 m²", "price_eur": 105, "store": "Praktiker", "search_query": "ламинат", "verified": False},
+        {"name": "Латексова боя", "category": "Бои", "quantity": "20 m²", "price_eur": 35, "store": "Praktiker", "search_query": "латекс боя", "verified": False},
+        {"name": "Основни мебели", "category": "Мебели", "quantity": "1 к-т", "price_eur": 299, "store": "Jysk", "search_query": "мебели", "verified": False},
+        {"name": "Осветление", "category": "Осветление", "quantity": "1 к-т", "price_eur": 45, "store": "Praktiker", "search_query": "осветление", "verified": False},
+    ],
+    "medium": [
+        {"name": "Паркет дъб", "category": "Настилки", "quantity": "15 m²", "price_eur": 270, "store": "Bauhaus", "search_query": "паркет дъб", "verified": False},
+        {"name": "Премиум боя + грунд", "category": "Бои", "quantity": "20 m²", "price_eur": 65, "store": "Praktiker", "search_query": "интериорна боя премиум", "verified": False},
+        {"name": "Обзавеждане комплект", "category": "Мебели", "quantity": "1 к-т", "price_eur": 699, "store": "HomeMax", "search_query": "обзавеждане", "verified": False},
+        {"name": "Дизайнерско осветление", "category": "Осветление", "quantity": "1 к-т", "price_eur": 119, "store": "HomeMax", "search_query": "осветление дизайн", "verified": False},
+    ],
+    "premium": [
+        {"name": "Масивен паркет", "category": "Настилки", "quantity": "15 m²", "price_eur": 525, "store": "Bauhaus", "search_query": "масивен паркет", "verified": False},
+        {"name": "Декоративна мазилка", "category": "Бои", "quantity": "20 m²", "price_eur": 200, "store": "Mr.Bricolage", "search_query": "декоративна мазилка", "verified": False},
+        {"name": "Луксозно обзавеждане", "category": "Мебели", "quantity": "1 к-т", "price_eur": 1499, "store": "HomeMax", "search_query": "луксозно обзавеждане", "verified": False},
+        {"name": "Арт осветление", "category": "Осветление", "quantity": "1 к-т", "price_eur": 299, "store": "HomeMax", "search_query": "луксозно осветление", "verified": False},
+    ],
+}
+
+LABOR_RATES_EUR = {
+    "bathroom": {"economy": 300, "medium": 500, "premium": 900},
+    "kitchen": {"economy": 250, "medium": 450, "premium": 800},
+    "living_room": {"economy": 200, "medium": 350, "premium": 600},
+    "bedroom": {"economy": 180, "medium": 300, "premium": 550},
+    "corridor": {"economy": 120, "medium": 200, "premium": 350},
+    "balcony": {"economy": 150, "medium": 250, "premium": 400},
+}
+
+def _build_static_fallback_budget(room_type: str, budget_eur: int, room_type_name: str) -> dict:
+    """Build a complete static budget from predefined BG prices when LLM is unavailable."""
+    room_prices = BG_ROOM_PRICES.get(room_type, BG_DEFAULT_PRICES)
+    if isinstance(room_prices, dict) and "economy" not in room_prices:
+        room_prices = BG_DEFAULT_PRICES
+
+    labor = LABOR_RATES_EUR.get(room_type, {"economy": 200, "medium": 350, "premium": 600})
+    tiers = []
+    tier_map = [
+        ("economy", "Иконом", 0.6),
+        ("medium", "Среден", 1.0),
+        ("premium", "Премиум", 1.5),
+    ]
+    for tier_key, tier_name, multiplier in tier_map:
+        materials = []
+        for item in room_prices.get(tier_key, BG_DEFAULT_PRICES.get(tier_key, [])):
+            mat = {**item}
+            from urllib.parse import quote as _uq
+            store = mat.get("store", "eMAG")
+            sq = _uq(mat.get("search_query", mat.get("name", "")), safe='')
+            store_urls = {
+                "Praktiker": f"https://praktiker.bg/bg/search?q={sq}",
+                "Mr.Bricolage": f"https://www.mr-bricolage.bg/search?q={sq}",
+                "Jysk": f"https://jysk.bg/catalogsearch/result/?q={sq}",
+                "HomeMax": f"https://www.homemax.bg/catalogsearch/result/?q={sq}",
+                "Bauhaus": f"https://www.bauhaus.bg/catalogsearch/result/?q={sq}",
+                "eMAG": f"https://www.emag.bg/search/{sq}",
+            }
+            mat["product_url"] = store_urls.get(store, f"https://www.emag.bg/search/{sq}")
+            materials.append(mat)
+        total = sum(m["price_eur"] for m in materials)
+        tiers.append({
+            "tier": tier_key,
+            "tier_name": tier_name,
+            "total_eur": total,
+            "materials": materials,
+        })
+
+    avg_labor = int(sum(labor.values()) / len(labor))
+    return {
+        "budget_tiers": tiers,
+        "labor_estimate_eur": avg_labor,
+        "client_budget_eur": budget_eur,
+        "summary": f"Статичен бюджет за ремонт на {room_type_name}. Цените са ориентировъчни от водещи български магазини.",
+        "_fallback": True,
+    }
+
 @api_router.post("/ai-designer/video-generate")
 async def generate_video_design(
     video: UploadFile = File(...),
@@ -3021,6 +3258,8 @@ async def generate_photo_design(
     """3D Designer v9: Async — returns task_id immediately, client polls for result."""
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+    if not _LLM_AVAILABLE:
+        raise HTTPException(status_code=500, detail="AI модулите не са заредени. Моля, свържете се с поддръжката.")
 
     user_id = None
     if authorization:
@@ -3098,27 +3337,32 @@ async def _process_photo_design(
 
         update_task_progress(task_id, 10, "Анализ на снимките...")
 
+        if not _LLM_AVAILABLE or not OpenAIImageGeneration:
+            raise Exception("AI модулите не са налични. Моля, рестартирайте сървъра.")
+
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         renders = []
 
         # Step 0: Analyze ALL photos together for unified style
         style_analysis = ""
-        try:
-            from emergentintegrations.llm.chat import LlmChat as AnalysisChat
-            analysis_chat = AnalysisChat(
-                api_key=EMERGENT_LLM_KEY,
-                session_id=f"photo-analysis-{uuid.uuid4()}",
-                system_message="Ти си експерт интериорен дизайнер. Отговаряй КРАТКО на български."
-            ).with_model("openai", "gpt-4o-mini")
+        if _LLM_AVAILABLE:
+            try:
+                analysis_chat = LlmChat(
+                    api_key=EMERGENT_LLM_KEY,
+                    session_id=f"photo-analysis-{uuid.uuid4()}",
+                    system_message="Ти си експерт интериорен дизайнер. Отговаряй КРАТКО на български."
+                ).with_model("openai", "gpt-4o-mini")
 
-            analysis_prompt = f"Анализирай тази снимка на {room_type_name}. Опиши КРАТКО: 1) Осветление (топло/студено) 2) Основни елементи и КЪДЕ са (ляво/дясно/център) 3) Цветова гама. Макс 3 реда."
-            style_analysis = await aio.get_event_loop().run_in_executor(
-                None, lambda: analysis_chat.send_message(analysis_prompt).text
-            )
-            logging.info(f"Photo Designer: Style analysis: {style_analysis[:200]}")
-        except Exception as vis_err:
-            logging.warning(f"Photo Designer: Vision analysis skipped: {vis_err}")
-            style_analysis = ""
+                analysis_prompt = f"Анализирай тази снимка на {room_type_name}. Опиши КРАТКО: 1) Осветление (топло/студено) 2) Основни елементи и КЪДЕ са (ляво/дясно/център) 3) Цветова гама. Макс 3 реда."
+                style_analysis = await aio.get_event_loop().run_in_executor(
+                    None, lambda: analysis_chat.send_message(analysis_prompt).text
+                )
+                logging.info(f"Photo Designer: Style analysis: {style_analysis[:200]}")
+            except Exception as vis_err:
+                logging.warning(f"Photo Designer: Vision analysis skipped: {vis_err}")
+                style_analysis = ""
+        else:
+            logging.info("Photo Designer: LlmChat not available — skipping style analysis")
 
         update_task_progress(task_id, 15, "Стилът е анализиран. Генериране...")
 
@@ -3350,31 +3594,56 @@ Output: photorealistic, same camera angle, professional interior photography."""
   "summary": "Кратко описание"
 }}"""
 
-        budget_chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"photo-budget-{uuid.uuid4()}",
-            system_message=budget_system
-        ).with_model("openai", "gpt-4o")
-
         update_task_progress(task_id, 70, "Генериране на бюджет с реални цени...")
 
-        budget_msg = UserMessage(
-            text=f"""Генерирай бюджет за ремонт на {room_type_name} ({width}м x {length}м x {height}м).
+        # Budget generation with gpt-4o-mini (10x cheaper) + cache + static fallback
+        budget_data = {}
+        budget_prompt_text = f"""Генерирай бюджет за ремонт на {room_type_name} ({width}м x {length}м x {height}м).
 БЮДЖЕТ: {budget_eur}€. Стил: {style_desc}. {f'Бележки: {notes}' if notes else ''}
 3 ВАРИАНТА: Иконом до {int(int(budget_eur)*0.6)}€, Среден до {budget_eur}€, Премиум до {int(int(budget_eur)*1.5)}€.
 Всеки с 8-12 материала. ИЗПОЛЗВАЙ реалните продукти от списъка за мебели/обзавеждане!"""
-        )
-        budget_response = await budget_chat.send_message(budget_msg)
 
-        budget_data = {}
-        try:
-            json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', budget_response)
-            if json_match:
-                budget_data = json_module.loads(json_match.group(1))
-            else:
-                budget_data = json_module.loads(budget_response)
-        except Exception:
-            budget_data = {"budget_tiers": [], "labor_estimate_eur": 0}
+        # Check cache first
+        cached = _get_cached(budget_system + budget_prompt_text)
+        if cached:
+            logging.info("Photo Designer: Budget cache HIT — skipping LLM call")
+            budget_data = cached
+        elif _LLM_AVAILABLE and LlmChat:
+            try:
+                budget_chat = LlmChat(
+                    api_key=EMERGENT_LLM_KEY,
+                    session_id=f"photo-budget-{uuid.uuid4()}",
+                    system_message=budget_system
+                ).with_model("openai", "gpt-4o-mini")
+
+                budget_msg = UserMessage(text=budget_prompt_text)
+                budget_response = await budget_chat.send_message(budget_msg)
+
+                try:
+                    json_match = re_module.search(r'```(?:json)?\s*([\s\S]*?)```', budget_response)
+                    if json_match:
+                        budget_data = json_module.loads(json_match.group(1))
+                    else:
+                        budget_data = json_module.loads(budget_response)
+                    # Cache the successful response
+                    _set_cached(budget_system + budget_prompt_text, budget_data)
+                except Exception:
+                    budget_data = {}
+
+            except Exception as budget_err:
+                err_str = str(budget_err)
+                if "Budget has been exceeded" in err_str or "quota" in err_str.lower():
+                    logging.warning(f"Photo Designer: LLM budget exceeded for budget gen, using STATIC fallback")
+                    update_task_progress(task_id, 75, "AI бюджетът е изчерпан — зареждане на стандартен бюджет...")
+                else:
+                    logging.warning(f"Photo Designer: Budget LLM error ({err_str}), using STATIC fallback")
+                budget_data = {}
+
+        # FAILSAFE: Static fallback if LLM produced nothing
+        if not budget_data or not budget_data.get("budget_tiers"):
+            logging.info(f"Photo Designer: Using STATIC fallback budget for {room_type}")
+            budget_data = _build_static_fallback_budget(room_type, int(budget_eur), room_type_name)
+            update_task_progress(task_id, 80, "Бюджет от база данни заредeн.")
 
         # Post-process: Set URLs for all materials
         from urllib.parse import quote as url_quote
@@ -3498,9 +3767,46 @@ Output: photorealistic, same camera angle, professional interior photography."""
     except Exception as e:
         err_msg = str(e)
         if "Budget has been exceeded" in err_msg:
-            logging.error(f"Photo Designer (task {task_id}): LLM Budget exceeded")
-            _tasks[task_id]["status"] = "error"
-            _tasks[task_id]["error"] = "Бюджетът за AI е изчерпан. Моля, добавете баланс от Profile → Universal Key → Add Balance"
+            logging.error(f"Photo Designer (task {task_id}): LLM Budget exceeded — returning static fallback")
+            # Try to salvage: return static budget + original photos as "renders"
+            try:
+                ROOM_TYPE_NAMES_FB = {
+                    "bathroom": "баня", "kitchen": "кухня", "living_room": "хол",
+                    "bedroom": "спалня", "corridor": "коридор", "balcony": "балкон",
+                    "stairs": "стълбище", "facade": "фасада", "other": "помещение"
+                }
+                fb_room_name = ROOM_TYPE_NAMES_FB.get(room_type, "помещение")
+                fb_budget = _build_static_fallback_budget(room_type, int(budget_eur), fb_room_name)
+                design_id = str(uuid.uuid4())
+                fb_renders = []
+                for i, pb in enumerate(photos_b64):
+                    fb_renders.append({"index": i, "label": photo_labels[i] if i < len(photo_labels) else f"Снимка {i+1}", "image_base64": pb, "original_base64": pb})
+                    await db.ai_design_renders.insert_one({
+                        "design_id": design_id, "index": i, "label": photo_labels[i] if i < len(photo_labels) else f"Снимка {i+1}",
+                        "render_b64": pb, "original_b64": pb,
+                    })
+                await db.ai_designs.insert_one({
+                    "id": design_id, "type": "photo", "user_id": user_id,
+                    "room_type": fb_room_name, "room_type_id": room_type, "style": style,
+                    "dimensions": {"width": width, "length": length, "height": height},
+                    "photos_count": len(photos_b64), "renders_count": len(fb_renders),
+                    "budget_data": fb_budget, "notes": notes, "budget_eur": int(budget_eur),
+                    "budget_tier": budget_tier, "shared": False, "created_at": datetime.now(timezone.utc).isoformat(),
+                })
+                result = {
+                    "id": design_id, "renders": fb_renders, "budget": fb_budget,
+                    "style": style, "dimensions": {"width": width, "length": length, "height": height},
+                    "photos_count": len(photos_b64), "renders_count": len(fb_renders),
+                    "_budget_fallback": True,
+                }
+                update_task_progress(task_id, 100, "Готово (бюджетът е ориентировъчен)")
+                _tasks[task_id]["status"] = "done"
+                _tasks[task_id]["result"] = result
+                logging.info(f"Photo Designer: Fallback result saved for task {task_id}")
+            except Exception as fb_err:
+                logging.error(f"Photo Designer fallback also failed: {fb_err}")
+                _tasks[task_id]["status"] = "error"
+                _tasks[task_id]["error"] = "Бюджетът за AI е изчерпан. Моля, добавете баланс от Profile → Universal Key → Add Balance"
         else:
             logging.error(f"Photo Designer error (task {task_id}): {e}")
             _tasks[task_id]["status"] = "error"
