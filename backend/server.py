@@ -3403,26 +3403,25 @@ async def _process_photo_design(
             label = photo_labels[idx] if idx < len(photo_labels) else f"Снимка {idx+1}"
             try:
                 style_context = f"\nАНАЛИЗ НА ОРИГИНАЛНАТА СНИМКА:\n{style_analysis}\n" if style_analysis else ""
-                render_prompt = f"""RENOVATION VISUALIZATION — edit this EXACT photo to show a renovated version.
+                render_prompt = f"""ПЪЛЕН ИНТЕРИОРЕН ДИЗАЙН на {room_type_name} от снимката.
+
+✅ АРХИТЕКТУРАТА ОСТАВА ТОЧНО ТАКВА:
+- Същите стени, ъгли, прозорци, врати — НИЩО НЕ СЕ МЕСТИ
+- Същите размери и пропорции: {width}м x {length}м x {height}м
+- Същата перспектива и ъгъл на камерата — PIXEL-PERFECT идентична геометрия
+- Фиксирани ВиК позиции (тоалетна, мивка, вана/душ, бойлер) — НА СЪЩИТЕ МЕСТА
 {style_context}
-KEEP PIXEL-PERFECT (DO NOT MOVE OR CHANGE):
-- Room shape, walls, ceiling, floor PLAN — identical geometry
-- EVERY window and door — same position, same size
-- Camera angle and perspective — IDENTICAL to the original photo
-- Fixed plumbing positions (toilet, sink, bathtub/shower, boiler) — SAME SPOTS
-- The room type is {room_type_name.upper()} — result MUST remain a {room_type_name}
+✅ НОВИЯТ ДИЗАЙН ВКЛЮЧВА:
+- {style_desc.upper()} стил интериор
+- Модерни мебели в празнините — ПО РАЗМЕРИТЕ НА СТАЯТА
+- Стилни смесители и аксесоари на СЪЩИТЕ позиции
+- Съвременни настилки и облицовки — плочки/паркет/мазилка
+- LED осветление и минималистични акценти (дърво/мрамор)
+- Професионална фотография, реалистично осветление
+{f'- Клиентски бележки: {notes}' if notes else ''}
 
-CHANGE ONLY SURFACES AND OBJECTS:
-- Wall tiles/paint → modern {style_desc} finishes
-- Floor tiles → matching {style_desc} flooring
-- Sink, faucet, mirror → modern {style_desc} versions AT THE SAME POSITIONS
-- Furniture → modern {style_desc} pieces for a {room_type_name}
-- Lighting → modern fixtures
-{f"- Client request: {reno_instruction}" if notes else ""}
-
-MATCH the original photo's lighting ({('топло' if 'топл' in style_analysis.lower() else 'студено' if 'студен' in style_analysis.lower() else 'неутрално')}) and perspective EXACTLY.
-Room: {width}m x {length}m, height {height}m.
-Output: photorealistic, same camera angle, professional interior photography."""
+MATCH осветлението на оригинала ({('топло' if style_analysis and 'топл' in style_analysis.lower() else 'студено' if style_analysis and 'студен' in style_analysis.lower() else 'неутрално')}).
+Резултат: фотореалистичен рендер, ТОЧНО същия ъгъл на камерата, професионална интериорна фотография."""
 
                 original_photo_bytes = base64.b64decode(photo_b64)
                 

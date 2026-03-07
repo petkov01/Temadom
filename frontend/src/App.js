@@ -270,21 +270,21 @@ const Navbar = () => {
           <div className="flex-1" />
 
           {/* Right: Everything else */}
-          <div className="hidden lg:flex items-center gap-0.5">
-            <Link to="/" className="px-2 py-1 text-xs font-medium rounded-md transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
-              Главна
+          <div className="hidden lg:flex items-center gap-1">
+            <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
+              Начало
             </Link>
-            <Link to="/calculator" className="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-calculator">
-              <Calculator className="taskbar-icon" />
-              Калкулатор
+            <a href="#how-it-works" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-how-works">
+              Как работи
+            </a>
+            <Link to="/companies" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
+              Партньори
             </Link>
-            <Link to="/companies" className="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
-              <Building2 className="taskbar-icon" />
-              Фирми
-            </Link>
-            <Link to="/ads" className="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
-              <Megaphone className="taskbar-icon" />
-              Обяви
+            <a href="#faq" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-faq">
+              ЧЗВ
+            </a>
+            <Link to="/ads" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
+              Обява
             </Link>
 
             {/* More dropdown */}
@@ -342,7 +342,7 @@ const Navbar = () => {
             </div>
 
             {/* Separator */}
-            <div className="h-4 w-px mx-1" style={{ background: 'var(--theme-border)' }}></div>
+            <div className="h-5 w-px mx-1.5" style={{ background: 'var(--theme-border)' }}></div>
 
             {/* Theme toggle */}
             <ThemeToggle />
@@ -351,12 +351,12 @@ const Navbar = () => {
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1 text-xs transition-all px-1.5 py-1 rounded-md hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
+                className="flex items-center gap-1.5 text-sm transition-all px-2 py-1.5 rounded-lg hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
                 style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="lang-switcher-btn"
               >
-                <Globe className="taskbar-icon" />
-                <span className="text-[10px] font-medium uppercase">{lang}</span>
+                <Globe className="h-4 w-4" />
+                <span className="text-xs font-medium uppercase">{lang}</span>
               </button>
               {langOpen && (
                 <div className="absolute top-full right-0 mt-2 w-44 rounded-xl shadow-2xl py-1 z-50 animate-slideDown" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="lang-dropdown">
@@ -380,39 +380,37 @@ const Navbar = () => {
 
             {user ? (
               <>
-                {user.user_type === 'client' && (
-                  <Link to="/dashboard/client">
-                    <Button size="sm" className="text-white font-bold rounded-lg text-xs h-7 px-2" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', boxShadow: '0 2px 8px rgba(255,138,0,0.25)' }} data-testid="nav-publish-project">
-                      + {t('nav_register')}
-                    </Button>
-                  </Link>
-                )}
-                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="font-medium flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-dashboard">
-                  <LayoutGrid className="taskbar-icon" />
+                <Link to="/room-scan">
+                  <Button size="sm" className="font-bold rounded-lg text-sm h-9 px-4" style={{ background: 'transparent', color: 'var(--theme-gold)', border: '2px solid var(--theme-gold)', boxShadow: '0 0 12px rgba(212,162,58,0.15)' }} data-testid="nav-your-project-btn">
+                    Твоят проект
+                  </Button>
+                </Link>
+                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-dashboard">
+                  <LayoutGrid className="h-4 w-4" />
                   {t('nav_dashboard')}
                 </Link>
-                <Link to="/messages" className="font-medium flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-messages">
-                  <MessageSquare className="taskbar-icon" />
+                <Link to="/messages" className="font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-messages">
+                  <MessageSquare className="h-4 w-4" />
                   {t('nav_messages')}
                 </Link>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <NotificationBell />
-                  <Link to="/profile" className="text-xs hover:text-[var(--theme-gold)] transition-all flex items-center gap-1 px-1.5 py-1 rounded-md hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-profile">
-                    <User className="taskbar-icon" /> {user.name}
+                  <Link to="/profile" className="text-sm hover:text-[var(--theme-gold)] transition-all flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-profile">
+                    <User className="h-4 w-4" /> {user.name}
                   </Link>
-                  <Button variant="ghost" size="sm" onClick={logout} className="rounded-md hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)] h-7 w-7 p-0" style={{ color: 'var(--theme-text-muted)' }} data-testid="logout-btn">
-                    <LogOut className="taskbar-icon" />
+                  <Button variant="ghost" size="sm" onClick={logout} className="rounded-lg hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)] h-8 w-8 p-0" style={{ color: 'var(--theme-text-muted)' }} data-testid="logout-btn">
+                    <LogOut className="h-4 w-4" />
                   </Button>
                 </div>
               </>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" size="sm" className="rounded-md font-medium text-xs h-7 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="login-btn">{t('nav_login')}</Button>
+                  <Button variant="ghost" size="sm" className="rounded-lg font-medium text-sm h-9 px-3 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="login-btn">{t('nav_login')}</Button>
                 </Link>
-                <Link to="/register">
-                  <Button size="sm" className="text-white font-bold rounded-lg text-xs h-7 px-2" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', boxShadow: '0 2px 8px rgba(255,138,0,0.25)' }} data-testid="register-btn">
-                    {t('nav_register')}
+                <Link to="/room-scan">
+                  <Button size="sm" className="font-bold rounded-lg text-sm h-9 px-4" style={{ background: 'transparent', color: 'var(--theme-gold)', border: '2px solid var(--theme-gold)', boxShadow: '0 0 12px rgba(212,162,58,0.15)' }} data-testid="nav-your-project-btn">
+                    Твоят проект
                   </Button>
                 </Link>
               </>
@@ -928,110 +926,118 @@ const LandingPage = () => {
 
   return (
     <div style={{ background: bg, color: text }} data-testid="landing-page">
-      {/* ===== HERO ===== */}
-      <section className="relative overflow-hidden noise-overlay" style={{ minHeight: '88vh' }}>
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-[700px] h-[700px] rounded-full blur-[160px] -translate-y-1/4 translate-x-1/4" style={{ background: 'rgba(246,195,106,0.06)' }} />
-          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full blur-[140px] translate-y-1/4 -translate-x-1/4" style={{ background: 'rgba(255,138,0,0.04)' }} />
-          <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" style={{ background: 'rgba(16,185,129,0.03)' }} />
+      {/* ===== HERO — Reference Design ===== */}
+      <section className="relative overflow-hidden" style={{ minHeight: '92vh' }}>
+        {/* Subtle background glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[200px]" style={{ background: 'rgba(212,162,58,0.06)' }} />
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 pt-2 pb-8 md:pt-2 md:pb-12 flex flex-col items-center">
-          {/* Hero Logo */}
-          <div className="-mb-8 md:-mb-12 animate-slideUp">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-[28rem] md:h-[36rem] w-auto mx-auto animate-float logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' : 'drop-shadow(0 4px 20px rgba(0,0,0,0.3)) brightness(0.8) contrast(1.2)' }} />
+
+        <div className="relative z-10 max-w-5xl mx-auto px-4 pt-6 md:pt-10 flex flex-col items-center">
+          {/* Centered Hero Logo */}
+          <div className="hero-scale-in mb-2">
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-48 sm:h-56 md:h-72 w-auto mx-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 30px rgba(246, 195, 106, 0.8))' : 'drop-shadow(0 4px 16px rgba(0,0,0,0.25)) brightness(0.85) contrast(1.15)' }} />
           </div>
 
-          {/* Counter badge */}
-          <div className="mb-4 animate-slideUp stagger-1" data-testid="hero-counter">
-            <div className="inline-flex items-center gap-3 rounded-full px-6 py-3 glass" 
-              style={{ border: `1px solid rgba(246,195,106,0.15)` }}>
-              <span className="text-3xl font-black tabular-nums gradient-text-gold">{slotsUsed}</span>
-              <span style={{ color: subtle }} className="text-lg">/</span>
-              <span className="text-3xl font-black tabular-nums gradient-text-gold">{slotsTotal}</span>
-              <div className="h-8 w-px mx-1" style={{ background: border }} />
-              <div className="text-left">
-                <p style={{ color: gold }} className="text-sm font-bold leading-tight">ПЪРВИ 56 ФИРМИ</p>
-                <p style={{ color: subtle }} className="text-[10px]">(2 на област x 28 области)</p>
-                <p className="text-xs font-bold gradient-text-gold">= 6 МЕСЕЦА ПРЕМИУМ 0 EUR</p>
+          {/* BEFORE / AFTER Showcase */}
+          <div className="w-full max-w-4xl mx-auto mb-8 hero-fade-2" data-testid="hero-before-after">
+            <div className="ba-showcase p-3 md:p-4 rounded-2xl" style={{ background: dark ? 'rgba(22,26,35,0.6)' : 'rgba(255,255,255,0.5)', border: `1px solid ${dark ? 'rgba(212,162,58,0.15)' : 'rgba(0,0,0,0.08)'}` }}>
+              {/* Before image */}
+              <div className="ba-image">
+                <img src="/showcase/before_bathroom.jpg" alt="Преди ремонт" />
+                <span className="ba-label left-3" style={{ background: 'rgba(0,0,0,0.65)', color: '#fff', border: '1px solid rgba(212,162,58,0.4)' }}>ПРЕДИ</span>
+              </div>
+
+              {/* Arrow between */}
+              <div className="flex flex-col items-center justify-center px-2 sm:px-4 ba-arrow">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="arrow-pulse">
+                  <path d="M5 12h14M13 6l6 6-6 6" stroke="#d4a23a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <div className="flex flex-col gap-1.5 mt-2">
+                  <span className="w-2 h-2 rounded-full" style={{ background: '#d4a23a', opacity: 0.9 }} />
+                  <span className="w-2 h-2 rounded-full" style={{ background: '#d4a23a', opacity: 0.6 }} />
+                  <span className="w-2 h-2 rounded-full" style={{ background: '#d4a23a', opacity: 0.3 }} />
+                </div>
+              </div>
+
+              {/* After image */}
+              <div className="ba-image">
+                <img src="/showcase/after_bathroom.jpg" alt="След AI дизайн" />
+                <span className="ba-label right-3" style={{ background: 'linear-gradient(135deg, #d4a23a, #f6c36a)', color: '#0f1115' }}>СЛЕД</span>
               </div>
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-center mb-6 leading-tight max-w-4xl animate-slideUp stagger-2">
+          {/* Main headline */}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-center mb-4 leading-tight max-w-3xl hero-fade-3">
             Ремонт без стрес —{' '}
             <span className="gradient-text">AI проектиране</span>
           </h1>
 
-          <p className="text-base md:text-lg text-center mb-4 max-w-2xl animate-slideUp stagger-3" style={{ color: muted }}>
-            Качи 3 снимки → получи реалистичен 3D ремонт + бюджет с директни линкове.
-            Виж точно как ще изглежда ПРЕДИ да платиш.
+          <p className="text-sm md:text-base text-center mb-6 max-w-xl hero-fade-3" style={{ color: muted }}>
+            Качи 3 снимки → получи реалистичен 3D проект + бюджет
           </p>
 
-          {/* Trust elements */}
-          <div className="flex flex-wrap justify-center gap-4 mb-10 animate-slideUp stagger-4">
+          {/* Primary CTA — Gold gradient button */}
+          <button onClick={() => navigate('/room-scan')} data-testid="hero-upload-btn"
+            className="gold-cta px-10 py-4 rounded-xl text-base md:text-lg mb-3 hero-fade-4">
+            КАЧИ СНИМКИ НА ПОМЕЩЕНИЕТО
+          </button>
+
+          <p className="text-xs mb-8 hero-fade-4" style={{ color: subtle }}>
+            3D ремонт + бюджет + линкове към реални магазини
+          </p>
+
+          {/* Room type tabs */}
+          <div className="flex flex-wrap justify-center gap-3 mb-10 hero-fade-5" data-testid="hero-room-tabs">
             {[
-              { icon: <Sparkles className="h-3.5 w-3.5" />, text: 'AI дизайн' },
-              { icon: <Camera className="h-3.5 w-3.5" />, text: '3D проект + бюджет' },
-              { icon: <ShoppingCart className="h-3.5 w-3.5" />, text: 'Линкове към магазини' },
-            ].map((item, i) => (
-              <span key={i} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
-                style={{ color: gold, background: `rgba(246,195,106,0.06)`, border: '1px solid rgba(246,195,106,0.12)' }}>
-                {item.icon} {item.text}
-              </span>
+              { id: 'bathroom', label: 'Баня' },
+              { id: 'kitchen', label: 'Кухня' },
+              { id: 'living_room', label: 'Хол' },
+            ].map((room, i) => (
+              <button key={room.id} onClick={() => navigate(`/room-scan?room=${room.id}`)}
+                className="room-tab" style={{ color: i === 0 ? gold : muted }}
+                data-testid={`hero-tab-${room.id}`}>
+                {room.label}
+              </button>
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6 animate-slideUp stagger-5">
-            <button onClick={() => navigate('/room-scan')} data-testid="hero-room-btn"
-              className="group relative px-8 py-4 rounded-xl text-white text-lg font-bold overflow-hidden transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 animate-orangePulse"
-              style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)' }}>
-              <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Camera className="mr-2 h-6 w-6 inline" /> 3D Дизайнер
-            </button>
-            <button onClick={() => navigate('/ai-sketch')} data-testid="hero-sketch-btn"
-              className="relative px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 btn-gold">
-              <FileText className="mr-2 h-5 w-5 inline" /> CAD Скица
-              <span className="block text-xs font-medium mt-1 opacity-80">Инструмент за професионалисти</span>
-            </button>
-          </div>
-
-          <p className="text-xs mb-12 animate-slideUp" style={{ color: gold }}>
-            AI визуализация на вашия проект
-          </p>
-
-          {/* Before/After Hero Preview */}
-          <div className="max-w-4xl w-full mx-auto mb-12 animate-slideUp">
-            <div className="grid grid-cols-2 gap-3 md:gap-4 premium-card p-3 md:p-4">
-              <div className="relative rounded-xl overflow-hidden">
-                <img src="/showcase/before_bathroom.jpg" alt="Before" className="w-full h-48 md:h-72 object-cover" />
-                <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold" style={{ background: 'rgba(0,0,0,0.7)', color: '#ffffff', backdropFilter: 'blur(8px)' }}>ПРЕДИ</span>
-              </div>
-              <div className="relative rounded-xl overflow-hidden">
-                <img src="/showcase/after_bathroom.jpg" alt="After" className="w-full h-48 md:h-72 object-cover" />
-                <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', color: '#ffffff' }}>СЛЕД AI</span>
+          {/* Counter badge — compact */}
+          <div className="mb-6 hero-fade-5" data-testid="hero-counter">
+            <div className="inline-flex items-center gap-3 rounded-full px-5 py-2.5 glass" 
+              style={{ border: `1px solid rgba(212,162,58,0.15)` }}>
+              <span className="text-2xl font-black tabular-nums gradient-text-gold">{slotsUsed}</span>
+              <span style={{ color: subtle }} className="text-base">/</span>
+              <span className="text-2xl font-black tabular-nums gradient-text-gold">{slotsTotal}</span>
+              <div className="h-6 w-px mx-1" style={{ background: border }} />
+              <div className="text-left">
+                <p style={{ color: gold }} className="text-xs font-bold leading-tight">ПЪРВИ 56 ФИРМИ</p>
+                <p style={{ color: subtle }} className="text-[9px]">(2 на област x 28 области)</p>
+                <p className="text-[10px] font-bold gradient-text-gold">= 6 МЕСЕЦА ПРЕМИУМ 0 EUR</p>
               </div>
             </div>
           </div>
 
           {/* Stats row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-3xl w-full">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl w-full mb-6">
             {[
               { v: `${liveStats.companies || 0}`, l: 'Фирми', c: gold },
               { v: `${liveStats.clients || 0}`, l: 'Клиенти', c: '#10B981' },
               { v: '1:1', l: 'Точен мащаб', c: gold },
               { v: `${slotsLeft} FREE`, l: `${slotsUsed}/${slotsTotal} (2/област)`, c: '#10B981' },
             ].map((s, i) => (
-              <div key={i} className="rounded-xl p-4 text-center glass border" 
+              <div key={i} className="rounded-xl p-3 text-center glass border" 
                 style={{ borderColor: 'var(--theme-border)' }}>
-                <p className="text-2xl font-black" style={{ color: s.c }}>{s.v}</p>
-                <p className="text-[11px] mt-0.5" style={{ color: subtle }}>{s.l}</p>
+                <p className="text-xl font-black" style={{ color: s.c }}>{s.v}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: subtle }}>{s.l}</p>
               </div>
             ))}
           </div>
 
           {/* Regional breakdown */}
           {liveStats.regions && (
-            <div className="max-w-3xl w-full mt-6 rounded-xl p-4 glass border" 
+            <div className="max-w-3xl w-full mt-2 rounded-xl p-4 glass border" 
               style={{ borderColor: 'var(--theme-border)' }} data-testid="region-breakdown">
               <p className="text-xs font-bold mb-3 text-center" style={{ color: subtle }}>{slotsUsed}/56 ФИРМИ (2 на област)</p>
               <div className="flex flex-wrap gap-1.5 justify-center">
@@ -1230,7 +1236,7 @@ const LandingPage = () => {
       </section>
 
       {/* ===== КАК РАБОТИ ===== */}
-      <section className="py-16 border-t" style={{ borderColor: border }} data-testid="how-it-works-section">
+      <section className="py-16 border-t" style={{ borderColor: border }} data-testid="how-it-works-section" id="how-it-works">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-2" style={{ color: text }}>Как работи AI Дизайнерът?</h2>
           <p className="text-center mb-10 text-sm" style={{ color: muted }}>3 лесни стъпки до вашия нов интериор</p>
@@ -1438,6 +1444,34 @@ const LandingPage = () => {
               </div>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ===== ЧЗВ (FAQ) ===== */}
+      <section className="py-16 border-t" style={{ borderColor: border }} data-testid="faq-section" id="faq">
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">Често задавани <span className="gradient-text">въпроси</span></h2>
+          <p className="text-center mb-10 text-sm" style={{ color: muted }}>Всичко, което трябва да знаете за TemaDom</p>
+          <div className="space-y-3">
+            {[
+              { q: 'Как работи AI дизайнерът?', a: 'Качвате 1-3 снимки на помещението. AI анализира точната архитектура — стени, ъгли, прозорци, врати — и генерира реалистичен 3D дизайн, който запазва ТОЧНАТА архитектура на вашата стая.' },
+              { q: 'Колко струва AI проектирането?', a: 'Цените започват от 69 EUR за 1 помещение. Получавате 3D рендер + детайлен бюджет с цени и линкове към реални магазини в България.' },
+              { q: 'Колко време отнема генерирането?', a: 'AI генерацията отнема около 30-60 секунди за едно помещение. Получавате резултата директно в браузъра.' },
+              { q: 'Мога ли да променя стила?', a: 'Да! Предлагаме 10+ стила — модерен, скандинавски, лофт, минимализъм, класически и други. Може да опишете и допълнителни предпочитания.' },
+              { q: 'Откъде са цените в бюджета?', a: 'Цените са от водещи български магазини: Praktiker, Bauhaus, Mr.Bricolage, HomeMax, Jysk, eMAG и други. Всички линкове са реални и актуални.' },
+              { q: 'Какво получава регистрирана фирма?', a: 'Първите 56 фирми (2 на област) получават 6 месеца ПРЕМИУМ достъп безплатно. Това включва AI дизайн, управление на проекти и достъп до клиенти.' },
+            ].map((faq, i) => (
+              <details key={i} className="group rounded-xl border overflow-hidden" style={{ background: bgCard, borderColor: border }} data-testid={`faq-item-${i}`}>
+                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer text-sm font-bold transition-colors hover:text-[var(--theme-gold)]" style={{ color: text }}>
+                  {faq.q}
+                  <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" style={{ color: muted }} />
+                </summary>
+                <div className="px-5 pb-4 text-sm leading-relaxed" style={{ color: muted }}>
+                  {faq.a}
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
