@@ -143,24 +143,35 @@ async def get_task_status(task_id: str):
 
 @api_router.get("/ai-designer/result/{design_id}")
 async def get_design_result(design_id: str):
-    """Fetch full AI design result by ID (separate from polling for mobile)."""
+    """Fetch full AI design result by ID (renders stored separately)."""
     design = await db.ai_designs.find_one({"id": design_id}, {"_id": 0})
     if not design:
         raise HTTPException(status_code=404, detail="Дизайнът не е намерен")
     
-    # Reconstruct renders array from render_X_b64 / original_X_b64 fields
-    photo_labels = ["Общ план", "Ъгъл 1", "Ъгъл 2"]
+    # Fetch renders from separate collection
     renders = []
-    for i in range(design.get("renders_count", 0)):
-        render_b64 = design.get(f"render_{i}_b64", "")
-        original_b64 = design.get(f"original_{i}_b64", "")
-        if render_b64:
-            renders.append({
-                "index": i,
-                "label": photo_labels[i] if i < len(photo_labels) else f"Ъгъл {i}",
-                "image_base64": render_b64,
-                "original_base64": original_b64,
-            })
+    cursor = db.ai_design_renders.find({"design_id": design_id}, {"_id": 0}).sort("index", 1)
+    async for doc in cursor:
+        renders.append({
+            "index": doc.get("index", 0),
+            "label": doc.get("label", f"Render {doc.get('index', 0)}"),
+            "image_base64": doc.get("render_b64", ""),
+            "original_base64": doc.get("original_b64", ""),
+        })
+    
+    # Fallback: check old format (render_X_b64 fields in main document)
+    if not renders:
+        photo_labels = ["Общ план", "Ъгъл 1", "Ъгъл 2"]
+        for i in range(design.get("renders_count", 0)):
+            render_b64 = design.get(f"render_{i}_b64", "")
+            original_b64 = design.get(f"original_{i}_b64", "")
+            if render_b64:
+                renders.append({
+                    "index": i,
+                    "label": photo_labels[i] if i < len(photo_labels) else f"Ъгъл {i}",
+                    "image_base64": render_b64,
+                    "original_base64": original_b64,
+                })
     
     return {
         "id": design.get("id", design_id),
@@ -3384,8 +3395,35 @@ Output: photorealistic, professional interior photography."""
         logging.info(f"Photo Designer: Budget generated with {real_count}/{total_count} verified real products")
         update_task_progress(task_id, 90, "Запазване на проекта...")
 
-        # Save project to DB
+        # Save project to DB — renders stored SEPARATELY to avoid 16MB BSON limit
         design_id = str(uuid.uuid4())
+
+        # Compress renders before storing (JPEG quality 65 to reduce size)
+        import io as io_save
+        from PIL import Image as PILSave
+        def compress_b64(b64_str, quality=65):
+            try:
+                raw = base64.b64decode(b64_str)
+                img = PILSave.open(io_save.BytesIO(raw))
+                if img.mode == 'RGBA':
+                    img = img.convert('RGB')
+                buf = io_save.BytesIO()
+                img.save(buf, format='JPEG', quality=quality)
+                return base64.b64encode(buf.getvalue()).decode('utf-8')
+            except Exception:
+                return b64_str  # fallback to original
+
+        # Save each render as a separate document
+        for i, r in enumerate(renders):
+            render_doc = {
+                "design_id": design_id,
+                "index": i,
+                "label": r["label"],
+                "render_b64": compress_b64(r["image_base64"]),
+                "original_b64": compress_b64(r["original_base64"], quality=70),
+            }
+            await db.ai_design_renders.insert_one(render_doc)
+
         design_record = {
             "id": design_id,
             "type": "photo",
@@ -3403,9 +3441,6 @@ Output: photorealistic, professional interior photography."""
             "shared": False,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
-        for i, r in enumerate(renders):
-            design_record[f"render_{i}_b64"] = r["image_base64"]
-            design_record[f"original_{i}_b64"] = r["original_base64"]
 
         await db.ai_designs.insert_one(design_record)
 
