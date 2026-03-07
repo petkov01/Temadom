@@ -260,14 +260,17 @@ const Navbar = () => {
   return (
     <nav className="glass-nav sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center relative" style={{ height: '44px' }}>
-          {/* Logo top-left in taskbar */}
-          <Link to="/" className="absolute top-1 left-0 z-10" data-testid="logo-link">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-9 lg:h-9 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
+        <div className="flex items-center relative" style={{ height: '44px' }}>
+          {/* Logo - left */}
+          <Link to="/" className="flex-shrink-0" data-testid="logo-link">
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-9 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
           </Link>
 
-          {/* Left: Nav links (desktop) - shifted right for logo */}
-          <div className="hidden lg:flex items-center gap-1 ml-12">
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Right: Everything else */}
+          <div className="hidden lg:flex items-center gap-1">
             <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
               Главна
             </Link>
@@ -416,7 +419,7 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="lg:hidden flex items-center gap-2 ml-11">
+          <div className="lg:hidden flex items-center gap-2">
             <ThemeToggle />
             <div className="relative" ref={mobileLangRef}>
               <button
