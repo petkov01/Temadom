@@ -258,32 +258,32 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="glass-nav sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center relative" style={{ height: '100px' }}>
+    <nav className="glass-nav sticky top-0 z-50" data-testid="main-navbar">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="flex items-center relative taskbar-container">
           {/* Logo - left */}
           <Link to="/" className="flex-shrink-0" data-testid="logo-link">
-            <img src="/logo-temadom.png?v=96" alt="TemaDom" id="nav-logo" className="object-contain logo-glow" style={{ height: '96px', width: 'auto', maxWidth: 'none', display: 'block', filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
+            <img src="/logo-temadom.png?v=96" alt="TemaDom" id="nav-logo" className="object-contain logo-glow taskbar-logo" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
           </Link>
 
           {/* Spacer */}
           <div className="flex-1" />
 
           {/* Right: Everything else */}
-          <div className="hidden lg:flex items-center gap-1">
-            <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
+          <div className="hidden lg:flex items-center gap-0.5">
+            <Link to="/" className="px-2 py-1 text-xs font-medium rounded-md transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
               Главна
             </Link>
-            <Link to="/calculator" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-calculator">
-              <Calculator className="h-3.5 w-3.5" />
+            <Link to="/calculator" className="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-calculator">
+              <Calculator className="taskbar-icon" />
               Калкулатор
             </Link>
-            <Link to="/companies" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
-              <Building2 className="h-3.5 w-3.5" />
-              Фирми и Майстори
+            <Link to="/companies" className="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
+              <Building2 className="taskbar-icon" />
+              Фирми
             </Link>
-            <Link to="/ads" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
-              <Megaphone className="h-3.5 w-3.5" />
+            <Link to="/ads" className="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
+              <Megaphone className="taskbar-icon" />
               Обяви
             </Link>
 
@@ -291,11 +291,11 @@ const Navbar = () => {
             <div className="relative" ref={moreRef}>
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
+                className="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
                 style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="nav-more-btn"
               >
-                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`taskbar-icon transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
                 Още
               </button>
               {moreOpen && (
@@ -342,7 +342,7 @@ const Navbar = () => {
             </div>
 
             {/* Separator */}
-            <div className="h-5 w-px mx-2" style={{ background: 'var(--theme-border)' }}></div>
+            <div className="h-4 w-px mx-1" style={{ background: 'var(--theme-border)' }}></div>
 
             {/* Theme toggle */}
             <ThemeToggle />
@@ -351,12 +351,12 @@ const Navbar = () => {
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 text-sm transition-all px-2 py-1.5 rounded-lg hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
+                className="flex items-center gap-1 text-xs transition-all px-1.5 py-1 rounded-md hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
                 style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="lang-switcher-btn"
               >
-                <Globe className="h-4 w-4" />
-                <span className="text-xs font-medium uppercase">{lang}</span>
+                <Globe className="taskbar-icon" />
+                <span className="text-[10px] font-medium uppercase">{lang}</span>
               </button>
               {langOpen && (
                 <div className="absolute top-full right-0 mt-2 w-44 rounded-xl shadow-2xl py-1 z-50 animate-slideDown" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="lang-dropdown">
@@ -382,36 +382,36 @@ const Navbar = () => {
               <>
                 {user.user_type === 'client' && (
                   <Link to="/dashboard/client">
-                    <Button className="text-white font-bold rounded-xl" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', boxShadow: '0 4px 15px rgba(255,138,0,0.25)' }} data-testid="nav-publish-project">
+                    <Button size="sm" className="text-white font-bold rounded-lg text-xs h-7 px-2" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', boxShadow: '0 2px 8px rgba(255,138,0,0.25)' }} data-testid="nav-publish-project">
                       + {t('nav_register')}
                     </Button>
                   </Link>
                 )}
-                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-dashboard">
-                  <LayoutGrid className="h-4 w-4" />
+                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="font-medium flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-dashboard">
+                  <LayoutGrid className="taskbar-icon" />
                   {t('nav_dashboard')}
                 </Link>
-                <Link to="/messages" className="font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-messages">
-                  <MessageSquare className="h-4 w-4" />
+                <Link to="/messages" className="font-medium flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-messages">
+                  <MessageSquare className="taskbar-icon" />
                   {t('nav_messages')}
                 </Link>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <NotificationBell />
-                  <Link to="/profile" className="text-sm hover:text-[var(--theme-gold)] transition-all flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-profile">
-                    <User className="h-3.5 w-3.5" /> {user.name}
+                  <Link to="/profile" className="text-xs hover:text-[var(--theme-gold)] transition-all flex items-center gap-1 px-1.5 py-1 rounded-md hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-profile">
+                    <User className="taskbar-icon" /> {user.name}
                   </Link>
-                  <Button variant="ghost" size="sm" onClick={logout} className="rounded-lg hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="logout-btn">
-                    <LogOut className="h-4 w-4" />
+                  <Button variant="ghost" size="sm" onClick={logout} className="rounded-md hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)] h-7 w-7 p-0" style={{ color: 'var(--theme-text-muted)' }} data-testid="logout-btn">
+                    <LogOut className="taskbar-icon" />
                   </Button>
                 </div>
               </>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" className="rounded-lg font-medium hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="login-btn">{t('nav_login')}</Button>
+                  <Button variant="ghost" size="sm" className="rounded-md font-medium text-xs h-7 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="login-btn">{t('nav_login')}</Button>
                 </Link>
                 <Link to="/register">
-                  <Button className="text-white font-bold rounded-xl" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', boxShadow: '0 4px 15px rgba(255,138,0,0.25)' }} data-testid="register-btn">
+                  <Button size="sm" className="text-white font-bold rounded-lg text-xs h-7 px-2" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', boxShadow: '0 2px 8px rgba(255,138,0,0.25)' }} data-testid="register-btn">
                     {t('nav_register')}
                   </Button>
                 </Link>
@@ -419,16 +419,16 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="lg:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-1">
             <ThemeToggle />
             <div className="relative" ref={mobileLangRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="p-2 hover:text-[#4DA6FF]"
+                className="p-1 hover:text-[#4DA6FF]"
                 style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="mobile-lang-btn"
               >
-                <Globe className="h-5 w-5" />
+                <Globe className="h-4 w-4" />
               </button>
               {langOpen && (
                 <div className="absolute top-full right-0 mt-2 w-44 rounded-lg shadow-2xl py-1 z-50" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
@@ -449,12 +449,12 @@ const Navbar = () => {
               )}
             </div>
             <button 
-              className="p-2"
+              className="p-1"
               style={{ color: 'var(--theme-text-muted)' }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               data-testid="mobile-menu-btn"
             >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>

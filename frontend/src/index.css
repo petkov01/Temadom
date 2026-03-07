@@ -322,6 +322,37 @@ html.light-mode .badge-accent { @apply bg-orange-100 text-orange-700; }
   border-bottom: 1px solid var(--theme-nav-border);
 }
 
+/* ==================== COMPACT TASKBAR ==================== */
+.taskbar-container {
+  height: 42px;
+  padding: 4px 0;
+}
+.taskbar-logo {
+  height: 36px;
+  width: auto;
+  max-width: none;
+  display: block;
+}
+.taskbar-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+  .taskbar-container {
+    height: 32px;
+    padding: 2px 0;
+  }
+  .taskbar-logo {
+    height: 24px;
+  }
+  .taskbar-icon {
+    width: 12px;
+    height: 12px;
+  }
+}
+
 .gradient-text-gold {
   background: linear-gradient(135deg, #f6c36a, #e0a94a);
   -webkit-background-clip: text;

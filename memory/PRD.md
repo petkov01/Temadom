@@ -16,18 +16,22 @@ TemaDom е уеб платформа за строителство и ремон
 
 ### Phase 7 (Mar 7, 2026) - AI Designer Speed & Mobile Fix
 - **Async Task System**: POST -> task_id immediately (<2s), frontend polls every 3s
-- **Separated polling from result**: Polling returns ~150 bytes (no base64). Full result fetched from `/api/ai-designer/result/{design_id}`
+- **Separated polling from result**: Polling returns ~150 bytes (no base64)
 - **Parallel Processing**: Photos + product scraping via `asyncio.gather`
-- **Navbar Logo**: 80x80px on all screens (h-20)
 
-### Phase 8 (Feb 2026) - AI Designer Cost & Reliability
-- **Safe LlmChat Import**: try/except with `_LLM_AVAILABLE` flag, graceful degradation
-- **gpt-4o-mini for budget**: Switched from gpt-4o (10x cheaper: $0.15/M tokens vs $3.75)
-- **LLM Response Cache**: MD5-based in-memory cache (200 entries) — skip redundant LLM calls
-- **Static Fallback Budget**: `BG_ROOM_PRICES` table with predefined prices for bathroom/kitchen/living_room/bedroom from real Bulgarian stores (Praktiker, Bauhaus, Mr.Bricolage, HomeMax, Jysk, eMAG)
-- **Budget Fallback on Error**: When LLM budget exceeded or API fails, returns static budget + original photos instead of crashing
+### Phase 8 (Mar 7, 2026) - AI Designer Cost & Reliability
+- **Safe LlmChat Import**: try/except with `_LLM_AVAILABLE` flag
+- **gpt-4o-mini for budget**: 10x cheaper ($0.15/M vs $3.75/M tokens)
+- **LLM Response Cache**: MD5-based in-memory cache (200 entries)
+- **Static Fallback Budget**: BG_ROOM_PRICES for bathroom/kitchen/living_room/bedroom
+- **Budget Fallback on Error**: Returns static budget + original photos instead of crashing
 - **Frontend Fallback Notice**: Orange banner when budget is from static data
-- **Testing**: iteration_81 — 13/13 backend, 100% frontend
+
+### Phase 8b (Mar 7, 2026) - Compact Taskbar
+- **Desktop**: 42px height, 36px logo, 14px icons, compact spacing
+- **Mobile**: 32px height, 24px logo, 12px icons
+- **CSS classes**: .taskbar-container, .taskbar-logo, .taskbar-icon
+- Responsive breakpoint at 1023px (lg)
 
 ## Key API Endpoints
 - `POST /api/ai-designer/photo-generate` -> `{task_id}` immediately
