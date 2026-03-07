@@ -43,7 +43,7 @@ function useGlbViewer(containerRef, glbBase64) {
     const w = container.clientWidth, h = container.clientHeight;
     const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0F1923);
     const camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 1000); camera.position.set(15, 12, 15);
-    const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.autoRotate = true; controls.autoRotateSpeed = 0.5;
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
@@ -403,17 +403,55 @@ export const AISketchPage = () => {
   };
 
   const downloadAsImage = useCallback(() => {
-    const canvasEl = document.querySelector('[data-testid="cad-canvas"]');
-    if (!canvasEl) { toast.error('Няма чертеж за сваляне'); return; }
+    const cadCanvas = document.querySelector('[data-testid="cad-canvas"]');
+    if (!cadCanvas) { toast.error('Няма чертеж за сваляне'); return; }
     try {
-      const dataUrl = canvasEl.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = `temadom-plan-${new Date().toISOString().slice(0,10)}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      toast.success('Изображението е свалено!');
+      // Get 3D viewer canvas
+      const viewerDiv = document.querySelector('[data-testid="3d-viewer"]');
+      const threeCanvas = viewerDiv ? viewerDiv.querySelector('canvas') : null;
+
+      if (threeCanvas) {
+        // Combine 2D + 3D side by side
+        const gap = 20;
+        const totalW = cadCanvas.width + threeCanvas.width + gap;
+        const totalH = Math.max(cadCanvas.height, threeCanvas.height) + 60;
+        const combined = document.createElement('canvas');
+        combined.width = totalW;
+        combined.height = totalH;
+        const ctx = combined.getContext('2d');
+        // Background
+        ctx.fillStyle = '#0F1923';
+        ctx.fillRect(0, 0, totalW, totalH);
+        // Labels
+        ctx.fillStyle = '#d4a43a';
+        ctx.font = 'bold 18px sans-serif';
+        ctx.fillText('2D Чертеж', 10, 22);
+        ctx.fillStyle = '#4DA6FF';
+        ctx.fillText('3D Преглед', cadCanvas.width + gap + 10, 22);
+        // Draw 2D
+        ctx.drawImage(cadCanvas, 0, 35);
+        // Draw 3D
+        ctx.drawImage(threeCanvas, cadCanvas.width + gap, 35);
+
+        const dataUrl = combined.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `temadom-plan-3d-${new Date().toISOString().slice(0,10)}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast.success('2D + 3D изображение свалено!');
+      } else {
+        // Fallback: only 2D canvas
+        const dataUrl = cadCanvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `temadom-plan-${new Date().toISOString().slice(0,10)}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast.success('Изображението е свалено!');
+      }
     } catch (err) {
       toast.error('Грешка при сваляне на изображение');
     }
@@ -606,7 +644,7 @@ export const AISketchPage = () => {
                 </div>
                 <Button size="sm" className="w-full bg-[#28A745] hover:bg-[#22943e] text-white text-xs h-10 font-bold"
                   onClick={downloadAsImage} data-testid="download-cad-image">
-                  <Download className="mr-1.5 h-4 w-4" /> Свали като изображение (PNG)
+                  <Download className="mr-1.5 h-4 w-4" /> Свали 2D + 3D (PNG)
                 </Button>
               </CardContent>
             </Card>

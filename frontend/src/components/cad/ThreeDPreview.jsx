@@ -175,7 +175,7 @@ export function useThreeViewer(containerRef, els, scale, selIdx) {
 
     const camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 1000);
     camera.position.set(12, 10, 12);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer.setSize(w, h);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
