@@ -1002,35 +1002,142 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ===== DEMO: TikTok scroll 6 projects ===== */}
-      <section className="py-16 border-t" style={{ borderColor: border }}>
+      {/* ===== SHOWCASE: 5 Real AI-Generated Projects ===== */}
+      <section className="py-16 border-t" style={{ borderColor: border }} data-testid="showcase-section">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">AI Демо Проекти</h2>
-          <p className="text-center mb-8 text-sm" style={{ color: muted }}>Примери за 1:1 реалистични ремонти</p>
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none' }} data-testid="demo-scroll">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2" style={{ color: text }}>Реални AI Проекти от TemaDom</h2>
+          <p className="text-center mb-3 text-sm" style={{ color: muted }}>Генерирани от нашия 3D дизайнер с реални цени и линкове</p>
+          <p className="text-center mb-8 text-xs" style={{ color: accent }}>Снимай помещението си и получи същия резултат</p>
+
+          {/* Room type quick buttons */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8" data-testid="room-quick-btns">
             {[
-              { title: 'Модерна баня', style: 'Модерен', price: '69 EUR', rooms: 1, color: '#F97316' },
-              { title: 'Скандинавска кухня', style: 'Скандинавски', price: '69 EUR', rooms: 1, color: '#10B981' },
-              { title: 'Лофт хол + спалня', style: 'Лофт', price: '129 EUR', rooms: 2, color: '#3B82F6' },
-              { title: 'Класически апартамент', style: 'Класически', price: '129 EUR', rooms: 3, color: '#8B5CF6' },
-              { title: 'Минимал. офис', style: 'Минималистичен', price: '220 EUR', rooms: 4, color: '#EC4899' },
-              { title: 'Пълен етаж', style: 'Модерен', price: '220 EUR', rooms: 5, color: '#F97316' },
-            ].map((p, i) => (
-              <div key={i} className="snap-start flex-shrink-0 w-64 rounded-2xl overflow-hidden border transition-transform hover:scale-105 cursor-pointer"
-                style={{ background: bgCard, borderColor: border }} onClick={() => navigate('/room-scan')} data-testid={`demo-card-${i}`}>
-                <div className="h-36 flex items-center justify-center" style={{ background: `${p.color}15` }}>
-                  <Camera className="h-12 w-12" style={{ color: `${p.color}60` }} />
-                </div>
-                <div className="p-4">
-                  <p className="font-bold text-sm mb-1">{p.title}</p>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[10px] px-2 py-0.5 rounded-full border" style={{ borderColor: `${p.color}30`, color: p.color }}>{p.style}</span>
-                    <span className="text-[10px]" style={{ color: muted }}>{p.rooms} пом.</span>
+              { id: 'bathroom', label: 'БАНЯ', icon: '🛁' },
+              { id: 'living_room', label: 'ХОЛ', icon: '🛋' },
+              { id: 'bedroom', label: 'СПАЛНЯ', icon: '🛏' },
+              { id: 'kitchen', label: 'КУХНЯ', icon: '🍳' },
+              { id: 'kids_room', label: 'ДЕТСКА', icon: '🎨' },
+            ].map(r => (
+              <button key={r.id} onClick={() => navigate(`/room-scan?room=${r.id}`)}
+                className="px-4 py-2.5 rounded-full text-sm font-bold border-2 transition-all hover:scale-105 active:scale-95"
+                style={{ borderColor: accent, color: accent, background: dark ? '#F9731610' : '#FFF7ED' }}
+                data-testid={`quick-btn-${r.id}`}>
+                {r.icon} {r.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Project cards grid — REAL AI-generated renders */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                room: 'БАНЯ', roomId: 'bathroom', dims: '3.5 x 3.0м', tierTotal: 2000, price: '69', color: '#F97316',
+                before: '/showcase/before_bathroom.jpg', after: '/showcase/after_bathroom.jpg',
+                products: [
+                  { name: 'Керамогранит 30x60', price: '500', store: 'HomeMax', url: 'https://www.home-max.bg/search/?q=%D0%BA%D0%B5%D1%80%D0%B0%D0%BC%D0%BE%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%82+30x60&ref=temadom' },
+                  { name: 'Стенна тоалетна', price: '250', store: 'Bauhaus', url: 'https://bauhaus.bg/search/%D1%81%D1%82%D0%B5%D0%BD%D0%BD%D0%B0+%D1%82%D0%BE%D0%B0%D0%BB%D0%B5%D1%82%D0%BD%D0%B0&utm_source=temadom&utm_medium=affiliate' },
+                  { name: 'Душ кабина хидромасаж', price: '400', store: 'Mr.Bricolage', url: 'https://mr-bricolage.bg/search?q=%D0%B4%D1%83%D1%88+%D0%BA%D0%B0%D0%B1%D0%B8%D0%BD%D0%B0&ref=temadom' },
+                ],
+              },
+              {
+                room: 'ХОЛ', roomId: 'living_room', dims: '5.0 x 4.0м', tierTotal: 3500, price: '89', color: '#10B981',
+                before: '/showcase/before_living.jpg', after: '/showcase/after_living_room.jpg',
+                products: [
+                  { name: 'Ламинат Дъб Натюр', price: '400', store: 'Praktiker', url: 'https://praktiker.bg/search?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+%D0%B4%D1%8A%D0%B1&utm_source=temadom&utm_medium=affiliate' },
+                  { name: 'Боя матов ефект 10л', price: '120', store: 'Mr.Bricolage', url: 'https://mr-bricolage.bg/search?q=%D0%B1%D0%BE%D1%8F+%D0%BC%D0%B0%D1%82%D0%BE%D0%B2&ref=temadom' },
+                  { name: 'LED панел вграден', price: '200', store: 'Praktiker', url: 'https://praktiker.bg/search?q=LED+%D0%BF%D0%B0%D0%BD%D0%B5%D0%BB&utm_source=temadom&utm_medium=affiliate' },
+                ],
+              },
+              {
+                room: 'СПАЛНЯ', roomId: 'bedroom', dims: '4.0 x 3.5м', tierTotal: 2790, price: '79', color: '#3B82F6',
+                before: '/showcase/before_bedroom.jpg', after: '/showcase/after_bedroom.jpg',
+                products: [
+                  { name: 'Легло мемори матрак 160', price: '800', store: 'eMAG', url: 'https://www.emag.bg/search/%D0%BB%D0%B5%D0%B3%D0%BB%D0%BE+%D0%BC%D0%B5%D0%BC%D0%BE%D1%80%D0%B8+160?ref=temadom' },
+                  { name: 'Ламинат 10мм дъб', price: '250', store: 'HomeMax', url: 'https://www.home-max.bg/search/?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC&ref=temadom' },
+                  { name: 'Боя акрилна мат', price: '80', store: 'Bauhaus', url: 'https://bauhaus.bg/search/%D0%B0%D0%BA%D1%80%D0%B8%D0%BB%D0%BD%D0%B0+%D0%B1%D0%BE%D1%8F&utm_source=temadom&utm_medium=affiliate' },
+                ],
+              },
+              {
+                room: 'КУХНЯ', roomId: 'kitchen', dims: '3.0 x 2.5м', tierTotal: 4497, price: '99', color: '#8B5CF6',
+                before: '/showcase/before_kitchen.jpg', after: '/showcase/after_kitchen.jpg',
+                products: [
+                  { name: 'Кухненски шкафове MDF', price: '2,000', store: 'Jysk', url: 'https://jysk.bg/search?q=%D0%BA%D1%83%D1%85%D0%BD%D0%B5%D0%BD%D1%81%D0%BA%D0%B8+%D1%88%D0%BA%D0%B0%D1%84%D0%BE%D0%B2%D0%B5&utm_source=temadom&utm_medium=affiliate' },
+                  { name: 'Керамични плочки 60x60', price: '300', store: 'Praktiker', url: 'https://praktiker.bg/search?q=%D0%BA%D0%B5%D1%80%D0%B0%D0%BC%D0%B8%D1%87%D0%BD%D0%B8+%D0%BF%D0%BB%D0%BE%D1%87%D0%BA%D0%B8+60x60&utm_source=temadom&utm_medium=affiliate' },
+                  { name: 'Мивка Franke полирана', price: '300', store: 'eMAG', url: 'https://www.emag.bg/search/%D0%BC%D0%B8%D0%B2%D0%BA%D0%B0+Franke?ref=temadom' },
+                ],
+              },
+              {
+                room: 'ДЕТСКА', roomId: 'kids_room', dims: '3.8 x 3.2м', tierTotal: 2295, price: '69', color: '#EC4899',
+                before: '/showcase/before_kids.jpg', after: '/showcase/after_kids_room.jpg',
+                products: [
+                  { name: 'Ламинат 10мм Дъб Каиро', price: '150', store: 'HomeMax', url: 'https://www.home-max.bg/search/?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC+%D0%B4%D1%8A%D0%B1&ref=temadom' },
+                  { name: 'Боя неутрално сива', price: '70', store: 'Bauhaus', url: 'https://bauhaus.bg/search/%D0%B1%D0%BE%D1%8F+%D1%81%D0%B8%D0%B2%D0%B0&utm_source=temadom&utm_medium=affiliate' },
+                  { name: 'Полилей със стъкло', price: '80', store: 'Jysk', url: 'https://jysk.bg/search?q=%D0%BF%D0%BE%D0%BB%D0%B8%D0%BB%D0%B5%D0%B9&utm_source=temadom&utm_medium=affiliate' },
+                ],
+              },
+            ].map((proj, i) => (
+              <div key={i} className="rounded-2xl overflow-hidden border transition-all hover:shadow-xl group"
+                style={{ background: bgCard, borderColor: border }}
+                data-testid={`showcase-card-${i}`}>
+                {/* Before / After images */}
+                <div className="relative">
+                  <div className="grid grid-cols-2 h-48">
+                    <div className="relative overflow-hidden">
+                      <img src={proj.before} alt={`${proj.room} преди`} className="w-full h-full object-cover" loading="lazy" />
+                      <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-black/60 text-white">ПРЕДИ</span>
+                    </div>
+                    <div className="relative overflow-hidden">
+                      <img src={proj.after} alt={`${proj.room} след`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                      <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded text-white" style={{ background: proj.color }}>СЛЕД AI</span>
+                    </div>
                   </div>
-                  <p className="text-lg font-black" style={{ color: accent }}>{p.price}</p>
+                  {/* Room label overlay */}
+                  <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
+                    <span className="text-xs font-black px-2 py-1 rounded-full bg-black/60 text-white">{proj.room} {proj.dims}</span>
+                    <span className="text-xs font-bold px-2 py-1 rounded-full text-white" style={{ background: proj.color }}>
+                      {proj.tierTotal.toLocaleString()} EUR
+                    </span>
+                  </div>
+                </div>
+
+                {/* Real products with affiliate links */}
+                <div className="p-4 space-y-1.5">
+                  <p className="text-[10px] font-bold mb-2" style={{ color: muted }}>Топ материали (среден вариант):</p>
+                  {proj.products.map((p, pi) => (
+                    <a key={pi} href={p.url} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-between py-1.5 px-2.5 rounded-lg transition-colors hover:bg-[#F97316]/5 group/link"
+                      data-testid={`showcase-product-${i}-${pi}`}>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold truncate group-hover/link:text-[#F97316] transition-colors" style={{ color: text }}>{p.name}</p>
+                        <p className="text-[10px]" style={{ color: muted }}>{p.store}</p>
+                      </div>
+                      <span className="text-xs font-black flex-shrink-0 ml-2" style={{ color: proj.color }}>{p.price} EUR</span>
+                    </a>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <div className="px-4 pb-4">
+                  <button onClick={() => navigate(`/room-scan?room=${proj.roomId}`)}
+                    className="w-full py-3 rounded-xl text-white text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.02] active:scale-95"
+                    style={{ background: proj.color }}
+                    data-testid={`showcase-cta-${i}`}>
+                    СНИМАЙ {proj.room} — {proj.price} EUR
+                  </button>
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="text-center mt-10">
+            <p className="text-sm mb-4" style={{ color: muted }}>3D рендер + бюджет с цени + линкове към 9 магазина</p>
+            <button onClick={() => navigate('/room-scan')}
+              className="px-8 py-4 rounded-xl text-white text-lg font-bold transition-all hover:scale-105 active:scale-95"
+              style={{ background: accent, boxShadow: `0 0 30px ${accent}40` }}
+              data-testid="showcase-main-cta">
+              ИЗБЕРИ ПОМЕЩЕНИЕ
+            </button>
           </div>
         </div>
       </section>
