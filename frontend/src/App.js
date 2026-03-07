@@ -987,7 +987,10 @@ const LandingPage = () => {
               <Camera className="mr-2 h-6 w-6 inline" /> Качи снимки на помещението
             </button>
             <button onClick={() => navigate('/ai-sketch')} data-testid="hero-sketch-btn"
-              className="px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 btn-gold">
+              className="relative px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 btn-gold">
+              <span className="absolute -top-3 -right-2 bg-gradient-to-r from-[#8C56FF] to-[#6D3FC4] text-white text-[9px] font-black px-2.5 py-0.5 rounded-full tracking-wider shadow-lg" style={{ filter: 'drop-shadow(0 0 6px rgba(140,86,255,0.5))' }}>
+                PRO TOOL
+              </span>
               <FileText className="mr-2 h-5 w-5 inline" /> CAD Скица
             </button>
           </div>
