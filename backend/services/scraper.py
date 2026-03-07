@@ -52,7 +52,9 @@ STORE_CONFIGS = {
         "name": "Mr.Bricolage",
         "base_url": "https://www.mr-bricolage.bg",
         "search_url": "https://www.mr-bricolage.bg/search?q={query}",
-        "type": "search_url",
+        "type": "playwright",
+        "extract_fn": "_extract_mrbricolage",
+        "wait_selector": ".product, .product-card",
     },
     "videnov": {
         "name": "Videnov",
@@ -66,7 +68,9 @@ STORE_CONFIGS = {
         "name": "Praktiker",
         "base_url": "https://praktiker.bg",
         "search_url": "https://praktiker.bg/bg/search?q={query}",
-        "type": "search_url",
+        "type": "playwright",
+        "extract_fn": "_extract_praktiker",
+        "wait_selector": ".product-box, .product-item",
     },
     "jysk": {
         "name": "Jysk",
@@ -84,7 +88,9 @@ STORE_CONFIGS = {
         "name": "eMAG",
         "base_url": "https://www.emag.bg",
         "search_url": "https://www.emag.bg/search/{query}",
-        "type": "search_url",
+        "type": "playwright",
+        "extract_fn": "_extract_emag",
+        "wait_selector": ".card-item, .card-v2",
     },
     "ikea": {
         "name": "IKEA",
@@ -268,9 +274,65 @@ async def _extract_videnov(page) -> list:
     }''')
 
 
+async def _extract_praktiker(page) -> list:
+    """Extract products from Praktiker search results page."""
+    return await page.evaluate('''() => {
+        const results = [];
+        const items = document.querySelectorAll('.product-box, .product-item, [class*=product-card]');
+        for (let i = 0; i < Math.min(items.length, 10); i++) {
+            const el = items[i];
+            const title = el.querySelector('[class*=title], [class*=name], h3, h4');
+            const priceEl = el.querySelector('[class*=price], .price');
+            const link = el.querySelector('a[href*="/bg/"]');
+            const img = el.querySelector('img');
+            const name = (title ? title.textContent.trim() : '');
+            const href = link ? link.href : '';
+            if (name && href) {
+                results.push({
+                    name: name.substring(0, 120),
+                    price_text: priceEl ? priceEl.textContent.trim().substring(0, 60) : '',
+                    url: href.startsWith('http') ? href : 'https://praktiker.bg' + href,
+                    image: img ? (img.src || img.dataset?.src || '') : '',
+                    store: 'Praktiker'
+                });
+            }
+        }
+        return results;
+    }''')
+
+
+async def _extract_emag(page) -> list:
+    """Extract products from eMAG search results page."""
+    return await page.evaluate('''() => {
+        const results = [];
+        const items = document.querySelectorAll('.card-item, .card-v2, [class*=card-standard]');
+        for (let i = 0; i < Math.min(items.length, 10); i++) {
+            const el = items[i];
+            const title = el.querySelector('[class*=product-title], [class*=card-v2-title], h2 a, .pad-hrz-xs a');
+            const priceEl = el.querySelector('[class*=product-new-price], .product-new-price, [class*=price]');
+            const link = el.querySelector('a[href*="/pd/"]') || el.querySelector('a[href*=".html"]');
+            const img = el.querySelector('img');
+            const name = (title ? title.textContent.trim() : '');
+            const href = link ? link.href : '';
+            if (name && href) {
+                results.push({
+                    name: name.substring(0, 120),
+                    price_text: priceEl ? priceEl.textContent.trim().substring(0, 60) : '',
+                    url: href.startsWith('http') ? href : 'https://www.emag.bg' + href,
+                    image: img ? (img.src || img.dataset?.src || '') : '',
+                    store: 'eMAG'
+                });
+            }
+        }
+        return results;
+    }''')
+
+
 EXTRACT_FNS = {
     "_extract_mrbricolage": _extract_mrbricolage,
     "_extract_videnov": _extract_videnov,
+    "_extract_praktiker": _extract_praktiker,
+    "_extract_emag": _extract_emag,
 }
 
 

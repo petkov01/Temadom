@@ -1230,6 +1230,31 @@ async def get_user_basic(user_id: str):
         "user_type": u.get("user_type", "")
     }
 
+@api_router.get("/users/search")
+async def search_users(q: str = "", user: dict = Depends(get_current_user)):
+    """Search users by name for starting a new chat conversation"""
+    if not q or len(q) < 2:
+        return {"users": []}
+    
+    results = await db.users.find(
+        {
+            "id": {"$ne": user["id"]},
+            "name": {"$regex": q, "$options": "i"}
+        },
+        {"_id": 0, "password_hash": 0}
+    ).limit(20).to_list(20)
+    
+    return {"users": [
+        {
+            "id": u["id"],
+            "name": u.get("name", "Неизвестен"),
+            "user_type": u.get("user_type", ""),
+            "city": u.get("city", ""),
+            "company_name": u.get("company_name", ""),
+        }
+        for u in results
+    ]}
+
 # ============== PDF GENERATION ==============
 
 @api_router.post("/calculator/pdf")
@@ -4013,6 +4038,69 @@ async def vote_suggestion(suggestion_id: str):
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Предложението не е намерено")
     return {"status": "ok"}
+
+@api_router.post("/suggestions/analyze")
+async def analyze_suggestions():
+    """Use AI to analyze all suggestions and generate improvement recommendations"""
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
+    
+    suggestions_list = await db.suggestions.find({}, {"_id": 0}).sort("votes", -1).to_list(100)
+    if not suggestions_list:
+        return {"analysis": "Няма предложения за анализ.", "recommendations": []}
+    
+    suggestions_text = "\n".join([
+        f"- [{s.get('votes', 0)} гласа] {s['text']} (от {s.get('name', 'Анонимен')})"
+        for s in suggestions_list
+    ])
+    
+    prompt = f"""Ти си анализатор на потребителски предложения за строителна платформа TemaDom.
+Платформата свързва клиенти с фирми и майстори за ремонти в България.
+
+Ето всички предложения от потребителите (сортирани по гласове):
+{suggestions_text}
+
+Анализирай предложенията и генерирай:
+1. ОБОБЩЕНИЕ - кратко обобщение на основните теми
+2. ТОП 5 ПРИОРИТЕТА - най-важните подобрения, подредени по важност и брой гласове
+3. БЪРЗИ ПОДОБРЕНИЯ - промени, които могат да се направят бързо (< 1 ден)
+4. ДЪЛГОСРОЧНИ ПОДОБРЕНИЯ - по-големи функции за бъдещо развитие
+
+Отговори на български. Бъди конкретен и практичен."""
+
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"suggestion-analysis-{uuid.uuid4()}",
+            system_message="Ти си AI анализатор на предложения за платформата TemaDom."
+        ).with_model("openai", "gpt-4o-mini")
+        response = await chat.send_message(UserMessage(text=prompt))
+        
+        analysis = {
+            "analysis": response if isinstance(response, str) else str(response),
+            "total_suggestions": len(suggestions_list),
+            "total_votes": sum(s.get("votes", 0) for s in suggestions_list),
+            "analyzed_at": datetime.now(timezone.utc).isoformat(),
+        }
+        
+        # Save analysis
+        await db.suggestion_analyses.update_one(
+            {"type": "latest"},
+            {"$set": {**analysis, "type": "latest"}},
+            upsert=True
+        )
+        
+        return analysis
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI грешка: {str(e)}")
+
+@api_router.get("/suggestions/analysis")
+async def get_latest_analysis():
+    """Get the latest AI analysis of suggestions"""
+    analysis = await db.suggestion_analyses.find_one({"type": "latest"}, {"_id": 0})
+    if not analysis:
+        return {"analysis": None}
+    return analysis
 
 # ============== ADMIN: CLEAN TEST DATA ==============
 

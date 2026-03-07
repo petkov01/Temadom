@@ -23,10 +23,13 @@ export const FeedbackPage = () => {
   const [suggestionName, setSuggestionName] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [submittingSuggestion, setSubmittingSuggestion] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [analyzingAI, setAnalyzingAI] = useState(false);
 
   useEffect(() => {
     loadFeedback();
     loadSuggestions();
+    loadAiAnalysis();
   }, []);
 
   const loadFeedback = async () => {
@@ -43,6 +46,25 @@ export const FeedbackPage = () => {
       const res = await axios.get(`${API}/suggestions`);
       setSuggestions(res.data.suggestions || []);
     } catch {}
+  };
+
+  const loadAiAnalysis = async () => {
+    try {
+      const res = await axios.get(`${API}/suggestions/analysis`);
+      if (res.data.analysis) setAiAnalysis(res.data);
+    } catch {}
+  };
+
+  const runAiAnalysis = async () => {
+    setAnalyzingAI(true);
+    try {
+      const res = await axios.post(`${API}/suggestions/analyze`);
+      setAiAnalysis(res.data);
+      toast.success('AI анализът е готов!');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при AI анализа');
+    }
+    setAnalyzingAI(false);
   };
 
   const handleSubmit = async () => {
@@ -226,6 +248,40 @@ export const FeedbackPage = () => {
 
             {suggestions.length > 0 && (
               <div>
+                {/* AI Analysis */}
+                <Card className="mb-6" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)' }}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2 text-base" style={{ color: 'var(--theme-text)' }}>
+                        <TrendingUp className="h-5 w-5 text-[#FF8C42]" />
+                        AI Анализ на предложенията
+                      </CardTitle>
+                      <Button onClick={runAiAnalysis} disabled={analyzingAI} size="sm" 
+                        className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" data-testid="ai-analyze-btn">
+                        {analyzingAI ? 'Анализиране...' : 'Анализирай с AI'}
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {aiAnalysis?.analysis ? (
+                      <div className="prose prose-sm max-w-none" style={{ color: 'var(--theme-text-muted)' }}>
+                        <pre className="whitespace-pre-wrap text-sm font-sans p-4 rounded-lg" 
+                          style={{ background: 'var(--theme-bg)', color: 'var(--theme-text-muted)' }}>
+                          {aiAnalysis.analysis}
+                        </pre>
+                        <p className="text-xs mt-2" style={{ color: 'var(--theme-text-subtle)' }}>
+                          Анализирани: {aiAnalysis.total_suggestions} предложения, {aiAnalysis.total_votes} гласа
+                          {aiAnalysis.analyzed_at && ` · ${new Date(aiAnalysis.analyzed_at).toLocaleDateString('bg-BG')}`}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
+                        Натиснете "Анализирай с AI" за да получите автоматичен анализ и препоръки от всички предложения.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+
                 <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--theme-text)' }}>Предложения от потребители</h2>
                 <div className="space-y-3">
                   {suggestions.map((s, i) => (
