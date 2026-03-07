@@ -261,10 +261,10 @@ const Navbar = () => {
     <nav className="glass-nav sticky top-0 z-50" data-testid="main-navbar">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         <div className="flex items-center relative" style={{ height: '56px' }}>
-          {/* Left: Hamburger + refresh icon (like reference) */}
+          {/* Left: Hamburger (mobile only) + ThemeToggle */}
           <div className="flex items-center gap-2">
             <button 
-              className="p-1.5 rounded-lg transition-all hover:bg-[rgba(246,195,106,0.08)]"
+              className="lg:hidden p-1.5 rounded-lg transition-all hover:bg-[rgba(246,195,106,0.08)]"
               style={{ color: 'var(--theme-text-muted)' }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               data-testid="nav-hamburger-btn"
@@ -274,8 +274,8 @@ const Navbar = () => {
             <ThemeToggle />
           </div>
 
-          {/* Center: Logo (absolute center, fills taskbar height) */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          {/* Center: Logo (mobile only — hidden on desktop) */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 lg:hidden">
             <Link to="/" data-testid="nav-center-logo">
               <img src="/logo-temadom.png" alt="TemaDom" className="h-[86px] w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246,195,106,0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.2)) brightness(0.85) contrast(1.15)' }} />
             </Link>
@@ -362,9 +362,6 @@ const Navbar = () => {
 
             {/* Separator */}
             <div className="h-5 w-px mx-1.5" style={{ background: 'var(--theme-border)' }}></div>
-
-            {/* Theme toggle */}
-            <ThemeToggle />
 
             {/* Language switcher */}
             <div className="relative" ref={langRef}>
