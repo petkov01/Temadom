@@ -4,47 +4,51 @@
 
 ## Core Features — ALL WORKING
 1. **3D Photo Designer v9.3** — GPT-4o-mini Vision + gpt-image-1 renders
-   - Room dimensions (Дължина/Ширина/Височина)
-   - Free text budget input (EUR) — client types own amount
-   - Info: "Само за материали и обзавеждане (без труд/монтаж)"
-   - Download PNG + Fullscreen per render
-   - Multi-room packages: 69/129/199 EUR
-   - Image compression to <2MB (frontend + backend PIL)
-   - Retry with exponential backoff (3 retries)
-   - 5 min timeout (300s)
+   - Room dimensions, free text budget input (EUR)
+   - 3 budget tiers (Иконом/Среден/Премиум) with real store search URLs
+   - **AFFILIATE tracking** on all material links (utm_source=temadom)
+   - Image compression <2MB, retry with backoff, 300s timeout
    - /api/test-ai diagnostic endpoint
 
-2. **AI Product Search** — Photo to 21 Bulgarian stores with EUR prices + share
+2. **AI Product Search** — Photo → 21 Bulgarian stores
+   - All product URLs include **affiliate tracking**
 
-3. **Community Feed v3** — Posts, images, project linking, firm offers, filters
+3. **Community Feed v3** — Posts, images, project linking, firm offers
+   - **Auto-detect** product keywords (плочки, мивка, etc.) and store names
+   - Generates **affiliate link pills** automatically under posts
+   - Non-intrusive pill design with ExternalLink icon
 
-4. **Leaderboard** — Dual ranking: Clients + Firms with scoring
+4. **Affiliate Monetization System**
+   - Centralized AFFILIATE_CONFIG with ref_id per store
+   - make_affiliate_url() adds tracking to ALL store URLs
+   - Stores: Praktiker, Jysk, Mr.Bricolage, HomeMax, Bauhaus, eMAG, IKEA, Teknoimpex, Technomarket
+   - Auto-applied in: Budget materials, Product Search, Community posts
+   - Format: `?utm_source=temadom&utm_medium=affiliate&utm_campaign=temadom`
 
-5. **Notifications** — Bell icon, auto-triggered on offers/likes
-
-6. **Stripe Payments** — 17 packages (multi-tier subscriptions)
-
-7. **Referral System** — Auto rewards, WhatsApp/Viber share, milestones
-
-8. **CAD System** — 2D plans with cost estimation
-
-9. **Auth** — JWT, regional firm limits, AuthGate (mandatory login)
-
-10. **Tracking** — Google Analytics + Facebook Pixel + PostHog
+5. **Leaderboard** — Dual ranking: Clients + Firms
+6. **Notifications** — Bell icon, auto-triggered
+7. **Stripe Payments** — 17 packages
+8. **Referral System** — Auto rewards, milestones
+9. **CAD System** — 2D plans with cost estimation
+10. **Auth** — JWT, AuthGate (mandatory login)
+11. **Tracking** — GA + FB Pixel + PostHog
 
 ## Latest Changes (2026-03-07)
-- Budget: Changed from preset buttons to free text input (min 100 EUR)
-- Budget info text: "Само за материали и обзавеждане (без труд/монтаж)"
-- Added /api/test-ai diagnostic endpoint for AI health checks
-- GPT-4o Vision timeout fixes (gpt-4o-mini, retry, resize, 300s timeout)
-- Fixed ProductSearchPage.jsx JSX syntax error
+- Added AFFILIATE_CONFIG with make_affiliate_url() for monetization
+- Community posts auto-detect product/store mentions → affiliate pills
+- All budget material URLs, product search URLs include affiliate tracking
+- Budget changed to free text input + "materials only" info
+- GPT-4o-mini for faster Vision, retry with backoff, image resize
 
-## Post-Launch Backlog (Priority)
-- P1: Backend refactoring (server.py monolith to modular routers)
+## Post-Launch Backlog
+- P1: Backend refactoring (server.py monolith → modular routers)
 - P1: Mobile responsiveness polish
-- P1: Real scraping for 21 stores (currently placeholder/MOCKED)
+- P1: Real scraping (currently placeholder/MOCKED)
 - P2: Company catalog & portfolios
-- P2: Direct user-to-user messaging
+- P2: Direct messaging
 - P2: Job ads module
-- P2: Email notifications (SendGrid)
-- P2: Push notifications
+
+## Affiliate Config (editable in server.py)
+- Default ref_id: "temadom"
+- To update: Edit AFFILIATE_CONFIG in server.py (~line 82)
+- Each store has configurable param name and ref value
