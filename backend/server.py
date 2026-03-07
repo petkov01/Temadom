@@ -2646,26 +2646,30 @@ async def generate_video_design(
         variant_angles = []
         for angle_idx, (angle_desc, angle_label) in enumerate(camera_angles):
             try:
-                strict_prompt = f"""STRICT 1:1 RENOVATION of the EXACT room described below. {angle_desc}.
+                strict_prompt = f"""ARCHITECTURAL RENOVATION — EXACT SAME ROOM, only surfaces and finishes changed. {angle_desc}.
 
-ROOM DESCRIPTION (keep EXACT layout): {room_desc}
-Dimensions: {width}m x {length}m, height {height}m.
+=== ROOM ARCHITECTURE (DO NOT CHANGE) ===
+Room: {room_type_name}, {width}m x {length}m, height {height}m.
 
-RENOVATION REQUEST: {reno_instruction}
+=== DETAILED ROOM DESCRIPTION (PRESERVE EXACTLY) ===
+{room_desc}
 
-STRICT RULES:
-1. Keep the EXACT same room geometry, proportions, and layout
-2. Do NOT add new objects/elements that aren't in the original
-3. Apply ONLY the requested renovation changes
-4. Preserve 1:1 scale and proportions
-
+=== RENOVATION TO APPLY ===
+{reno_instruction}
 Style: {style_desc}.
-Ultra-realistic professional interior photography, 8K quality, perfect lighting."""
+
+=== ABSOLUTE RULES ===
+1. IDENTICAL room geometry — same walls, same proportions, same shape
+2. Windows and doors in EXACTLY the same positions and sizes
+3. ONLY change: wall finishes, floor material, ceiling, furniture style, lighting
+4. DO NOT add or remove structural elements
+5. Ultra-realistic professional interior photography, 8K quality."""
 
                 img_result = await image_gen.generate_images(
                     prompt=strict_prompt,
                     model="gpt-image-1",
-                    number_of_images=1
+                    number_of_images=1,
+                    quality="high"
                 )
 
                 if img_result and len(img_result) > 0:
@@ -3687,15 +3691,35 @@ async def generate_ai_design(request: Request):
         analysis_chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"ai-designer-{uuid.uuid4()}",
-            system_message=f"""Ти си експерт интериорен дизайнер. Получаваш {len(cleaned_images)} снимки на {room_type_name}.
+            system_message=f"""You are an expert architectural interior analyst. You receive {len(cleaned_images)} photos of a {room_type_name}.
 
-СТРИКТЕН РЕЖИМ 1:1 — анализирай ТОЧНО какво виждаш:
-- САМО елементи от снимката (плочки, стени, мебели, вана/душ, мивка, тоалетна, осветление)
-- НЕ добавяй нови елементи
-- Опиши ТОЧНАТА геометрия, пропорции и позиции
+YOUR JOB: Create an EXTREMELY PRECISE architectural description that can be used to RECREATE this EXACT room.
 
-Отговори в JSON:
-{{"room_type": "{room_type_name}", "current_state": "детайлно описание", "elements": ["списък"], "lighting": "тип", "colors": ["цветове"], "furniture": ["мебели"], "layout": "разпределение", "description": "VERY DETAILED English description of the EXACT room visible — include every fixture, wall position, floor area, window/door positions, lighting. This must be precise enough to recreate the SAME room."}}"""
+MANDATORY ANALYSIS CHECKLIST:
+1. ROOM GEOMETRY: Exact shape (rectangular/L-shaped/irregular), proportions (width vs length ratio), ceiling height relative to room size
+2. WALLS: Number of walls visible, color/texture of each, any recesses/niches/columns
+3. WINDOWS: Exact position (which wall, how high, how wide relative to wall), number, frame type
+4. DOORS: Position (which wall, which side), type (single/double/sliding)
+5. FLOOR: Material, color, pattern direction
+6. CEILING: Type (flat/suspended/beamed), height, any fixtures
+7. FIXED ELEMENTS: Radiators, pipes, electrical outlets, built-in shelves, structural columns
+8. FURNITURE/FIXTURES: EXACT position of each item relative to walls (e.g. "bathtub along right wall, toilet on left wall 1m from door")
+9. LIGHTING: Natural light direction, artificial light positions
+10. CAMERA ANGLE: Where the photographer was standing, looking direction
+
+Respond in JSON:
+{{"room_type": "{room_type_name}",
+"shape": "rectangular/L-shaped/etc",
+"proportions": "width:length ratio",
+"walls": [{{"wall": "left/right/far/entrance", "features": "..."}}],
+"windows": [{{"wall": "...", "position": "center/left/right", "size": "relative to wall", "height": "from floor"}}],
+"doors": [{{"wall": "...", "position": "...", "type": "..."}}],
+"floor": {{"material": "...", "color": "...", "pattern": "..."}},
+"ceiling": {{"type": "...", "height": "...", "fixtures": "..."}},
+"fixed_elements": ["precise positions"],
+"furniture": ["item at exact position"],
+"camera_position": "where photographer stood, looking direction",
+"description": "ULTRA-DETAILED English paragraph describing the EXACT room architecture. Include EVERY wall, window, door position. Describe proportions precisely. This must enable recreation of the IDENTICAL room layout."}}"""
         ).with_model("openai", "gpt-4o")
 
         image_contents = [ImageContent(image_base64=img) for img in cleaned_images]
@@ -3735,31 +3759,55 @@ async def generate_ai_design(request: Request):
         # Build strict renovation prompt
         reno_instruction = renovation_text or notes or "обновяване на покрития и осветление"
 
+        # Extract architectural details from analysis
+        walls_desc = ""
+        windows_desc = ""
+        doors_desc = ""
+        if isinstance(room_analysis.get("walls"), list):
+            walls_desc = "; ".join([f"{w.get('wall','')}: {w.get('features','')}" for w in room_analysis["walls"]])
+        if isinstance(room_analysis.get("windows"), list):
+            windows_desc = "; ".join([f"window on {w.get('wall','')} at {w.get('position','')}" for w in room_analysis["windows"]])
+        if isinstance(room_analysis.get("doors"), list):
+            doors_desc = "; ".join([f"door on {d.get('wall','')} at {d.get('position','')}" for d in room_analysis["doors"]])
+        camera_pos = room_analysis.get("camera_position", "from entrance looking inward")
+
         for i in range(variants_count):
             variant_angles = []
             for angle_idx, (angle_desc, angle_label) in enumerate(camera_angles):
                 try:
-                    strict_prompt = f"""STRICT 1:1 RENOVATION of the EXACT room described below. {angle_desc}.
+                    strict_prompt = f"""ARCHITECTURAL RENOVATION — EXACT SAME ROOM, only surfaces and finishes changed.
 
-ROOM DESCRIPTION (keep EXACT layout): {room_desc}
-Dimensions: {room_width}m x {room_length}m, height {room_height}m.
+=== ROOM ARCHITECTURE (DO NOT CHANGE) ===
+Room: {room_type_name}, {room_width}m x {room_length}m, height {room_height}m
+Shape: {room_analysis.get('shape', 'rectangular')}
+Walls: {walls_desc or 'standard rectangular layout'}
+Windows: {windows_desc or 'as described'}
+Doors: {doors_desc or 'as described'}
+Camera: {angle_desc}
 
-RENOVATION REQUEST: {reno_instruction}
+=== DETAILED ROOM DESCRIPTION (PRESERVE EXACTLY) ===
+{room_desc}
 
-STRICT RULES:
-1. Keep the EXACT same room geometry, proportions, and layout
-2. Do NOT add new objects/elements that aren't in the original
-3. Do NOT use Pinterest/stock images — generate THIS specific room
-4. Apply ONLY the requested renovation changes
-5. Preserve 1:1 scale and proportions
-
+=== RENOVATION TO APPLY ===
+{reno_instruction}
 Style: {style_desc}. Materials: {material_desc}.
-Ultra-realistic professional interior photography, 8K quality, perfect lighting."""
+
+=== ABSOLUTE RULES ===
+1. IDENTICAL room geometry — same walls, same proportions, same shape
+2. Windows and doors in EXACTLY the same positions and sizes
+3. Same camera perspective and room proportions
+4. ONLY change: wall colors/textures, floor material, ceiling finish, furniture style, lighting fixtures
+5. DO NOT add structural elements (walls, columns, alcoves) that don't exist
+6. DO NOT remove structural elements (windows, doors, load-bearing walls)
+7. Keep the SAME number of windows and doors in the SAME positions
+8. Furniture placement must follow the same logical layout
+9. Ultra-realistic professional interior photography, natural lighting, 8K quality"""
 
                     img_result = await image_gen.generate_images(
                         prompt=strict_prompt,
                         model="gpt-image-1",
-                        number_of_images=1
+                        number_of_images=1,
+                        quality="high"
                     )
 
                     if img_result and len(img_result) > 0:

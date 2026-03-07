@@ -9,7 +9,7 @@ import {
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
   ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator, Camera, ChevronLeft, Image, MessageSquare,
   FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench,
-  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, ArrowLeft, Trophy
+  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, ArrowLeft, Trophy, Palette
 } from 'lucide-react';
 import { AIDesignerPage } from '@/components/AIDesignerPage';
 import { FeedbackPage } from '@/components/FeedbackPage';
@@ -1067,7 +1067,7 @@ const LandingPage = () => {
               <div ref={showcaseRef} className="flex gap-6 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {[
               {
-                room: 'БАНЯ', roomId: 'bathroom', dims: '3.5 x 3.0м', tierTotal: 2000, price: '69', color: '#F97316',
+                room: 'БАНЯ', roomId: 'bathroom', dims: '3.5 x 3.0м', tierTotal: 2000, price: '69', tier: '1 помещение', color: '#F97316',
                 before: '/showcase/before_bathroom.jpg', after: '/showcase/after_bathroom.jpg',
                 products: [
                   { name: 'Керамогранит 30x60', price: '500', store: 'HomeMax', url: 'https://www.homemax.bg/catalogsearch/result/?q=%D0%BA%D0%B5%D1%80%D0%B0%D0%BC%D0%BE%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%82+30x60&ref=temadom' },
@@ -1076,7 +1076,7 @@ const LandingPage = () => {
                 ],
               },
               {
-                room: 'ХОЛ', roomId: 'living_room', dims: '5.0 x 4.0м', tierTotal: 3500, price: '89', color: '#10B981',
+                room: 'ХОЛ', roomId: 'living_room', dims: '5.0 x 4.0м', tierTotal: 3500, price: '69', tier: '1 помещение', color: '#10B981',
                 before: '/showcase/before_living.jpg', after: '/showcase/after_living_room.jpg',
                 products: [
                   { name: 'Ламинат Дъб Натюр', price: '400', store: 'Praktiker', url: 'https://praktiker.bg/bg/search?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+%D0%B4%D1%8A%D0%B1&utm_source=temadom' },
@@ -1085,7 +1085,16 @@ const LandingPage = () => {
                 ],
               },
               {
-                room: 'СПАЛНЯ', roomId: 'bedroom', dims: '4.0 x 3.5м', tierTotal: 2790, price: '79', color: '#3B82F6',
+                room: 'ХОЛ + КУХНЯ', roomId: 'combo', dims: '2 помещения', tierTotal: 6200, price: '119', tier: '2 помещения', color: '#8B5CF6',
+                before: '/showcase/before_living.jpg', after: '/showcase/after_kitchen.jpg',
+                products: [
+                  { name: 'Ламинат 10мм Дъб', price: '400', store: 'HomeMax', url: 'https://www.homemax.bg/catalogsearch/result/?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC&ref=temadom' },
+                  { name: 'Кухненски шкафове MDF', price: '2,000', store: 'Mr.Bricolage', url: 'https://www.mr-bricolage.bg/search?q=%D0%BA%D1%83%D1%85%D0%BD%D0%B5%D0%BD%D1%81%D0%BA%D0%B8+%D1%88%D0%BA%D0%B0%D1%84&ref=temadom' },
+                  { name: 'LED осветление', price: '300', store: 'Praktiker', url: 'https://praktiker.bg/bg/search?q=LED+%D0%BE%D1%81%D0%B2%D0%B5%D1%82%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5&utm_source=temadom' },
+                ],
+              },
+              {
+                room: 'СПАЛНЯ', roomId: 'bedroom', dims: '4.0 x 3.5м', tierTotal: 2790, price: '69', tier: '1 помещение', color: '#3B82F6',
                 before: '/showcase/before_bedroom.jpg', after: '/showcase/after_bedroom.jpg',
                 products: [
                   { name: 'Легло мемори матрак 160', price: '800', store: 'eMAG', url: 'https://www.emag.bg/search/%D0%BB%D0%B5%D0%B3%D0%BB%D0%BE+%D0%BC%D0%B5%D0%BC%D0%BE%D1%80%D0%B8+160?ref=temadom' },
@@ -1094,21 +1103,21 @@ const LandingPage = () => {
                 ],
               },
               {
-                room: 'КУХНЯ', roomId: 'kitchen', dims: '3.0 x 2.5м', tierTotal: 4497, price: '99', color: '#8B5CF6',
-                before: '/showcase/before_kitchen.jpg', after: '/showcase/after_kitchen.jpg',
-                products: [
-                  { name: 'Кухненски шкафове MDF', price: '2,000', store: 'Jysk', url: 'https://jysk.bg/catalogsearch/result/?q=%D0%BA%D1%83%D1%85%D0%BD%D0%B5%D0%BD%D1%81%D0%BA%D0%B8+%D1%88%D0%BA%D0%B0%D1%84%D0%BE%D0%B2%D0%B5&utm_source=temadom' },
-                  { name: 'Керамични плочки 60x60', price: '300', store: 'Praktiker', url: 'https://praktiker.bg/bg/search?q=%D0%BA%D0%B5%D1%80%D0%B0%D0%BC%D0%B8%D1%87%D0%BD%D0%B8+%D0%BF%D0%BB%D0%BE%D1%87%D0%BA%D0%B8+60x60&utm_source=temadom' },
-                  { name: 'Мивка Franke полирана', price: '300', store: 'eMAG', url: 'https://www.emag.bg/search/%D0%BC%D0%B8%D0%B2%D0%BA%D0%B0+Franke?ref=temadom' },
-                ],
-              },
-              {
-                room: 'ДЕТСКА', roomId: 'kids_room', dims: '3.8 x 3.2м', tierTotal: 2295, price: '69', color: '#EC4899',
+                room: 'ДЕТСКА', roomId: 'kids_room', dims: '3.8 x 3.2м', tierTotal: 2295, price: '69', tier: '1 помещение', color: '#EC4899',
                 before: '/showcase/before_kids.jpg', after: '/showcase/after_kids_room.jpg',
                 products: [
                   { name: 'Ламинат 10мм Дъб Каиро', price: '150', store: 'HomeMax', url: 'https://www.homemax.bg/catalogsearch/result/?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC+%D0%B4%D1%8A%D0%B1&ref=temadom' },
                   { name: 'Боя неутрално сива', price: '70', store: 'Bauhaus', url: 'https://www.bauhaus.bg/catalogsearch/result/?q=%D0%B1%D0%BE%D1%8F+%D1%81%D0%B8%D0%B2%D0%B0&utm_source=temadom' },
                   { name: 'Полилей със стъкло', price: '80', store: 'Jysk', url: 'https://jysk.bg/catalogsearch/result/?q=%D0%BF%D0%BE%D0%BB%D0%B8%D0%BB%D0%B5%D0%B9&utm_source=temadom' },
+                ],
+              },
+              {
+                room: 'ЦЯЛ АПАРТАМЕНТ', roomId: 'apartment', dims: '70м² · 3+ стаи', tierTotal: 15000, price: '199', tier: 'Цял апартамент', color: '#F59E0B',
+                before: '/showcase/before_apartment.jpg', after: '/showcase/after_apartment.jpg',
+                products: [
+                  { name: 'Ламинат 10мм за 70м²', price: '2,100', store: 'Praktiker', url: 'https://praktiker.bg/bg/search?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC&utm_source=temadom' },
+                  { name: 'Комплект боя за стени', price: '500', store: 'Mr.Bricolage', url: 'https://www.mr-bricolage.bg/search?q=%D0%B1%D0%BE%D1%8F+%D0%BA%D0%BE%D0%BC%D0%BF%D0%BB%D0%B5%D0%BA%D1%82&ref=temadom' },
+                  { name: 'Вградено LED осветление', price: '800', store: 'eMAG', url: 'https://www.emag.bg/search/LED+%D0%BE%D1%81%D0%B2%D0%B5%D1%82%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5?ref=temadom' },
                 ],
               },
             ].map((proj, i) => (
@@ -1131,7 +1140,7 @@ const LandingPage = () => {
                   <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
                     <span className="text-xs font-black px-2 py-1 rounded-full bg-black/60 text-white">{proj.room} {proj.dims}</span>
                     <span className="text-xs font-bold px-2 py-1 rounded-full text-white" style={{ background: proj.color }}>
-                      {proj.tierTotal.toLocaleString()} EUR
+                      AI Дизайн: {proj.price} EUR
                     </span>
                   </div>
                 </div>
@@ -1181,6 +1190,31 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* ===== КАК РАБОТИ ===== */}
+      <section className="py-16 border-t" style={{ borderColor: border }} data-testid="how-it-works-section">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2" style={{ color: text }}>Как работи AI Дизайнерът?</h2>
+          <p className="text-center mb-10 text-sm" style={{ color: muted }}>3 лесни стъпки до вашия нов интериор</p>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { step: '1', title: 'Снимайте помещението', desc: 'Качете 1-3 снимки на стаята, която искате да обновите. AI анализира точната архитектура — стени, прозорци, врати, размери.', icon: Camera, color: '#F97316' },
+              { step: '2', title: 'Изберете стил и материали', desc: 'Изберете от 10 стила (модерен, скандинавски, лофт...) и клас материали. Опишете какво точно искате да промените.', icon: Palette, color: '#3B82F6' },
+              { step: '3', title: 'Получете 3D рендер + бюджет', desc: 'AI генерира реалистичен дизайн, който запазва ТОЧНАТА архитектура. Получавате бюджет с цени и директни линкове към 9 магазина.', icon: Check, color: '#10B981' },
+            ].map((s, i) => (
+              <div key={i} className="text-center p-6 rounded-2xl border transition-all hover:scale-105"
+                style={{ background: dark ? 'rgba(30,41,59,0.4)' : 'rgba(255,255,255,0.8)', borderColor: `${s.color}20` }}>
+                <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center" style={{ background: `${s.color}15` }}>
+                  <s.icon className="h-8 w-8" style={{ color: s.color }} />
+                </div>
+                <div className="text-xs font-bold mb-2 px-3 py-1 rounded-full inline-block" style={{ background: `${s.color}15`, color: s.color }}>Стъпка {s.step}</div>
+                <h3 className="text-lg font-bold mb-2" style={{ color: text }}>{s.title}</h3>
+                <p className="text-sm" style={{ color: muted }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== PRICING: 3 glassmorphism cards ===== */}
       <section className="py-16 border-t" style={{ borderColor: border }} data-testid="pricing-section">
         <div className="max-w-5xl mx-auto px-4">
@@ -1188,8 +1222,8 @@ const LandingPage = () => {
           <p className="text-center mb-10 text-sm" style={{ color: muted }}>Реалистичен 1:1 проект на вашето помещение</p>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['3 снимки → 3D рендери', '3 ъгъла рендер', '10 стила', 'Пред/След сравнение', 'Бюджет + линкове'], color: accent, popular: false },
-              { name: '2 ПОМЕЩЕНИЯ', price: '129', rooms: '2', features: ['2 помещения', '3 снимки на помещение', '10 стила за всяко', 'Пред/След рендер', 'Бюджет + директни линкове'], color: '#10B981', popular: true },
+              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['3 снимки → 3D рендери', '4 ъгъла рендер', '10 стила', 'Пред/След сравнение', 'Бюджет + линкове'], color: accent, popular: false },
+              { name: '2 ПОМЕЩЕНИЯ', price: '119', rooms: '2', features: ['2 помещения', '3 снимки на помещение', '10 стила за всяко', 'Пред/След рендер', 'Бюджет + директни линкове'], color: '#10B981', popular: true },
               { name: 'АПАРТАМЕНТ', price: '199', rooms: '3-5', features: ['До 5 помещения', '3 снимки на помещение', 'Пълен бюджет', 'Всички стилове', 'Приоритетна обработка'], color: '#8B5CF6', popular: false },
             ].map((plan, i) => (
               <div key={i} className={`rounded-2xl p-6 text-center border backdrop-blur-lg relative transition-transform hover:scale-105 ${plan.popular ? 'ring-2' : ''}`}
@@ -2023,6 +2057,27 @@ const CompaniesPage = () => {
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>Фирми и Майстори</h1>
           <p style={{ color: 'var(--theme-text-muted)' }}>Намерете проверени професионалисти за вашия ремонт</p>
+        </div>
+
+        {/* How it works info */}
+        <div className="mb-6 p-4 rounded-xl border" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)' }} data-testid="companies-how-it-works">
+          <h3 className="font-semibold text-sm mb-3 flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
+            <Info className="h-4 w-4 text-[#FF8C42]" /> Как работи?
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="flex items-start gap-2">
+              <span className="w-6 h-6 rounded-full bg-[#FF8C42]/15 text-[#FF8C42] text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <p style={{ color: 'var(--theme-text-muted)' }}>Търсете фирми и майстори по категория, град или тип. Филтрите ви помагат да стесните избора.</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="w-6 h-6 rounded-full bg-[#3B82F6]/15 text-[#3B82F6] text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+              <p style={{ color: 'var(--theme-text-muted)' }}>Прегледайте профилите — оценки, отзиви, портфолио с реални проекти и описания на услугите.</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="w-6 h-6 rounded-full bg-[#10B981]/15 text-[#10B981] text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
+              <p style={{ color: 'var(--theme-text-muted)' }}>Свържете се директно чрез чат или телефон. Без посредници, без комисионна.</p>
+            </div>
+          </div>
         </div>
 
         {/* Tabs: Всички / Фирми / Майстори */}
@@ -3650,7 +3705,7 @@ const AdsPage = () => {
                     </div>
                     <Badge variant="outline" className="text-xs">{ad.user_type === 'company' ? 'Фирма' : ad.user_type === 'master' ? 'Майстор' : 'Клиент'}</Badge>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-slate-500">
+                  <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--theme-text-muted)' }}>
                     {ad.city && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {ad.city}</span>}
                     <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {new Date(ad.created_at).toLocaleDateString('bg-BG')}</span>
                     <span>{ad.user_name}</span>
