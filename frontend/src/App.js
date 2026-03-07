@@ -260,11 +260,11 @@ const Navbar = () => {
   return (
     <nav className="glass-nav sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-24">
+        <div className="flex justify-between h-44">
           {/* Left: Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
-              <img src="/logo-temadom.png" alt="TemaDom" className="h-20 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-40 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
             </Link>
           </div>
 
@@ -934,10 +934,10 @@ const LandingPage = () => {
           <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full blur-[140px] translate-y-1/4 -translate-x-1/4" style={{ background: 'rgba(255,138,0,0.04)' }} />
           <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" style={{ background: 'rgba(16,185,129,0.03)' }} />
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 pt-2 pb-8 md:pt-4 md:pb-12 flex flex-col items-center">
           {/* Logo */}
-          <div className="mb-2 animate-slideUp">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-[28rem] md:h-[36rem] w-auto mx-auto animate-float logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' : 'drop-shadow(0 4px 20px rgba(0,0,0,0.3)) brightness(0.8) contrast(1.2)' }} />
+          <div className="-mb-8 md:-mb-12 animate-slideUp">
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-[22rem] md:h-[28rem] w-auto mx-auto animate-float logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' : 'drop-shadow(0 4px 20px rgba(0,0,0,0.3)) brightness(0.8) contrast(1.2)' }} />
           </div>
 
           {/* Counter badge */}
