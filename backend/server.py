@@ -1406,19 +1406,25 @@ async def generate_calculator_pdf(data: dict):
     except Exception:
         font_name = "Helvetica"
     
-    # Header
-    pdf.set_fill_color(242, 109, 33)  # Orange
-    pdf.rect(0, 0, 210, 40, 'F')
-    pdf.set_text_color(255, 255, 255)
-    pdf.set_font(font_name, 'B', 22)
-    pdf.set_y(8)
-    pdf.cell(0, 12, "TemaDom", ln=True, align='C')
-    pdf.set_font(font_name, '', 10)
-    pdf.cell(0, 8, "РЕМОНТИ И СТРОИТЕЛСТВО", ln=True, align='C')
+    # Header - Clean design with logo
+    # Light gray background strip
+    pdf.set_fill_color(245, 245, 245)
+    pdf.rect(0, 0, 210, 35, 'F')
+    
+    # Add logo
+    import os
+    logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "public", "logo-temadom.png")
+    if os.path.exists(logo_path):
+        pdf.image(logo_path, x=75, y=3, w=60)
+    else:
+        pdf.set_text_color(40, 40, 40)
+        pdf.set_font(font_name, 'B', 22)
+        pdf.set_y(8)
+        pdf.cell(0, 12, "TemaDom", ln=True, align='C')
     
     # Title
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_y(50)
+    pdf.set_text_color(40, 40, 40)
+    pdf.set_y(42)
     pdf.set_font(font_name, 'B', 16)
     pdf.cell(0, 10, "Ценова оферта / Калкулация", ln=True, align='C')
     
@@ -1479,7 +1485,7 @@ async def generate_calculator_pdf(data: dict):
     
     # Total row
     pdf.ln(5)
-    pdf.set_fill_color(242, 109, 33)
+    pdf.set_fill_color(40, 40, 40)
     pdf.set_text_color(255, 255, 255)
     pdf.set_font(font_name, 'B', 11)
     total_bgn = total * 1.9558
@@ -3720,47 +3726,63 @@ async def export_cad_contract(request: Request):
 
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=25*mm, bottomMargin=25*mm, leftMargin=25*mm, rightMargin=25*mm)
+    
+    # Register DejaVu font for Cyrillic support
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    bold_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    try:
+        pdfmetrics.registerFont(TTFont('DejaVu', font_path))
+        pdfmetrics.registerFont(TTFont('DejaVu-Bold', bold_font_path))
+        from reportlab.lib.fonts import addMapping
+        addMapping('DejaVu', 0, 0, 'DejaVu')
+        addMapping('DejaVu', 1, 0, 'DejaVu-Bold')
+        base_font = 'DejaVu'
+    except Exception:
+        base_font = 'Helvetica'
+    
     styles = getSampleStyleSheet()
-    title_s = ParagraphStyle('CTitle', parent=styles['Title'], fontSize=16, spaceAfter=12)
-    h2_s = ParagraphStyle('CH2', parent=styles['Heading2'], fontSize=12, spaceAfter=8, spaceBefore=12)
-    body_s = ParagraphStyle('CBody', parent=styles['Normal'], fontSize=10, spaceAfter=4, leading=14)
+    title_s = ParagraphStyle('CTitle', parent=styles['Title'], fontName=f'{base_font}-Bold' if base_font == 'DejaVu' else 'Helvetica-Bold', fontSize=16, spaceAfter=12)
+    h2_s = ParagraphStyle('CH2', parent=styles['Heading2'], fontName=f'{base_font}-Bold' if base_font == 'DejaVu' else 'Helvetica-Bold', fontSize=12, spaceAfter=8, spaceBefore=12)
+    body_s = ParagraphStyle('CBody', parent=styles['Normal'], fontName=base_font, fontSize=10, spaceAfter=4, leading=14)
 
     story = []
-    story.append(Paragraph("DOGOVOR ZA STROITELSTVO", title_s))
-    story.append(Paragraph(f"Dnes, {today} g., mezhdu:", body_s))
+    story.append(Paragraph("ДОГОВОР ЗА СТРОИТЕЛСТВО", title_s))
+    story.append(Paragraph(f"Днес, {today} г., между:", body_s))
     story.append(Spacer(1, 6))
-    story.append(Paragraph(f"<b>IZPALNITEL:</b> {company_name}, BULSTAT: {company_bulstat}", body_s))
-    story.append(Paragraph(f"<b>VAZLOZHITEL:</b> {client_name}, EGN/BULSTAT: {client_egn}", body_s))
-    story.append(Paragraph(f"<b>Adres na obekta:</b> {address}", body_s))
+    story.append(Paragraph(f"<b>ИЗПЪЛНИТЕЛ:</b> {company_name}, БУЛСТАТ: {company_bulstat}", body_s))
+    story.append(Paragraph(f"<b>ВЪЗЛОЖИТЕЛ:</b> {client_name}, ЕГН/БУЛСТАТ: {client_egn}", body_s))
+    story.append(Paragraph(f"<b>Адрес на обекта:</b> {address}", body_s))
     story.append(Spacer(1, 8))
-    story.append(Paragraph("se skluchi nastoyashtiyat dogovor za slednoeto:", body_s))
+    story.append(Paragraph("се сключи настоящият договор за следното:", body_s))
 
-    story.append(Paragraph("I. PREDMET NA DOGOVORA", h2_s))
-    story.append(Paragraph(f"1. Izpalnitelyat se zadulzhava da izvurshi: {description}", body_s))
-    story.append(Paragraph("2. Rabotite se izvurshvat soglasno prilozhena kolichestvena smetka (Prilozhenie 1).", body_s))
+    story.append(Paragraph("I. ПРЕДМЕТ НА ДОГОВОРА", h2_s))
+    story.append(Paragraph(f"1. Изпълнителят се задължава да извърши: {description}", body_s))
+    story.append(Paragraph("2. Работите се извършват съгласно приложена количествена сметка (Приложение 1).", body_s))
 
-    story.append(Paragraph("II. CENA I PLASHTANE", h2_s))
-    story.append(Paragraph(f"3. Obshta stoinost: <b>{total_eur} EUR ({total_bgn} BGN)</b>.", body_s))
-    story.append(Paragraph("4. Plashtaneto se izvurshva na tri chasti: 30% avans, 40% pri 50% gotovnost, 30% pri priemane.", body_s))
+    story.append(Paragraph("II. ЦЕНА И ПЛАЩАНЕ", h2_s))
+    story.append(Paragraph(f"3. Обща стойност: <b>{total_eur} EUR ({total_bgn} BGN)</b>.", body_s))
+    story.append(Paragraph("4. Плащането се извършва на три части: 30% аванс, 40% при 50% готовност, 30% при приемане.", body_s))
 
-    story.append(Paragraph("III. SROK", h2_s))
-    story.append(Paragraph("5. Srokut za izpulnenie e ____________ rabotni dni ot datata na podpisvane.", body_s))
-    story.append(Paragraph("6. Srokut mozhe da bude udulzhen pri loshi vremenni usloviya ili forsmazzhorni obstoyatelstva.", body_s))
+    story.append(Paragraph("III. СРОК", h2_s))
+    story.append(Paragraph("5. Срокът за изпълнение е ____________ работни дни от датата на подписване.", body_s))
+    story.append(Paragraph("6. Срокът може да бъде удължен при лоши климатични условия или форсмажорни обстоятелства.", body_s))
 
-    story.append(Paragraph("IV. GARANTSIYA", h2_s))
-    story.append(Paragraph("7. Izpalnitelyat predostavya garantsiya za izvurshenite raboti v srok ot 5 (pet) godini.", body_s))
+    story.append(Paragraph("IV. ГАРАНЦИЯ", h2_s))
+    story.append(Paragraph("7. Изпълнителят предоставя гаранция за извършените работи в срок от 5 (пет) години.", body_s))
 
-    story.append(Paragraph("V. OTGOVORNOSTI", h2_s))
-    story.append(Paragraph("8. Izpalnitelyat otgovarya za kachestvoto na materialie i izvurshenite raboti.", body_s))
-    story.append(Paragraph("9. Vazlozhitelyat osiguryava dostap do obekta i neobhodimite razreshitelni.", body_s))
+    story.append(Paragraph("V. ОТГОВОРНОСТИ", h2_s))
+    story.append(Paragraph("8. Изпълнителят отговаря за качеството на материалите и извършените работи.", body_s))
+    story.append(Paragraph("9. Възложителят осигурява достъп до обекта и необходимите разрешителни.", body_s))
 
-    story.append(Paragraph("VI. PREKLATIAVANE", h2_s))
-    story.append(Paragraph("10. Dogovorat mozhe da bude preklaten ot vsyaka strana s 14-dnevno pismenno uvedomlenie.", body_s))
+    story.append(Paragraph("VI. ПРЕКРАТЯВАНЕ", h2_s))
+    story.append(Paragraph("10. Договорът може да бъде прекратен от всяка страна с 14-дневно писмено уведомление.", body_s))
 
     story.append(Spacer(1, 25))
-    story.append(Paragraph("IZPALNITEL: ________________________       VAZLOZHITEL: ________________________", body_s))
+    story.append(Paragraph("ИЗПЪЛНИТЕЛ: ________________________       ВЪЗЛОЖИТЕЛ: ________________________", body_s))
     story.append(Spacer(1, 10))
-    story.append(Paragraph(f"Data: {today}", body_s))
+    story.append(Paragraph(f"Дата: {today}", body_s))
 
     doc.build(story)
     buf.seek(0)

@@ -988,10 +988,8 @@ const LandingPage = () => {
             </button>
             <button onClick={() => navigate('/ai-sketch')} data-testid="hero-sketch-btn"
               className="relative px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 btn-gold">
-              <span className="absolute -top-3 -right-2 bg-gradient-to-r from-[#8C56FF] to-[#6D3FC4] text-white text-[9px] font-black px-2.5 py-0.5 rounded-full tracking-wider shadow-lg" style={{ filter: 'drop-shadow(0 0 6px rgba(140,86,255,0.5))' }}>
-                PRO TOOL
-              </span>
               <FileText className="mr-2 h-5 w-5 inline" /> CAD Скица
+              <span className="block text-xs font-medium mt-1 opacity-80">Инструмент за професионалисти</span>
             </button>
           </div>
 
@@ -4149,7 +4147,7 @@ const SubscriptionsPage = () => {
         <div className="grid md:grid-cols-3 gap-4 max-w-3xl">
           {[
             { name: '1 помещение', price: '69 EUR', features: ['3 снимки → 3D рендери', 'Бюджет + линкове', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
-            { name: '2 помещения', price: '129 EUR', features: ['2 видеа → 8 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
+            { name: '2 помещения', price: '119 EUR', features: ['2 видеа → 8 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
             { name: 'Апартамент', price: '199 EUR', features: ['До 5 видеа → 20 ъгъла', 'PDF за всяко помещение', 'Пълна сметка + 3D', 'Приоритетна обработка'] },
           ].map((plan, i) => (
             <Card key={i} className={`relative ${plan.popular ? 'border-[#F97316] bg-[#F97316]/5' : ''}`} style={!plan.popular ? { background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' } : {}}>
