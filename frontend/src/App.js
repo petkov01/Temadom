@@ -260,11 +260,11 @@ const Navbar = () => {
   return (
     <nav className="glass-nav sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-[140px] lg:h-44">
+        <div className="flex justify-between h-16 lg:h-20">
           {/* Left: Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
-              <img src="/logo-temadom.png" alt="TemaDom" className="h-32 lg:h-40 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 18px rgba(246, 195, 106, 0.85))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-12 lg:h-16 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
             </Link>
           </div>
 
