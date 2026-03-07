@@ -3,7 +3,7 @@
 import requests
 import json
 
-BASE_URL = "https://temadom-speed.preview.emergentagent.com/api"
+BASE_URL = "https://room-render-staging.preview.emergentagent.com/api"
 
 def test_portfolio_endpoints():
     # Login as company to get token

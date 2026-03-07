@@ -3101,6 +3101,27 @@ async def _process_photo_design(
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         renders = []
 
+        # Step 0: Analyze ALL photos together for unified style
+        style_analysis = ""
+        try:
+            from emergentintegrations.llm.chat import LlmChat as AnalysisChat
+            analysis_chat = AnalysisChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=f"photo-analysis-{uuid.uuid4()}",
+                system_message="Ти си експерт интериорен дизайнер. Отговаряй КРАТКО на български."
+            ).with_model("openai", "gpt-4o-mini")
+
+            analysis_prompt = f"Анализирай тази снимка на {room_type_name}. Опиши КРАТКО: 1) Осветление (топло/студено) 2) Основни елементи и КЪДЕ са (ляво/дясно/център) 3) Цветова гама. Макс 3 реда."
+            style_analysis = await aio.get_event_loop().run_in_executor(
+                None, lambda: analysis_chat.send_message(analysis_prompt).text
+            )
+            logging.info(f"Photo Designer: Style analysis: {style_analysis[:200]}")
+        except Exception as vis_err:
+            logging.warning(f"Photo Designer: Vision analysis skipped: {vis_err}")
+            style_analysis = ""
+
+        update_task_progress(task_id, 15, "Стилът е анализиран. Генериране...")
+
         ROOM_ELEMENT_MAP = {
             "bathroom": "вана, душ кабина, тоалетна, мивка, огледало, плочки, бойлер",
             "kitchen": "шкафове, плот, хладилник, печка, мивка, аспиратор, гранитогрес",
@@ -3137,30 +3158,27 @@ async def _process_photo_design(
         async def process_single_photo(idx, photo_b64):
             label = photo_labels[idx] if idx < len(photo_labels) else f"Снимка {idx+1}"
             try:
-                render_prompt = f"""RENOVATION VISUALIZATION — edit this photo to show a renovated version.
+                style_context = f"\nАНАЛИЗ НА ОРИГИНАЛНАТА СНИМКА:\n{style_analysis}\n" if style_analysis else ""
+                render_prompt = f"""RENOVATION VISUALIZATION — edit this EXACT photo to show a renovated version.
+{style_context}
+KEEP PIXEL-PERFECT (DO NOT MOVE OR CHANGE):
+- Room shape, walls, ceiling, floor PLAN — identical geometry
+- EVERY window and door — same position, same size
+- Camera angle and perspective — IDENTICAL to the original photo
+- Fixed plumbing positions (toilet, sink, bathtub/shower, boiler) — SAME SPOTS
+- The room type is {room_type_name.upper()} — result MUST remain a {room_type_name}
 
-WHAT YOU MUST NOT CHANGE (keep pixel-perfect):
-- The room's shape, size, and proportions
-- The exact position of every wall, corner, and ceiling  
-- The exact position and size of every window and door
-- The camera angle, perspective, and field of view
-- The position of fixed plumbing (toilet, sink, bathtub/shower if visible)
-- The position of the water heater/boiler if visible
+CHANGE ONLY SURFACES AND OBJECTS:
+- Wall tiles/paint → modern {style_desc} finishes
+- Floor tiles → matching {style_desc} flooring
+- Sink, faucet, mirror → modern {style_desc} versions AT THE SAME POSITIONS
+- Furniture → modern {style_desc} pieces for a {room_type_name}
+- Lighting → modern fixtures
+{f"- Client request: {reno_instruction}" if notes else ""}
 
-THIS IS A {room_type_name.upper()}. The result MUST look like a {room_type_name}, NOT a kitchen or any other room.
-
-WHAT TO CHANGE:
-- Replace wall tiles/paint with modern {style_desc} finishes
-- Replace floor tiles with matching {style_desc} flooring  
-- Update the sink, faucet, and mirror to modern {style_desc} versions (same positions)
-- Replace/add modern furniture appropriate for a {room_type_name}
-- Add modern lighting fixtures
-- Clean and declutter the space
-{f"- Specific request: {reno_instruction}" if notes else ""}
-
+MATCH the original photo's lighting ({('топло' if 'топл' in style_analysis.lower() else 'студено' if 'студен' in style_analysis.lower() else 'неутрално')}) and perspective EXACTLY.
 Room: {width}m x {length}m, height {height}m.
-Style: {style_desc}.
-Output: photorealistic, professional interior photography."""
+Output: photorealistic, same camera angle, professional interior photography."""
 
                 original_photo_bytes = base64.b64decode(photo_b64)
                 
@@ -3372,18 +3390,30 @@ Output: photorealistic, professional interior photography."""
                     mat["product_url"] = make_affiliate_url(existing_url, mat.get("store", ""))
                     mat["verified"] = True
                 else:
-                    # Not a real product — generate search URL with BULGARIAN terms
+                    # Not a real product — use CATEGORY-BASED URLs, not GPT search queries
                     store = mat.get("store", "")
-                    search_q = mat.get("search_query", "")
-                    # Fallback: use product name if search_query is empty or non-Bulgarian
-                    if not search_q or len(search_q) < 3:
-                        search_q = mat.get("name", "")
-                    # Sanitize: keep only Cyrillic, Latin, numbers, spaces
-                    import re as re_sanitize
-                    search_q = re_sanitize.sub(r'[^\w\sа-яА-ЯёЁ]', '', search_q).strip()
-                    if not search_q:
-                        search_q = room_type_name  # fallback to room type
-                    encoded_q = url_quote(search_q, safe='')
+                    product_name = mat.get("name", "")
+                    
+                    # Map room type to predefined Bulgarian search categories
+                    ROOM_SEARCH_CATEGORIES = {
+                        "баня": ["плочки за баня", "смесител за баня", "мивка за баня", "душ кабина", "тоалетна", "огледало за баня", "шкаф за баня", "аксесоари за баня"],
+                        "кухня": ["кухненски плот", "кухненски шкаф", "смесител за кухня", "мивка за кухня", "плочки за кухня", "абсорбатор", "кухненско обзавеждане"],
+                        "хол": ["диван", "холна маса", "ТВ шкаф", "осветление хол", "килим", "ламинат", "боя за стени"],
+                        "спалня": ["легло", "матрак", "гардероб", "нощно шкафче", "осветление спалня", "ламинат"],
+                        "коридор": ["шкаф за коридор", "закачалка", "осветление", "ламинат", "боя за стени"],
+                    }
+                    categories = ROOM_SEARCH_CATEGORIES.get(room_type_name, ["мебели", "обзавеждане"])
+                    
+                    # Find best matching category or use room-specific default
+                    search_q = room_type_name + " " + (categories[0] if categories else "мебели")
+                    name_lower = product_name.lower()
+                    for cat in categories:
+                        if any(w in name_lower for w in cat.lower().split()):
+                            search_q = cat
+                            break
+                    
+                    from urllib.parse import quote as url_quote_inner
+                    encoded_q = url_quote_inner(search_q, safe='')
                     base_url = STORE_SEARCH_URLS.get(store, "")
                     if base_url:
                         mat["product_url"] = make_affiliate_url(f"{base_url}{encoded_q}", store)

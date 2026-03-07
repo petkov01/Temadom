@@ -260,10 +260,10 @@ const Navbar = () => {
   return (
     <nav className="glass-nav sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center relative" style={{ height: '44px' }}>
+        <div className="flex items-center relative" style={{ height: '100px' }}>
           {/* Logo - left */}
           <Link to="/" className="flex-shrink-0" data-testid="logo-link">
-            <img src="/logo-temadom.png?v=44" alt="TemaDom" id="nav-logo" className="object-contain logo-glow" style={{ height: window.innerWidth < 768 ? '36px' : '44px', width: 'auto', maxWidth: 'none', display: 'block', filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
+            <img src="/logo-temadom.png?v=96" alt="TemaDom" id="nav-logo" className="object-contain logo-glow" style={{ height: '96px', width: 'auto', maxWidth: 'none', display: 'block', filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
           </Link>
 
           {/* Spacer */}
