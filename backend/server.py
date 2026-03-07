@@ -3119,23 +3119,25 @@ async def _process_photo_design(
         async def process_single_photo(idx, photo_b64):
             label = photo_labels[idx] if idx < len(photo_labels) else f"Снимка {idx+1}"
             try:
-                # Simplified prompt - skip vision analysis to save ~10sec per photo
-                render_prompt = f"""ARCHITECTURAL RENOVATION — transform this EXACT room into a {style_desc} interior.
+                render_prompt = f"""You are an interior renovation AI. Edit ONLY the surfaces and furniture in this photo.
 
-ABSOLUTE RULES — DO NOT VIOLATE:
-1. Keep the IDENTICAL room geometry, walls, proportions, and shape
-2. Keep windows and doors in EXACTLY the same positions and sizes
-3. Keep the same camera angle and perspective
-4. ONLY change: wall finishes, floor material, ceiling, furniture, lighting fixtures
-5. DO NOT add or remove any structural elements (walls, columns, windows, doors)
+CRITICAL — PRESERVE EXACTLY AS-IS:
+- The EXACT room shape, walls, ceiling, floor plan
+- ALL window positions, sizes, and proportions  
+- ALL door positions, sizes, and proportions
+- The EXACT camera angle and perspective — do NOT rotate or shift the viewpoint
+- The room type is {room_type_name} — the result MUST remain a {room_type_name}, NOT any other room type
 
-RENOVATION:
-- Room: {room_type_name}, {width}m x {length}m, height {height}m
-- Style: {style_desc}
-{f"- Client notes: {reno_instruction}" if notes else "- Apply complete modern renovation with high-quality finishes"}
-- Replace old materials with modern {style_desc} finishes
-- Add stylish furniture and decor matching the {style_desc} aesthetic
-- Professional interior photography lighting, ultra-realistic"""
+CHANGE ONLY THESE:
+- Wall paint/tiles/texture → modern {style_desc} materials
+- Floor material → matching {style_desc} flooring
+- Replace old furniture with new {style_desc} furniture for a {room_type_name}
+- Update lighting fixtures
+- Add appropriate decor for a {room_type_name}
+{f"- Client request: {reno_instruction}" if notes else ""}
+
+Room dimensions: {width}m x {length}m, height {height}m.
+Output: photorealistic interior photography, 8K quality, professional lighting."""
 
                 original_photo_bytes = base64.b64decode(photo_b64)
                 
@@ -3158,7 +3160,7 @@ RENOVATION:
                         prompt=render_prompt,
                         model="gpt-image-1",
                         n=1,
-                        quality="low",
+                        quality="high",
                         api_key=EMERGENT_LLM_KEY,
                         api_base=proxy_url,
                     )
