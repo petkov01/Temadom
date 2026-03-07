@@ -117,7 +117,7 @@ const LeaderboardPage = () => {
             <span className="text-xs font-bold text-[#F97316]">Класация</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-black" style={{ color: 'var(--theme-text)' }}>Leaderboard</h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--theme-text-muted)' }}>Топ дизайнери и фирми в TemaDom</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--theme-text-muted)' }}>Топ дизайнери и фирми</p>
         </div>
 
         {/* Controls */}

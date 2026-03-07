@@ -7,7 +7,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 
 const content = {
   bg: {
-    heroTitle1: "Защо създадохме ", heroTitle2: "?",
+    heroTitle1: "Защо създадохме ", heroTitle2: "тази платформа?",
     heroDesc: "Защото вярваме, че всеки заслужава качествен ремонт от коректен майстор. И защото знаем, че добрите фирми заслужават достъп до реални клиенти.",
     problemTitle: "Проблемът, който решаваме",
     problemSub: "Реалността в строителния сектор в България",
@@ -20,7 +20,7 @@ const content = {
       { title: "Прескачане на платформите", desc: "Фирмите си разменят телефони преди ангажимент." }
     ],
     solutionTitle: "Нашето решение",
-    solutionSub: "TemaDom променя начина, по който хората намират майстори",
+    solutionSub: "Платформата, която променя начина за намиране на майстори",
     solutions: [
       { title: "Система за репутация", desc: "Всеки клиент може да остави отзив. Фирмите НЕ могат да изтриват отзиви. Добрите майстори се отличават." },
       { title: "Прозрачни цени", desc: "Калкулаторът е базиран на реални данни за всички 28 области. Клиентите знаят цената ПРЕДИ да се обадят." },
@@ -49,13 +49,13 @@ const content = {
     missionTitle: "Нашата мисия",
     missionP1: "Искаме всеки клиент в България да намери качествен и коректен майстор — без стрес, без изненади, без измами.",
     missionP2: "И искаме всеки добър майстор да бъде възнаграден за качеството си.",
-    missionFooter: "TemaDom — защото вашият дом заслужава най-доброто.",
+    missionFooter: "Защото вашият дом заслужава най-доброто.",
     ctaTitle: "Готови ли сте?",
     ctaStart: "Започнете сега",
     ctaCalc: "Опитайте калкулатора"
   },
   en: {
-    heroTitle1: "Why we created ", heroTitle2: "?",
+    heroTitle1: "Why we created ", heroTitle2: "this platform?",
     heroDesc: "Because we believe everyone deserves quality renovation from an honest craftsman.",
     problemTitle: "The problem we solve",
     problemSub: "The reality in Bulgaria's construction sector",
@@ -68,7 +68,7 @@ const content = {
       { title: "Bypassing platforms", desc: "Companies exchange contacts before commitment." }
     ],
     solutionTitle: "Our solution",
-    solutionSub: "TemaDom changes the way people find craftsmen",
+    solutionSub: "The platform that changes the way people find craftsmen",
     solutions: [
       { title: "Reputation system", desc: "Every client can leave a review. Companies CANNOT delete reviews." },
       { title: "Transparent prices", desc: "Calculator based on real data for all 28 regions." },
@@ -83,7 +83,7 @@ const content = {
     missionTitle: "Our mission",
     missionP1: "We want every client to find a quality craftsman — no stress, no surprises, no fraud.",
     missionP2: "And every good craftsman to be rewarded for quality.",
-    missionFooter: "TemaDom — because your home deserves the best.",
+    missionFooter: "Because your home deserves the best.",
     ctaTitle: "Ready?",
     ctaStart: "Get started",
     ctaCalc: "Try the calculator"
@@ -106,7 +106,7 @@ const AboutPage = () => {
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-600 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
         </div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-6" style={{ color: 'var(--theme-text)' }}>{c.heroTitle1}<span className="text-[#FF8C42]">TemaDom</span>{c.heroTitle2}</h1>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-6" style={{ color: 'var(--theme-text)' }}>{c.heroTitle1}<span className="text-[#FF8C42]">{c.heroTitle2}</span></h1>
           <p className="text-lg max-w-3xl mx-auto leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>{c.heroDesc}</p>
         </div>
       </section>

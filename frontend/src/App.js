@@ -1059,7 +1059,7 @@ const LandingPage = () => {
       {/* ===== SHOWCASE: 5 Real AI-Generated Projects ===== */}
       <section className="py-16" style={{ borderTop: `1px solid ${border}` }} data-testid="showcase-section">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">Реални <span className="gradient-text">AI Проекти</span> от TemaDom</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">Реални <span className="gradient-text">AI Проекти</span></h2>
           <p className="text-center mb-3 text-sm" style={{ color: muted }}>Генерирани от нашия 3D дизайнер с реални цени и линкове</p>
           <p className="text-center mb-8 text-xs" style={{ color: gold }}>Снимай помещението си и получи същия резултат</p>
 
@@ -2843,7 +2843,7 @@ const RegisterPage = () => {
               <div>
                 <p className="text-sm font-bold text-[#4DA6FF] mb-1">Платформата е нова!</p>
                 <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
-                  TemaDom стартира и непрекъснато се подобрява. Ако забележите грешки или имате предложения, 
+                  Платформата стартира и непрекъснато се подобрява. Ако забележите грешки или имате предложения, 
                   моля <a href="/feedback" className="text-[#FF8C42] underline">информирайте ни</a> — заедно правим платформата по-добра!
                 </p>
               </div>

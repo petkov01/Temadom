@@ -84,7 +84,7 @@ const AnalyticsDashboard = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <BarChart3 className="h-6 w-6 text-orange-400" />
-            <h1 className="text-xl font-bold">TemaDom Аналитикс</h1>
+            <h1 className="text-xl font-bold">Аналитикс</h1>
             <Badge className="bg-green-600 animate-pulse"><Activity className="h-3 w-3 mr-1" /> Live</Badge>
           </div>
           <span className="theme-text-muted text-sm">Последна актуализация: {new Date().toLocaleTimeString('bg-BG')}</span>

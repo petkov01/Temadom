@@ -103,7 +103,7 @@ export const FeedbackPage = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--theme-text)' }}>Обратна връзка и Предложения</h1>
-          <p style={{ color: 'var(--theme-text-muted)' }}>Помогнете ни да подобрим TemaDom — вашето мнение е важно</p>
+          <p style={{ color: 'var(--theme-text-muted)' }}>Вашето мнение е важно за нас</p>
         </div>
 
         {/* Stats */}
