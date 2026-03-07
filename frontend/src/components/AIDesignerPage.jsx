@@ -37,12 +37,6 @@ const PACKAGES = [
   { id: 3, label: 'Апартамент', price: 199, maxRooms: 5 },
 ];
 
-const BUDGETS = [
-  { value: 1000, label: '1,000 EUR' },
-  { value: 2500, label: '2,500 EUR' },
-  { value: 5000, label: '5,000 EUR' },
-];
-
 const PHOTO_LABELS = ['Общ план', 'Ъгъл 1', 'Ъгъл 2'];
 
 const emptyRoom = () => ({
@@ -55,7 +49,7 @@ const emptyRoom = () => ({
   length: '4.0',
   width: '3.0',
   height: '2.6',
-  budget: 5000,
+  budget: '',
 });
 
 /* ---- Before / After Slider ---- */
@@ -223,25 +217,27 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
           </div>
         </div>
 
-        {/* BUDGET CHECKBOXES */}
+        {/* BUDGET INPUT */}
         <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex items-center gap-1.5 mb-1">
             <span className="text-[#F97316] font-black text-sm">EUR</span>
-            <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Бюджет</span>
+            <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Бюджет за материали и обзавеждане</span>
           </div>
-          <div className="flex gap-2">
-            {BUDGETS.map(b => (
-              <button key={b.value} onClick={() => onUpdate({ ...room, budget: b.value })}
-                className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${room.budget === b.value ? 'text-white shadow-md scale-[1.03]' : ''}`}
-                style={{
-                  background: room.budget === b.value ? '#F97316' : 'var(--theme-card-bg)',
-                  color: room.budget !== b.value ? 'var(--theme-text-muted)' : undefined,
-                  border: `2px solid ${room.budget === b.value ? '#F97316' : 'var(--theme-border)'}`,
-                }}
-                data-testid={`budget-${b.value}-${index}`}>
-                {b.label}
-              </button>
-            ))}
+          <p className="text-[10px] mb-2" style={{ color: 'var(--theme-text-subtle)' }}>
+            Въведете вашия бюджет само за материали и обзавеждане (без труд/монтаж)
+          </p>
+          <div className="relative">
+            <Input
+              type="number"
+              min="100"
+              step="100"
+              placeholder="Напр. 5000"
+              value={room.budget}
+              onChange={e => onUpdate({ ...room, budget: e.target.value })}
+              className="h-11 text-sm font-bold pr-14"
+              data-testid={`budget-input-${index}`}
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#F97316]">EUR</span>
           </div>
         </div>
 
@@ -370,6 +366,8 @@ export const AIDesignerPage = () => {
   const handleGenerate = async () => {
     const hasAnyPhotos = rooms.some(r => r.photos.some(p => p !== null));
     if (!hasAnyPhotos) { toast.error('Качете поне една снимка'); return; }
+    const missingBudget = rooms.some(r => r.photos.some(p => p !== null) && (!r.budget || Number(r.budget) < 100));
+    if (missingBudget) { toast.error('Въведете бюджет (мин. 100 EUR)'); return; }
 
     setLoading(true);
     setElapsed(0);
@@ -392,7 +390,7 @@ export const AIDesignerPage = () => {
         fd.append('style', room.style);
         fd.append('room_type', room.roomType);
         fd.append('notes', room.notes);
-        fd.append('budget_eur', String(room.budget));
+        fd.append('budget_eur', String(room.budget || '2500'));
         fd.append('width', room.length);
         fd.append('length', room.width);
         fd.append('height', room.height);
@@ -415,7 +413,7 @@ export const AIDesignerPage = () => {
           renders: res.data.renders || [],
           budget: res.data.budget || {},
           dimensions: { length: room.length, width: room.width, height: room.height },
-          budgetBgn: room.budget,
+          budgetEur: room.budget,
           id: res.data.id,
         });
         setUploadPct(0);
@@ -566,9 +564,9 @@ export const AIDesignerPage = () => {
                       {roomResult.dimensions.length}x{roomResult.dimensions.width}x{roomResult.dimensions.height} м
                     </span>
                   )}
-                  {roomResult.budgetBgn && (
+                  {roomResult.budgetEur && (
                     <span className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
-                      {roomResult.budgetBgn.toLocaleString()} EUR
+                      {Number(roomResult.budgetEur).toLocaleString()} EUR
                     </span>
                   )}
                 </div>
@@ -626,7 +624,7 @@ export const AIDesignerPage = () => {
                 {roomResult.budget?.summary && (
                   <div className="p-3 rounded-lg text-xs" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }}
                     data-testid={`budget-info-${ri}`}>
-                    <p className="font-bold mb-1" style={{ color: 'var(--theme-text)' }}>Бюджет: {roomResult.budgetBgn?.toLocaleString()} EUR</p>
+                    <p className="font-bold mb-1" style={{ color: 'var(--theme-text)' }}>Бюджет за материали: {Number(roomResult.budgetEur).toLocaleString()} EUR</p>
                     <p>{roomResult.budget.summary}</p>
                   </div>
                 )}

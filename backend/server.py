@@ -126,6 +126,36 @@ def get_region_from_city(city: str) -> str:
     # Default to Sofia
     return "София-град"
 
+
+# ============== TEST AI ENDPOINT ==============
+
+@api_router.post("/test-ai")
+async def test_ai():
+    """Diagnostic endpoint to check if AI (OpenAI) connection works."""
+    if not EMERGENT_LLM_KEY:
+        return {"error": "EMERGENT_LLM_KEY not configured", "code": "missing_key"}
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"test-ai-{uuid.uuid4()}",
+            system_message="You are a test assistant."
+        ).with_model("openai", "gpt-4o-mini")
+        response = await chat.send_message(UserMessage(text="Say OK"))
+        return {"status": "AI OK", "model": "gpt-4o-mini", "response": response[:100]}
+    except Exception as e:
+        error_str = str(e)
+        code = None
+        if hasattr(e, 'code'):
+            code = e.code
+        elif '401' in error_str or '403' in error_str:
+            code = 'auth_error'
+        elif '429' in error_str:
+            code = 'rate_limit'
+        elif 'timeout' in error_str.lower():
+            code = 'timeout'
+        return {"error": error_str, "code": code}
+
+
 # ============== AUTH ROUTES ==============
 
 @api_router.post("/auth/register")

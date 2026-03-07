@@ -1,0 +1,111 @@
+{
+  "summary": "Iteration 60: Testing budget free text input and /api/test-ai endpoint. All 8 backend tests passed. All 11 frontend UI elements verified via Playwright. Budget changed from preset buttons (1000/2500/5000) to free text input with min 100 EUR validation. Info text about 'materials only' added.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "=== BACKEND TESTS (8/8 passed) ===",
+    "✅ GET /api/ returns 200 - API health check",
+    "✅ POST /api/auth/login successful for testfix@test.bg",
+    "✅ POST /api/test-ai returns {status: 'AI OK', model: 'gpt-4o-mini'} - NEW ENDPOINT WORKING",
+    "✅ POST /api/ai-designer/photo-generate validates photo requirement (422)",
+    "✅ budget_eur parameter accepted by AI Designer endpoint",
+    "✅ GET /api/categories returns categories",
+    "✅ GET /api/stats returns stats",
+    "✅ GET /api/reviews returns reviews",
+    "",
+    "=== FRONTEND UI TESTS (11/11 elements found) ===",
+    "✅ ai-designer-page container found",
+    "✅ pkg-1, pkg-2, pkg-3 package buttons found (69/129/199 EUR)",
+    "✅ room-type-0 selector found",
+    "✅ style-0 selector found",
+    "✅ length-0, width-0, height-0 dimension inputs found",
+    "✅ budget-input-0 NEW FREE TEXT INPUT found",
+    "  - type='number', min='100', step='100', placeholder='Напр. 5000'",
+    "  - Can type free text (tested with '1500')",
+    "  - EUR suffix indicator visible",
+    "✅ generate-btn found ('ГЕНЕРИРАЙ 3D — 69 EUR')",
+    "",
+    "=== REMOVED ELEMENTS (3/3 confirmed removed) ===",
+    "✅ budget-1000-0 REMOVED",
+    "✅ budget-2500-0 REMOVED",
+    "✅ budget-5000-0 REMOVED",
+    "",
+    "=== INFO TEXT VERIFICATION ===",
+    "✅ 'Бюджет за материали и обзавеждане' text found",
+    "✅ 'без труд/монтаж' text found",
+    "✅ 'EUR' indicator visible"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iter60_budget_testai.py",
+    "/app/test_reports/pytest/pytest_results_iter60.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All requested features verified:",
+    "1. ✅ /api/test-ai POST endpoint returns {status: 'AI OK', model: 'gpt-4o-mini'} when AI is working",
+    "2. ✅ Budget changed from preset buttons (1000/2500/5000 EUR) to free text input",
+    "3. ✅ Budget input has min=100 validation (data-testid='budget-input-0')",
+    "4. ✅ Budget input has placeholder 'Напр. 5000'",
+    "5. ✅ Budget input has EUR suffix indicator",
+    "6. ✅ Info text 'Бюджет за материали и обзавеждане' visible",
+    "7. ✅ Info text 'без труд/монтаж' visible (materials only, no labor)",
+    "8. ✅ All previous timeout fixes still in place (gpt-4o-mini, retry_with_backoff, PIL resize)"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter60_budget_testai.py"
+  ],
+  "success_rate": {
+    "backend": "100% (8/8 tests passed)",
+    "frontend": "100% (11/11 UI elements verified, 3 old elements confirmed removed)"
+  },
+  "test_credentials": "testfix@test.bg / Test123!",
+  "seed_data_creation": "None - used existing test user",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 60 verified: 1) New /api/test-ai diagnostic endpoint working, 2) Budget changed from preset buttons to free text input (data-testid='budget-input-0'), 3) Info text about 'materials only (no labor)' added. Old budget button testids (budget-1000-0, budget-2500-0, budget-5000-0) are REMOVED. Budget input uses type='number' with min=100, step=100, placeholder='Напр. 5000' and EUR suffix.",
+  "features_tested": {
+    "test_ai_endpoint": {
+      "status": "PASS",
+      "endpoint": "POST /api/test-ai",
+      "response": "{status: 'AI OK', model: 'gpt-4o-mini', response: '...'}"
+    },
+    "budget_free_text_input": {
+      "status": "PASS",
+      "data_testid": "budget-input-0",
+      "type": "number",
+      "min": "100",
+      "step": "100",
+      "placeholder": "Напр. 5000"
+    },
+    "budget_eur_suffix": {
+      "status": "PASS",
+      "location": "Inside budget input wrapper"
+    },
+    "info_text_materials": {
+      "status": "PASS",
+      "text": "Бюджет за материали и обзавеждане"
+    },
+    "info_text_no_labor": {
+      "status": "PASS",
+      "text": "без труд/монтаж"
+    },
+    "old_budget_buttons_removed": {
+      "status": "PASS",
+      "removed_testids": ["budget-1000-0", "budget-2500-0", "budget-5000-0"]
+    },
+    "previous_timeout_fixes": {
+      "status": "PASS",
+      "verified": ["gpt-4o-mini model", "retry_with_backoff", "PIL resize", "300s timeout", "compressImage"]
+    }
+  },
+  "mocked_apis": {
+    "Product scraping": "/api/scrape/* - scraping logic is placeholder"
+  }
+}
