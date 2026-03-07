@@ -968,7 +968,7 @@ const LandingPage = () => {
           {/* Trust elements */}
           <div className="flex flex-wrap justify-center gap-4 mb-10 animate-slideUp stagger-4">
             {[
-              { icon: <Sparkles className="h-3.5 w-3.5" />, text: 'AI дизайн за ~90 сек' },
+              { icon: <Sparkles className="h-3.5 w-3.5" />, text: 'AI дизайн' },
               { icon: <Camera className="h-3.5 w-3.5" />, text: '3D проект + бюджет' },
               { icon: <ShoppingCart className="h-3.5 w-3.5" />, text: 'Линкове към магазини' },
             ].map((item, i) => (
@@ -994,7 +994,7 @@ const LandingPage = () => {
           </div>
 
           <p className="text-xs mb-12 animate-slideUp" style={{ color: gold }}>
-            AI дизайн за около 90 секунди
+            AI визуализация на вашия проект
           </p>
 
           {/* Before/After Hero Preview */}

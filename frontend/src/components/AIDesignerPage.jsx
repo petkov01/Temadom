@@ -253,13 +253,17 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
             <div key={pIdx}>
               <Label className="text-[10px] mb-1 block text-center" style={{ color: 'var(--theme-text-subtle)' }}>{label}</Label>
               {room.photoUrls[pIdx] ? (
-                <div className="relative aspect-video rounded-lg overflow-hidden group">
+                <div className="relative aspect-[4/3] rounded-lg overflow-hidden group border-2 border-[#10B981]/40">
                   <img src={room.photoUrls[pIdx]} alt={label} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <button onClick={() => removePhoto(pIdx)}
-                    className="absolute top-1 right-1 bg-red-500/90 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 bg-red-500/90 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                     data-testid={`remove-photo-${index}-${pIdx}`}>
-                    <X className="h-3 w-3" />
+                    <X className="h-3.5 w-3.5" />
                   </button>
+                  <div className="absolute bottom-0 left-0 right-0 bg-[#10B981]/80 text-white text-center text-[9px] py-0.5 font-bold">
+                    Качено
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-1">
@@ -580,7 +584,7 @@ export const AIDesignerPage = () => {
                         {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, '0')}
                       </span>
                       <span className="text-[10px] ml-2" style={{ color: 'var(--theme-text-muted)' }}>
-                        / прибл. {rooms.filter(r => r.photos.some(p => p)).length * 2}-{rooms.filter(r => r.photos.some(p => p)).length * 3} мин
+                        Генериране...
                       </span>
                     </div>
                   </div>
@@ -588,17 +592,7 @@ export const AIDesignerPage = () => {
               </Card>
             ) : (
               <div className="space-y-2">
-                {/* Estimated time info */}
-                {rooms.some(r => r.photos.some(p => p)) && (
-                  <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-xs"
-                    style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }}
-                    data-testid="estimated-time">
-                    <Loader2 className="h-3.5 w-3.5" />
-                    <span>Приблизително време: <strong style={{ color: 'var(--theme-text)' }}>
-                      {rooms.filter(r => r.photos.some(p => p)).length * 2}-{rooms.filter(r => r.photos.some(p => p)).length * 3} минути
-                    </strong> за {rooms.filter(r => r.photos.some(p => p)).length} {rooms.filter(r => r.photos.some(p => p)).length === 1 ? 'помещение' : 'помещения'}</span>
-                  </div>
-                )}
+                {/* Generate button */}
                 <Button className="w-full h-16 text-lg font-black shadow-xl rounded-xl"
                   style={{
                     background: rooms.some(r => r.photos.some(p => p)) ? 'linear-gradient(135deg, #F97316, #EA580C)' : 'var(--theme-bg-surface)',

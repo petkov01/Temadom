@@ -3093,7 +3093,7 @@ RENOVATION:
                         prompt=prompt,
                         model="gpt-image-1",
                         n=1,
-                        quality="medium",
+                        quality="low",
                         api_key=EMERGENT_LLM_KEY,
                         api_base=proxy_url,
                     )
