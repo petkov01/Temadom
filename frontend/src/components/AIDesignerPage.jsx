@@ -402,7 +402,6 @@ export const AIDesignerPage = () => {
         if (!room.photos.some(p => p !== null)) continue;
 
         const fd = new FormData();
-        // Compress photos to <2MB before upload
         for (let i = 0; i < room.photos.length; i++) {
           if (room.photos[i]) {
             const compressed = await compressImage(room.photos[i], 2);
@@ -418,25 +417,50 @@ export const AIDesignerPage = () => {
         fd.append('height', room.height);
         if (token) fd.append('authorization', `Bearer ${token}`);
 
-        // Retry with exponential backoff + 5 min timeout
-        const res = await retryWithBackoff(async () => {
-          return await axios.post(`${API}/ai-designer/photo-generate`, fd, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-            timeout: 300000, // 5 minutes
-            onUploadProgress: (e) => { if (e.total) setUploadPct(Math.round((e.loaded / e.total) * 100)); },
-          });
-        }, 3, 2000);
+        // Step 1: Submit task — returns immediately with task_id
+        setUploadPct(5);
+        const submitRes = await axios.post(`${API}/ai-designer/photo-generate`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 60000,
+          onUploadProgress: (e) => { if (e.total) setUploadPct(Math.round((e.loaded / e.total) * 100)); },
+        });
+
+        const taskId = submitRes.data.task_id;
+        if (!taskId) throw new Error('Няма task_id от сървъра');
+
+        // Step 2: Poll for result every 3 seconds
+        let result = null;
+        for (let poll = 0; poll < 100; poll++) { // max 5 minutes
+          await new Promise(r => setTimeout(r, 3000));
+          try {
+            const statusRes = await axios.get(`${API}/ai-designer/task/${taskId}`, { timeout: 10000 });
+            const task = statusRes.data;
+            setUploadPct(task.progress || 0);
+
+            if (task.status === 'done') {
+              result = task.result;
+              break;
+            } else if (task.status === 'error') {
+              throw new Error(task.error || 'Грешка при генериране');
+            }
+          } catch (pollErr) {
+            if (pollErr.response?.status === 404) continue;
+            if (pollErr.message?.includes('Грешка')) throw pollErr;
+          }
+        }
+
+        if (!result) throw new Error('Времето за генериране изтече');
 
         const roomName = ROOM_TYPES.find(r => r.id === room.roomType)?.name || 'Помещение';
         allRoomResults.push({
           roomIndex: ri,
           roomName,
           style: room.style,
-          renders: res.data.renders || [],
-          budget: res.data.budget || {},
+          renders: result.renders || [],
+          budget: result.budget || {},
           dimensions: { length: room.length, width: room.width, height: room.height },
           budgetEur: room.budget,
-          id: res.data.id,
+          id: result.id,
         });
         setUploadPct(0);
       }
@@ -460,7 +484,7 @@ export const AIDesignerPage = () => {
     setShowShare(false);
   };
 
-  const pct = Math.min(100, (elapsed / (rooms.length * 90)) * 100);
+  const pct = uploadPct > 0 ? uploadPct : Math.min(95, (elapsed / (rooms.length * 90)) * 100);
 
   return (
     <div className="min-h-screen py-6 px-3 md:px-6" style={{ background: 'var(--theme-bg)' }} data-testid="ai-designer-page">
@@ -552,7 +576,7 @@ export const AIDesignerPage = () => {
                   <div className="w-full" data-testid="progress-bar">
                     <div className="flex justify-between items-end mb-2">
                       <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
-                      {pct < 20 ? 'Качване и анализ на снимките...' : pct < 45 ? 'AI обработва архитектурата на стаята...' : pct < 70 ? 'Генериране на 3D рендер (запазване на архитектурата 1:1)...' : pct < 90 ? 'Търсене на реални продукти от магазини...' : 'Финализиране на бюджета...'}
+                      {pct < 10 ? 'Качване на снимките...' : pct < 25 ? 'Анализ на снимките...' : pct < 65 ? 'Генериране на 3D рендер...' : pct < 75 ? 'Изчисляване на бюджет...' : pct < 95 ? 'Запазване на проекта...' : 'Готово!'}
                     </span>
                       <span className="text-[#c9953a] font-black text-2xl">{Math.round(pct)}%</span>
                     </div>

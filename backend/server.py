@@ -92,6 +92,53 @@ async def health_check():
 async def api_health_check():
     return {"status": "ok"}
 
+# ==================== ASYNC TASK SYSTEM ====================
+# In-memory task store for long-running AI operations
+import asyncio as aio
+
+_tasks = {}  # task_id -> {status, progress, message, result, error, created_at}
+
+async def _run_task_in_background(task_id: str, coro):
+    """Run a coroutine in background and update task status."""
+    try:
+        result = await coro
+        _tasks[task_id]["status"] = "done"
+        _tasks[task_id]["progress"] = 100
+        _tasks[task_id]["message"] = "Готово!"
+        _tasks[task_id]["result"] = result
+    except Exception as e:
+        logging.error(f"Task {task_id} failed: {e}")
+        _tasks[task_id]["status"] = "error"
+        _tasks[task_id]["error"] = str(e)
+
+def update_task_progress(task_id: str, progress: int, message: str = ""):
+    """Update task progress (called from within the processing function)."""
+    if task_id in _tasks:
+        _tasks[task_id]["progress"] = progress
+        if message:
+            _tasks[task_id]["message"] = message
+
+@api_router.get("/ai-designer/task/{task_id}")
+async def get_task_status(task_id: str):
+    """Poll task status for async AI generation."""
+    task = _tasks.get(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Задачата не е намерена")
+    response = {
+        "task_id": task_id,
+        "status": task["status"],
+        "progress": task["progress"],
+        "message": task.get("message", ""),
+    }
+    if task["status"] == "done":
+        response["result"] = task["result"]
+        # Clean up after delivery (keep for 5 min for retries)
+        aio.get_event_loop().call_later(300, lambda: _tasks.pop(task_id, None))
+    elif task["status"] == "error":
+        response["error"] = task.get("error", "Неизвестна грешка")
+        aio.get_event_loop().call_later(60, lambda: _tasks.pop(task_id, None))
+    return response
+
 # ==================== AFFILIATE CONFIG ====================
 # Affiliate ref parameters for each store (monetization)
 AFFILIATE_CONFIG = {
@@ -2927,7 +2974,7 @@ async def generate_photo_design(
     budget_tier: str = Form("medium"),
     authorization: str = Form(None)
 ):
-    """3D Designer v8: 3 photos -> 3 separate 3D renders + budget with direct product links. NO 360."""
+    """3D Designer v9: Async — returns task_id immediately, client polls for result."""
     if not EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="AI ключът не е конфигуриран")
 
@@ -2947,24 +2994,20 @@ async def generate_photo_design(
             photo_bytes = await photo.read()
             if len(photo_bytes) > 10 * 1024 * 1024:
                 raise HTTPException(status_code=400, detail="Снимката е твърде голяма (макс. 10MB)")
-            # Resize to <2MB for faster Vision API processing
             if len(photo_bytes) > 2 * 1024 * 1024:
                 try:
                     from PIL import Image as PILImage
                     import io
                     img = PILImage.open(io.BytesIO(photo_bytes))
-                    # Resize keeping aspect ratio, max 1920px
                     max_dim = 1920
                     if img.width > max_dim or img.height > max_dim:
                         ratio = min(max_dim / img.width, max_dim / img.height)
                         new_size = (int(img.width * ratio), int(img.height * ratio))
                         img = img.resize(new_size, PILImage.LANCZOS)
-                    # Compress as JPEG with quality reduction
                     buf = io.BytesIO()
-                    quality = 70
                     if img.mode == 'RGBA':
                         img = img.convert('RGB')
-                    img.save(buf, format='JPEG', quality=quality)
+                    img.save(buf, format='JPEG', quality=70)
                     photo_bytes = buf.getvalue()
                     logging.info(f"Photo resized: {len(photo_bytes)} bytes")
                 except Exception as resize_err:
@@ -2974,17 +3017,43 @@ async def generate_photo_design(
     if not photos_b64:
         raise HTTPException(status_code=400, detail="Качете поне една снимка")
 
-    style_desc = AI_STYLES.get(style, AI_STYLES.get("modern", "modern style"))
-    ROOM_TYPE_NAMES = {
-        "bathroom": "баня", "kitchen": "кухня", "living_room": "хол",
-        "bedroom": "спалня", "corridor": "коридор", "balcony": "балкон",
-        "stairs": "стълбище", "facade": "фасада", "other": "помещение"
+    # Create async task and return immediately
+    task_id = str(uuid.uuid4())
+    _tasks[task_id] = {
+        "status": "processing",
+        "progress": 5,
+        "message": "Подготовка на снимките...",
+        "result": None,
+        "error": None,
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
-    room_type_name = ROOM_TYPE_NAMES.get(room_type, "помещение")
-    reno_instruction = notes or "complete renovation with modern finishes"
 
+    # Launch background processing
+    aio.ensure_future(_process_photo_design(
+        task_id, photos_b64, photo_labels, width, length, height,
+        style, room_type, notes, budget_eur, budget_tier, user_id
+    ))
+
+    return {"task_id": task_id, "status": "processing", "message": "Генерирането започна"}
+
+
+async def _process_photo_design(
+    task_id, photos_b64, photo_labels, width, length, height,
+    style, room_type, notes, budget_eur, budget_tier, user_id
+):
+    """Background task: process photos, scrape products, generate budget."""
     try:
-        # Step 1: Use GPT-4o-mini Vision to analyze EACH photo — identify room, elements, layout
+        style_desc = AI_STYLES.get(style, AI_STYLES.get("modern", "modern style"))
+        ROOM_TYPE_NAMES = {
+            "bathroom": "баня", "kitchen": "кухня", "living_room": "хол",
+            "bedroom": "спалня", "corridor": "коридор", "balcony": "балкон",
+            "stairs": "стълбище", "facade": "фасада", "other": "помещение"
+        }
+        room_type_name = ROOM_TYPE_NAMES.get(room_type, "помещение")
+        reno_instruction = notes or "complete renovation with modern finishes"
+
+        update_task_progress(task_id, 10, "Анализ на снимките...")
+
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         renders = []
 
@@ -3100,6 +3169,7 @@ RENOVATION:
                 return {}
 
         logging.info(f"Photo Designer: Processing {len(photos_b64)} photos + scraping IN PARALLEL")
+        update_task_progress(task_id, 20, f"Генериране на {len(photos_b64)} рендер(а) + търсене на продукти...")
         photo_tasks = [process_single_photo(i, p) for i, p in enumerate(photos_b64)]
         all_results = await aio_module.gather(
             aio_module.gather(*photo_tasks),
@@ -3109,6 +3179,7 @@ RENOVATION:
         real_products_by_category = all_results[1]
         renders = [r for r in parallel_results if r is not None]
         logging.info(f"Photo Designer: {len(renders)}/{len(photos_b64)} renders completed")
+        update_task_progress(task_id, 60, f"{len(renders)} рендер(а) готови. Изчисляване на бюджет...")
 
         # Build the real products context for GPT
         real_products_context = format_products_for_prompt(real_products_by_category, int(budget_eur)) if real_products_by_category else ""
@@ -3201,6 +3272,8 @@ RENOVATION:
             system_message=budget_system
         ).with_model("openai", "gpt-4o")
 
+        update_task_progress(task_id, 70, "Генериране на бюджет с реални цени...")
+
         budget_msg = UserMessage(
             text=f"""Генерирай бюджет за ремонт на {room_type_name} ({width}м x {length}м x {height}м).
 БЮДЖЕТ: {budget_eur}€. Стил: {style_desc}. {f'Бележки: {notes}' if notes else ''}
@@ -3253,6 +3326,7 @@ RENOVATION:
         real_count = sum(1 for t in budget_data.get("budget_tiers", []) for m in t.get("materials", []) if m.get("verified"))
         total_count = sum(len(t.get("materials", [])) for t in budget_data.get("budget_tiers", []))
         logging.info(f"Photo Designer: Budget generated with {real_count}/{total_count} verified real products")
+        update_task_progress(task_id, 90, "Запазване на проекта...")
 
         # Save project to DB
         design_id = str(uuid.uuid4())
@@ -3279,7 +3353,7 @@ RENOVATION:
 
         await db.ai_designs.insert_one(design_record)
 
-        return {
+        result = {
             "id": design_id,
             "renders": [{"index": r["index"], "label": r["label"], "image_base64": r["image_base64"], "original_base64": r["original_base64"]} for r in renders],
             "budget": budget_data,
@@ -3288,12 +3362,15 @@ RENOVATION:
             "photos_count": len(photos_b64),
             "renders_count": len(renders),
         }
+        update_task_progress(task_id, 100, "Готово!")
+        _tasks[task_id]["status"] = "done"
+        _tasks[task_id]["result"] = result
+        logging.info(f"Photo Designer: Task {task_id} completed successfully")
 
-    except HTTPException:
-        raise
     except Exception as e:
-        logging.error(f"Photo Designer error: {e}")
-        raise HTTPException(status_code=500, detail=f"Грешка при обработка: {str(e)}")
+        logging.error(f"Photo Designer error (task {task_id}): {e}")
+        _tasks[task_id]["status"] = "error"
+        _tasks[task_id]["error"] = f"Грешка при обработка: {str(e)}"
 
 
 @api_router.get("/ai-designer/my-projects")
