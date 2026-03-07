@@ -310,7 +310,7 @@ async def login(credentials: UserLogin):
     if not user:
         raise HTTPException(status_code=401, detail="Грешен имейл или парола")
     
-    if not verify_password(credentials.password, user.get("password_hash", "")):
+    if not user.get("password_hash") or not verify_password(credentials.password, user.get("password_hash", "")):
         raise HTTPException(status_code=401, detail="Грешен имейл или парола")
     
     token = create_token(user["id"], user["user_type"])
@@ -322,7 +322,10 @@ async def login(credentials: UserLogin):
             "email": user["email"],
             "name": user["name"],
             "user_type": user["user_type"],
-            "subscription_active": user.get("subscription_active", False)
+            "subscription_active": user.get("subscription_active", False),
+            "subscription_plan": user.get("subscription_plan", "basic"),
+            "avatar": user.get("avatar", ""),
+            "company_name": user.get("company_name", ""),
         }
     }
 
@@ -3978,6 +3981,39 @@ async def get_feedback():
         avg_rating = sum(f["rating"] for f in feedback_list) / len(feedback_list)
     return {"feedback": feedback_list, "avg_rating": round(avg_rating, 1), "total": len(feedback_list)}
 
+# ============== SUGGESTIONS ==============
+
+@api_router.post("/suggestions")
+async def submit_suggestion(data: dict):
+    """Submit a user suggestion for platform improvement"""
+    text = data.get("text", "").strip()
+    name = data.get("name", "Анонимен")
+    if not text:
+        raise HTTPException(status_code=400, detail="Моля, напишете предложение")
+    suggestion = {
+        "id": str(uuid.uuid4()),
+        "text": text,
+        "name": name,
+        "votes": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.suggestions.insert_one(suggestion)
+    return {"status": "ok", "message": "Благодарим за предложението!"}
+
+@api_router.get("/suggestions")
+async def get_suggestions():
+    """Get all suggestions sorted by votes"""
+    suggestions_list = await db.suggestions.find({}, {"_id": 0}).sort("votes", -1).to_list(100)
+    return {"suggestions": suggestions_list}
+
+@api_router.post("/suggestions/{suggestion_id}/vote")
+async def vote_suggestion(suggestion_id: str):
+    """Upvote a suggestion"""
+    result = await db.suggestions.update_one({"id": suggestion_id}, {"$inc": {"votes": 1}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Предложението не е намерено")
+    return {"status": "ok"}
+
 # ============== ADMIN: CLEAN TEST DATA ==============
 
 @api_router.post("/admin/clean-test-data")
@@ -5630,6 +5666,12 @@ app.include_router(notifications_router)
 
 from routes.products import router as products_router
 app.include_router(products_router)
+
+from routes.google_auth import router as google_auth_router
+app.include_router(google_auth_router)
+
+from routes.telegram import router as telegram_router
+app.include_router(telegram_router)
 
 @app.on_event("startup")
 async def start_background_tasks():

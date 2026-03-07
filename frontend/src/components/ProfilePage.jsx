@@ -22,6 +22,95 @@ const PLAN_DISPLAY = {
   premium: { name: 'PREMIUM', color: '#8B5CF6', price: 75 },
 };
 
+const TelegramConnect = ({ token, profile }) => {
+  const [botInfo, setBotInfo] = useState(null);
+  const [chatId, setChatId] = useState('');
+  const [connecting, setConnecting] = useState(false);
+  const isConnected = profile?.telegram_connected;
+
+  useEffect(() => {
+    axios.get(`${API}/telegram/bot-info`).then(r => setBotInfo(r.data)).catch(() => {});
+  }, []);
+
+  const connect = async () => {
+    if (!chatId.trim()) { toast.error('Въведете Chat ID'); return; }
+    setConnecting(true);
+    try {
+      await axios.post(`${API}/telegram/connect`, { chat_id: chatId.trim() }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Telegram е свързан!');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Грешка при свързване');
+    }
+    setConnecting(false);
+  };
+
+  const disconnect = async () => {
+    try {
+      await axios.delete(`${API}/telegram/disconnect`, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Telegram е прекъснат');
+    } catch { toast.error('Грешка'); }
+  };
+
+  const testNotify = async () => {
+    try {
+      await axios.post(`${API}/telegram/test`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Тестовото известие е изпратено!');
+    } catch (err) { toast.error(err.response?.data?.detail || 'Грешка'); }
+  };
+
+  return (
+    <Card className="mb-4" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}
+      data-testid="telegram-connect">
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-[#0088cc]/10 flex items-center justify-center">
+            <MessageCircle className="h-4 w-4 text-[#0088cc]" />
+          </div>
+          <div>
+            <p className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>Telegram известия</p>
+            <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>
+              {isConnected ? 'Свързан' : 'Получавайте известия за нови запитвания'}
+            </p>
+          </div>
+          {isConnected && (
+            <Badge className="ml-auto bg-emerald-100 text-emerald-700 text-[10px]">Активен</Badge>
+          )}
+        </div>
+
+        {isConnected ? (
+          <div className="flex gap-2">
+            <Button size="sm" className="flex-1 bg-[#0088cc] hover:bg-[#006699] text-white text-xs"
+              onClick={testNotify} data-testid="telegram-test">
+              Тестово известие
+            </Button>
+            <Button size="sm" variant="outline" className="text-xs text-red-400 border-red-400/30"
+              onClick={disconnect} data-testid="telegram-disconnect">
+              Прекъсни
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="p-3 rounded-lg text-xs space-y-1.5" style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)' }}>
+              <p className="font-medium" style={{ color: 'var(--theme-text)' }}>Как да свържете:</p>
+              <p>1. Отворете <a href={botInfo?.bot_link || 'https://t.me/temadom_notify_bot'} target="_blank" rel="noopener noreferrer" className="text-[#0088cc] underline">@temadom_notify_bot</a> в Telegram</p>
+              <p>2. Натиснете /start</p>
+              <p>3. Ботът ще ви даде вашия Chat ID — въведете го тук:</p>
+            </div>
+            <div className="flex gap-2">
+              <Input placeholder="Вашият Chat ID" value={chatId} onChange={e => setChatId(e.target.value)}
+                className="h-9 text-sm flex-1" data-testid="telegram-chat-id-input" />
+              <Button size="sm" className="bg-[#0088cc] hover:bg-[#006699] text-white px-4"
+                onClick={connect} disabled={connecting} data-testid="telegram-connect-btn">
+                {connecting ? '...' : 'Свържи'}
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
 const FEATURE_LABELS = {
   pdf_contracts: { label: 'PDF Договори', icon: FileText },
   ai_sketches: { label: 'AI Скици', icon: Zap },
@@ -580,6 +669,8 @@ const ProfilePage = () => {
           <TabsContent value="payments">
             {/* Subscription Dashboard */}
             {isCompany && <SubscriptionDashboard token={token} />}
+            {/* Telegram Connection for firms */}
+            {isCompany && <TelegramConnect token={token} profile={profile} />}
             <PaymentSection />
           </TabsContent>
 

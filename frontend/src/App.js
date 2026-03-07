@@ -72,6 +72,15 @@ import { Separator } from "@/components/ui/separator";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// ScrollToTop — fix bug where pages show the bottom on navigation
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
 // Auth Context
 const AuthContext = createContext(null);
 
@@ -130,8 +139,14 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithToken = (newToken, userData) => {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+    setUser(userData);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, api, refreshUser }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, api, refreshUser, loginWithToken }}>
       {children}
     </AuthContext.Provider>
   );
@@ -257,7 +272,7 @@ const Navbar = () => {
             </Link>
             <Link to="/companies" className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
               <Building2 className="h-3.5 w-3.5" />
-              Фирми
+              Фирми и Майстори
             </Link>
             <Link to="/ads" className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
               <Megaphone className="h-3.5 w-3.5" />
@@ -285,9 +300,6 @@ const Navbar = () => {
                   </Link>
                   <Link to="/ready-projects" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#28A745] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-ready-projects">
                     <FolderSearch className="h-4 w-4" /> Готови проекти
-                  </Link>
-                  <Link to="/companies" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#4DA6FF] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-companies">
-                    <Building2 className="h-4 w-4" /> Фирми
                   </Link>
                   <Link to="/subscriptions" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-subscriptions">
                     <ShoppingCart className="h-4 w-4" /> Абонаменти
@@ -449,7 +461,7 @@ const Navbar = () => {
               <FolderSearch className="h-4 w-4" /> {t('nav_projects')}
             </Link>
             <Link to="/companies" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
-              <Building2 className="h-4 w-4" /> {t('nav_companies')}
+              <Building2 className="h-4 w-4" /> Фирми и Майстори
             </Link>
             <Link to="/calculator" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <Calculator className="h-4 w-4" /> {t('nav_calculator')}
@@ -462,9 +474,6 @@ const Navbar = () => {
             </Link>
             <Link to="/ready-projects" className="block py-2 flex items-center gap-2 hover:text-[#28A745]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ready-projects">
               <FolderSearch className="h-4 w-4" /> Готови проекти
-            </Link>
-            <Link to="/companies" className="block py-2 flex items-center gap-2 hover:text-[#4DA6FF]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-companies">
-              <Building2 className="h-4 w-4" /> Фирми
             </Link>
             <Link to="/subscriptions" className="block py-2 flex items-center gap-2 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <ShoppingCart className="h-4 w-4" /> Абонаменти
@@ -925,7 +934,7 @@ const LandingPage = () => {
               <div className="text-left">
                 <p style={{ color: accent }} className="text-sm font-bold leading-tight">ПЪРВИ 56 ФИРМИ</p>
                 <p style={{ color: muted }} className="text-[10px]">(2 на област × 28 области)</p>
-                <p style={{ color: dark ? '#FCD34D' : '#D97706' }} className="text-xs font-bold">= 1 ГОДИНА ПРЕМИУМ 0 EUR</p>
+                <p style={{ color: dark ? '#FCD34D' : '#D97706' }} className="text-xs font-bold">= 6 МЕСЕЦА ПРЕМИУМ 0 EUR</p>
               </div>
             </div>
           </div>
@@ -960,8 +969,8 @@ const LandingPage = () => {
           {/* Stats row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl w-full">
             {[
-              { v: `${liveStats.companies || 21}`, l: 'Фирми', c: accent },
-              { v: `${liveStats.clients || 9}`, l: 'Клиенти', c: '#10B981' },
+              { v: `${liveStats.companies || 0}`, l: 'Фирми', c: accent },
+              { v: `${liveStats.clients || 0}`, l: 'Клиенти', c: '#10B981' },
               { v: '1:1', l: 'Точен мащаб', c: dark ? '#FCD34D' : '#D97706' },
               { v: `${slotsLeft} FREE`, l: `${slotsUsed}/${slotsTotal} (2/област)`, c: '#10B981' },
             ].map((s, i) => (
@@ -1027,25 +1036,46 @@ const LandingPage = () => {
             ))}
           </div>
 
-          {/* Project cards grid — REAL AI-generated renders */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Project cards — Horizontal carousel */}
+          {(() => {
+            const showcaseRef = React.createRef();
+            const scrollCarousel = (dir) => {
+              if (showcaseRef.current) {
+                showcaseRef.current.scrollBy({ left: dir * 360, behavior: 'smooth' });
+              }
+            };
+            return (
+            <div className="relative">
+              <button onClick={() => scrollCarousel(-1)}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+                style={{ background: bgCard, color: text, border: `1px solid ${border}` }}
+                data-testid="showcase-prev">
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button onClick={() => scrollCarousel(1)}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+                style={{ background: bgCard, color: text, border: `1px solid ${border}` }}
+                data-testid="showcase-next">
+                <ChevronRight className="h-5 w-5" />
+              </button>
+              <div ref={showcaseRef} className="flex gap-6 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {[
               {
                 room: 'БАНЯ', roomId: 'bathroom', dims: '3.5 x 3.0м', tierTotal: 2000, price: '69', color: '#F97316',
                 before: '/showcase/before_bathroom.jpg', after: '/showcase/after_bathroom.jpg',
                 products: [
-                  { name: 'Керамогранит 30x60', price: '500', store: 'HomeMax', url: 'https://www.home-max.bg/search/?q=%D0%BA%D0%B5%D1%80%D0%B0%D0%BC%D0%BE%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%82+30x60&ref=temadom' },
-                  { name: 'Стенна тоалетна', price: '250', store: 'Bauhaus', url: 'https://bauhaus.bg/search/%D1%81%D1%82%D0%B5%D0%BD%D0%BD%D0%B0+%D1%82%D0%BE%D0%B0%D0%BB%D0%B5%D1%82%D0%BD%D0%B0&utm_source=temadom&utm_medium=affiliate' },
-                  { name: 'Душ кабина хидромасаж', price: '400', store: 'Mr.Bricolage', url: 'https://mr-bricolage.bg/search?q=%D0%B4%D1%83%D1%88+%D0%BA%D0%B0%D0%B1%D0%B8%D0%BD%D0%B0&ref=temadom' },
+                  { name: 'Керамогранит 30x60', price: '500', store: 'HomeMax', url: 'https://www.homemax.bg/catalogsearch/result/?q=%D0%BA%D0%B5%D1%80%D0%B0%D0%BC%D0%BE%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%82+30x60&ref=temadom' },
+                  { name: 'Стенна тоалетна', price: '250', store: 'Bauhaus', url: 'https://www.bauhaus.bg/catalogsearch/result/?q=%D1%81%D1%82%D0%B5%D0%BD%D0%BD%D0%B0+%D1%82%D0%BE%D0%B0%D0%BB%D0%B5%D1%82%D0%BD%D0%B0&utm_source=temadom' },
+                  { name: 'Душ кабина хидромасаж', price: '400', store: 'Mr.Bricolage', url: 'https://www.mr-bricolage.bg/search?q=%D0%B4%D1%83%D1%88+%D0%BA%D0%B0%D0%B1%D0%B8%D0%BD%D0%B0&ref=temadom' },
                 ],
               },
               {
                 room: 'ХОЛ', roomId: 'living_room', dims: '5.0 x 4.0м', tierTotal: 3500, price: '89', color: '#10B981',
                 before: '/showcase/before_living.jpg', after: '/showcase/after_living_room.jpg',
                 products: [
-                  { name: 'Ламинат Дъб Натюр', price: '400', store: 'Praktiker', url: 'https://praktiker.bg/search?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+%D0%B4%D1%8A%D0%B1&utm_source=temadom&utm_medium=affiliate' },
-                  { name: 'Боя матов ефект 10л', price: '120', store: 'Mr.Bricolage', url: 'https://mr-bricolage.bg/search?q=%D0%B1%D0%BE%D1%8F+%D0%BC%D0%B0%D1%82%D0%BE%D0%B2&ref=temadom' },
-                  { name: 'LED панел вграден', price: '200', store: 'Praktiker', url: 'https://praktiker.bg/search?q=LED+%D0%BF%D0%B0%D0%BD%D0%B5%D0%BB&utm_source=temadom&utm_medium=affiliate' },
+                  { name: 'Ламинат Дъб Натюр', price: '400', store: 'Praktiker', url: 'https://praktiker.bg/bg/search?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+%D0%B4%D1%8A%D0%B1&utm_source=temadom' },
+                  { name: 'Боя матов ефект 10л', price: '120', store: 'Mr.Bricolage', url: 'https://www.mr-bricolage.bg/search?q=%D0%B1%D0%BE%D1%8F+%D0%BC%D0%B0%D1%82%D0%BE%D0%B2&ref=temadom' },
+                  { name: 'LED панел вграден', price: '200', store: 'Praktiker', url: 'https://praktiker.bg/bg/search?q=LED+%D0%BF%D0%B0%D0%BD%D0%B5%D0%BB&utm_source=temadom' },
                 ],
               },
               {
@@ -1053,16 +1083,16 @@ const LandingPage = () => {
                 before: '/showcase/before_bedroom.jpg', after: '/showcase/after_bedroom.jpg',
                 products: [
                   { name: 'Легло мемори матрак 160', price: '800', store: 'eMAG', url: 'https://www.emag.bg/search/%D0%BB%D0%B5%D0%B3%D0%BB%D0%BE+%D0%BC%D0%B5%D0%BC%D0%BE%D1%80%D0%B8+160?ref=temadom' },
-                  { name: 'Ламинат 10мм дъб', price: '250', store: 'HomeMax', url: 'https://www.home-max.bg/search/?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC&ref=temadom' },
-                  { name: 'Боя акрилна мат', price: '80', store: 'Bauhaus', url: 'https://bauhaus.bg/search/%D0%B0%D0%BA%D1%80%D0%B8%D0%BB%D0%BD%D0%B0+%D0%B1%D0%BE%D1%8F&utm_source=temadom&utm_medium=affiliate' },
+                  { name: 'Ламинат 10мм дъб', price: '250', store: 'HomeMax', url: 'https://www.homemax.bg/catalogsearch/result/?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC&ref=temadom' },
+                  { name: 'Боя акрилна мат', price: '80', store: 'Bauhaus', url: 'https://www.bauhaus.bg/catalogsearch/result/?q=%D0%B0%D0%BA%D1%80%D0%B8%D0%BB%D0%BD%D0%B0+%D0%B1%D0%BE%D1%8F&utm_source=temadom' },
                 ],
               },
               {
                 room: 'КУХНЯ', roomId: 'kitchen', dims: '3.0 x 2.5м', tierTotal: 4497, price: '99', color: '#8B5CF6',
                 before: '/showcase/before_kitchen.jpg', after: '/showcase/after_kitchen.jpg',
                 products: [
-                  { name: 'Кухненски шкафове MDF', price: '2,000', store: 'Jysk', url: 'https://jysk.bg/search?q=%D0%BA%D1%83%D1%85%D0%BD%D0%B5%D0%BD%D1%81%D0%BA%D0%B8+%D1%88%D0%BA%D0%B0%D1%84%D0%BE%D0%B2%D0%B5&utm_source=temadom&utm_medium=affiliate' },
-                  { name: 'Керамични плочки 60x60', price: '300', store: 'Praktiker', url: 'https://praktiker.bg/search?q=%D0%BA%D0%B5%D1%80%D0%B0%D0%BC%D0%B8%D1%87%D0%BD%D0%B8+%D0%BF%D0%BB%D0%BE%D1%87%D0%BA%D0%B8+60x60&utm_source=temadom&utm_medium=affiliate' },
+                  { name: 'Кухненски шкафове MDF', price: '2,000', store: 'Jysk', url: 'https://jysk.bg/catalogsearch/result/?q=%D0%BA%D1%83%D1%85%D0%BD%D0%B5%D0%BD%D1%81%D0%BA%D0%B8+%D1%88%D0%BA%D0%B0%D1%84%D0%BE%D0%B2%D0%B5&utm_source=temadom' },
+                  { name: 'Керамични плочки 60x60', price: '300', store: 'Praktiker', url: 'https://praktiker.bg/bg/search?q=%D0%BA%D0%B5%D1%80%D0%B0%D0%BC%D0%B8%D1%87%D0%BD%D0%B8+%D0%BF%D0%BB%D0%BE%D1%87%D0%BA%D0%B8+60x60&utm_source=temadom' },
                   { name: 'Мивка Franke полирана', price: '300', store: 'eMAG', url: 'https://www.emag.bg/search/%D0%BC%D0%B8%D0%B2%D0%BA%D0%B0+Franke?ref=temadom' },
                 ],
               },
@@ -1070,13 +1100,13 @@ const LandingPage = () => {
                 room: 'ДЕТСКА', roomId: 'kids_room', dims: '3.8 x 3.2м', tierTotal: 2295, price: '69', color: '#EC4899',
                 before: '/showcase/before_kids.jpg', after: '/showcase/after_kids_room.jpg',
                 products: [
-                  { name: 'Ламинат 10мм Дъб Каиро', price: '150', store: 'HomeMax', url: 'https://www.home-max.bg/search/?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC+%D0%B4%D1%8A%D0%B1&ref=temadom' },
-                  { name: 'Боя неутрално сива', price: '70', store: 'Bauhaus', url: 'https://bauhaus.bg/search/%D0%B1%D0%BE%D1%8F+%D1%81%D0%B8%D0%B2%D0%B0&utm_source=temadom&utm_medium=affiliate' },
-                  { name: 'Полилей със стъкло', price: '80', store: 'Jysk', url: 'https://jysk.bg/search?q=%D0%BF%D0%BE%D0%BB%D0%B8%D0%BB%D0%B5%D0%B9&utm_source=temadom&utm_medium=affiliate' },
+                  { name: 'Ламинат 10мм Дъб Каиро', price: '150', store: 'HomeMax', url: 'https://www.homemax.bg/catalogsearch/result/?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC+%D0%B4%D1%8A%D0%B1&ref=temadom' },
+                  { name: 'Боя неутрално сива', price: '70', store: 'Bauhaus', url: 'https://www.bauhaus.bg/catalogsearch/result/?q=%D0%B1%D0%BE%D1%8F+%D1%81%D0%B8%D0%B2%D0%B0&utm_source=temadom' },
+                  { name: 'Полилей със стъкло', price: '80', store: 'Jysk', url: 'https://jysk.bg/catalogsearch/result/?q=%D0%BF%D0%BE%D0%BB%D0%B8%D0%BB%D0%B5%D0%B9&utm_source=temadom' },
                 ],
               },
             ].map((proj, i) => (
-              <div key={i} className="rounded-2xl overflow-hidden border transition-all hover:shadow-xl group"
+              <div key={i} className="flex-shrink-0 w-[320px] snap-center rounded-2xl overflow-hidden border transition-all hover:shadow-xl group"
                 style={{ background: bgCard, borderColor: border }}
                 data-testid={`showcase-card-${i}`}>
                 {/* Before / After images */}
@@ -1128,6 +1158,9 @@ const LandingPage = () => {
               </div>
             ))}
           </div>
+            </div>
+            );
+          })()}
 
           {/* Bottom CTA */}
           <div className="text-center mt-10">
@@ -1342,7 +1375,7 @@ const LandingPage = () => {
             <span className="text-xs font-bold" style={{ color: accent }}>ОСТАВАТ {slotsLeft} МЕСТА</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-black mb-4">
-            Първи <span style={{ color: accent }}>56 фирми</span> = 1 година ПРЕМИУМ
+            Първи <span style={{ color: accent }}>56 фирми</span> = 6 месеца ПРЕМИУМ
           </h2>
           <p className="text-lg mb-8" style={{ color: muted }}>Регистрирай фирмата си и получи достъп до всички AI функции безплатно за 12 месеца.</p>
           <button onClick={() => navigate('/register')} data-testid="cta-register"
@@ -1946,136 +1979,18 @@ const ProjectDetailPage = () => {
 
 // ============== COMPANIES PAGE ==============
 const CompaniesPage = () => {
-  const [companies, setCompanies] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState('');
-  const [city, setCity] = useState('');
-  const { t } = useLanguage();
-
-  useEffect(() => {
-    axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
-  }, []);
-
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      setLoading(true);
-      const params = new URLSearchParams();
-      if (category && category !== 'all') params.set('category', category);
-      if (city) params.set('city', city);
-      
-      const res = await axios.get(`${API}/companies?${params}`);
-      setCompanies(res.data.companies);
-      setLoading(false);
-    };
-    fetchCompanies();
-  }, [category, city]);
-
-  return (
-    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">{t('comp_title')}</h1>
-          <p className="text-slate-400">{t('comp_subtitle')}</p>
-        </div>
-
-        <PageInstructions
-          title="Намерете строителна фирма"
-          description="Преглед и сравнение на фирми по категория и град"
-          steps={['Филтрирайте по категория или град', 'Разгледайте профилите на фирмите', 'Вижте оценки и отзиви от клиенти', 'Изпратете запитване директно']}
-          benefits={['Проверени фирми с реални отзиви', 'Директен контакт без посредници', 'Безплатно търсене и сравнение']}
-          videoUrl="https://temadom.com/videos/companies"
-        />
-
-        <Card className="p-4 mb-8">
-          <div className="grid md:grid-cols-3 gap-4">
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder={t('projects_all_cat')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('projects_all_cat')}</SelectItem>
-                {categories.map(cat => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
-            <Input 
-              placeholder={t('projects_city')} 
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
-            
-            <Button className="bg-[#FF8C42] hover:bg-[#e67a30]">
-              <Search className="mr-2 h-4 w-4" /> {t('comp_search')}
-            </Button>
-          </div>
-        </Card>
-
-        {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1,2,3].map(i => <Card key={i} className="h-48 animate-pulse bg-[#253545]" />)}
-          </div>
-        ) : companies.length === 0 ? (
-          <Card className="p-12 text-center">
-            <Building2 className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-            <h3 className="text-xl font-semibold text-slate-300 mb-2">{t('comp_empty')}</h3>
-            <p className="text-slate-500">{t('comp_empty_sub')}</p>
-          </Card>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {companies.map(company => (
-              <Link key={company.id} to={`/companies/${company.id}`}>
-                <Card className="p-6 hover:shadow-lg transition-all duration-300 h-full">
-                  <div className="flex items-center gap-4 mb-4">
-                    <Avatar className="h-14 w-14">
-                      <AvatarFallback className="bg-[#FF8C42]/10 text-[#FF8C42] text-lg">
-                        {company.company_name?.charAt(0) || 'F'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold text-lg">{company.company_name}</h3>
-                      {company.city && (
-                        <p className="text-sm text-slate-500 flex items-center gap-1">
-                          <MapPin className="h-3 w-3" /> {company.city}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 mb-4">
-                    <StarRating rating={company.rating} />
-                    <span className="text-sm text-slate-400">
-                      ({company.review_count} отзива)
-                    </span>
-                  </div>
-                  
-                  {company.description && (
-                    <p className="text-sm text-slate-400 line-clamp-2">{company.description}</p>
-                  )}
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// ============== FIND MASTER PAGE ==============
-const FindMasterPage = () => {
   const [professionals, setProfessionals] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('');
   const [city, setCity] = useState('');
-  const [proType, setProType] = useState('all'); // all, company, master
+  const [activeTab, setActiveTab] = useState('all');
   const { t } = useLanguage();
+  const theme = useTheme();
+  const dark = theme?.dark ?? true;
 
   useEffect(() => {
-    axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
+    axios.get(`${API}/categories`).then(res => setCategories(res.data.categories)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -2084,52 +1999,57 @@ const FindMasterPage = () => {
       const params = new URLSearchParams();
       if (category && category !== 'all') params.set('category', category);
       if (city) params.set('city', city);
-      if (proType && proType !== 'all') params.set('user_type', proType);
+      if (activeTab === 'companies') params.set('user_type', 'company');
+      if (activeTab === 'masters') params.set('user_type', 'master');
       
-      const res = await axios.get(`${API}/companies?${params}`);
-      setProfessionals(res.data.companies);
+      try {
+        const res = await axios.get(`${API}/companies?${params}`);
+        setProfessionals(res.data.companies || []);
+      } catch { setProfessionals([]); }
       setLoading(false);
     };
     fetchPros();
-  }, [category, city, proType]);
+  }, [category, city, activeTab]);
 
   return (
-    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}} data-testid="find-master-page">
+    <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}} data-testid="companies-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">{t('fm_title')}</h1>
-          <p className="text-slate-400">{t('fm_subtitle')}</p>
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>Фирми и Майстори</h1>
+          <p style={{ color: 'var(--theme-text-muted)' }}>Намерете проверени професионалисти за вашия ремонт</p>
         </div>
 
-        {/* Free platform notice */}
-        <div className="bg-[#28A745]/10 border border-[#28A745]/20 rounded-lg p-4 mb-6" data-testid="find-master-free-notice">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-[#28A745] flex-shrink-0" />
-            <p className="text-sm text-[#28A745]">
-              <strong>{t('fm_free')}</strong> {t('fm_free_desc')}
-            </p>
+        {/* Tabs: Всички / Фирми / Майстори */}
+        <div className="flex justify-center mb-6" data-testid="companies-tabs">
+          <div className="inline-flex rounded-xl p-1" style={{ background: dark ? '#1E293B' : '#F1F5F9', border: `1px solid ${dark ? '#334155' : '#E2E8F0'}` }}>
+            {[
+              { id: 'all', label: 'Всички', icon: Users },
+              { id: 'companies', label: 'Фирми', icon: Building2 },
+              { id: 'masters', label: 'Майстори', icon: Wrench },
+            ].map(tab => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all"
+                style={{
+                  background: activeTab === tab.id ? '#F97316' : 'transparent',
+                  color: activeTab === tab.id ? 'white' : (dark ? '#94A3B8' : '#64748B'),
+                }}
+                data-testid={`tab-${tab.id}`}>
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        <Card className="p-4 mb-8">
-          <div className="grid md:grid-cols-4 gap-4">
-            <Select value={proType} onValueChange={setProType}>
-              <SelectTrigger data-testid="filter-pro-type">
-                <SelectValue placeholder={t('fm_type')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('fm_all')}</SelectItem>
-                <SelectItem value="company">{t('fm_companies')}</SelectItem>
-                <SelectItem value="master">{t('fm_masters')}</SelectItem>
-              </SelectContent>
-            </Select>
-
+        {/* Filters */}
+        <Card className="p-4 mb-6">
+          <div className="grid md:grid-cols-3 gap-4">
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger data-testid="filter-category">
-                <SelectValue placeholder={t('fm_all_prof')} />
+                <SelectValue placeholder="Всички категории" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('fm_all_prof')}</SelectItem>
+                <SelectItem value="all">Всички категории</SelectItem>
                 {categories.map(cat => (
                   <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                 ))}
@@ -2137,51 +2057,56 @@ const FindMasterPage = () => {
             </Select>
             
             <Input 
-              placeholder={t('fm_city')} 
+              placeholder="Търсене по град..."
               value={city}
               onChange={(e) => setCity(e.target.value)}
               data-testid="filter-city"
             />
             
             <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" data-testid="filter-search-btn">
-              <Search className="mr-2 h-4 w-4" /> {t('fm_search')}
+              <Search className="mr-2 h-4 w-4" /> Търсене
             </Button>
           </div>
         </Card>
 
+        {/* Results */}
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1,2,3].map(i => <Card key={i} className="h-48 animate-pulse bg-[#253545]" />)}
+            {[1,2,3].map(i => <Card key={i} className="h-48 animate-pulse" style={{ background: dark ? '#253545' : '#E2E8F0' }} />)}
           </div>
         ) : professionals.length === 0 ? (
           <Card className="p-12 text-center">
-            <Wrench className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-            <h3 className="text-xl font-semibold text-slate-300 mb-2">{t('fm_empty')}</h3>
-            <p className="text-slate-500">{t('fm_empty_sub')}</p>
+            <Building2 className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--theme-text-muted)' }} />
+            <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--theme-text)' }}>
+              {activeTab === 'masters' ? 'Няма намерени майстори' : activeTab === 'companies' ? 'Няма намерени фирми' : 'Няма намерени професионалисти'}
+            </h3>
+            <p style={{ color: 'var(--theme-text-muted)' }}>Опитайте с различни филтри или се регистрирайте като първите в района!</p>
           </Card>
         ) : (
           <>
-            <p className="text-sm text-slate-500 mb-4">{t('fm_found')} {professionals.length} {t('fm_specialists')}</p>
+            <p className="text-sm mb-4" style={{ color: 'var(--theme-text-muted)' }}>Намерени: {professionals.length} професионалисти</p>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {professionals.map(pro => (
                 <Link key={pro.id} to={`/companies/${pro.id}`}>
-                  <Card className="p-6 hover:shadow-lg transition-all duration-300 h-full border-l-4 border-l-orange-400" data-testid={`pro-card-${pro.id}`}>
+                  <Card className="p-6 hover:shadow-lg transition-all duration-300 h-full border-l-4" 
+                    style={{ borderLeftColor: pro.user_type === 'master' ? '#4DA6FF' : '#FF8C42' }}
+                    data-testid={`pro-card-${pro.id}`}>
                     <div className="flex items-center gap-4 mb-4">
                       <Avatar className="h-14 w-14">
                         <AvatarFallback className={`text-lg ${pro.user_type === 'master' ? 'bg-[#4DA6FF]/10 text-[#4DA6FF]' : 'bg-[#FF8C42]/10 text-[#FF8C42]'}`}>
-                          {pro.company_name?.charAt(0) || 'M'}
+                          {pro.company_name?.charAt(0) || 'P'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg truncate">{pro.company_name}</h3>
+                        <h3 className="font-semibold text-lg truncate" style={{ color: 'var(--theme-text)' }}>{pro.company_name}</h3>
                         <div className="flex items-center gap-2">
                           {pro.city && (
-                            <span className="text-sm text-slate-500 flex items-center gap-1">
+                            <span className="text-sm flex items-center gap-1" style={{ color: 'var(--theme-text-muted)' }}>
                               <MapPin className="h-3 w-3" /> {pro.city}
                             </span>
                           )}
                           <Badge variant="outline" className={`text-[10px] ${pro.user_type === 'master' ? 'border-[#4DA6FF]/30 text-[#4DA6FF]' : 'border-[#FF8C42]/30 text-[#FF8C42]'}`}>
-                            {pro.user_type === 'master' ? t('fm_master_badge') : t('fm_company_badge')}
+                            {pro.user_type === 'master' ? 'Майстор' : 'Фирма'}
                           </Badge>
                         </div>
                       </div>
@@ -2189,13 +2114,13 @@ const FindMasterPage = () => {
                     
                     <div className="flex items-center gap-2 mb-3">
                       <StarRating rating={pro.rating} />
-                      <span className="text-sm text-slate-400">
-                        ({pro.review_count} {t('comp_reviews')})
+                      <span className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
+                        ({pro.review_count} отзива)
                       </span>
                     </div>
                     
                     {pro.description && (
-                      <p className="text-sm text-slate-400 line-clamp-2 mb-3">{pro.description}</p>
+                      <p className="text-sm line-clamp-2 mb-3" style={{ color: 'var(--theme-text-muted)' }}>{pro.description}</p>
                     )}
 
                     {pro.categories && pro.categories.length > 0 && (
@@ -2527,6 +2452,29 @@ const LoginPage = () => {
               {loading ? t('login_loading') : t('login_submit')}
             </Button>
           </form>
+
+          {/* Google Auth divider */}
+          <div className="flex items-center gap-3 my-4">
+            <div className="flex-1 h-px" style={{ background: 'var(--theme-border)' }} />
+            <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>или</span>
+            <div className="flex-1 h-px" style={{ background: 'var(--theme-border)' }} />
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            data-testid="google-login-btn"
+            onClick={async () => {
+              try {
+                const res = await axios.get(`${API}/auth/google/login`);
+                if (res.data.auth_url) window.location.href = res.data.auth_url;
+              } catch { toast.error('Google вход не е достъпен в момента'); }
+            }}
+          >
+            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Вход с Google
+          </Button>
         </CardContent>
         <CardFooter className="justify-center">
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
@@ -2537,6 +2485,37 @@ const LoginPage = () => {
           </p>
         </CardFooter>
       </Card>
+    </div>
+  );
+};
+
+// Google Auth Callback handler
+const GoogleAuthCallback = () => {
+  const { loginWithToken } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const code = searchParams.get('code');
+    if (!code) { navigate('/login'); return; }
+
+    axios.get(`${API}/auth/google/callback?code=${code}`)
+      .then(res => {
+        if (res.data.token) {
+          loginWithToken(res.data.token, res.data.user);
+          toast.success(res.data.is_new ? 'Регистрацията е успешна!' : 'Добре дошли!');
+          navigate('/');
+        }
+      })
+      .catch(() => { toast.error('Google вход неуспешен'); navigate('/login'); });
+  }, [searchParams, navigate, loginWithToken]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--theme-bg)' }}>
+      <div className="text-center">
+        <div className="animate-spin h-8 w-8 border-2 border-[#FF8C42] border-t-transparent rounded-full mx-auto mb-4" />
+        <p style={{ color: 'var(--theme-text-muted)' }}>Влизане с Google...</p>
+      </div>
     </div>
   );
 };
@@ -2632,6 +2611,20 @@ const RegisterPage = () => {
             <p className="text-xs text-[#28A745]">
               {t('reg_free_desc')}
             </p>
+          </div>
+
+          {/* Beta notice */}
+          <div className="bg-[#4DA6FF]/10 border border-[#4DA6FF]/20 rounded-lg p-4 mb-4" data-testid="register-beta-notice">
+            <div className="flex items-start gap-2">
+              <Info className="h-5 w-5 text-[#4DA6FF] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-[#4DA6FF] mb-1">Платформата е нова!</p>
+                <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
+                  TemaDom стартира и непрекъснато се подобрява. Ако забележите грешки или имате предложения, 
+                  моля <a href="/feedback" className="text-[#FF8C42] underline">информирайте ни</a> — заедно правим платформата по-добра!
+                </p>
+              </div>
+            </div>
           </div>
 
           {(userType === 'company' || userType === 'master') && (
@@ -3862,34 +3855,37 @@ function App() {
       <AuthProvider>
         <div className="App min-h-screen flex flex-col">
           <BrowserRouter>
+            <ScrollToTop />
             <PageTracker />
             <Navbar />
             <LiveCounter />
             <main className="flex-1">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/blog" element={<BlogPage />} />
+                <Route path="/blog/:slug" element={<BlogArticle />} />
+                <Route path="/subscriptions" element={<SubscriptionsPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/auth/callback" element={<GoogleAuthCallback />} />
                 <Route path="/projects" element={<AuthGate><ProjectsPage /></AuthGate>} />
                 <Route path="/projects/:id" element={<AuthGate><ProjectDetailPage /></AuthGate>} />
-                <Route path="/companies" element={<AuthGate><CompaniesPage /></AuthGate>} />
-                <Route path="/companies/:id" element={<AuthGate><CompanyDetailPage /></AuthGate>} />
-                <Route path="/find-master" element={<AuthGate><FindMasterPage /></AuthGate>} />
+                <Route path="/companies" element={<CompaniesPage />} />
+                <Route path="/companies/:id" element={<CompanyDetailPage />} />
+                <Route path="/find-master" element={<CompaniesPage />} />
                 <Route path="/calculator" element={<AuthGate><PriceCalculator /></AuthGate>} />
                 <Route path="/services" element={<AuthGate><ServicesPage /></AuthGate>} />
                 <Route path="/messages" element={<AuthGate><ChatPage /></AuthGate>} />
-                <Route path="/about" element={<AuthGate><AboutPage /></AuthGate>} />
                 <Route path="/profile" element={<AuthGate><ProfilePage /></AuthGate>} />
-                <Route path="/terms" element={<TermsPage />} />
                 <Route path="/professions" element={<AuthGate><ProfessionsPage /></AuthGate>} />
-                <Route path="/blog" element={<AuthGate><BlogPage /></AuthGate>} />
-                <Route path="/blog/:slug" element={<AuthGate><BlogArticle /></AuthGate>} />
                 <Route path="/prices" element={<AuthGate><PricesByRegionPage /></AuthGate>} />
                 <Route path="/region/:slug" element={<AuthGate><RegionalPage /></AuthGate>} />
                 <Route path="/analytics" element={<AuthGate><AnalyticsDashboard /></AuthGate>} />
                 <Route path="/community" element={<AuthGate><CommunityPage /></AuthGate>} />
                 <Route path="/product-search" element={<AuthGate><ProductSearchPage /></AuthGate>} />
                 <Route path="/leaderboard" element={<AuthGate><LeaderboardPage /></AuthGate>} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
                 <Route path="/dashboard" element={<AuthGate><CompanyDashboard /></AuthGate>} />
                 <Route path="/dashboard/client" element={<AuthGate><ClientDashboard /></AuthGate>} />
                 <Route path="/payment/success" element={<AuthGate><PaymentSuccessPage /></AuthGate>} />
@@ -3903,8 +3899,7 @@ function App() {
                 <Route path="/3d-scanner/:projectId" element={<AuthGate><Scanner3DPage /></AuthGate>} />
                 <Route path="/ai-gallery" element={<AuthGate><PublishedGalleryPage /></AuthGate>} />
                 <Route path="/ready-projects" element={<AuthGate><ReadyProjectsPage /></AuthGate>} />
-                <Route path="/subscriptions" element={<AuthGate><SubscriptionsPage /></AuthGate>} />
-                <Route path="/feedback" element={<AuthGate><FeedbackPage /></AuthGate>} />
+                <Route path="/feedback" element={<FeedbackPage />} />
               </Routes>
             </main>
             <Footer />

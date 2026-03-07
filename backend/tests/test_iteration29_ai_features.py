@@ -9,7 +9,7 @@ import base64
 import numpy as np
 import cv2
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://design-budget-tool-1.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://ui-polish-52.preview.emergentagent.com").rstrip("/")
 
 
 def create_test_sketch_image():
