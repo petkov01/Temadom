@@ -1431,13 +1431,13 @@ const ProjectCard = ({ project }) => {
           <div className="flex items-center gap-2">
             <Badge className="bg-[#FF8C42]/10 text-[#FF8C42]">{project.category_name}</Badge>
             {project.images && project.images.length > 0 && (
-              <span className="text-xs text-slate-400 flex items-center gap-1">
+              <span className="text-xs flex items-center gap-1" style={{ color: 'var(--theme-text-muted)' }}>
                 <Image className="h-3 w-3" /> {project.images.length}
               </span>
             )}
           </div>
           {project.contact_locked && (
-            <Lock className="h-4 w-4 text-slate-400" />
+            <Lock className="h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} />
           )}
         </div>
         <CardTitle className="text-lg group-hover:text-[#FF8C42] transition-colors line-clamp-2">
@@ -1445,10 +1445,10 @@ const ProjectCard = ({ project }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
-        <p className="text-slate-400 text-sm line-clamp-2 mb-4">{project.description}</p>
+        <p className="text-sm line-clamp-2 mb-4" style={{ color: 'var(--theme-text-muted)' }}>{project.description}</p>
         
         <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2 text-slate-500">
+          <div className="flex items-center gap-2" style={{ color: 'var(--theme-text-muted)' }}>
             <MapPin className="h-4 w-4" />
             <span>{project.city}</span>
           </div>
@@ -1462,7 +1462,7 @@ const ProjectCard = ({ project }) => {
           )}
           
           {(project.budget_min || project.budget_max) && (
-            <div className="flex items-center gap-2 text-slate-500">
+            <div className="flex items-center gap-2" style={{ color: 'var(--theme-text-muted)' }}>
               <Euro className="h-4 w-4" />
               <span>
                 {project.budget_min && `${project.budget_min}€`}
@@ -1472,14 +1472,14 @@ const ProjectCard = ({ project }) => {
             </div>
           )}
           
-          <div className="flex items-center gap-2 text-slate-500">
+          <div className="flex items-center gap-2" style={{ color: 'var(--theme-text-muted)' }}>
             <Calendar className="h-4 w-4" />
             <span>{new Date(project.created_at).toLocaleDateString('bg-BG')}</span>
           </div>
         </div>
         
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#3A4A5C]">
-          <span className="text-xs text-slate-400">{project.views} {t('projects_views')}</span>
+        <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: '1px solid var(--theme-border)' }}>
+          <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{project.views} {t('projects_views')}</span>
           <span className="text-[#FF8C42] text-sm font-medium group-hover:underline">
             {t('projects_details')}
           </span>
@@ -1559,7 +1559,7 @@ const ProjectsPage = () => {
         <Card className="p-4 mb-8">
           <form onSubmit={handleSearch} className="grid md:grid-cols-4 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} />
               <Input 
                 placeholder={t('projects_search')} 
                 className="pl-10"
@@ -1603,9 +1603,9 @@ const ProjectsPage = () => {
           </div>
         ) : projects.length === 0 ? (
           <Card className="p-12 text-center">
-            <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-            <h3 className="text-xl font-semibold text-slate-300 mb-2">{t('projects_empty')}</h3>
-            <p className="text-slate-500">{t('projects_empty_sub')}</p>
+            <Boxes className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--theme-text-muted)' }} />
+            <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--theme-text)' }}>{t('projects_empty')}</h3>
+            <p style={{ color: 'var(--theme-text-muted)' }}>{t('projects_empty_sub')}</p>
           </Card>
         ) : (
           <>
@@ -1624,7 +1624,7 @@ const ProjectsPage = () => {
                 >
                   {t('projects_prev')}
                 </Button>
-                <span className="flex items-center px-4 text-slate-400">
+                <span className="flex items-center px-4" style={{ color: 'var(--theme-text-muted)' }}>
                   {t('projects_page')} {page} {t('projects_of')} {totalPages}
                 </span>
                 <Button 
@@ -1821,7 +1821,7 @@ const ProjectDetailPage = () => {
           <CardHeader>
             <div className="flex justify-between items-start mb-4">
               <Badge className="bg-[#FF8C42]/10 text-[#FF8C42] text-sm">{project.category_name}</Badge>
-              <div className="flex items-center gap-4 text-sm text-slate-500">
+              <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
                 {project.images?.length > 0 && (
                   <span className="flex items-center gap-1">
                     <Image className="h-4 w-4" />
@@ -1835,7 +1835,7 @@ const ProjectDetailPage = () => {
               </div>
             </div>
             <CardTitle className="text-2xl md:text-3xl">{project.title}</CardTitle>
-            <div className="flex items-center gap-4 mt-4 text-slate-400">
+            <div className="flex items-center gap-4 mt-4" style={{ color: 'var(--theme-text-muted)' }}>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
                 {project.city}
@@ -1850,12 +1850,12 @@ const ProjectDetailPage = () => {
           <CardContent>
             <div className="prose max-w-none mb-8">
               <h3 className="text-lg font-semibold mb-3">{t('pd_description')}</h3>
-              <p className="text-slate-400 whitespace-pre-wrap">{project.description}</p>
+              <p className="whitespace-pre-wrap" style={{ color: 'var(--theme-text-muted)' }}>{project.description}</p>
             </div>
 
             {(project.budget_min || project.budget_max) && (
               <div className="bg-[#1E2A38] rounded-lg p-4 mb-8">
-                <h4 className="font-semibold text-slate-300 mb-2">{t('pd_budget')}</h4>
+                <h4 className="font-semibold mb-2" style={{ color: 'var(--theme-text)' }}>{t('pd_budget')}</h4>
                 <p className="text-2xl font-bold text-white">
                   {project.budget_min && `${project.budget_min}€`}
                   {project.budget_min && project.budget_max && ' - '}
@@ -1903,13 +1903,13 @@ const ProjectDetailPage = () => {
                 <div className="space-y-4">
                   {project.client_name && (
                     <div className="flex items-center gap-3">
-                      <User className="h-5 w-5 text-slate-400" />
+                      <User className="h-5 w-5" style={{ color: 'var(--theme-text-muted)' }} />
                       <span className="font-medium">{project.client_name}</span>
                     </div>
                   )}
                   {project.client_email && (
                     <div className="flex items-center gap-3">
-                      <Mail className="h-5 w-5 text-slate-400" />
+                      <Mail className="h-5 w-5" style={{ color: 'var(--theme-text-muted)' }} />
                       <a href={`mailto:${project.client_email}`} className="text-[#FF8C42] hover:underline">
                         {project.client_email}
                       </a>
@@ -2254,7 +2254,7 @@ const CompanyDetailPage = () => {
             {company.description && (
               <div className="mb-6">
                 <h3 className="font-semibold mb-2">{t('cd_about')}</h3>
-                <p className="text-slate-400">{company.description}</p>
+                <p style={{ color: 'var(--theme-text-muted)' }}>{company.description}</p>
               </div>
             )}
 
@@ -2671,7 +2671,7 @@ const RegisterPage = () => {
           {/* Professional sub-type dropdown */}
           {(userType === 'master' || userType === 'company') && (
             <div className="mb-4">
-              <Label className="text-slate-300">Тип професионалист</Label>
+              <Label style={{ color: 'var(--theme-text)' }}>Тип професионалист</Label>
               <Select value={userType} onValueChange={setUserType}>
                 <SelectTrigger className="bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="register-pro-type">
                   <SelectValue />
@@ -3016,7 +3016,7 @@ const CompanyDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">{t('dash_title')}</h1>
-          <p className="text-slate-400">{t('dash_subtitle')}</p>
+          <p style={{ color: 'var(--theme-text-muted)' }}>{t('dash_subtitle')}</p>
         </div>
 
         {/* Free Platform Banner */}
@@ -3068,9 +3068,9 @@ const CompanyDashboard = () => {
               <CardContent>
                 {leads.length === 0 ? (
                   <div className="text-center py-12">
-                    <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                    <h3 className="text-lg font-medium text-slate-300 mb-2">{t('dash_no_contacts')}</h3>
-                    <p className="text-slate-500 mb-4">{t('dash_no_contacts_sub')}</p>
+                    <Boxes className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--theme-text-muted)' }} />
+                    <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--theme-text)' }}>{t('dash_no_contacts')}</h3>
+                    <p className="mb-4" style={{ color: 'var(--theme-text-muted)' }}>{t('dash_no_contacts_sub')}</p>
                     <Button onClick={() => navigate('/projects')} className="bg-[#FF8C42] hover:bg-[#e67a30]">
                       {t('dash_view_projects')}
                     </Button>
