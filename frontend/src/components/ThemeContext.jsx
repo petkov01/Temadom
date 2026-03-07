@@ -1,4 +1,4 @@
-// TemaDom v6.5 — Theme Context (Dark/Light mode)
+// TemaDom v7.0 — Premium Theme Context (Dark/Light mode)
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext(null);
@@ -9,7 +9,7 @@ export const ThemeProvider = ({ children }) => {
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem('temadom-theme');
     if (saved) return saved === 'dark';
-    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true;
+    return true; // Default to dark mode
   });
 
   useEffect(() => {
@@ -29,14 +29,14 @@ export const ThemeProvider = ({ children }) => {
   const toggle = () => setDark(d => !d);
 
   const t = dark ? {
-    bg: '#0F172A', bgCard: '#1E293B', bgSurface: '#253545',
-    border: '#334155', text: '#F8FAFC', textMuted: '#94A3B8',
-    accent: '#F97316', accentGlow: '#F97316', gold: '#FCD34D',
+    bg: '#0f1115', bgCard: '#161a23', bgSurface: '#1b1f2a',
+    border: '#252a36', text: '#ffffff', textMuted: '#c9ced6', textSubtle: '#8f96a3',
+    accent: '#ff8a00', accentGlow: '#ff8a00', gold: '#f6c36a', goldEnd: '#e0a94a',
     green: '#10B981', red: '#EF4444',
   } : {
-    bg: '#F8FAFC', bgCard: '#FFFFFF', bgSurface: '#F1F5F9',
-    border: '#E2E8F0', text: '#0F172A', textMuted: '#64748B',
-    accent: '#F97316', accentGlow: '#EA580C', gold: '#D97706',
+    bg: '#f6f7fb', bgCard: '#ffffff', bgSurface: '#eef0f5',
+    border: '#d1d5e0', text: '#111318', textMuted: '#6b7280', textSubtle: '#9ca3af',
+    accent: '#e67a00', accentGlow: '#e67a00', gold: '#d4a23a', goldEnd: '#c4912f',
     green: '#10B981', red: '#EF4444',
   };
 

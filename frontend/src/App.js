@@ -9,7 +9,7 @@ import {
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
   ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator, Camera, ChevronLeft, Image, MessageSquare,
   FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench,
-  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, ArrowLeft, Trophy, Palette, Ruler, Upload
+  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, ArrowLeft, Trophy, Palette, Ruler, Upload, Sun, Moon
 } from 'lucide-react';
 import { AIDesignerPage } from '@/components/AIDesignerPage';
 import { FeedbackPage } from '@/components/FeedbackPage';
@@ -172,10 +172,10 @@ const ThemeToggle = () => {
   if (!theme) return null;
   return (
     <button onClick={theme.toggle}
-      className="p-2 rounded-lg theme-text-muted hover:text-[#F97316] transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+      className="p-2 rounded-lg transition-all hover:bg-[rgba(246,195,106,0.06)]"
       style={{ color: 'var(--theme-text-muted)' }}
       data-testid="theme-toggle" title={theme.dark ? 'Светъл режим' : 'Тъмен режим'}>
-      {theme.dark ? <span className="text-sm">☀️</span> : <span className="text-sm">🌙</span>}
+      {theme.dark ? <Sun className="h-4 w-4" style={{ color: 'var(--theme-gold)' }} /> : <Moon className="h-4 w-4" style={{ color: 'var(--theme-gold)' }} />}
     </button>
   );
 };
@@ -257,30 +257,30 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav style={{ background: 'var(--theme-nav-bg)', borderBottom: '1px solid var(--theme-nav-border)' }} className="sticky top-0 z-50">
+    <nav className="glass-nav sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-[70px] lg:h-[110px]">
-          {/* Left: Logo - prominent and left-corner */}
-          <div className="flex items-center -ml-4 lg:-ml-8">
-            <Link to="/" className="flex items-center pt-1" data-testid="logo-link">
-              <TemaDomLogo className={NAVBAR_LOGO_CLASS} />
+        <div className="flex justify-between h-[60px] lg:h-16">
+          {/* Left: Logo */}
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-8 lg:h-10 w-auto" />
             </Link>
           </div>
 
           {/* Right: Nav links + Language + Auth */}
-          <div className="hidden lg:flex items-center gap-3 lg:gap-4">
-            <Link to="/" className="text-sm font-medium transition-colors hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
+          <div className="hidden lg:flex items-center gap-1">
+            <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
               Главна
             </Link>
-            <Link to="/calculator" className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-calculator">
+            <Link to="/calculator" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-calculator">
               <Calculator className="h-3.5 w-3.5" />
               Калкулатор
             </Link>
-            <Link to="/companies" className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
+            <Link to="/companies" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
               <Building2 className="h-3.5 w-3.5" />
               Фирми и Майстори
             </Link>
-            <Link to="/ads" className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
+            <Link to="/ads" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
               <Megaphone className="h-3.5 w-3.5" />
               Обяви
             </Link>
@@ -289,7 +289,7 @@ const Navbar = () => {
             <div className="relative" ref={moreRef}>
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="text-sm font-medium transition-colors flex items-center gap-1 hover:text-[#FF8C42]"
+                className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
                 style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="nav-more-btn"
               >
@@ -297,41 +297,42 @@ const Navbar = () => {
                 Още
               </button>
               {moreOpen && (
-                <div className="absolute top-full right-0 mt-2 w-52 rounded-lg shadow-2xl py-1 z-50" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="nav-more-dropdown">
-                  <Link to="/ai-sketch" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-ai-sketch">
+                <div className="absolute top-full right-0 mt-2 w-56 rounded-xl shadow-2xl py-2 z-50 animate-slideDown" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }} data-testid="nav-more-dropdown">
+                  <Link to="/ai-sketch" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-ai-sketch">
                     <FileText className="h-4 w-4" /> AI Sketch (скици)
                   </Link>
-                  <Link to="/room-scan" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#8C56FF] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-room-scan">
-                    <Camera className="h-4 w-4" /> 3D Photo Designer
+                  <Link to="/room-scan" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-room-scan">
+                    <Camera className="h-4 w-4 text-[var(--theme-gold)]" /> 3D Photo Designer
                   </Link>
-                  <Link to="/ready-projects" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#28A745] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-ready-projects">
+                  <Link to="/ready-projects" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-ready-projects">
                     <FolderSearch className="h-4 w-4" /> Готови проекти
                   </Link>
-                  <Link to="/subscriptions" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-subscriptions">
+                  <div className="my-1 mx-3 gold-line"></div>
+                  <Link to="/subscriptions" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-subscriptions">
                     <ShoppingCart className="h-4 w-4" /> Абонаменти
                   </Link>
-                  <Link to="/services" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-services">
+                  <Link to="/services" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-services">
                     <Hammer className="h-4 w-4" /> Услуги
                   </Link>
-                  <Link to="/professions" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-professions">
+                  <Link to="/professions" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-professions">
                     <HardHat className="h-4 w-4" /> Професии
                   </Link>
-                  <Link to="/blog" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-blog">
+                  <Link to="/blog" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-blog">
                     <BookOpen className="h-4 w-4" /> Блог
                   </Link>
-                  <Link to="/community" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-community">
+                  <Link to="/community" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-community">
                     <MessageSquare className="h-4 w-4" /> Общност
                   </Link>
-                  <Link to="/product-search" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#F97316] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-product-search">
+                  <Link to="/product-search" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-product-search">
                     <ShoppingCart className="h-4 w-4" /> AI Търсене
                   </Link>
-                  <Link to="/leaderboard" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#F97316] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-leaderboard">
+                  <Link to="/leaderboard" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-leaderboard">
                     <Trophy className="h-4 w-4" /> Класация
                   </Link>
-                  <Link to="/about" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-about">
+                  <Link to="/about" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-about">
                     <Info className="h-4 w-4" /> За нас
                   </Link>
-                  <Link to="/feedback" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-feedback">
+                  <Link to="/feedback" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-feedback">
                     <Star className="h-4 w-4" /> Обратна връзка
                   </Link>
                 </div>
@@ -339,7 +340,7 @@ const Navbar = () => {
             </div>
 
             {/* Separator */}
-            <div className="h-5 w-px mx-1" style={{ background: 'var(--theme-border)' }}></div>
+            <div className="h-5 w-px mx-2" style={{ background: 'var(--theme-border)' }}></div>
 
             {/* Theme toggle */}
             <ThemeToggle />
@@ -348,7 +349,7 @@ const Navbar = () => {
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 text-sm transition-colors px-2 py-1 rounded-md hover:text-[#4DA6FF]"
+                className="flex items-center gap-1.5 text-sm transition-all px-2 py-1.5 rounded-lg hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
                 style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="lang-switcher-btn"
               >
@@ -356,7 +357,7 @@ const Navbar = () => {
                 <span className="text-xs font-medium uppercase">{lang}</span>
               </button>
               {langOpen && (
-                <div className="absolute top-full right-0 mt-2 w-44 rounded-lg shadow-2xl py-1 z-50" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="lang-dropdown">
+                <div className="absolute top-full right-0 mt-2 w-44 rounded-xl shadow-2xl py-1 z-50 animate-slideDown" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="lang-dropdown">
                   {LANGUAGES.map(l => (
                     <button
                       key={l.code}
@@ -379,25 +380,25 @@ const Navbar = () => {
               <>
                 {user.user_type === 'client' && (
                   <Link to="/dashboard/client">
-                    <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" data-testid="nav-publish-project">
+                    <Button className="text-white font-bold rounded-xl" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', boxShadow: '0 4px 15px rgba(255,138,0,0.25)' }} data-testid="nav-publish-project">
                       + {t('nav_register')}
                     </Button>
                   </Link>
                 )}
-                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="font-medium flex items-center gap-1.5 hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-dashboard">
+                <Link to={user.user_type === 'client' ? '/dashboard/client' : '/dashboard'} className="font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-dashboard">
                   <LayoutGrid className="h-4 w-4" />
                   {t('nav_dashboard')}
                 </Link>
-                <Link to="/messages" className="font-medium flex items-center gap-1.5 hover:text-[#FF8C42] transition-colors" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-messages">
+                <Link to="/messages" className="font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-messages">
                   <MessageSquare className="h-4 w-4" />
                   {t('nav_messages')}
                 </Link>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <NotificationBell />
-                  <Link to="/profile" className="text-sm hover:text-[#FF8C42] transition-colors flex items-center gap-1" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-profile">
+                  <Link to="/profile" className="text-sm hover:text-[var(--theme-gold)] transition-all flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-profile">
                     <User className="h-3.5 w-3.5" /> {user.name}
                   </Link>
-                  <Button variant="ghost" size="sm" onClick={logout} className="hover:bg-black/5 dark:hover:bg-white/10" style={{ color: 'var(--theme-text-muted)' }} data-testid="logout-btn">
+                  <Button variant="ghost" size="sm" onClick={logout} className="rounded-lg hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="logout-btn">
                     <LogOut className="h-4 w-4" />
                   </Button>
                 </div>
@@ -405,10 +406,10 @@ const Navbar = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" className="hover:bg-black/5 dark:hover:bg-white/10" style={{ color: 'var(--theme-text-muted)' }} data-testid="login-btn">{t('nav_login')}</Button>
+                  <Button variant="ghost" className="rounded-lg font-medium hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="login-btn">{t('nav_login')}</Button>
                 </Link>
                 <Link to="/register">
-                  <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-white" data-testid="register-btn">
+                  <Button className="text-white font-bold rounded-xl" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', boxShadow: '0 4px 15px rgba(255,138,0,0.25)' }} data-testid="register-btn">
                     {t('nav_register')}
                   </Button>
                 </Link>
@@ -654,7 +655,7 @@ const Footer = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <div className="mb-4 flex flex-col items-start">
-            <TemaDomLogo className="h-16 w-auto" />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-12 w-auto opacity-60" />
             <p className="text-[#FF8C42] text-xs font-bold tracking-wider uppercase mt-2">{t('footer_tagline')}</p>
           </div>
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
@@ -693,7 +694,7 @@ const Footer = () => {
       </div>
       <Separator className="my-8" style={{ background: 'var(--theme-nav-border)' }} />
       <div className="flex flex-col items-center gap-3">
-        <TemaDomLogo className="h-12 w-auto opacity-60" />
+        <img src="/logo-temadom.png" alt="TemaDom" className="h-10 w-auto opacity-60" />
         <p className="text-center text-sm" style={{ color: 'var(--theme-text-subtle)' }}>
           © 2025-2026 TemaDom. {t('footer_rights')}
         </p>
@@ -913,86 +914,122 @@ const LandingPage = () => {
   const slotsTotal = liveStats.free_slots?.total || 56;
   const slotsLeft = Math.max(0, slotsTotal - slotsUsed);
 
-  const bg = dark ? '#0F172A' : '#F8FAFC';
-  const bgCard = dark ? '#1E293B' : '#FFFFFF';
-  const border = dark ? '#334155' : '#E2E8F0';
-  const text = dark ? '#F8FAFC' : '#0F172A';
-  const muted = dark ? '#94A3B8' : '#64748B';
-  const accent = '#F97316';
+  const bg = dark ? '#0f1115' : '#f6f7fb';
+  const bgCard = dark ? '#161a23' : '#ffffff';
+  const border = dark ? '#252a36' : '#d1d5e0';
+  const text = dark ? '#ffffff' : '#111318';
+  const muted = dark ? '#c9ced6' : '#6b7280';
+  const subtle = dark ? '#8f96a3' : '#9ca3af';
+  const gold = dark ? '#f6c36a' : '#d4a23a';
+  const accent = '#ff8a00';
 
   return (
     <div style={{ background: bg, color: text }} data-testid="landing-page">
       {/* ===== HERO ===== */}
-      <section className="relative overflow-hidden" style={{ minHeight: '85vh' }}>
+      <section className="relative overflow-hidden noise-overlay" style={{ minHeight: '88vh' }}>
         <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] -translate-y-1/4 translate-x-1/4" style={{ background: `${accent}15` }} />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4" style={{ background: '#10B98115' }} />
+          <div className="absolute top-0 right-0 w-[700px] h-[700px] rounded-full blur-[160px] -translate-y-1/4 translate-x-1/4" style={{ background: 'rgba(246,195,106,0.06)' }} />
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full blur-[140px] translate-y-1/4 -translate-x-1/4" style={{ background: 'rgba(255,138,0,0.04)' }} />
+          <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" style={{ background: 'rgba(16,185,129,0.03)' }} />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24 flex flex-col items-center">
-          {/* Counter [0/50] pulse */}
-          <div className="mb-8 animate-pulse" data-testid="hero-counter">
-            <div className="inline-flex items-center gap-3 rounded-full px-6 py-3 border-2" 
-              style={{ borderColor: accent, background: dark ? '#F9731615' : '#FFF7ED' }}>
-              <span className="text-4xl font-black tabular-nums" style={{ color: accent }}>{slotsUsed}</span>
-              <span style={{ color: muted }} className="text-lg">/</span>
-              <span className="text-4xl font-black tabular-nums" style={{ color: accent }}>{slotsTotal}</span>
+          {/* Logo */}
+          <div className="mb-8 animate-slideUp">
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-16 md:h-20 w-auto mx-auto animate-float" />
+          </div>
+
+          {/* Counter badge */}
+          <div className="mb-8 animate-slideUp stagger-1" data-testid="hero-counter">
+            <div className="inline-flex items-center gap-3 rounded-full px-6 py-3 glass" 
+              style={{ border: `1px solid rgba(246,195,106,0.15)` }}>
+              <span className="text-3xl font-black tabular-nums gradient-text-gold">{slotsUsed}</span>
+              <span style={{ color: subtle }} className="text-lg">/</span>
+              <span className="text-3xl font-black tabular-nums gradient-text-gold">{slotsTotal}</span>
               <div className="h-8 w-px mx-1" style={{ background: border }} />
               <div className="text-left">
-                <p style={{ color: accent }} className="text-sm font-bold leading-tight">ПЪРВИ 56 ФИРМИ</p>
-                <p style={{ color: muted }} className="text-[10px]">(2 на област × 28 области)</p>
-                <p style={{ color: dark ? '#FCD34D' : '#D97706' }} className="text-xs font-bold">= 6 МЕСЕЦА ПРЕМИУМ 0 EUR</p>
+                <p style={{ color: gold }} className="text-sm font-bold leading-tight">ПЪРВИ 56 ФИРМИ</p>
+                <p style={{ color: subtle }} className="text-[10px]">(2 на област x 28 области)</p>
+                <p className="text-xs font-bold gradient-text-gold">= 6 МЕСЕЦА ПРЕМИУМ 0 EUR</p>
               </div>
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-center mb-6 leading-tight max-w-4xl">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-center mb-6 leading-tight max-w-4xl animate-slideUp stagger-2">
             Ремонт без стрес —{' '}
-            <span style={{ color: accent }} className="relative">
-              AI проектиране
-              <span className="absolute -bottom-1 left-0 w-full h-1 rounded-full" style={{ background: accent, opacity: 0.5 }} />
-            </span>
+            <span className="gradient-text">AI проектиране</span>
           </h1>
 
-          <p className="text-base md:text-lg text-center mb-10 max-w-2xl" style={{ color: muted }}>
+          <p className="text-base md:text-lg text-center mb-4 max-w-2xl animate-slideUp stagger-3" style={{ color: muted }}>
             Качи 3 снимки → получи реалистичен 3D ремонт + бюджет с директни линкове.
             Виж точно как ще изглежда ПРЕДИ да платиш.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          {/* Trust elements */}
+          <div className="flex flex-wrap justify-center gap-4 mb-10 animate-slideUp stagger-4">
+            {[
+              { icon: <Sparkles className="h-3.5 w-3.5" />, text: 'AI дизайн за ~90 сек' },
+              { icon: <Camera className="h-3.5 w-3.5" />, text: '3D проект + бюджет' },
+              { icon: <ShoppingCart className="h-3.5 w-3.5" />, text: 'Линкове към магазини' },
+            ].map((item, i) => (
+              <span key={i} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+                style={{ color: gold, background: `rgba(246,195,106,0.06)`, border: '1px solid rgba(246,195,106,0.12)' }}>
+                {item.icon} {item.text}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6 animate-slideUp stagger-5">
             <button onClick={() => navigate('/room-scan')} data-testid="hero-room-btn"
-              className="group relative px-8 py-4 rounded-xl text-white text-lg font-bold overflow-hidden transition-all hover:scale-105 active:scale-95"
-              style={{ background: accent, boxShadow: `0 0 30px ${accent}40` }}>
+              className="group relative px-8 py-4 rounded-xl text-white text-lg font-bold overflow-hidden transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 animate-orangePulse"
+              style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)' }}>
               <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Camera className="mr-2 h-6 w-6 inline" /> 3D Photo Designer
+              <Camera className="mr-2 h-6 w-6 inline" /> Качи снимки на помещението
             </button>
             <button onClick={() => navigate('/ai-sketch')} data-testid="hero-sketch-btn"
-              className="px-8 py-4 rounded-xl text-lg font-bold border-2 transition-all hover:scale-105 active:scale-95"
-              style={{ borderColor: accent, color: accent, background: dark ? '#F9731610' : '#FFF7ED' }}>
+              className="px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 btn-gold">
               <FileText className="mr-2 h-5 w-5 inline" /> CAD Скица
             </button>
           </div>
 
+          <p className="text-xs mb-12 animate-slideUp" style={{ color: gold }}>
+            AI дизайн за около 90 секунди
+          </p>
+
+          {/* Before/After Hero Preview */}
+          <div className="max-w-4xl w-full mx-auto mb-12 animate-slideUp">
+            <div className="grid grid-cols-2 gap-3 md:gap-4 premium-card p-3 md:p-4">
+              <div className="relative rounded-xl overflow-hidden">
+                <img src="/showcase/before_bathroom.jpg" alt="Before" className="w-full h-48 md:h-72 object-cover" />
+                <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold" style={{ background: 'rgba(0,0,0,0.7)', color: '#ffffff', backdropFilter: 'blur(8px)' }}>ПРЕДИ</span>
+              </div>
+              <div className="relative rounded-xl overflow-hidden">
+                <img src="/showcase/after_bathroom.jpg" alt="After" className="w-full h-48 md:h-72 object-cover" />
+                <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', color: '#ffffff' }}>СЛЕД AI</span>
+              </div>
+            </div>
+          </div>
+
           {/* Stats row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl w-full">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-3xl w-full">
             {[
-              { v: `${liveStats.companies || 0}`, l: 'Фирми', c: accent },
+              { v: `${liveStats.companies || 0}`, l: 'Фирми', c: gold },
               { v: `${liveStats.clients || 0}`, l: 'Клиенти', c: '#10B981' },
-              { v: '1:1', l: 'Точен мащаб', c: dark ? '#FCD34D' : '#D97706' },
+              { v: '1:1', l: 'Точен мащаб', c: gold },
               { v: `${slotsLeft} FREE`, l: `${slotsUsed}/${slotsTotal} (2/област)`, c: '#10B981' },
             ].map((s, i) => (
-              <div key={i} className="rounded-xl p-4 text-center backdrop-blur-lg border" 
-                style={{ background: dark ? 'rgba(30,41,59,0.6)' : 'rgba(255,255,255,0.7)', borderColor: border }}>
+              <div key={i} className="rounded-xl p-4 text-center glass border" 
+                style={{ borderColor: 'var(--theme-border)' }}>
                 <p className="text-2xl font-black" style={{ color: s.c }}>{s.v}</p>
-                <p className="text-[11px] mt-0.5" style={{ color: muted }}>{s.l}</p>
+                <p className="text-[11px] mt-0.5" style={{ color: subtle }}>{s.l}</p>
               </div>
             ))}
           </div>
 
           {/* Regional breakdown */}
           {liveStats.regions && (
-            <div className="max-w-3xl w-full mt-6 rounded-xl p-4 backdrop-blur-lg border" 
-              style={{ background: dark ? 'rgba(30,41,59,0.6)' : 'rgba(255,255,255,0.7)', borderColor: border }} data-testid="region-breakdown">
-              <p className="text-xs font-bold mb-3 text-center" style={{ color: muted }}>{slotsUsed}/56 ФИРМИ (2 на област)</p>
+            <div className="max-w-3xl w-full mt-6 rounded-xl p-4 glass border" 
+              style={{ borderColor: 'var(--theme-border)' }} data-testid="region-breakdown">
+              <p className="text-xs font-bold mb-3 text-center" style={{ color: subtle }}>{slotsUsed}/56 ФИРМИ (2 на област)</p>
               <div className="flex flex-wrap gap-1.5 justify-center">
                 {Object.entries(liveStats.regions || {}).map(([region, data]) => {
                   const full = data.used >= data.total;
@@ -1007,7 +1044,7 @@ const LandingPage = () => {
                   );
                 })}
               </div>
-              <div className="flex justify-center gap-4 mt-3 text-[9px]" style={{ color: muted }}>
+              <div className="flex justify-center gap-4 mt-3 text-[9px]" style={{ color: subtle }}>
                 <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Свободна</span>
                 <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> 1/2</span>
                 <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Пълна</span>
@@ -1018,11 +1055,11 @@ const LandingPage = () => {
       </section>
 
       {/* ===== SHOWCASE: 5 Real AI-Generated Projects ===== */}
-      <section className="py-16 border-t" style={{ borderColor: border }} data-testid="showcase-section">
+      <section className="py-16" style={{ borderTop: `1px solid ${border}` }} data-testid="showcase-section">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2" style={{ color: text }}>Реални AI Проекти от TemaDom</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">Реални <span className="gradient-text">AI Проекти</span> от TemaDom</h2>
           <p className="text-center mb-3 text-sm" style={{ color: muted }}>Генерирани от нашия 3D дизайнер с реални цени и линкове</p>
-          <p className="text-center mb-8 text-xs" style={{ color: accent }}>Снимай помещението си и получи същия резултат</p>
+          <p className="text-center mb-8 text-xs" style={{ color: gold }}>Снимай помещението си и получи същия резултат</p>
 
           {/* Room type quick buttons */}
           <div className="flex flex-wrap justify-center gap-2 mb-8" data-testid="room-quick-btns">
@@ -1121,42 +1158,40 @@ const LandingPage = () => {
                 ],
               },
             ].map((proj, i) => (
-              <div key={i} className="flex-shrink-0 w-[280px] sm:w-[320px] snap-center rounded-2xl overflow-hidden border transition-all hover:shadow-xl group"
-                style={{ background: bgCard, borderColor: border }}
+              <div key={i} className="flex-shrink-0 w-[280px] sm:w-[320px] snap-center rounded-2xl overflow-hidden premium-card transition-all hover:shadow-xl group"
                 data-testid={`showcase-card-${i}`}>
                 {/* Before / After images */}
                 <div className="relative">
                   <div className="grid grid-cols-2 h-48">
                     <div className="relative overflow-hidden">
                       <img src={proj.before} alt={`${proj.room} преди`} className="w-full h-full object-cover" loading="lazy" />
-                      <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-black/60 text-white">ПРЕДИ</span>
+                      <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(0,0,0,0.7)', color: '#ffffff', backdropFilter: 'blur(4px)' }}>ПРЕДИ</span>
                     </div>
                     <div className="relative overflow-hidden">
                       <img src={proj.after} alt={`${proj.room} след`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                      <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded text-white" style={{ background: proj.color }}>СЛЕД AI</span>
+                      <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)' }}>СЛЕД AI</span>
                     </div>
                   </div>
-                  {/* Room label overlay */}
                   <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
-                    <span className="text-xs font-black px-2 py-1 rounded-full bg-black/60 text-white">{proj.room} {proj.dims}</span>
-                    <span className="text-xs font-bold px-2 py-1 rounded-full text-white" style={{ background: proj.color }}>
-                      AI Дизайн: {proj.price} EUR
+                    <span className="text-xs font-black px-2.5 py-1 rounded-full" style={{ background: 'rgba(0,0,0,0.7)', color: '#ffffff', backdropFilter: 'blur(4px)' }}>{proj.room} {proj.dims}</span>
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-full text-white" style={{ background: `linear-gradient(135deg, ${proj.color}, ${proj.color}dd)` }}>
+                      {proj.price} EUR
                     </span>
                   </div>
                 </div>
 
-                {/* Real products with affiliate links */}
+                {/* Real products */}
                 <div className="p-4 space-y-1.5">
-                  <p className="text-[10px] font-bold mb-2" style={{ color: muted }}>Топ материали (среден вариант):</p>
+                  <p className="text-[10px] font-bold mb-2" style={{ color: subtle }}>Топ материали (среден вариант):</p>
                   {proj.products.map((p, pi) => (
                     <a key={pi} href={p.url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center justify-between py-1.5 px-2.5 rounded-lg transition-colors hover:bg-[#F97316]/5 group/link"
+                      className="flex items-center justify-between py-1.5 px-2.5 rounded-lg transition-all hover:bg-[rgba(246,195,106,0.06)] group/link"
                       data-testid={`showcase-product-${i}-${pi}`}>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold truncate group-hover/link:text-[#F97316] transition-colors" style={{ color: text }}>{p.name}</p>
-                        <p className="text-[10px]" style={{ color: muted }}>{p.store}</p>
+                        <p className="text-xs font-bold truncate transition-colors" style={{ color: text }}>{p.name}</p>
+                        <p className="text-[10px]" style={{ color: subtle }}>{p.store}</p>
                       </div>
-                      <span className="text-xs font-black flex-shrink-0 ml-2" style={{ color: proj.color }}>{p.price} EUR</span>
+                      <span className="text-xs font-black flex-shrink-0 ml-2" style={{ color: gold }}>{p.price} EUR</span>
                     </a>
                   ))}
                 </div>
@@ -1407,29 +1442,30 @@ const LandingPage = () => {
       <FirmSubscriptionsSection dark={dark} text={text} muted={muted} accent={accent} border={border} navigate={navigate} />
 
       {/* ===== CTA: РЕГИСТРИРАЙ ФИРМАТА (original) ===== */}
-      <section className="py-16 relative overflow-hidden" style={{ background: dark ? '#1E293B' : '#FFF7ED' }}>
-        <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${accent}15, ${accent}05)` }} />
+      <section className="py-16 relative overflow-hidden" style={{ background: dark ? '#141821' : '#eef0f5' }}>
+        <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, rgba(246,195,106,0.06), rgba(255,138,0,0.04))` }} />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full px-5 py-2 mb-6 border" style={{ borderColor: `${accent}40`, background: `${accent}10` }}>
-            <Zap className="h-4 w-4" style={{ color: accent }} />
-            <span className="text-xs font-bold" style={{ color: accent }}>ОСТАВАТ {slotsLeft} МЕСТА</span>
+          <div className="inline-flex items-center gap-2 rounded-full px-5 py-2 mb-6"
+            style={{ border: '1px solid rgba(246,195,106,0.2)', background: 'rgba(246,195,106,0.06)' }}>
+            <Zap className="h-4 w-4" style={{ color: gold }} />
+            <span className="text-xs font-bold" style={{ color: gold }}>ОСТАВАТ {slotsLeft} МЕСТА</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-black mb-4">
-            Първи <span style={{ color: accent }}>56 фирми</span> = 6 месеца ПРЕМИУМ
+            Първи <span className="gradient-text-gold">56 фирми</span> = 6 месеца ПРЕМИУМ
           </h2>
           <p className="text-lg mb-8" style={{ color: muted }}>Регистрирай фирмата си и получи достъп до всички AI функции безплатно за 12 месеца.</p>
           <button onClick={() => navigate('/register')} data-testid="cta-register"
-            className="px-10 py-5 rounded-xl text-white text-xl font-black transition-all hover:scale-105 active:scale-95"
-            style={{ background: `linear-gradient(135deg, ${accent}, #EA580C)`, boxShadow: `0 0 40px ${accent}40` }}>
+            className="px-10 py-5 rounded-xl text-white text-xl font-black transition-all hover:scale-105 hover:-translate-y-1 active:scale-95 animate-orangePulse"
+            style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)' }}>
             РЕГИСТРИРАЙ ФИРМАТА
           </button>
         </div>
       </section>
 
       {/* Sticky bottom CTA (mobile) */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden p-3" style={{ background: dark ? '#0F172AEE' : '#F8FAFCEE', backdropFilter: 'blur(12px)', borderTop: `1px solid ${border}` }} data-testid="sticky-cta">
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden p-3 glass-nav" data-testid="sticky-cta">
         <button onClick={() => navigate('/register')} className="w-full py-3.5 rounded-xl text-white font-bold text-base"
-          style={{ background: `linear-gradient(135deg, ${accent}, #EA580C)` }}>
+          style={{ background: 'linear-gradient(135deg, #ff8a00, #ff5a00)', boxShadow: '0 4px 20px rgba(255,138,0,0.3)' }}>
           РЕГИСТРИРАЙ ФИРМАТА ({slotsLeft} места)
         </button>
       </div>
@@ -2590,7 +2626,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-md" data-testid="login-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <TemaDomLogo className="h-16 w-auto" />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-12 w-auto opacity-60" />
           </div>
           <CardTitle className="text-2xl">{t('login_title')}</CardTitle>
           <CardDescription>{t('login_subtitle')}</CardDescription>
@@ -2780,7 +2816,7 @@ const RegisterPage = () => {
       <Card className="w-full max-w-md" data-testid="register-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <TemaDomLogo className="h-16 w-auto" />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-12 w-auto opacity-60" />
           </div>
           <CardTitle className="text-2xl">{t('reg_title')}</CardTitle>
           <CardDescription>{t('reg_subtitle')}</CardDescription>
