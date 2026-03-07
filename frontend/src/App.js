@@ -260,11 +260,11 @@ const Navbar = () => {
   return (
     <nav className="glass-nav sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20 lg:h-24">
+        <div className="flex justify-between h-52 lg:h-56">
           {/* Left: Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
-              <img src="/logo-temadom.png" alt="TemaDom" className="h-16 lg:h-20 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-48 lg:h-52 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
             </Link>
           </div>
 
@@ -657,7 +657,7 @@ const Footer = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <div className="mb-4 flex flex-col items-start">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-20 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 10px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.3)) brightness(0.85)' }} />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-48 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 10px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.3)) brightness(0.85)' }} />
           </div>
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             {t('footer_desc')}
@@ -695,7 +695,7 @@ const Footer = () => {
       </div>
       <Separator className="my-8" style={{ background: 'var(--theme-nav-border)' }} />
       <div className="flex flex-col items-center gap-3">
-        <img src="/logo-temadom.png" alt="TemaDom" className="h-16 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) brightness(0.85)' }} />
+        <img src="/logo-temadom.png" alt="TemaDom" className="h-48 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) brightness(0.85)' }} />
         <p className="text-center text-sm" style={{ color: 'var(--theme-text-subtle)' }}>
           © 2025-2026 TemaDom. {t('footer_rights')}
         </p>
@@ -937,7 +937,7 @@ const LandingPage = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 pt-2 pb-8 md:pt-4 md:pb-12 flex flex-col items-center">
           {/* Logo */}
           <div className="-mb-8 md:-mb-12 animate-slideUp">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-[22rem] md:h-[28rem] w-auto mx-auto animate-float logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' : 'drop-shadow(0 4px 20px rgba(0,0,0,0.3)) brightness(0.8) contrast(1.2)' }} />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-[28rem] md:h-[36rem] w-auto mx-auto animate-float logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' : 'drop-shadow(0 4px 20px rgba(0,0,0,0.3)) brightness(0.8) contrast(1.2)' }} />
           </div>
 
           {/* Counter badge */}
@@ -2631,7 +2631,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-md" data-testid="login-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-16 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) brightness(0.85)' }} />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-48 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) brightness(0.85)' }} />
           </div>
           <CardTitle className="text-2xl">{t('login_title')}</CardTitle>
           <CardDescription>{t('login_subtitle')}</CardDescription>
@@ -2822,7 +2822,7 @@ const RegisterPage = () => {
       <Card className="w-full max-w-md" data-testid="register-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-16 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) brightness(0.85)' }} />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-48 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) brightness(0.85)' }} />
           </div>
           <CardTitle className="text-2xl">{t('reg_title')}</CardTitle>
           <CardDescription>{t('reg_subtitle')}</CardDescription>
