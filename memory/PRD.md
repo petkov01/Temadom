@@ -1,68 +1,84 @@
 # TEMADOM — Product Requirements Document
 
-## Status: PRODUCTION READY (Scraping MVP Complete)
+## Status: LAUNCH READY
 
 ## Core Features — ALL WORKING
 
 ### 1. 3D Photo Designer v10 — Real Product Integration
 - GPT-4o-mini Vision + gpt-image-1 renders
-- **NEW: Real-time product scraping from Videnov.bg** (Playwright-based)
+- Real-time product scraping from Videnov.bg (Playwright)
 - 3 budget tiers with REAL product links (verified) + search URL fallbacks
 - Products include exact names, EUR prices, and direct URLs
 - Frontend shows "Реален" badge for verified products, "Купи от" buttons
-- Room-type based category mapping (bathroom, kitchen, living_room, bedroom, etc.)
-- 24h MongoDB caching with TTL for scraped products
-- Free text budget (EUR), retry with backoff, image resize <2MB
+- 3 packages: 1 room (69€), 2 rooms (129€), Apartment up to 5 rooms (199€)
+- Room-type category mapping, 24h MongoDB caching, image compression
 
 ### 2. Product Scraping Service
-- **Scraped stores**: Videnov.bg (furniture, fixtures, bathroom, kitchen)
-- **Search URL stores**: Praktiker, Mr.Bricolage, Bauhaus, Jysk, eMAG, IKEA, HomeMax, Praktis
-- API endpoints:
-  - `GET /api/products/search?q=&stores=&limit=` - Search real products
-  - `GET /api/products/for-room/{room_type}?budget=` - Get products by room category
-  - `GET /api/products/stores` - List available stores
-  - `GET /api/products/categories/{room_type}` - Get categories for room type
-- Playwright browser singleton with graceful shutdown
-- Affiliate tracking applied to all product URLs
+- **Scraped**: Videnov.bg (furniture, fixtures, bathroom, kitchen)
+- **Search URL**: Praktiker, Mr.Bricolage, Bauhaus, Jysk, eMAG, IKEA, HomeMax, Praktis
+- API: `/api/products/search`, `/api/products/for-room/{type}`, `/api/products/stores`
+- Playwright browser singleton, affiliate tracking on all URLs
 
-### 3. Landing Page Showcase — 5 REAL AI-generated projects
-- Before/After photos (real AI renders)
-- Materials with affiliate links
+### 3. Subscription System — FULLY FUNCTIONAL
+- Plans: БАЗОВ (15€/мес), ПРО (35€/мес), PREMIUM (75€/мес)
+- Feature gating: PDF contracts, AI sketches, quantitative estimates, Telegram notifications, priority display, team members
+- Profile dashboard: plan display, offers usage bar, feature lock indicators
+- Subscriptions page: current plan indicator ("ТЕКУЩ ПЛАН"), upgrade flow
+- Backend endpoints: activate, my, my-limits, check-feature, plans
+- Stripe payment (test mode)
 
-### 4. Affiliate Monetization — Auto-applied everywhere
-- 9 stores with configurable ref IDs in AFFILIATE_CONFIG
+### 4. CAD System — with PNG Download
+- Full 2D CAD editor with walls, doors, windows, furniture
+- 3D live preview
+- PDF plan + contract export
+- **NEW: Download as PNG image** (works on mobile)
 
-### 5. Subscription Plan Enforcement
-- БАЗОВ/ПРО/PREMIUM tiers with feature gating
+### 5. Calculator (AI Blueprint Removed)
+- Full renovation cost calculator with services/materials
+- Regional pricing (Sofia, cities, villages)
+- Quality levels, PDF export
+- AI blueprint analysis REMOVED per user request
 
-### 6. Live Counter, Community Feed, AI Product Search, Leaderboard, Notifications, etc.
+### 6. Affiliate Monetization
+- 9 stores with configurable ref IDs
+- Auto-applied to all product/search URLs
+
+### 7. Landing Page Showcase
+- 5 real AI-generated Before/After projects
+- Material lists with affiliate links
+
+### 8. Other Features
+- Community feed, AI product search, leaderboard, notifications
+- Live statistics counter (desktop + mobile)
+- Multi-language (BG/EN)
 
 ## Architecture
 ```
 /app/backend/
-  ├── server.py          # Main monolith (~5650 lines)
-  ├── config.py          # Shared config, DB, auth helpers
+  ├── server.py          # Main (~5650 lines)
+  ├── config.py          # Config, DB, auth
   ├── services/
-  │   └── scraper.py     # Playwright-based product scraper (NEW)
+  │   └── scraper.py     # Playwright product scraper
   ├── routes/
-  │   ├── products.py    # Product search API (NEW)
+  │   ├── products.py    # Product search API
   │   ├── notifications.py
   │   └── payments.py
-  └── models/
-      └── models.py
+  └── models/models.py
 
 /app/frontend/src/
   ├── components/
-  │   ├── AIDesignerPage.jsx  # Updated with verified badges
+  │   ├── AIDesignerPage.jsx  # 3D designer with verified badges
+  │   ├── AISketchPage.jsx    # CAD with PNG download
+  │   ├── PriceCalculator.jsx # Calculator (no AI blueprint)
+  │   ├── ProfilePage.jsx     # Subscription dashboard
   │   └── ...
-  └── pages/
-      └── LandingPage.jsx
+  └── App.js                  # Subscriptions page with current plan
 ```
 
-## Post-Launch Backlog
+## Backlog
 - P1: Backend refactoring (server.py monolith → modular routers)
-- P1: Mobile responsiveness polish (all pages)
-- P1: Add more scraped stores (currently only Videnov works reliably)
+- P1: Mobile responsiveness polish
+- P1: Add more scraped stores
 - P2: Company catalog & portfolios
 - P2: Direct messaging
 - P2: Job ads module
