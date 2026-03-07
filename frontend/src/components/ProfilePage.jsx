@@ -804,7 +804,7 @@ const ProfilePage = () => {
                         {profile.subscription_active ? `Активен до ${profile.subscription_expires || 'N/A'}` : 'Безплатен план'}
                       </p>
                     </div>
-                    <Badge className={profile.subscription_active ? 'bg-[#10B981]/15 text-[#10B981]' : 'bg-slate-500/15 text-slate-400'}>
+                    <Badge className={profile.subscription_active ? 'bg-[#10B981]/15 text-[#10B981]' : 'bg-slate-500/15 theme-text-muted'}>
                       {profile.subscription_active ? 'PREMIUM' : 'FREE'}
                     </Badge>
                   </div>

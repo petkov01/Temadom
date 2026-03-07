@@ -106,28 +106,28 @@ const AboutPage = () => {
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-600 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
         </div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-6 text-white">{c.heroTitle1}<span className="text-[#FF8C42]">TemaDom</span>{c.heroTitle2}</h1>
-          <p className="text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">{c.heroDesc}</p>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-6" style={{ color: 'var(--theme-text)' }}>{c.heroTitle1}<span className="text-[#FF8C42]">TemaDom</span>{c.heroTitle2}</h1>
+          <p className="text-lg max-w-3xl mx-auto leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>{c.heroDesc}</p>
         </div>
       </section>
 
       {/* Problems */}
-      <section className="py-16 bg-[#1A2535]">
+      <section className="py-16" style={{ background: 'var(--theme-bg-secondary)' }}>
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">{c.problemTitle}</h2>
-            <p className="text-slate-400">{c.problemSub}</p>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: 'var(--theme-text)' }}>{c.problemTitle}</h2>
+            <p style={{ color: 'var(--theme-text-muted)' }}>{c.problemSub}</p>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             {c.problems.map((p, i) => (
-              <Card key={i} className="bg-[#253545] border-red-500/20 hover:border-red-500/40 transition-colors">
+              <Card key={i} className="border-red-500/20 hover:border-red-500/40 transition-colors" style={{ background: 'var(--theme-card-bg)' }}>
                 <CardContent className="p-5">
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="font-bold text-white mb-1">{p.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">{p.desc}</p>
+                      <h3 className="font-bold mb-1" style={{ color: 'var(--theme-text)' }}>{p.title}</h3>
+                      <p className="text-sm leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>{p.desc}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -138,25 +138,25 @@ const AboutPage = () => {
       </section>
 
       {/* Solutions */}
-      <section className="py-16 bg-[#0F1923]">
+      <section className="py-16" style={{ background: 'var(--theme-bg)' }}>
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <Shield className="h-12 w-12 text-[#FF8C42] mx-auto mb-4" />
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">{c.solutionTitle}</h2>
-            <p className="text-slate-400">{c.solutionSub}</p>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: 'var(--theme-text)' }}>{c.solutionTitle}</h2>
+            <p style={{ color: 'var(--theme-text-muted)' }}>{c.solutionSub}</p>
           </div>
           <div className="space-y-4">
             {c.solutions.map((s, i) => {
               const Icon = sIcons[i];
               return (
-                <Card key={i} className="bg-[#1E2A38] border-[#2A3A4C] hover:border-[#FF8C42]/30 transition-colors">
+                <Card key={i} className="hover:border-[#FF8C42]/30 transition-colors" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
                   <CardContent className="p-5 flex items-start gap-5">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${sColors[i]}15` }}>
                       <Icon className="h-6 w-6" style={{ color: sColors[i] }} />
                     </div>
                     <div>
-                      <h3 className="font-bold text-white mb-1">{s.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">{s.desc}</p>
+                      <h3 className="font-bold mb-1" style={{ color: 'var(--theme-text)' }}>{s.title}</h3>
+                      <p className="text-sm leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>{s.desc}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -167,19 +167,19 @@ const AboutPage = () => {
       </section>
 
       {/* For Clients / Companies */}
-      <section className="py-16 bg-[#1A2535]">
+      <section className="py-16" style={{ background: 'var(--theme-bg-secondary)' }}>
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <Users className="h-7 w-7 text-[#FF8C42]" />
-                <h2 className="text-xl font-bold text-white">{c.forClients}</h2>
+                <h2 className="text-xl font-bold" style={{ color: 'var(--theme-text)' }}>{c.forClients}</h2>
               </div>
               <div className="space-y-3">
                 {c.clientBenefits.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
-                    <p className="text-slate-300 text-sm">{item}</p>
+                    <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{item}</p>
                   </div>
                 ))}
               </div>
@@ -187,13 +187,13 @@ const AboutPage = () => {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <Building2 className="h-7 w-7 text-[#FF8C42]" />
-                <h2 className="text-xl font-bold text-white">{c.forCompanies}</h2>
+                <h2 className="text-xl font-bold" style={{ color: 'var(--theme-text)' }}>{c.forCompanies}</h2>
               </div>
               <div className="space-y-3">
                 {c.companyBenefits.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
-                    <p className="text-slate-300 text-sm">{item}</p>
+                    <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{item}</p>
                   </div>
                 ))}
               </div>
@@ -216,9 +216,9 @@ const AboutPage = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-[#0F1923] text-center">
+      <section className="py-16 text-center" style={{ background: 'var(--theme-bg)' }}>
         <div className="max-w-xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-white mb-6">{c.ctaTitle}</h2>
+          <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--theme-text)' }}>{c.ctaTitle}</h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/register">
               <Button className="bg-[#FF8C42] hover:bg-[#e67a30] text-lg px-8 py-3 text-white" data-testid="about-register-btn">
@@ -226,7 +226,7 @@ const AboutPage = () => {
               </Button>
             </Link>
             <Link to="/calculator">
-              <Button variant="outline" className="text-lg px-8 py-3 border-[#3A4A5C] text-slate-300 hover:text-white hover:bg-white/5" data-testid="about-calculator-btn">
+              <Button variant="outline" className="text-lg px-8 py-3" style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }} data-testid="about-calculator-btn">
                 <Calculator className="mr-2 h-5 w-5" /> {c.ctaCalc}
               </Button>
             </Link>

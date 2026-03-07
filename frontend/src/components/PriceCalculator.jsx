@@ -512,14 +512,14 @@ const PriceCalculator = () => {
     return (
       <div className="min-h-screen flex items-center justify-center py-16 px-4" style={{background: "var(--theme-bg-secondary)"}} data-testid="calculator-auth-guard">
         <div className="max-w-md w-full text-center">
-          <div className="bg-[#253545] rounded-2xl shadow-lg border border-[#3A4A5C] p-8">
+          <div className="rounded-2xl shadow-lg p-8" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
             <div className="bg-[#FF8C42]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
               <Lock className="h-8 w-8 text-[#FF8C42]" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-3">
+            <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--theme-text)' }}>
               {t('calc_auth_title')}
             </h2>
-            <p className="text-slate-400 mb-8">
+            <p className="mb-8" style={{ color: 'var(--theme-text-muted)' }}>
               {t('calc_auth_desc')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -532,7 +532,8 @@ const PriceCalculator = () => {
               </button>
               <button
                 onClick={() => navigate('/login')}
-                className="flex-1 bg-[#253545] hover:bg-[#1E2A38] text-slate-300 font-medium py-3 px-6 rounded-lg border border-[#3A4A5C] transition-colors"
+                className="flex-1 font-medium py-3 px-6 rounded-lg transition-colors"
+                style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }}
                 data-testid="calculator-login-btn"
               >
                 {t('calc_auth_login')}
@@ -553,11 +554,11 @@ const PriceCalculator = () => {
             <div className="bg-[#FF8C42]/10 p-3 rounded-full">
               <Calculator className="h-8 w-8 text-[#FF8C42]" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white">
+            <h1 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--theme-text)' }}>
               {t('calc_title')}
             </h1>
           </div>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--theme-text-muted)' }}>
             {t('calc_subtitle')}
           </p>
         </div>
@@ -588,13 +589,14 @@ const PriceCalculator = () => {
                         className={`p-4 rounded-lg border-2 transition-all duration-200 text-left hover:shadow-md ${
                           isSelected 
                             ? 'border-orange-400 bg-[#FF8C42]/5' 
-                            : 'border-[#3A4A5C] hover:border-orange-300'
+                            : 'hover:border-orange-300'
                         }`}
+                        style={!isSelected ? { borderColor: 'var(--theme-border)' } : {}}
                         data-testid={`add-${key}`}
                       >
-                        <Icon className={`h-6 w-6 mb-2 ${isSelected ? 'text-[#FF8C42]' : 'text-slate-500'}`} />
+                        <Icon className={`h-6 w-6 mb-2 ${isSelected ? 'text-[#FF8C42]' : ''}`} style={!isSelected ? { color: 'var(--theme-text-subtle)' } : {}} />
                         <p className="font-medium text-sm">{category.name}</p>
-                        <p className="text-xs text-slate-500 mt-1">{category.unit}</p>
+                        <p className="text-xs mt-1" style={{ color: 'var(--theme-text-subtle)' }}>{category.unit}</p>
                       </button>
                     );
                   })}
@@ -615,10 +617,10 @@ const PriceCalculator = () => {
                   {selectedItems.map(item => {
                     const category = PRICE_DATABASE[item.category];
                     return (
-                      <div key={item.id} className="flex items-center gap-4 p-4 bg-[#1E2A38] rounded-lg">
+                      <div key={item.id} className="flex items-center gap-4 p-4 rounded-lg" style={{ background: 'var(--theme-bg-surface)' }}>
                         <div className="flex-1">
                           <Label className="font-medium">{item.name}</Label>
-                          <p className="text-xs text-slate-500">{category.unitLabel}</p>
+                          <p className="text-xs" style={{ color: 'var(--theme-text-subtle)' }}>{category.unitLabel}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <Input
@@ -631,7 +633,7 @@ const PriceCalculator = () => {
                             placeholder="0"
                             data-testid={`quantity-${item.category}`}
                           />
-                          <span className="text-sm text-slate-500 w-12">{item.unit}</span>
+                          <span className="text-sm w-12" style={{ color: 'var(--theme-text-subtle)' }}>{item.unit}</span>
                           <Button 
                             variant="ghost" 
                             size="sm"
@@ -668,12 +670,13 @@ const PriceCalculator = () => {
                         className={`p-4 rounded-lg border-2 text-left transition-all ${
                           pricingType === key 
                             ? 'border-orange-500 bg-[#FF8C42]/5' 
-                            : 'border-[#3A4A5C] hover:border-[#3A4A5C]'
+                            : 'hover:border-orange-300'
                         }`}
+                        style={pricingType !== key ? { borderColor: 'var(--theme-border)' } : {}}
                         data-testid={`pricing-${key}`}
                       >
                         <p className="font-semibold">{type.name}</p>
-                        <p className="text-xs text-slate-500 mt-1">{type.description}</p>
+                        <p className="text-xs mt-1" style={{ color: 'var(--theme-text-subtle)' }}>{type.description}</p>
                       </button>
                     ))}
                   </div>
@@ -690,12 +693,13 @@ const PriceCalculator = () => {
                         className={`p-4 rounded-lg border-2 text-center transition-all ${
                           qualityLevel === key 
                             ? 'border-orange-500 bg-[#FF8C42]/5' 
-                            : 'border-[#3A4A5C] hover:border-[#3A4A5C]'
+                            : 'hover:border-orange-300'
                         }`}
+                        style={qualityLevel !== key ? { borderColor: 'var(--theme-border)' } : {}}
                         data-testid={`quality-${key}`}
                       >
                         <Badge className={`${level.color} mb-2`}>{level.name}</Badge>
-                        <p className="text-xs text-slate-500">{level.description}</p>
+                        <p className="text-xs" style={{ color: 'var(--theme-text-subtle)' }}>{level.description}</p>
                       </button>
                     ))}
                   </div>
@@ -716,7 +720,7 @@ const PriceCalculator = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-slate-500 mt-2">
+                  <p className="text-xs mt-2" style={{ color: 'var(--theme-text-subtle)' }}>
                     Цените варират според региона. София е с най-високи цени.
                   </p>
                 </div>
@@ -738,7 +742,7 @@ const PriceCalculator = () => {
               </CardHeader>
               <CardContent className="pt-6">
                 {calculation.items.length === 0 ? (
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8" style={{ color: 'var(--theme-text-subtle)' }}>
                     <Calculator className="h-12 w-12 mx-auto mb-3 opacity-30" />
                     <p>Изберете услуги и въведете количества</p>
                   </div>
@@ -746,12 +750,12 @@ const PriceCalculator = () => {
                   <>
                     <div className="space-y-3 mb-4">
                       {calculation.items.map(item => (
-                        <div key={item.id} className="flex justify-between text-sm py-2 border-b border-slate-100 last:border-0">
+                        <div key={item.id} className="flex justify-between text-sm py-2 last:border-0" style={{ borderBottom: '1px solid var(--theme-border)' }}>
                           <div className="flex-1">
-                            <span className="text-slate-300 font-medium">{item.name}</span>
-                            <span className="text-slate-400 ml-1">({item.quantity} {PRICE_DATABASE[item.category].unit})</span>
+                            <span className="font-medium" style={{ color: 'var(--theme-text-muted)' }}>{item.name}</span>
+                            <span className="ml-1" style={{ color: 'var(--theme-text-subtle)' }}>({item.quantity} {PRICE_DATABASE[item.category].unit})</span>
                           </div>
-                          <span className="font-semibold text-white ml-3">
+                          <span className="font-semibold ml-3" style={{ color: 'var(--theme-text)' }}>
                             {item.total.toFixed(0)} €
                           </span>
                         </div>
@@ -760,7 +764,7 @@ const PriceCalculator = () => {
 
                     <Separator className="my-4" />
 
-                    <div className="space-y-2 text-sm text-slate-500">
+                    <div className="space-y-2 text-sm" style={{ color: 'var(--theme-text-subtle)' }}>
                       <div className="flex justify-between">
                         <span>Тип:</span>
                         <span>{PRICING_TYPES[pricingType].name}</span>
@@ -773,7 +777,7 @@ const PriceCalculator = () => {
                         <span>Регион:</span>
                         <span>{calculation.regionName}</span>
                       </div>
-                      <div className="flex justify-between font-medium text-slate-300">
+                      <div className="flex justify-between font-medium" style={{ color: 'var(--theme-text-muted)' }}>
                         <span>Брой дейности:</span>
                         <span>{calculation.items.filter(i => i.quantity > 0).length}</span>
                       </div>
@@ -781,8 +785,8 @@ const PriceCalculator = () => {
 
                     <Separator className="my-4" />
 
-                    <div className="bg-slate-900 text-white rounded-lg p-5 text-center" data-testid="grand-total-box">
-                      <p className="text-sm text-slate-300 mb-1">ОБЩА ЦЕНА ЗА ВСИЧКО</p>
+                    <div className="rounded-lg p-5 text-center" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }} data-testid="grand-total-box">
+                      <p className="text-sm mb-1" style={{ color: 'var(--theme-text-muted)' }}>ОБЩА ЦЕНА ЗА ВСИЧКО</p>
                       <p className="text-4xl font-bold" data-testid="total-price">
                         {calculation.total.toFixed(0)} €
                       </p>
@@ -831,7 +835,7 @@ const PriceCalculator = () => {
                       </Button>
                     )}
 
-                    <p className="text-xs text-slate-500 mt-4 text-center">
+                    <p className="text-xs mt-4 text-center" style={{ color: 'var(--theme-text-subtle)' }}>
                       * Цените са ориентировъчни и могат да варират в зависимост от специфичните условия на обекта.
                     </p>
                   </>
@@ -861,13 +865,13 @@ const PriceCalculator = () => {
 
       {/* Mobile sticky total bar */}
       {calculation.total > 0 && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-900 text-white px-4 py-3 shadow-2xl z-50 border-t border-slate-700" data-testid="mobile-total-bar">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 px-4 py-3 shadow-2xl z-50" style={{ background: 'var(--theme-nav-bg)', borderTop: '1px solid var(--theme-nav-border)', color: 'var(--theme-text)' }} data-testid="mobile-total-bar">
           <div className="flex items-center justify-between max-w-lg mx-auto">
             <div>
-              <p className="text-xs text-slate-400">ОБЩА ЦЕНА</p>
+              <p className="text-xs" style={{ color: 'var(--theme-text-subtle)' }}>ОБЩА ЦЕНА</p>
               <p className="text-2xl font-bold">{calculation.total.toFixed(0)} EUR</p>
             </div>
-            <span className="text-xs text-slate-400">{calculation.items.filter(i => i.quantity > 0).length} дейности</span>
+            <span className="text-xs" style={{ color: 'var(--theme-text-subtle)' }}>{calculation.items.filter(i => i.quantity > 0).length} дейности</span>
           </div>
         </div>
       )}

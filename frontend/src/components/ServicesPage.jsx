@@ -407,7 +407,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
       <Collapsible open={isExpanded} onOpenChange={onToggle}>
         <CollapsibleTrigger asChild>
           <button className="w-full text-left">
-            <CardHeader className="hover:bg-[#1E2A38] transition-colors cursor-pointer">
+            <CardHeader className="hover:opacity-80 transition-colors cursor-pointer">
               <div className="flex items-start gap-4">
                 <div className="bg-[#FF8C42]/10 p-3 rounded-xl">
                   <Icon className="h-6 w-6 text-[#FF8C42]" />
@@ -418,11 +418,11 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                       <Badge variant="secondary" className="mb-2">{service.category}</Badge>
                       <CardTitle className="text-xl">{service.name}</CardTitle>
                     </div>
-                    {isExpanded ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />}
+                    {isExpanded ? <ChevronUp className="h-5 w-5" style={{ color: 'var(--theme-text-subtle)' }} /> : <ChevronDown className="h-5 w-5" style={{ color: 'var(--theme-text-subtle)' }} />}
                   </div>
                   <CardDescription className="mt-2">{service.shortDescription}</CardDescription>
                   <div className="flex items-center gap-4 mt-3 text-sm">
-                    <span className="flex items-center gap-1 text-slate-400">
+                    <span className="flex items-center gap-1" style={{ color: 'var(--theme-text-subtle)' }}>
                       <Clock className="h-4 w-4" /> {service.timeEstimate}
                     </span>
                     <span className="text-[#FF8C42] font-medium">{service.priceRange}</span>
@@ -439,7 +439,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
               {/* Left column */}
               <div>
                 <h4 className="font-semibold text-lg mb-3">{isEn ? 'Description' : 'Описание'}</h4>
-                <p className="text-slate-400 mb-6">{service.fullDescription}</p>
+                <p style={{ color: 'var(--theme-text-muted)' }} className="mb-6">{service.fullDescription}</p>
 
                 <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-600" /> {isEn ? 'Execution steps' : 'Стъпки на изпълнение'}
@@ -450,7 +450,7 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                       <span className="flex-shrink-0 w-6 h-6 bg-[#FF8C42]/10 text-[#FF8C42] rounded-full flex items-center justify-center text-sm font-medium">
                         {idx + 1}
                       </span>
-                      <span className="text-slate-400">{step}</span>
+                      <span style={{ color: 'var(--theme-text-muted)' }}>{step}</span>
                     </li>
                   ))}
                 </ol>
@@ -491,11 +491,11 @@ const ServiceCard = ({ serviceKey, service, isExpanded, onToggle, lang }) => {
                   </ul>
                 </div>
 
-                <div className="mt-6 p-4 bg-slate-100 rounded-lg">
+                <div className="mt-6 p-4 rounded-lg" style={{ background: 'var(--theme-bg-surface)' }}>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-semibold">{isEn ? 'Need a craftsman?' : 'Нужда от майстор?'}</p>
-                      <p className="text-sm text-slate-400">{isEn ? 'Find a verified specialist' : 'Намерете проверен специалист'}</p>
+                      <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{isEn ? 'Find a verified specialist' : 'Намерете проверен специалист'}</p>
                     </div>
                     <Link to="/companies">
                       <Button className="bg-[#FF8C42] hover:bg-[#e67a30]">
@@ -528,12 +528,12 @@ const ServicesPage = () => {
   return (
     <div className="min-h-screen" style={{background: "var(--theme-bg-secondary)"}}>
       {/* Hero */}
-      <section className="bg-slate-900 py-16">
+      <section className="py-16" style={{ background: 'var(--theme-bg)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--theme-text)' }}>
             {isEn ? 'Construction & Renovation Guide' : 'Справочник за строителство и ремонт'}
           </h1>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+          <p className="text-xl max-w-3xl mx-auto" style={{ color: 'var(--theme-text-muted)' }}>
             {isEn 
               ? 'Detailed information about all construction activities - execution technology, duration, materials and useful tips from professionals.'
               : 'Подробна информация за всички строителни дейности - технология на изпълнение, времетраене, материали и полезни съвети от професионалисти.'}
@@ -542,7 +542,7 @@ const ServicesPage = () => {
       </section>
 
       {/* Category Filter */}
-      <div className="bg-[#253545] border-b sticky top-16 z-40">
+      <div className="sticky top-16 z-40" style={{ background: 'var(--theme-nav-bg)', borderBottom: '1px solid var(--theme-nav-border)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap gap-2">
             {categories.map(cat => (
@@ -586,12 +586,12 @@ const ServicesPage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/calculator">
-                <Button size="lg" className="bg-[#253545] text-[#FF8C42] hover:bg-[#FF8C42]/5">
+                <Button size="lg" className="bg-white/20 text-white hover:bg-white/30">
                   {isEn ? 'Price Calculator' : 'Калкулатор за цени'}
                 </Button>
               </Link>
               <Link to="/register">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-[#253545]/10">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                   {isEn ? 'Publish project' : 'Публикувай проект'}
                 </Button>
               </Link>

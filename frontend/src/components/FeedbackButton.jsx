@@ -48,20 +48,20 @@ export const FeedbackButton = () => {
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setIsOpen(false)}>
           <div
-            className="bg-[#1E2A38] border border-[#3A4A5C] rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl animate-slideUp"
+            className=" border  rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl animate-slideUp"
             onClick={(e) => e.stopPropagation()}
             data-testid="feedback-modal"
           >
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-white font-bold text-lg">Дай обратна връзка</h3>
-              <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setIsOpen(false)} className="theme-text-muted hover:text-white">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Star Rating */}
             <div className="mb-5">
-              <p className="text-slate-400 text-sm mb-2">Как оценявате платформата?</p>
+              <p className="theme-text-muted text-sm mb-2">Как оценявате платформата?</p>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <button
@@ -91,7 +91,7 @@ export const FeedbackButton = () => {
                 placeholder="Вашето име (по избор)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-[#253545] border border-[#3A4A5C] rounded-lg px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:border-[#FF8C42] focus:outline-none transition-colors"
+                className="w-full  border  rounded-lg px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:border-[#FF8C42] focus:outline-none transition-colors"
                 data-testid="feedback-name"
               />
             </div>
@@ -103,7 +103,7 @@ export const FeedbackButton = () => {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={3}
-                className="w-full bg-[#253545] border border-[#3A4A5C] rounded-lg px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:border-[#FF8C42] focus:outline-none transition-colors resize-none"
+                className="w-full  border  rounded-lg px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:border-[#FF8C42] focus:outline-none transition-colors resize-none"
                 data-testid="feedback-text"
               />
             </div>

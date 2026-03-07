@@ -45,7 +45,7 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-slate-100">
-                <Image className="h-8 w-8 text-slate-300" />
+                <Image className="h-8 w-8 theme-text-muted" />
               </div>
             )}
             <Badge className="absolute top-2 left-2 bg-red-500 text-white text-xs">
@@ -69,7 +69,7 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-slate-100">
-                <Image className="h-8 w-8 text-slate-300" />
+                <Image className="h-8 w-8 theme-text-muted" />
               </div>
             )}
             <Badge className="absolute top-2 right-2 bg-green-500 text-white text-xs">
@@ -105,14 +105,14 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
       <CardContent className="p-4">
         <h4 className="font-semibold mb-1">{project.title}</h4>
         {project.description && (
-          <p className="text-sm text-slate-400 line-clamp-2">{project.description}</p>
+          <p className="text-sm theme-text-muted line-clamp-2">{project.description}</p>
         )}
         <div className="flex items-center gap-2 mt-3">
           {project.category && (
             <Badge variant="secondary" className="text-xs">{project.category}</Badge>
           )}
           {project.location && (
-            <span className="text-xs text-slate-500">{project.location}</span>
+            <span className="text-xs theme-text-subtle">{project.location}</span>
           )}
         </div>
       </CardContent>
@@ -149,7 +149,7 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:bg-[#253545]/20"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:/20"
                   onClick={() => navigateImage('prev')}
                 >
                   <ChevronLeft className="h-8 w-8" />
@@ -157,7 +157,7 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:bg-[#253545]/20"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:/20"
                   onClick={() => navigateImage('next')}
                 >
                   <ChevronRight className="h-8 w-8" />
@@ -174,7 +174,7 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-2 right-2 text-white hover:bg-[#253545]/20"
+              className="absolute top-2 right-2 text-white hover:/20"
               onClick={() => setLightboxOpen(false)}
             >
               <X className="h-6 w-6" />
@@ -182,10 +182,10 @@ const PortfolioProject = ({ project, onDelete, isOwner }) => {
           </div>
 
           {/* Project info */}
-          <div className="p-4 bg-slate-900 text-white">
+          <div className="p-4 theme-bg-surface theme-text">
             <h3 className="font-semibold text-lg">{project.title}</h3>
             {project.description && (
-              <p className="text-slate-300 text-sm mt-1">{project.description}</p>
+              <p className="theme-text-muted text-sm mt-1">{project.description}</p>
             )}
           </div>
         </DialogContent>
@@ -314,7 +314,7 @@ const AddPortfolioForm = ({ onSubmit, onCancel, loading }) => {
           {beforeImages.length < 5 && (
             <button
               onClick={() => beforeInputRef.current?.click()}
-              className="w-24 h-24 border-2 border-dashed border-[#3A4A5C] rounded-lg flex flex-col items-center justify-center text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
+              className="w-24 h-24 border-2 border-dashed  rounded-lg flex flex-col items-center justify-center theme-text-muted hover:border-orange-400 hover:text-orange-500 transition-colors"
             >
               <Camera className="h-6 w-6 mb-1" />
               <span className="text-xs">Добави</span>
@@ -352,7 +352,7 @@ const AddPortfolioForm = ({ onSubmit, onCancel, loading }) => {
           {afterImages.length < 5 && (
             <button
               onClick={() => afterInputRef.current?.click()}
-              className="w-24 h-24 border-2 border-dashed border-[#3A4A5C] rounded-lg flex flex-col items-center justify-center text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
+              className="w-24 h-24 border-2 border-dashed  rounded-lg flex flex-col items-center justify-center theme-text-muted hover:border-orange-400 hover:text-orange-500 transition-colors"
             >
               <Camera className="h-6 w-6 mb-1" />
               <span className="text-xs">Добави</span>
@@ -406,7 +406,7 @@ const PortfolioGallery = ({ projects, isOwner, onAddProject, onDeleteProject }) 
       <div className="flex justify-between items-center mb-6">
         <div>
           <h3 className="text-xl font-semibold">Портфолио</h3>
-          <p className="text-sm text-slate-500">Снимки преди и след извършени проекти</p>
+          <p className="text-sm theme-text-subtle">Снимки преди и след извършени проекти</p>
         </div>
         {isOwner && (
           <Button 
@@ -421,9 +421,9 @@ const PortfolioGallery = ({ projects, isOwner, onAddProject, onDeleteProject }) 
 
       {projects.length === 0 ? (
         <Card className="p-12 text-center">
-          <Camera className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-          <h4 className="text-lg font-medium text-slate-300 mb-2">Няма проекти в портфолиото</h4>
-          <p className="text-slate-500">
+          <Camera className="h-12 w-12 mx-auto mb-4 theme-text-muted" />
+          <h4 className="text-lg font-medium theme-text-muted mb-2">Няма проекти в портфолиото</h4>
+          <p className="theme-text-subtle">
             {isOwner 
               ? 'Добавете снимки от вашите проекти за да покажете работата си'
               : 'Тази фирма все още не е добавила проекти'}

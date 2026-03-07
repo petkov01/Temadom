@@ -259,11 +259,11 @@ const Navbar = () => {
   return (
     <nav className="glass-nav sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-[60px] lg:h-16">
+        <div className="flex justify-between h-[72px] lg:h-20">
           {/* Left: Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
-              <img src="/logo-temadom.png" alt="TemaDom" className="h-8 lg:h-10 w-auto" />
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-14 lg:h-16 w-auto" style={{ filter: 'drop-shadow(0 0 10px rgba(246, 195, 106, 0.6))' }} />
             </Link>
           </div>
 
@@ -655,7 +655,7 @@ const Footer = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <div className="mb-4 flex flex-col items-start">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-12 w-auto opacity-60" />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-14 w-auto" style={{ filter: 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' }} />
             <p className="text-[#FF8C42] text-xs font-bold tracking-wider uppercase mt-2">{t('footer_tagline')}</p>
           </div>
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
@@ -694,7 +694,7 @@ const Footer = () => {
       </div>
       <Separator className="my-8" style={{ background: 'var(--theme-nav-border)' }} />
       <div className="flex flex-col items-center gap-3">
-        <img src="/logo-temadom.png" alt="TemaDom" className="h-10 w-auto opacity-60" />
+        <img src="/logo-temadom.png" alt="TemaDom" className="h-12 w-auto" style={{ filter: 'drop-shadow(0 0 6px rgba(246, 195, 106, 0.4))' }} />
         <p className="text-center text-sm" style={{ color: 'var(--theme-text-subtle)' }}>
           © 2025-2026 TemaDom. {t('footer_rights')}
         </p>
@@ -712,7 +712,8 @@ const StarRating = ({ rating, size = 'sm' }) => {
       {[1, 2, 3, 4, 5].map(i => (
         <Star 
           key={i} 
-          className={`${sizeClass} ${i <= rating ? 'fill-[#FF8C42] text-[#FF8C42]' : 'text-slate-300'}`} 
+           className={`${sizeClass} ${i <= rating ? 'fill-[#FF8C42] text-[#FF8C42]' : ''}`}
+          style={i > rating ? { color: 'var(--theme-border)' } : {}}
         />
       ))}
     </div>
@@ -935,7 +936,7 @@ const LandingPage = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24 flex flex-col items-center">
           {/* Logo */}
           <div className="mb-8 animate-slideUp">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-16 md:h-20 w-auto mx-auto animate-float" />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-20 md:h-28 w-auto mx-auto animate-float" style={{ filter: 'drop-shadow(0 0 14px rgba(246, 195, 106, 0.7))' }} />
           </div>
 
           {/* Counter badge */}
@@ -1488,7 +1489,7 @@ const ProjectCard = ({ project }) => {
     >
       {/* Show first image if available */}
       {project.images && project.images.length > 0 && (
-        <div className="aspect-video bg-[#253545] overflow-hidden">
+        <div className="aspect-video overflow-hidden" style={{ background: 'var(--theme-bg-surface)' }}>
           <img 
             src={project.images[0]} 
             alt={project.title}
@@ -1783,7 +1784,7 @@ const ProjectsPage = () => {
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1,2,3,4,5,6].map(i => (
-              <Card key={i} className="h-64 animate-pulse bg-[#253545]" />
+              <Card key={i} className="h-64 animate-pulse" style={{ background: 'var(--theme-bg-surface)' }} />
             ))}
           </div>
         ) : projects.length === 0 ? (
@@ -1927,7 +1928,7 @@ const ProjectDetailPage = () => {
     return (
       <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
         <div className="max-w-4xl mx-auto px-4">
-          <Card className="h-96 animate-pulse bg-[#253545]" />
+          <Card className="h-96 animate-pulse" style={{ background: 'var(--theme-bg-surface)' }} />
         </div>
       </div>
     );
@@ -2039,9 +2040,9 @@ const ProjectDetailPage = () => {
             </div>
 
             {(project.budget_min || project.budget_max) && (
-              <div className="bg-[#1E2A38] rounded-lg p-4 mb-8">
+              <div className="rounded-lg p-4 mb-8" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
                 <h4 className="font-semibold mb-2" style={{ color: 'var(--theme-text)' }}>{t('pd_budget')}</h4>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }}>
                   {project.budget_min && `${project.budget_min}€`}
                   {project.budget_min && project.budget_max && ' - '}
                   {project.budget_max && `${project.budget_max}€`}
@@ -2066,7 +2067,7 @@ const ProjectDetailPage = () => {
             )}
 
             {/* Contact Info Section */}
-            <div className="border-t border-[#3A4A5C] pt-8">
+            <div className="pt-8" style={{ borderTop: '1px solid var(--theme-border)' }}>
               <h3 className="text-lg font-semibold mb-4">{t('pd_contact')}</h3>
               
               {/* Free platform notice */}
@@ -2284,7 +2285,7 @@ const CompaniesPage = () => {
         {/* Results */}
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1,2,3].map(i => <Card key={i} className="h-48 animate-pulse" style={{ background: dark ? '#253545' : '#E2E8F0' }} />)}
+            {[1,2,3].map(i => <Card key={i} className="h-48 animate-pulse" style={{ background: 'var(--theme-bg-surface)' }} />)}
           </div>
         ) : professionals.length === 0 ? (
           <Card className="p-12 text-center">
@@ -2416,7 +2417,7 @@ const CompanyDetailPage = () => {
     return (
       <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
         <div className="max-w-4xl mx-auto px-4">
-          <Card className="h-96 animate-pulse bg-[#253545]" />
+          <Card className="h-96 animate-pulse" style={{ background: 'var(--theme-bg-surface)' }} />
         </div>
       </div>
     );
@@ -2442,13 +2443,13 @@ const CompanyDetailPage = () => {
               <div>
                 <CardTitle className="text-2xl">{company.company_name}</CardTitle>
                 {company.city && (
-                  <p className="text-slate-500 flex items-center gap-2 mt-2">
+                  <p className="flex items-center gap-2 mt-2" style={{ color: 'var(--theme-text-muted)' }}>
                     <MapPin className="h-4 w-4" /> {company.city}
                   </p>
                 )}
                 <div className="flex items-center gap-2 mt-2">
                   <StarRating rating={company.rating} size="md" />
-                  <span className="text-slate-400">
+                  <span style={{ color: 'var(--theme-text-muted)' }}>
                     {company.rating.toFixed(1)} ({company.review_count} {t('comp_reviews')})
                   </span>
                 </div>
@@ -2515,11 +2516,11 @@ const CompanyDetailPage = () => {
           </CardHeader>
           <CardContent>
             {company.reviews?.length === 0 ? (
-              <p className="text-slate-500 text-center py-8">{t('cd_no_reviews')}</p>
+              <p style={{ color: 'var(--theme-text-muted)' }} className="text-center py-8">{t('cd_no_reviews')}</p>
             ) : (
               <div className="space-y-6">
                 {company.reviews?.map(review => (
-                  <div key={review.id} className="border-b border-[#3A4A5C] pb-6 last:border-0">
+                  <div key={review.id} className="pb-6 last:border-0" style={{ borderBottom: '1px solid var(--theme-border)' }}>
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
@@ -2527,14 +2528,14 @@ const CompanyDetailPage = () => {
                         </Avatar>
                         <div>
                           <p className="font-medium">{review.client_name}</p>
-                          <p className="text-xs text-slate-500">
-                            {new Date(review.created_at).toLocaleDateString('bg-BG')}
+                  <p className="text-xs text-slate-500">
+                          {new Date(review.created_at).toLocaleDateString('bg-BG')}
                           </p>
                         </div>
                       </div>
                       <StarRating rating={review.rating} />
                     </div>
-                    <p className="text-slate-400 mt-2">{review.comment}</p>
+                    <p className="mt-2" style={{ color: 'var(--theme-text-muted)' }}>{review.comment}</p>
                   </div>
                 ))}
               </div>
@@ -2561,7 +2562,8 @@ const CompanyDetailPage = () => {
                       className="focus:outline-none"
                     >
                       <Star 
-                        className={`h-8 w-8 ${i <= reviewData.rating ? 'fill-[#FF8C42] text-[#FF8C42]' : 'text-slate-300'}`}
+                        className={`h-8 w-8 ${i <= reviewData.rating ? 'fill-[#FF8C42] text-[#FF8C42]' : ''}`}
+                        style={i > reviewData.rating ? { color: 'var(--theme-border)' } : {}}
                       />
                     </button>
                   ))}
@@ -2626,7 +2628,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-md" data-testid="login-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-12 w-auto opacity-60" />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-14 w-auto" style={{ filter: 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' }} />
           </div>
           <CardTitle className="text-2xl">{t('login_title')}</CardTitle>
           <CardDescription>{t('login_subtitle')}</CardDescription>
@@ -2816,7 +2818,7 @@ const RegisterPage = () => {
       <Card className="w-full max-w-md" data-testid="register-form">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-12 w-auto opacity-60" />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-14 w-auto" style={{ filter: 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.5))' }} />
           </div>
           <CardTitle className="text-2xl">{t('reg_title')}</CardTitle>
           <CardDescription>{t('reg_subtitle')}</CardDescription>
@@ -2855,7 +2857,7 @@ const RegisterPage = () => {
                   <p className="text-sm font-bold text-[#FF8C42] mb-1">
                     {t('reg_promo_title')}
                   </p>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>
                     {t('reg_promo_desc')}
                   </p>
                 </div>
@@ -2879,7 +2881,7 @@ const RegisterPage = () => {
             <div className="mb-4">
               <Label style={{ color: 'var(--theme-text)' }}>Тип професионалист</Label>
               <Select value={userType} onValueChange={setUserType}>
-                <SelectTrigger className="bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="register-pro-type">
+                <SelectTrigger data-testid="register-pro-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -2916,7 +2918,7 @@ const RegisterPage = () => {
                   required
                   data-testid="register-bulstat"
                 />
-                <p className="text-xs text-slate-500 mt-1">{t('reg_bulstat_required')}</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--theme-text-subtle)' }}>{t('reg_bulstat_required')}</p>
               </div>
             )}
 
@@ -3042,7 +3044,7 @@ const RegisterPage = () => {
           </form>
         </CardContent>
         <CardFooter className="justify-center">
-          <p className="text-sm text-slate-400">
+          <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             Имате профил?{' '}
             <Link to="/login" className="text-[#FF8C42] hover:underline">
               {t('reg_login')}
@@ -3083,7 +3085,7 @@ const TelegramConnectCard = ({ user, token }) => {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <svg className="h-6 w-6" style={{ color: tier.color }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.13l-1.97 9.28c-.15.66-.54.82-1.09.51l-3.01-2.22-1.45 1.4c-.16.16-.3.3-.61.3l.22-3.06 5.55-5.01c.24-.22-.05-.33-.37-.13l-6.86 4.32-2.95-.92c-.64-.2-.66-.64.14-.95l11.54-4.45c.53-.2 1-.05.86.93z"/></svg>
-              <h2 className="text-lg font-semibold text-white">Telegram известия</h2>
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--theme-text)' }}>Telegram известия</h2>
               {telegramLinked && (
                 <Badge className="bg-[#28A745]/20 text-[#28A745] border-[#28A745]/30 text-xs">
                   <CheckCircle className="h-3 w-3 mr-1" /> Свързан
@@ -3209,8 +3211,8 @@ const CompanyDashboard = () => {
       <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="animate-pulse space-y-6">
-            <Card className="h-32 bg-[#253545]" />
-            <Card className="h-64 bg-[#253545]" />
+            <Card className="h-32" style={{ background: 'var(--theme-bg-surface)' }} />
+            <Card className="h-64" style={{ background: 'var(--theme-bg-surface)' }} />
           </div>
         </div>
       </div>
@@ -3221,7 +3223,7 @@ const CompanyDashboard = () => {
     <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}} data-testid="company-dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">{t('dash_title')}</h1>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--theme-text)' }}>{t('dash_title')}</h1>
           <p style={{ color: 'var(--theme-text-muted)' }}>{t('dash_subtitle')}</p>
         </div>
 
@@ -3290,17 +3292,17 @@ const CompanyDashboard = () => {
                             <h4 className="font-semibold">{lead.title}</h4>
                             <Badge className="mt-1">{lead.category_name}</Badge>
                           </div>
-                          <span className="text-sm text-slate-500">
+                          <span className="text-sm" style={{ color: 'var(--theme-text-subtle)' }}>
                             {new Date(lead.created_at).toLocaleDateString('bg-BG')}
                           </span>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-slate-400" />
+                            <User className="h-4 w-4" style={{ color: 'var(--theme-text-subtle)' }} />
                             <span>{lead.client_name}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-slate-400" />
+                            <Mail className="h-4 w-4" style={{ color: 'var(--theme-text-subtle)' }} />
                             <a href={`mailto:${lead.client_email}`} className="text-[#FF8C42] hover:underline">
                               {lead.client_email}
                             </a>
@@ -3441,7 +3443,7 @@ const ClientDashboard = () => {
     return (
       <div className="min-h-screen py-8" style={{background: "var(--theme-bg-secondary)"}}>
         <div className="max-w-7xl mx-auto px-4">
-          <Card className="h-64 animate-pulse bg-[#253545]" />
+          <Card className="h-64 animate-pulse" style={{ background: 'var(--theme-bg-surface)' }} />
         </div>
       </div>
     );
@@ -3452,8 +3454,8 @@ const ClientDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white">{t('cl_my_projects')}</h1>
-            <p className="text-slate-400">{t('cl_manage')}</p>
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--theme-text)' }}>{t('cl_my_projects')}</h1>
+            <p style={{ color: 'var(--theme-text-muted)' }}>{t('cl_manage')}</p>
           </div>
           <Button 
             className="bg-[#FF8C42] hover:bg-[#e67a30]"
@@ -3468,9 +3470,9 @@ const ClientDashboard = () => {
           <CardContent className="pt-6">
             {projects.length === 0 ? (
               <div className="text-center py-12">
-                <Boxes className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                <h3 className="text-lg font-medium text-slate-300 mb-2">{t('cl_no_projects')}</h3>
-                <p className="text-slate-500 mb-4">{t('cl_no_projects_sub')}</p>
+                <Boxes className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--theme-text-muted)' }} />
+                <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--theme-text-muted)' }}>{t('cl_no_projects')}</h3>
+                <p className="mb-4" style={{ color: 'var(--theme-text-subtle)' }}>{t('cl_no_projects_sub')}</p>
                 <Button 
                   className="bg-[#FF8C42] hover:bg-[#e67a30]"
                   onClick={() => setCreateDialogOpen(true)}
@@ -3501,7 +3503,7 @@ const ClientDashboard = () => {
                         </p>
                       </div>
                     </div>
-                    <p className="text-slate-400 mt-3 line-clamp-2">{project.description}</p>
+                    <p style={{ color: 'var(--theme-text-muted)' }} className="mt-3 line-clamp-2">{project.description}</p>
                   </div>
                 ))}
               </div>
@@ -3884,8 +3886,8 @@ const AdsPage = () => {
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white">Обяви</h1>
-            <p className="text-slate-400">Безплатни обяви за строителство и ремонти</p>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>Обяви</h1>
+            <p style={{ color: 'var(--theme-text-muted)' }}>Безплатни обяви за строителство и ремонти</p>
           </div>
           <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" onClick={() => user ? setShowCreate(true) : navigate('/login')} data-testid="create-ad-btn">
             + Нова обява
@@ -3940,9 +3942,9 @@ const AdsPage = () => {
           <div className="text-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto" /></div>
         ) : ads.length === 0 ? (
           <div className="text-center py-16">
-            <Megaphone className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-            <h3 className="text-lg font-medium text-slate-300 mb-2">Няма обяви все още</h3>
-            <p className="text-slate-500">Бъдете първият, който ще публикува обява!</p>
+            <Megaphone className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--theme-text-muted)' }} />
+            <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--theme-text-muted)' }}>Няма обяви все още</h3>
+            <p style={{ color: 'var(--theme-text-subtle)' }}>Бъдете първият, който ще публикува обява!</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
@@ -3952,7 +3954,7 @@ const AdsPage = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-semibold text-lg mb-1">{ad.title}</h3>
-                      <p className="text-sm text-slate-400 mb-3 line-clamp-2">{ad.description}</p>
+                      <p className="text-sm mb-3 line-clamp-2" style={{ color: 'var(--theme-text-muted)' }}>{ad.description}</p>
                     </div>
                     <Badge variant="outline" className="text-xs">{ad.user_type === 'company' ? 'Фирма' : ad.user_type === 'master' ? 'Майстор' : 'Клиент'}</Badge>
                   </div>
@@ -4017,30 +4019,30 @@ const SubscriptionsPage = () => {
     <div className="min-h-screen py-12" style={{background: "var(--theme-bg-secondary)"}} data-testid="subscriptions-page">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Абонаменти и услуги</h1>
-          <p className="text-lg text-slate-400">Изберете план, който отговаря на вашите нужди</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: 'var(--theme-text)' }}>Абонаменти и услуги</h1>
+          <p className="text-lg" style={{ color: 'var(--theme-text-muted)' }}>Изберете план, който отговаря на вашите нужди</p>
         </div>
 
         {/* How notification timing works */}
-        <div className="bg-[#0F1923] border border-[#2A3A4C] rounded-xl p-5 mb-8 max-w-3xl mx-auto" data-testid="notification-explainer">
-          <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
+        <div className="rounded-xl p-5 mb-8 max-w-3xl mx-auto" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid="notification-explainer">
+          <h3 className="font-bold text-sm mb-3 flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
             <Clock className="h-4 w-4 text-[#FF8C42]" /> Как работят известията за нови обяви?
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <div className="bg-[#8C56FF]/10 border border-[#8C56FF]/20 rounded-lg p-3 text-center">
               <p className="text-[#8C56FF] font-bold">PREMIUM</p>
-              <p className="text-white mt-1">10:00 ч. — вижда обявата ПЪРВИ</p>
-              <p className="text-slate-500 mt-0.5">10 мин. преди ПРО!</p>
+              <p className="mt-1" style={{ color: 'var(--theme-text)' }}>10:00 ч. — вижда обявата ПЪРВИ</p>
+              <p className="mt-0.5" style={{ color: 'var(--theme-text-subtle)' }}>10 мин. преди ПРО!</p>
             </div>
             <div className="bg-[#FF8C42]/10 border border-[#FF8C42]/20 rounded-lg p-3 text-center">
               <p className="text-[#FF8C42] font-bold">ПРО</p>
-              <p className="text-white mt-1">10:10 ч. — получава известие</p>
-              <p className="text-slate-500 mt-0.5">Едновременно с всички ПРО</p>
+              <p className="mt-1" style={{ color: 'var(--theme-text)' }}>10:10 ч. — получава известие</p>
+              <p className="mt-0.5" style={{ color: 'var(--theme-text-subtle)' }}>Едновременно с всички ПРО</p>
             </div>
             <div className="bg-[#4DA6FF]/10 border border-[#4DA6FF]/20 rounded-lg p-3 text-center">
               <p className="text-[#4DA6FF] font-bold">БАЗОВ</p>
-              <p className="text-white mt-1">Търси ръчно в сайта</p>
-              <p className="text-slate-500 mt-0.5">Без автоматични известия</p>
+              <p className="mt-1" style={{ color: 'var(--theme-text)' }}>Търси ръчно в сайта</p>
+              <p className="mt-0.5" style={{ color: 'var(--theme-text-subtle)' }}>Без автоматични известия</p>
             </div>
           </div>
           <p className="text-center text-[#FF8C42] font-bold text-xs mt-3">PREMIUM взима 80% от договорите!</p>
@@ -4051,7 +4053,7 @@ const SubscriptionsPage = () => {
           {plans.company && Object.entries(plans.company).map(([key, plan]) => {
             const cfg = planConfig[key] || planConfig.basic;
             return (
-              <Card key={key} className={`relative bg-[#253545] border-[#3A4A5C] overflow-hidden ${cfg.ring}`} data-testid={`plan-${key}`}>
+              <Card key={key} className={`relative overflow-hidden ${cfg.ring}`} style={{ background: 'var(--theme-card-bg)', border: `1px solid var(--theme-border)` }} data-testid={`plan-${key}`}>
                 {currentSub?.subscription_active && currentSub?.subscription_plan === key && (
                   <div className="bg-emerald-500 text-white text-center text-xs py-1.5 font-bold tracking-wider">
                     ТЕКУЩ ПЛАН
@@ -4064,7 +4066,7 @@ const SubscriptionsPage = () => {
                 )}
                 <CardContent className="p-6">
                   {renderStars(cfg.stars, cfg.color)}
-                  <h3 className="text-xl font-bold text-white text-center mb-1">{plan.name}</h3>
+                  <h3 className="text-xl font-bold text-center mb-1" style={{ color: 'var(--theme-text)' }}>{plan.name}</h3>
                   <p className="text-3xl font-bold text-center mb-1" style={{ color: cfg.color }}>{plan.price}</p>
 
                   {/* Notification delay badge */}
@@ -4082,16 +4084,16 @@ const SubscriptionsPage = () => {
 
                   <div className="space-y-2.5 mb-4">
                     {plan.features.map((f, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                      <div key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
                         <CheckCircle className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: cfg.color }} />
                         <span>{f}</span>
                       </div>
                     ))}
                   </div>
                   {plan.limitations && plan.limitations.length > 0 && (
-                    <div className="space-y-1.5 mb-4 pt-3 border-t border-[#3A4A5C]">
+                    <div className="space-y-1.5 mb-4 pt-3" style={{ borderTop: '1px solid var(--theme-border)' }}>
                       {plan.limitations.map((l, i) => (
-                        <div key={i} className="flex items-start gap-2 text-xs text-slate-500">
+                        <div key={i} className="flex items-start gap-2 text-xs" style={{ color: 'var(--theme-text-subtle)' }}>
                           <X className="h-3 w-3 flex-shrink-0 mt-0.5 text-red-400/60" />
                           <span>{l}</span>
                         </div>
@@ -4114,18 +4116,18 @@ const SubscriptionsPage = () => {
         </div>
 
         {/* Standalone services */}
-        <h2 className="text-2xl font-bold text-white mb-2">Еднократни услуги</h2>
-        <p className="text-slate-400 text-sm mb-6">Без абонамент — платете само когато имате нужда</p>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>Еднократни услуги</h2>
+        <p className="text-sm mb-6" style={{ color: 'var(--theme-text-muted)' }}>Без абонамент — платете само когато имате нужда</p>
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {plans.standalone && Object.entries(plans.standalone).map(([key, svc]) => (
-            <Card key={key} className="bg-[#253545] border-[#3A4A5C] overflow-hidden" data-testid={`standalone-${key}`}>
+            <Card key={key} className="overflow-hidden" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }} data-testid={`standalone-${key}`}>
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold text-white mb-1">{svc.name}</h3>
+                <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--theme-text)' }}>{svc.name}</h3>
                 <p className="text-2xl font-bold text-[#28A745] mb-2">{svc.price}</p>
-                <p className="text-sm text-slate-400 mb-4">{svc.description}</p>
+                <p className="text-sm mb-4" style={{ color: 'var(--theme-text-muted)' }}>{svc.description}</p>
                 <div className="space-y-2">
                   {svc.features.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-slate-300">
+                    <div key={i} className="flex items-center gap-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
                       <CheckCircle className="h-4 w-4 text-[#28A745] flex-shrink-0" /> {f}
                     </div>
                   ))}
@@ -4139,27 +4141,28 @@ const SubscriptionsPage = () => {
         </div>
 
         {/* AI Video Designer module */}
-        <h2 className="text-2xl font-bold text-white mb-2">3D Photo Designer</h2>
-        <p className="text-slate-400 text-sm mb-6">Качете 3 снимки на помещение → AI генерира 3D ремонт + бюджет с директни линкове.</p>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>3D Photo Designer</h2>
+        <p className="text-sm mb-6" style={{ color: 'var(--theme-text-muted)' }}>Качете 3 снимки на помещение → AI генерира 3D ремонт + бюджет с директни линкове.</p>
         <div className="grid md:grid-cols-3 gap-4 max-w-3xl">
           {[
             { name: '1 помещение', price: '69 EUR', features: ['3 снимки → 3D рендери', 'Бюджет + линкове', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
             { name: '2 помещения', price: '129 EUR', features: ['2 видеа → 8 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
             { name: 'Апартамент', price: '199 EUR', features: ['До 5 видеа → 20 ъгъла', 'PDF за всяко помещение', 'Пълна сметка + 3D', 'Приоритетна обработка'] },
           ].map((plan, i) => (
-            <Card key={i} className={`border ${plan.popular ? 'border-[#F97316] bg-[#F97316]/5' : 'border-[#2A3A4C] bg-[#1E2A38]'} relative`}>
+            <Card key={i} className={`relative ${plan.popular ? 'border-[#F97316] bg-[#F97316]/5' : ''}`} style={!plan.popular ? { background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' } : {}}>
               {plan.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F97316] text-white text-[10px] font-bold px-3 py-0.5 rounded-full">ПОПУЛЯРЕН</div>}
               <CardContent className="p-5">
-                <h3 className="text-lg font-bold text-white mb-1">{plan.name}</h3>
+                <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--theme-text)' }}>{plan.name}</h3>
                 <p className="text-2xl font-black text-[#F97316] mb-4">{plan.price}</p>
                 <div className="space-y-2 mb-5">
                   {plan.features.map((f, fi) => (
-                    <div key={fi} className="flex items-center gap-2 text-sm text-slate-300">
+                    <div key={fi} className="flex items-center gap-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
                       <CheckCircle className="h-3.5 w-3.5 text-[#10B981] flex-shrink-0" /> {f}
                     </div>
                   ))}
                 </div>
-                <Button className={`w-full ${plan.popular ? 'bg-[#F97316] hover:bg-[#EA580C]' : 'bg-[#253545] hover:bg-[#2A3A4C]'} text-white`}
+                <Button className={`w-full ${plan.popular ? 'bg-[#F97316] hover:bg-[#EA580C]' : ''} text-white`}
+                  style={!plan.popular ? { background: 'var(--theme-bg-surface)', color: 'var(--theme-text)' } : {}}
                   onClick={() => navigate('/room-scan')}>
                   Започни
                 </Button>

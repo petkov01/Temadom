@@ -121,7 +121,7 @@ export const AIChartPage = () => {
   const summary = results?.summary || {};
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="ai-chart-page">
+    <div className="min-h-screen  py-8" data-testid="ai-chart-page">
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
@@ -132,7 +132,7 @@ export const AIChartPage = () => {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
             Чертеж &rarr; <span className="text-[#28A745]">Количествена сметка</span> + PDF Договор
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
+          <p className="theme-text-muted text-sm sm:text-base max-w-2xl mx-auto">
             Качете технически чертеж или скица. AI ще анализира конструкцията с 95-100% точност и ще генерира пълна количествена сметка с цени и готов PDF договор за подписване.
           </p>
         </div>
@@ -140,7 +140,7 @@ export const AIChartPage = () => {
         {!results ? (
           /* === Upload & Analyze Phase === */
           <div className="max-w-2xl mx-auto space-y-6">
-            <Card className="bg-[#253545] border-[#3A4A5C]">
+            <Card className=" ">
               <CardContent className="p-6">
                 <input
                   ref={fileRef}
@@ -152,7 +152,7 @@ export const AIChartPage = () => {
                 />
                 {preview ? (
                   <div className="relative">
-                    <div className="rounded-xl overflow-hidden border-2 border-[#28A745]/30 bg-[#0F1923]">
+                    <div className="rounded-xl overflow-hidden border-2 border-[#28A745]/30 ">
                       <img src={preview} alt="Чертеж" className="w-full max-h-[400px] object-contain" />
                     </div>
                     <button
@@ -171,7 +171,7 @@ export const AIChartPage = () => {
                 ) : (
                   <button
                     onClick={() => fileRef.current?.click()}
-                    className="w-full aspect-[16/9] rounded-xl border-2 border-dashed border-[#3A4A5C] hover:border-[#28A745]/50 bg-[#0F1923]/50 hover:bg-[#0F1923] transition-all flex flex-col items-center justify-center gap-4"
+                    className="w-full aspect-[16/9] rounded-xl border-2 border-dashed hover:border-[#28A745]/50 transition-all flex flex-col items-center justify-center gap-4"
                     data-testid="chart-upload-btn"
                   >
                     <div className="w-16 h-16 rounded-full bg-[#28A745]/15 flex items-center justify-center">
@@ -179,7 +179,7 @@ export const AIChartPage = () => {
                     </div>
                     <div className="text-center">
                       <p className="text-white font-medium">Качете технически чертеж</p>
-                      <p className="text-slate-500 text-sm mt-1">Стълби, фундаменти, покриви, етажни планове</p>
+                      <p className="theme-text-subtle text-sm mt-1">Стълби, фундаменти, покриви, етажни планове</p>
                       <p className="text-slate-600 text-xs mt-1">JPG, PNG, до 20MB</p>
                     </div>
                   </button>
@@ -187,12 +187,12 @@ export const AIChartPage = () => {
 
                 {/* Notes */}
                 <div className="mt-5">
-                  <Label className="text-slate-300 text-sm">Допълнителни бележки (по избор)</Label>
+                  <Label className="theme-text-muted text-sm">Допълнителни бележки (по избор)</Label>
                   <Textarea
                     placeholder="Напр. стълбище 3 етажа, бетонен фундамент, дървен покрив..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    className="mt-1.5 bg-[#0F1923] border-[#3A4A5C] text-white"
+                    className="mt-1.5   text-white"
                     data-testid="chart-notes"
                   />
                 </div>
@@ -228,14 +228,14 @@ export const AIChartPage = () => {
                   <ClipboardList className="h-7 w-7 text-[#28A745] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                 </div>
                 <p className="text-white font-medium mt-4">AI анализира вашия чертеж...</p>
-                <p className="text-slate-500 text-sm mt-1">Извличане на конструктивни елементи, размери и количества</p>
+                <p className="theme-text-subtle text-sm mt-1">Извличане на конструктивни елементи, размери и количества</p>
               </div>
             )}
 
             {/* Tips */}
-            <div className="bg-[#0F1923] rounded-xl border border-[#2A3A4C] p-4">
+            <div className=" rounded-xl border  p-4">
               <p className="text-xs font-medium text-[#28A745] mb-2">Какво може да анализира AI:</p>
-              <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
+              <div className="grid grid-cols-2 gap-2 text-xs theme-text-muted">
                 <div className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3 text-[#28A745]" /> Стълбища и стъпала</div>
                 <div className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3 text-[#28A745]" /> Фундаменти и основи</div>
                 <div className="flex items-center gap-1.5"><CheckCircle className="h-3 w-3 text-[#28A745]" /> Колони и греди</div>
@@ -255,24 +255,24 @@ export const AIChartPage = () => {
                   <CheckCircle className="h-3 w-3 mr-1" /> Анализ готов
                 </Badge>
                 {results.accuracy_note && (
-                  <span className="text-slate-500 text-xs">{results.accuracy_note}</span>
+                  <span className="theme-text-subtle text-xs">{results.accuracy_note}</span>
                 )}
               </div>
-              <Button variant="outline" size="sm" onClick={reset} className="border-[#3A4A5C] text-slate-300 hover:bg-[#253545]" data-testid="reset-btn">
+              <Button variant="outline" size="sm" onClick={reset} className=" theme-text-muted hover:" data-testid="reset-btn">
                 <X className="mr-1 h-3.5 w-3.5" /> Нов анализ
               </Button>
             </div>
 
             {/* Title & Description */}
-            <Card className="bg-[#253545] border-[#3A4A5C]">
+            <Card className=" ">
               <CardContent className="p-5">
                 <h2 className="text-xl font-bold text-white mb-2" data-testid="result-title">{results.title || 'Анализ на чертеж'}</h2>
-                {results.description && <p className="text-slate-400 text-sm">{results.description}</p>}
+                {results.description && <p className="theme-text-muted text-sm">{results.description}</p>}
                 {results.dimensions && (
                   <div className="flex flex-wrap gap-3 mt-3">
-                    {results.dimensions.length && <Badge variant="outline" className="text-slate-300 border-[#3A4A5C]"><Ruler className="h-3 w-3 mr-1" /> {results.dimensions.length} x {results.dimensions.width}</Badge>}
-                    {results.dimensions.area && <Badge variant="outline" className="text-slate-300 border-[#3A4A5C]">{results.dimensions.area} м²</Badge>}
-                    {results.dimensions.height && <Badge variant="outline" className="text-slate-300 border-[#3A4A5C]">H: {results.dimensions.height}</Badge>}
+                    {results.dimensions.length && <Badge variant="outline" className="theme-text-muted "><Ruler className="h-3 w-3 mr-1" /> {results.dimensions.length} x {results.dimensions.width}</Badge>}
+                    {results.dimensions.area && <Badge variant="outline" className="theme-text-muted ">{results.dimensions.area} м²</Badge>}
+                    {results.dimensions.height && <Badge variant="outline" className="theme-text-muted ">H: {results.dimensions.height}</Badge>}
                   </div>
                 )}
               </CardContent>
@@ -280,8 +280,8 @@ export const AIChartPage = () => {
 
             {/* Uploaded image */}
             {preview && (
-              <Card className="bg-[#253545] border-[#3A4A5C] overflow-hidden">
-                <div className="bg-[#0F1923] p-1">
+              <Card className="  overflow-hidden">
+                <div className=" p-1">
                   <img src={preview} alt="Чертеж" className="w-full max-h-[300px] object-contain rounded" />
                 </div>
               </Card>
@@ -289,14 +289,14 @@ export const AIChartPage = () => {
 
             {/* Materials Table */}
             {materials.length > 0 && (
-              <Card className="bg-[#253545] border-[#3A4A5C]" data-testid="materials-table">
+              <Card className=" " data-testid="materials-table">
                 <CardHeader className="pb-2 cursor-pointer" onClick={() => setShowMaterials(!showMaterials)}>
                   <CardTitle className="text-white text-sm flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-[#FF8C42]" />
                       Материали ({materials.length} позиции)
                     </span>
-                    {showMaterials ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+                    {showMaterials ? <ChevronUp className="h-4 w-4 theme-text-muted" /> : <ChevronDown className="h-4 w-4 theme-text-muted" />}
                   </CardTitle>
                 </CardHeader>
                 {showMaterials && (
@@ -304,7 +304,7 @@ export const AIChartPage = () => {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="text-xs text-slate-400 border-b border-[#3A4A5C]">
+                          <tr className="text-xs theme-text-muted border-b ">
                             <th className="text-left py-2 pr-2">#</th>
                             <th className="text-left py-2 pr-2">Материал</th>
                             <th className="text-center py-2 pr-2">Ед.</th>
@@ -315,12 +315,12 @@ export const AIChartPage = () => {
                         </thead>
                         <tbody>
                           {materials.map((m, i) => (
-                            <tr key={i} className="border-b border-[#3A4A5C]/50 text-slate-300">
-                              <td className="py-2 pr-2 text-slate-500">{i + 1}</td>
+                            <tr key={i} className="border-b /50 theme-text-muted">
+                              <td className="py-2 pr-2 theme-text-subtle">{i + 1}</td>
                               <td className="py-2 pr-2 font-medium text-white">{m.name}</td>
-                              <td className="py-2 pr-2 text-center text-slate-400">{m.unit}</td>
+                              <td className="py-2 pr-2 text-center theme-text-muted">{m.unit}</td>
                               <td className="py-2 pr-2 text-center">{m.quantity}</td>
-                              <td className="py-2 pr-2 text-right text-slate-400">{m.price_per_unit}</td>
+                              <td className="py-2 pr-2 text-right theme-text-muted">{m.price_per_unit}</td>
                               <td className="py-2 text-right font-medium text-[#FF8C42]">{m.total}</td>
                             </tr>
                           ))}
@@ -340,14 +340,14 @@ export const AIChartPage = () => {
 
             {/* Labor Table */}
             {labor.length > 0 && (
-              <Card className="bg-[#253545] border-[#3A4A5C]" data-testid="labor-table">
+              <Card className=" " data-testid="labor-table">
                 <CardHeader className="pb-2 cursor-pointer" onClick={() => setShowLabor(!showLabor)}>
                   <CardTitle className="text-white text-sm flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <Ruler className="h-4 w-4 text-[#4DA6FF]" />
                       Труд ({labor.length} позиции)
                     </span>
-                    {showLabor ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+                    {showLabor ? <ChevronUp className="h-4 w-4 theme-text-muted" /> : <ChevronDown className="h-4 w-4 theme-text-muted" />}
                   </CardTitle>
                 </CardHeader>
                 {showLabor && (
@@ -355,7 +355,7 @@ export const AIChartPage = () => {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="text-xs text-slate-400 border-b border-[#3A4A5C]">
+                          <tr className="text-xs theme-text-muted border-b ">
                             <th className="text-left py-2 pr-2">#</th>
                             <th className="text-left py-2 pr-2">Вид работа</th>
                             <th className="text-center py-2 pr-2">Ед.</th>
@@ -366,12 +366,12 @@ export const AIChartPage = () => {
                         </thead>
                         <tbody>
                           {labor.map((l, i) => (
-                            <tr key={i} className="border-b border-[#3A4A5C]/50 text-slate-300">
-                              <td className="py-2 pr-2 text-slate-500">{i + 1}</td>
+                            <tr key={i} className="border-b /50 theme-text-muted">
+                              <td className="py-2 pr-2 theme-text-subtle">{i + 1}</td>
                               <td className="py-2 pr-2 font-medium text-white">{l.name}</td>
-                              <td className="py-2 pr-2 text-center text-slate-400">{l.unit}</td>
+                              <td className="py-2 pr-2 text-center theme-text-muted">{l.unit}</td>
                               <td className="py-2 pr-2 text-center">{l.quantity}</td>
-                              <td className="py-2 pr-2 text-right text-slate-400">{l.price_per_unit}</td>
+                              <td className="py-2 pr-2 text-right theme-text-muted">{l.price_per_unit}</td>
                               <td className="py-2 text-right font-medium text-[#4DA6FF]">{l.total}</td>
                             </tr>
                           ))}
@@ -394,19 +394,19 @@ export const AIChartPage = () => {
               <CardContent className="p-5">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                   <div>
-                    <p className="text-slate-400 text-xs">Материали</p>
+                    <p className="theme-text-muted text-xs">Материали</p>
                     <p className="text-[#FF8C42] font-bold text-lg">{summary.materials_total || 0} EUR</p>
                   </div>
                   <div>
-                    <p className="text-slate-400 text-xs">Труд</p>
+                    <p className="theme-text-muted text-xs">Труд</p>
                     <p className="text-[#4DA6FF] font-bold text-lg">{summary.labor_total || 0} EUR</p>
                   </div>
                   <div>
-                    <p className="text-slate-400 text-xs">Непредвидени ({summary.overhead_percent || 10}%)</p>
-                    <p className="text-slate-300 font-bold text-lg">{summary.overhead_total || 0} EUR</p>
+                    <p className="theme-text-muted text-xs">Непредвидени ({summary.overhead_percent || 10}%)</p>
+                    <p className="theme-text-muted font-bold text-lg">{summary.overhead_total || 0} EUR</p>
                   </div>
                   <div>
-                    <p className="text-slate-400 text-xs">ОБЩА СТОЙНОСТ</p>
+                    <p className="theme-text-muted text-xs">ОБЩА СТОЙНОСТ</p>
                     <p className="text-[#28A745] font-extrabold text-2xl">{summary.grand_total || 0} EUR</p>
                   </div>
                 </div>
@@ -414,7 +414,7 @@ export const AIChartPage = () => {
             </Card>
 
             {/* PDF Contract Section */}
-            <Card className="bg-[#253545] border-[#3A4A5C]" data-testid="contract-section">
+            <Card className=" " data-testid="contract-section">
               <CardHeader>
                 <CardTitle className="text-white text-sm flex items-center gap-2">
                   <FileText className="h-4 w-4 text-[#8C56FF]" />
@@ -424,33 +424,33 @@ export const AIChartPage = () => {
               <CardContent className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-slate-300 text-xs">Възложител (Клиент)</Label>
+                    <Label className="theme-text-muted text-xs">Възложител (Клиент)</Label>
                     <Input
                       placeholder="Име на клиента"
                       value={clientName}
                       onChange={(e) => setClientName(e.target.value)}
-                      className="bg-[#0F1923] border-[#3A4A5C] text-white mt-1"
+                      className="  text-white mt-1"
                       data-testid="client-name"
                     />
                   </div>
                   <div>
-                    <Label className="text-slate-300 text-xs">Изпълнител (Фирма)</Label>
+                    <Label className="theme-text-muted text-xs">Изпълнител (Фирма)</Label>
                     <Input
                       placeholder="Име на фирмата"
                       value={contractorName}
                       onChange={(e) => setContractorName(e.target.value)}
-                      className="bg-[#0F1923] border-[#3A4A5C] text-white mt-1"
+                      className="  text-white mt-1"
                       data-testid="contractor-name"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-slate-300 text-xs">Адрес на обекта</Label>
+                  <Label className="theme-text-muted text-xs">Адрес на обекта</Label>
                   <Input
                     placeholder="Адрес"
                     value={clientAddress}
                     onChange={(e) => setClientAddress(e.target.value)}
-                    className="bg-[#0F1923] border-[#3A4A5C] text-white mt-1"
+                    className="  text-white mt-1"
                     data-testid="client-address"
                   />
                 </div>
@@ -467,7 +467,7 @@ export const AIChartPage = () => {
                     <><Download className="mr-2 h-5 w-5" /> Изтегли PDF Договор + Количествена сметка</>
                   )}
                 </Button>
-                <p className="text-slate-500 text-xs text-center">
+                <p className="theme-text-subtle text-xs text-center">
                   Договорът включва: условия за изпълнение, количествена сметка с материали и труд, места за подпис.
                 </p>
               </CardContent>

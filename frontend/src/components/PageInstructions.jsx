@@ -67,7 +67,7 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
             </div>
             <div>
               <h3 className="text-white font-semibold text-sm">{title}</h3>
-              <p className="text-slate-400 text-xs">{description}</p>
+              <p className="theme-text-muted text-xs">{description}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -81,13 +81,13 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
                 Инструкции
               </button>
             )}
-            {isOpen ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />}
+            {isOpen ? <ChevronUp className="h-5 w-5 theme-text-muted" /> : <ChevronDown className="h-5 w-5 theme-text-muted" />}
           </div>
         </div>
       </div>
 
       {isOpen && (
-        <div className="mt-3 bg-[#253545] border border-[#3A4A5C] rounded-xl p-5 animate-slideDown space-y-5">
+        <div className="mt-3  border  rounded-xl p-5 animate-slideDown space-y-5">
           {steps.length > 0 && (
             <div>
               <h4 className="text-[#4DA6FF] font-semibold text-sm mb-3 flex items-center gap-2">
@@ -99,7 +99,7 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
                     <span className="w-6 h-6 rounded-full bg-[#FF8C42]/15 text-[#FF8C42] text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                       {i + 1}
                     </span>
-                    <p className="text-slate-300 text-sm">{step}</p>
+                    <p className="theme-text-muted text-sm">{step}</p>
                   </div>
                 ))}
               </div>
@@ -113,7 +113,7 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
               </h4>
               <div className="space-y-1.5">
                 {benefits.map((b, i) => (
-                  <p key={i} className="text-slate-300 text-sm flex items-center gap-2">
+                  <p key={i} className="theme-text-muted text-sm flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#28A745] flex-shrink-0" />
                     {b}
                   </p>
@@ -129,7 +129,7 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
               </h4>
               <div className="space-y-1.5">
                 {tips.map((tip, i) => (
-                  <p key={i} className="text-slate-400 text-sm italic">- {tip}</p>
+                  <p key={i} className="theme-text-muted text-sm italic">- {tip}</p>
                 ))}
               </div>
             </div>
@@ -140,10 +140,10 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
       {/* Interactive Tutorial Modal */}
       {videoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setVideoOpen(false)}>
-          <div className="bg-[#1E2A38] border border-[#3A4A5C] rounded-xl max-w-2xl w-full mx-4 shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-4 border-b border-[#3A4A5C]">
+          <div className=" border  rounded-xl max-w-2xl w-full mx-4 shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-4 border-b ">
               <h3 className="text-white font-semibold">{tutorial.title}</h3>
-              <button onClick={() => setVideoOpen(false)} className="text-slate-400 hover:text-white text-lg" data-testid="close-video-modal">&times;</button>
+              <button onClick={() => setVideoOpen(false)} className="theme-text-muted hover:text-white text-lg" data-testid="close-video-modal">&times;</button>
             </div>
             <div className="p-6 space-y-4">
               {tutorial.steps.map((step, i) => {
@@ -158,13 +158,13 @@ export const PageInstructions = ({ title, description, steps = [], benefits = []
                         <span className="text-[#FF8C42] text-xs font-bold bg-[#FF8C42]/10 rounded-full px-2 py-0.5">Стъпка {i + 1}</span>
                         <h4 className="text-white font-medium text-sm">{step.title}</h4>
                       </div>
-                      <p className="text-slate-400 text-sm">{step.desc}</p>
+                      <p className="theme-text-muted text-sm">{step.desc}</p>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="p-4 border-t border-[#3A4A5C] text-center">
+            <div className="p-4 border-t  text-center">
               <button
                 onClick={() => setVideoOpen(false)}
                 className="bg-[#FF8C42] hover:bg-[#e67a30] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors"

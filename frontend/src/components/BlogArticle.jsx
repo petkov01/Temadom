@@ -49,9 +49,9 @@ const BlogArticle = () => {
 
           <header className="mb-8">
             <Badge className="bg-amber-100 text-amber-800 mb-3">{detailedArticle.category}</Badge>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">{detailedArticle.title}</h1>
-            <p className="text-lg text-slate-400">{detailedArticle.metaDescription}</p>
-            <div className="flex items-center gap-4 mt-4 text-sm text-slate-500">
+            <h1 className="text-3xl sm:text-4xl font-bold theme-text mb-4">{detailedArticle.title}</h1>
+            <p className="text-lg theme-text-muted">{detailedArticle.metaDescription}</p>
+            <div className="flex items-center gap-4 mt-4 text-sm theme-text-subtle">
               <span className="flex items-center gap-1"><Clock className="h-4 w-4" /> {detailedArticle.readTime}</span>
               <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> България</span>
             </div>
@@ -60,13 +60,13 @@ const BlogArticle = () => {
           <Separator className="mb-8" />
 
           {/* Render content as formatted HTML */}
-          <div className="prose prose-slate max-w-none prose-headings:text-white prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-p:text-slate-300 prose-p:leading-relaxed prose-strong:text-white prose-table:border-collapse prose-td:border prose-td:border-[#3A4A5C] prose-td:p-3 prose-th:border prose-th:border-[#3A4A5C] prose-th:bg-slate-900 prose-th:text-white prose-th:p-3 prose-li:text-slate-300 prose-a:text-[#FF8C42]">
+          <div className="prose prose-slate max-w-none prose-headings:text-[var(--theme-text)] prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-p:text-[var(--theme-text-muted)] prose-p:leading-relaxed prose-strong:text-[var(--theme-text)] prose-table:border-collapse prose-td:border prose-td:border-[var(--theme-border)] prose-td:p-3 prose-th:border prose-th:border-[var(--theme-border)] prose-th:p-3 prose-li:text-[var(--theme-text-muted)] prose-a:text-[#FF8C42]">
             {detailedArticle.content.split('\n').map((line, i) => {
               const trimmed = line.trim();
               if (!trimmed) return null;
               
-              if (trimmed.startsWith('## ')) return <h2 key={i} className="text-2xl font-bold text-white mt-8 mb-4">{trimmed.slice(3)}</h2>;
-              if (trimmed.startsWith('### ')) return <h3 key={i} className="text-xl font-semibold text-white mt-6 mb-3">{trimmed.slice(4)}</h3>;
+              if (trimmed.startsWith('## ')) return <h2 key={i} className="text-2xl font-bold theme-text mt-8 mb-4">{trimmed.slice(3)}</h2>;
+              if (trimmed.startsWith('### ')) return <h3 key={i} className="text-xl font-semibold theme-text mt-6 mb-3">{trimmed.slice(4)}</h3>;
               
               if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
                 // Table row
@@ -78,7 +78,7 @@ const BlogArticle = () => {
                     <div key={i} className="overflow-x-auto my-4">
                       <table className="w-full border-collapse text-sm">
                         <thead>
-                          <tr className="bg-slate-900 text-white">
+                          <tr className="theme-bg-surface theme-text">
                             {cells.map((cell, j) => <th key={j} className="p-3 text-left font-medium">{cell.trim()}</th>)}
                           </tr>
                         </thead>
@@ -94,12 +94,12 @@ const BlogArticle = () => {
                 return (
                   <div key={i} className="flex items-start gap-2 my-1.5">
                     <span className="text-orange-500 mt-1 flex-shrink-0">&#8226;</span>
-                    <p className="text-slate-300" dangerouslySetInnerHTML={{ __html: text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                    <p className="theme-text-muted" dangerouslySetInnerHTML={{ __html: text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
                   </div>
                 );
               }
               
-              return <p key={i} className="text-slate-300 leading-relaxed my-2" dangerouslySetInnerHTML={{ __html: trimmed.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[#FF8C42] hover:underline">$1</a>') }} />;
+              return <p key={i} className="theme-text-muted leading-relaxed my-2" dangerouslySetInnerHTML={{ __html: trimmed.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>').replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[#FF8C42] hover:underline">$1</a>') }} />;
             })}
           </div>
 
@@ -108,7 +108,7 @@ const BlogArticle = () => {
             <CardContent className="p-6 text-center">
               <Calculator className="h-8 w-8 text-[#FF8C42] mx-auto mb-3" />
               <h3 className="text-xl font-bold mb-2">Изчислете вашата оферта безплатно</h3>
-              <p className="text-slate-400 mb-4">28 професии, 28 области, актуални цени 2026</p>
+              <p className="theme-text-muted mb-4">28 професии, 28 области, актуални цени 2026</p>
               <Link to="/calculator">
                 <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" data-testid="article-calc-btn">
                   <Calculator className="mr-2 h-4 w-4" /> Към калкулатора
@@ -119,7 +119,7 @@ const BlogArticle = () => {
 
           {/* Related articles */}
           <section className="mt-10">
-            <h2 className="text-xl font-bold text-white mb-4">Свързани статии</h2>
+            <h2 className="text-xl font-bold theme-text mb-4">Свързани статии</h2>
             <div className="grid sm:grid-cols-2 gap-3">
               {SEO_BLOG_ARTICLES.filter(a => a.slug !== slug).slice(0, 6).map(a => (
                 <Link key={a.slug} to={`/blog/${a.slug}`} className="text-sm text-[#FF8C42] hover:underline flex items-center gap-1">
@@ -158,9 +158,9 @@ const BlogArticle = () => {
 
         <header className="mb-8">
           <Badge className="bg-[#FF8C42]/10 text-[#FF8C42] mb-3">{article.type === 'profession' ? 'Професия' : article.type === 'region' ? 'Регион' : 'Строителство'}</Badge>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">{article.h1}</h1>
-          <p className="text-lg text-slate-400">{article.description}</p>
-          <div className="flex items-center gap-4 mt-4 text-sm text-slate-500">
+          <h1 className="text-3xl sm:text-4xl font-bold theme-text mb-4">{article.h1}</h1>
+          <p className="text-lg theme-text-muted">{article.description}</p>
+          <div className="flex items-center gap-4 mt-4 text-sm theme-text-subtle">
             <span className="flex items-center gap-1"><Clock className="h-4 w-4" /> Февруари 2026</span>
             <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> България</span>
           </div>
@@ -170,7 +170,7 @@ const BlogArticle = () => {
 
         {/* Price comparison table */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold text-white mb-4">
+          <h2 className="text-2xl font-bold theme-text mb-4">
             {profession ? `Цени ${profession.name.toLowerCase()} по области` : region ? `Строителни цени в ${region.name}` : 'Цени по области 2026'}
           </h2>
 
@@ -178,7 +178,7 @@ const BlogArticle = () => {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-slate-900 text-white">
+                  <tr className="theme-bg-surface theme-text">
                     <th className="p-3 text-left">Област</th>
                     <th className="p-3 text-center">Само труд (EUR/{profession.unit})</th>
                     <th className="p-3 text-center">Труд + материали (EUR/{profession.unit})</th>
@@ -187,11 +187,11 @@ const BlogArticle = () => {
                 </thead>
                 <tbody>
                   {regions.sort((a,b) => b[1].multiplier - a[1].multiplier).map(([key, r], i) => (
-                    <tr key={key} className={i % 2 === 0 ? 'bg-[#1E2A38]' : 'bg-[#253545]'}>
+                    <tr key={key} className={i % 2 === 0 ? '' : ''}>
                       <td className="p-3 font-medium">{r.name}</td>
                       <td className="p-3 text-center">{(profession.basePrice.labor * r.multiplier).toFixed(2)}</td>
                       <td className="p-3 text-center font-semibold text-[#FF8C42]">{(profession.basePrice.full * r.multiplier).toFixed(2)}</td>
-                      <td className="p-3 text-center text-slate-400">{(profession.basePrice.full * r.multiplier * 1.9558).toFixed(2)}</td>
+                      <td className="p-3 text-center theme-text-muted">{(profession.basePrice.full * r.multiplier * 1.9558).toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -203,7 +203,7 @@ const BlogArticle = () => {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-slate-900 text-white">
+                  <tr className="theme-bg-surface theme-text">
                     <th className="p-3 text-left">Услуга</th>
                     <th className="p-3 text-center">Единица</th>
                     <th className="p-3 text-center">Само труд (EUR)</th>
@@ -213,14 +213,14 @@ const BlogArticle = () => {
                 </thead>
                 <tbody>
                   {SEO_PROFESSIONS.map((p, i) => (
-                    <tr key={p.id} className={i % 2 === 0 ? 'bg-[#1E2A38]' : 'bg-[#253545]'}>
+                    <tr key={p.id} className={i % 2 === 0 ? '' : ''}>
                       <td className="p-3 font-medium">
                         <Link to={`/blog/ceni-${p.slug}-2026`} className="text-[#FF8C42] hover:underline">{p.name}</Link>
                       </td>
                       <td className="p-3 text-center">{p.unit}</td>
                       <td className="p-3 text-center">{(p.basePrice.labor * region.multiplier).toFixed(2)}</td>
                       <td className="p-3 text-center font-semibold text-[#FF8C42]">{(p.basePrice.full * region.multiplier).toFixed(2)}</td>
-                      <td className="p-3 text-center text-slate-400">{(p.basePrice.full * region.multiplier * 1.9558).toFixed(2)}</td>
+                      <td className="p-3 text-center theme-text-muted">{(p.basePrice.full * region.multiplier * 1.9558).toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -232,7 +232,7 @@ const BlogArticle = () => {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-slate-900 text-white">
+                  <tr className="theme-bg-surface theme-text">
                     <th className="p-3 text-left">Област</th>
                     <th className="p-3 text-center">Коефициент</th>
                     <th className="p-3 text-center">Боядисване EUR/м²</th>
@@ -242,7 +242,7 @@ const BlogArticle = () => {
                 </thead>
                 <tbody>
                   {regions.sort((a,b) => b[1].multiplier - a[1].multiplier).map(([key, r], i) => (
-                    <tr key={key} className={i % 2 === 0 ? 'bg-[#1E2A38]' : 'bg-[#253545]'}>
+                    <tr key={key} className={i % 2 === 0 ? '' : ''}>
                       <td className="p-3 font-medium">
                         <Link to={`/region/${r.slug}`} className="text-[#FF8C42] hover:underline">{r.name}</Link>
                       </td>
@@ -260,7 +260,7 @@ const BlogArticle = () => {
 
         {/* How calculator works */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold text-white mb-4">Как работи калкулаторът</h2>
+          <h2 className="text-2xl font-bold theme-text mb-4">Как работи калкулаторът</h2>
           <div className="space-y-3">
             {[
               'Изберете услугата, от която се нуждаете (28 категории)',
@@ -273,7 +273,7 @@ const BlogArticle = () => {
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-3">
                 <span className="bg-[#FF8C42]/10 text-[#FF8C42] w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{i+1}</span>
-                <p className="text-slate-300">{step}</p>
+                <p className="theme-text-muted">{step}</p>
               </div>
             ))}
           </div>
@@ -281,7 +281,7 @@ const BlogArticle = () => {
 
         {/* FAQ */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold text-white mb-4">Често задавани въпроси</h2>
+          <h2 className="text-2xl font-bold theme-text mb-4">Често задавани въпроси</h2>
           <div className="space-y-4">
             {[
               { q: profession ? `Колко струва ${profession.name.toLowerCase()} в България?` : region ? `Колко струва ремонт в ${region.name}?` : 'Колко струва ремонт в България 2026?',
@@ -295,8 +295,8 @@ const BlogArticle = () => {
             ].map((faq, i) => (
               <Card key={i}>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-white mb-2">{faq.q}</h3>
-                  <p className="text-slate-400 text-sm">{faq.a}</p>
+                  <h3 className="font-semibold theme-text mb-2">{faq.q}</h3>
+                  <p className="theme-text-muted text-sm">{faq.a}</p>
                 </CardContent>
               </Card>
             ))}
@@ -308,7 +308,7 @@ const BlogArticle = () => {
           <CardContent className="p-6 text-center">
             <Calculator className="h-8 w-8 text-[#FF8C42] mx-auto mb-3" />
             <h3 className="text-xl font-bold mb-2">Изчислете вашата оферта безплатно</h3>
-            <p className="text-slate-400 mb-4">28 професии, 28 области, актуални цени 2026</p>
+            <p className="theme-text-muted mb-4">28 професии, 28 области, актуални цени 2026</p>
             <Link to="/calculator">
               <Button className="bg-[#FF8C42] hover:bg-[#e67a30]" data-testid="article-calc-btn">
                 <Calculator className="mr-2 h-4 w-4" /> Към калкулатора
@@ -319,7 +319,7 @@ const BlogArticle = () => {
 
         {/* Internal links */}
         <section className="mt-10">
-          <h2 className="text-xl font-bold text-white mb-4">Свързани статии</h2>
+          <h2 className="text-xl font-bold theme-text mb-4">Свързани статии</h2>
           <div className="grid sm:grid-cols-2 gap-3">
             {BLOG_ARTICLES.filter(a => a.slug !== slug).slice(0, 6).map(a => (
               <Link key={a.slug} to={`/blog/${a.slug}`} className="text-sm text-[#FF8C42] hover:underline flex items-center gap-1">

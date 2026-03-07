@@ -122,7 +122,7 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
               </div>
               <div>
                 <h4 className="font-semibold text-white">Добави оценка на бюджета</h4>
-                <p className="text-sm text-slate-500">Помогнете на майсторите да разберат мащаба на проекта</p>
+                <p className="text-sm theme-text-subtle">Помогнете на майсторите да разберат мащаба на проекта</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -131,7 +131,7 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
                   ~{estimate} €
                 </Badge>
               )}
-              {isOpen ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />}
+              {isOpen ? <ChevronUp className="h-5 w-5 theme-text-muted" /> : <ChevronDown className="h-5 w-5 theme-text-muted" />}
             </div>
           </button>
         </CollapsibleTrigger>
@@ -206,7 +206,7 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
                   {selectedServices.map(service => {
                     const priceData = QUICK_PRICES[service.key];
                     return (
-                      <div key={service.key} className="flex items-center gap-2 bg-[#253545] rounded-lg p-2 border border-orange-100">
+                      <div key={service.key} className="flex items-center gap-2  rounded-lg p-2 border border-orange-100">
                         <span className="flex-1 text-sm font-medium">{priceData.name}</span>
                         <Input
                           type="number"
@@ -217,13 +217,13 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
                           placeholder="0"
                           className="w-20 h-8 text-sm text-right"
                         />
-                        <span className="text-xs text-slate-500 w-12">{priceData.unit}</span>
+                        <span className="text-xs theme-text-subtle w-12">{priceData.unit}</span>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
                           onClick={() => removeService(service.key)}
-                          className="h-8 w-8 p-0 text-slate-400 hover:text-red-500"
+                          className="h-8 w-8 p-0 theme-text-muted hover:text-red-500"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -236,13 +236,13 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
               {/* Estimate display */}
               {estimate > 0 && (
                 <div className="bg-slate-900 text-white rounded-lg p-4 text-center">
-                  <p className="text-sm text-slate-400 mb-1">Приблизителна оценка</p>
+                  <p className="text-sm theme-text-muted mb-1">Приблизителна оценка</p>
                   <p className="text-2xl font-bold">{estimate} €</p>
-                  <p className="text-sm text-slate-400">EUR</p>
+                  <p className="text-sm theme-text-muted">EUR</p>
                 </div>
               )}
 
-              <div className="flex items-start gap-2 mt-3 text-xs text-slate-500">
+              <div className="flex items-start gap-2 mt-3 text-xs theme-text-subtle">
                 <Info className="h-4 w-4 flex-shrink-0 mt-0.5" />
                 <p>Цените са ориентировъчни (стандартно качество, труд + материали). Служат за ориентир на майсторите.</p>
               </div>

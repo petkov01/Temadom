@@ -15,7 +15,7 @@ const PricesByRegionPage = () => {
   const getTrend = (m) => {
     if (m >= 1.05) return <TrendingUp className="h-4 w-4 text-red-500" />;
     if (m <= 0.90) return <TrendingDown className="h-4 w-4 text-green-500" />;
-    return <Minus className="h-4 w-4 text-slate-400" />;
+    return <Minus className="h-4 w-4 theme-text-muted" />;
   };
 
   return (
@@ -24,7 +24,7 @@ const PricesByRegionPage = () => {
         <div className="max-w-5xl mx-auto px-4 text-center">
           <MapPin className="h-10 w-10 text-orange-400 mx-auto mb-4" />
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">{isEn ? <>Construction prices by <span className="text-orange-400">regions</span> 2026</> : <>Строителни цени по <span className="text-orange-400">области</span> 2026</>}</h1>
-          <p className="text-slate-300 max-w-2xl mx-auto">Сравнение на строителните цени във всички 28 области на България</p>
+          <p className="theme-text-muted max-w-2xl mx-auto">Сравнение на строителните цени във всички 28 области на България</p>
         </div>
       </section>
 
@@ -62,18 +62,18 @@ const PricesByRegionPage = () => {
                 <tr className="bg-slate-900 text-white">
                   <th className="p-3 text-left sticky left-0 bg-slate-900 z-10">Област</th>
                   <th className="p-3 text-center">Коеф.</th>
-                  <th className="p-3 text-center">Боядисване<br/><span className="text-xs text-slate-300">EUR/м²</span></th>
-                  <th className="p-3 text-center">Шпакловка<br/><span className="text-xs text-slate-300">EUR/м²</span></th>
-                  <th className="p-3 text-center">Плочки<br/><span className="text-xs text-slate-300">EUR/м²</span></th>
-                  <th className="p-3 text-center">Ел. инст.<br/><span className="text-xs text-slate-300">EUR/точка</span></th>
-                  <th className="p-3 text-center">ВиК<br/><span className="text-xs text-slate-300">EUR/точка</span></th>
-                  <th className="p-3 text-center">Замазка<br/><span className="text-xs text-slate-300">EUR/м²</span></th>
+                  <th className="p-3 text-center">Боядисване<br/><span className="text-xs theme-text-muted">EUR/м²</span></th>
+                  <th className="p-3 text-center">Шпакловка<br/><span className="text-xs theme-text-muted">EUR/м²</span></th>
+                  <th className="p-3 text-center">Плочки<br/><span className="text-xs theme-text-muted">EUR/м²</span></th>
+                  <th className="p-3 text-center">Ел. инст.<br/><span className="text-xs theme-text-muted">EUR/точка</span></th>
+                  <th className="p-3 text-center">ВиК<br/><span className="text-xs theme-text-muted">EUR/точка</span></th>
+                  <th className="p-3 text-center">Замазка<br/><span className="text-xs theme-text-muted">EUR/м²</span></th>
                   <th className="p-3 text-center whitespace-nowrap">Действие</th>
                 </tr>
               </thead>
               <tbody>
                 {regions.map(([key, r], i) => (
-                  <tr key={key} className={`${i % 2 === 0 ? 'bg-[#1E2A38]' : 'bg-[#253545]'} hover:bg-[#FF8C42]/5 transition-colors`}>
+                  <tr key={key} className={`${i % 2 === 0 ? '' : ''} hover:bg-[#FF8C42]/5 transition-colors`}>
                     <td className="p-3 font-medium sticky left-0 bg-inherit z-10">
                       <div className="flex items-center gap-2">
                         {getTrend(r.multiplier)}

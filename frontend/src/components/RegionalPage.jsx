@@ -31,7 +31,7 @@ const RegionalPage = () => {
 
   return (
     <div className="min-h-screen" style={{background: "var(--theme-bg-surface)"}} data-testid="regional-page">
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-14">
+      <section className="py-14" style={{ background: 'var(--theme-bg)' }}>
         <div className="max-w-5xl mx-auto px-4">
           <Link to="/prices" className="text-orange-400 hover:text-orange-300 text-sm flex items-center gap-1 mb-4">
             <ArrowLeft className="h-4 w-4" /> Всички области
@@ -40,26 +40,26 @@ const RegionalPage = () => {
             <MapPin className="h-8 w-8 text-orange-400" />
             <h1 className="text-3xl sm:text-4xl font-bold">Строителство и ремонти <span className="text-orange-400">{region.name}</span> 2026</h1>
           </div>
-          <p className="text-slate-300 max-w-2xl">{region.description}. Ценови коефициент: <Badge className="bg-orange-600 ml-1">x{region.multiplier.toFixed(2)}</Badge></p>
+          <p className="theme-text-muted max-w-2xl">{region.description}. Ценови коефициент: <Badge className="bg-orange-600 ml-1">x{region.multiplier.toFixed(2)}</Badge></p>
         </div>
       </section>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Quick stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-[#FF8C42]">x{region.multiplier.toFixed(2)}</p><p className="text-xs text-slate-500">Ценови коефициент</p></CardContent></Card>
-          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-white">28</p><p className="text-xs text-slate-500">Професии</p></CardContent></Card>
-          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-white">{region.population}</p><p className="text-xs text-slate-500">Население</p></CardContent></Card>
-          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-green-600">{(6 * region.multiplier).toFixed(1)}€</p><p className="text-xs text-slate-500">Боядисване/м²</p></CardContent></Card>
+          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-[#FF8C42]">x{region.multiplier.toFixed(2)}</p><p className="text-xs theme-text-subtle">Ценови коефициент</p></CardContent></Card>
+          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold theme-text">28</p><p className="text-xs theme-text-subtle">Професии</p></CardContent></Card>
+          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold theme-text">{region.population}</p><p className="text-xs theme-text-subtle">Население</p></CardContent></Card>
+          <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-green-600">{(6 * region.multiplier).toFixed(1)}€</p><p className="text-xs theme-text-subtle">Боядисване/м²</p></CardContent></Card>
         </div>
 
         {/* Full price table */}
-        <h2 className="text-2xl font-bold text-white mb-4">Всички цени в {region.name} за 2026</h2>
+        <h2 className="text-2xl font-bold theme-text mb-4">Всички цени в {region.name} за 2026</h2>
         <Card className="mb-8 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-900 text-white">
+                <tr className="theme-bg-surface theme-text">
                   <th className="p-3 text-left">Услуга</th>
                   <th className="p-3 text-center">Единица</th>
                   <th className="p-3 text-center">Само труд (EUR)</th>
@@ -69,14 +69,14 @@ const RegionalPage = () => {
               </thead>
               <tbody>
                 {SEO_PROFESSIONS.map((p, i) => (
-                  <tr key={p.id} className={i % 2 === 0 ? 'bg-[#1E2A38]' : 'bg-[#253545]'}>
+                  <tr key={p.id} className={i % 2 === 0 ? '' : ''}>
                     <td className="p-3 font-medium">
                       <Link to={`/blog/ceni-${p.slug}-2026`} className="text-[#FF8C42] hover:underline">{p.name}</Link>
                     </td>
-                    <td className="p-3 text-center text-slate-500">{p.unit}</td>
+                    <td className="p-3 text-center theme-text-subtle">{p.unit}</td>
                     <td className="p-3 text-center">{(p.basePrice.labor * region.multiplier).toFixed(2)}</td>
                     <td className="p-3 text-center font-semibold text-[#FF8C42]">{(p.basePrice.full * region.multiplier).toFixed(2)}</td>
-                    <td className="p-3 text-center text-slate-400">{(p.basePrice.full * region.multiplier * 1.9558).toFixed(2)}</td>
+                    <td className="p-3 text-center theme-text-muted">{(p.basePrice.full * region.multiplier * 1.9558).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -85,7 +85,7 @@ const RegionalPage = () => {
         </Card>
 
         {/* Example calculation */}
-        <h2 className="text-2xl font-bold text-white mb-4">Примерна калкулация за апартамент 60 м² в {region.name}</h2>
+        <h2 className="text-2xl font-bold theme-text mb-4">Примерна калкулация за апартамент 60 м² в {region.name}</h2>
         <Card className="mb-8 bg-[#FF8C42]/5 border-[#FF8C42]/20">
           <CardContent className="p-6">
             <div className="space-y-3">
@@ -98,13 +98,13 @@ const RegionalPage = () => {
                 { name: 'Плочки - баня (15 м²)', price: 22 * region.multiplier * 15 },
               ].map((item, i) => (
                 <div key={i} className="flex justify-between items-center">
-                  <span className="text-slate-300">{item.name}</span>
+                  <span className="theme-text-muted">{item.name}</span>
                   <span className="font-semibold">{item.price.toFixed(0)} EUR</span>
                 </div>
               ))}
               <Separator />
               <div className="flex justify-between items-center text-lg">
-                <span className="font-bold text-white">ОБЩА СУМА</span>
+                <span className="font-bold theme-text">ОБЩА СУМА</span>
                 <span className="font-bold text-[#FF8C42]">
                   {(6 * region.multiplier * 120 + 7 * region.multiplier * 120 + 12 * region.multiplier * 60 + 14 * region.multiplier * 25 + 18 * region.multiplier * 10 + 22 * region.multiplier * 15).toFixed(0)} EUR
                 </span>
@@ -123,7 +123,7 @@ const RegionalPage = () => {
         </div>
 
         {/* Other regions */}
-        <h2 className="text-xl font-bold text-white mb-4">Сравни с други области</h2>
+        <h2 className="text-xl font-bold theme-text mb-4">Сравни с други области</h2>
         <div className="grid sm:grid-cols-3 md:grid-cols-4 gap-3">
           {otherRegions.slice(0, 8).map(([k, r]) => (
             <Link key={k} to={`/region/${r.slug}`} className="text-sm text-[#FF8C42] hover:underline flex items-center gap-1">

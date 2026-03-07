@@ -463,20 +463,20 @@ export const AISketchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-3 px-2 md:px-4" data-testid="ai-sketch-page">
+    <div className="min-h-screen  py-3 px-2 md:px-4" data-testid="ai-sketch-page">
       <div className="max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-lg md:text-xl font-bold text-white">IA CAD v5.2</h1>
-            <p className="text-slate-500 text-[10px]">Handles: Drag Край/Център/Ротация | Shift: Орт | Ctrl+Z/Y</p>
+            <p className="theme-text-subtle text-[10px]">Handles: Drag Край/Център/Ротация | Shift: Орт | Ctrl+Z/Y</p>
           </div>
           <div className="flex gap-2" data-testid="mode-tabs">
             <button onClick={() => { setMode('draw'); setUploadRes(null); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'draw' ? 'bg-[#FF8C42] text-white' : 'bg-[#253545] text-slate-400 border border-[#3A4A5C]'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'draw' ? 'bg-[#FF8C42] text-white' : ' theme-text-muted border '}`}
               data-testid="mode-draw">CAD</button>
             <button onClick={() => setMode('upload')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'upload' ? 'bg-[#FF8C42] text-white' : 'bg-[#253545] text-slate-400 border border-[#3A4A5C]'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'upload' ? 'bg-[#FF8C42] text-white' : ' theme-text-muted border '}`}
               data-testid="mode-upload"><Upload className="h-3.5 w-3.5 inline mr-1" />Качи</button>
           </div>
         </div>
@@ -485,7 +485,7 @@ export const AISketchPage = () => {
         {mode === 'draw' && (
           <>
             {/* Toolbar */}
-            <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
+            <Card className="  mb-3">
               <CardContent className="py-2 px-3">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex flex-wrap gap-1" data-testid="cad-toolbar">
@@ -494,37 +494,37 @@ export const AISketchPage = () => {
                       return (
                         <button key={t.id} onClick={() => setTool(t.id)}
                           className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-all ${
-                            tool === t.id ? 'bg-[#FF8C42] text-white shadow-lg shadow-[#FF8C42]/20' : 'bg-[#1E2A38] text-slate-400 hover:text-white hover:bg-[#2A3A4C]'
+                            tool === t.id ? 'bg-[#FF8C42] text-white shadow-lg shadow-[#FF8C42]/20' : ' theme-text-muted hover:text-white hover:bg-[#2A3A4C]'
                           }`} data-testid={`tool-${t.id}`}>
                           {I && <I className="h-3 w-3" />}<span className="hidden sm:inline">{t.label}</span>
                         </button>
                       );
                     })}
                     {tool === 'column' && (
-                      <div className="flex items-center gap-1 ml-1 pl-2 border-l border-[#3A4A5C]">
+                      <div className="flex items-center gap-1 ml-1 pl-2 border-l ">
                         <button onClick={() => setColShape('round')}
-                          className={`px-2 py-1 rounded text-[10px] font-bold ${colShape === 'round' ? 'bg-[#9b59b6] text-white' : 'bg-[#1E2A38] text-slate-400'}`}
+                          className={`px-2 py-1 rounded text-[10px] font-bold ${colShape === 'round' ? 'bg-[#9b59b6] text-white' : ' theme-text-muted'}`}
                           data-testid="col-shape-round" title="Кръгла колона">O</button>
                         <button onClick={() => setColShape('rect')}
-                          className={`px-2 py-1 rounded text-[10px] font-bold ${colShape === 'rect' ? 'bg-[#9b59b6] text-white' : 'bg-[#1E2A38] text-slate-400'}`}
+                          className={`px-2 py-1 rounded text-[10px] font-bold ${colShape === 'rect' ? 'bg-[#9b59b6] text-white' : ' theme-text-muted'}`}
                           data-testid="col-shape-rect" title="Правоъгълна колона">&#9645;</button>
                       </div>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={undo} className="px-2 py-1 rounded text-[10px] font-medium bg-[#1E2A38] text-slate-400 hover:text-white hover:bg-[#2A3A4C]" data-testid="undo-btn" title="Ctrl+Z">&#8630;</button>
-                    <button onClick={redo} className="px-2 py-1 rounded text-[10px] font-medium bg-[#1E2A38] text-slate-400 hover:text-white hover:bg-[#2A3A4C]" data-testid="redo-btn" title="Ctrl+Y">&#8631;</button>
+                    <button onClick={undo} className="px-2 py-1 rounded text-[10px] font-medium  theme-text-muted hover:text-white hover:bg-[#2A3A4C]" data-testid="undo-btn" title="Ctrl+Z">&#8630;</button>
+                    <button onClick={redo} className="px-2 py-1 rounded text-[10px] font-medium  theme-text-muted hover:text-white hover:bg-[#2A3A4C]" data-testid="redo-btn" title="Ctrl+Y">&#8631;</button>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-slate-500 text-[10px]">Ет:</span>
-                      <button onClick={() => setCurrentFloor(p => Math.max(0, p - 1))} className="text-slate-400 hover:text-white text-xs px-1 bg-[#1E2A38] rounded">-</button>
+                      <span className="theme-text-subtle text-[10px]">Ет:</span>
+                      <button onClick={() => setCurrentFloor(p => Math.max(0, p - 1))} className="theme-text-muted hover:text-white text-xs px-1  rounded">-</button>
                       <span className="text-white text-xs font-bold w-4 text-center" data-testid="floor-indicator">{currentFloor}</span>
-                      <button onClick={() => setCurrentFloor(p => p + 1)} className="text-slate-400 hover:text-white text-xs px-1 bg-[#1E2A38] rounded" data-testid="floor-up-btn">+</button>
+                      <button onClick={() => setCurrentFloor(p => p + 1)} className="theme-text-muted hover:text-white text-xs px-1  rounded" data-testid="floor-up-btn">+</button>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="text-slate-500 text-[10px]">м/кв:</span>
+                      <span className="theme-text-subtle text-[10px]">м/кв:</span>
                       <Input type="number" value={scale} min={0.1} step={0.1}
                         onChange={e => setScale(Math.max(0.1, +e.target.value || 1))}
-                        className="w-14 h-6 text-[10px] bg-[#1E2A38] border-[#3A4A5C] text-white px-1" data-testid="scale-input" />
+                        className="w-14 h-6 text-[10px]   text-white px-1" data-testid="scale-input" />
                     </div>
                   </div>
                 </div>
@@ -533,7 +533,7 @@ export const AISketchPage = () => {
 
             {/* Canvas + 3D side by side */}
             <div className="grid lg:grid-cols-[1fr_1fr] gap-3 mb-3">
-              <Card className="bg-[#253545] border-[#3A4A5C]">
+              <Card className=" ">
                 <CardHeader className="pb-1 pt-2 px-3">
                   <CardTitle className="text-white text-sm flex items-center gap-2">
                     <Ruler className="h-4 w-4 text-[#FF8C42]" /> 2D Чертеж
@@ -556,7 +556,7 @@ export const AISketchPage = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#253545] border-[#3A4A5C]">
+              <Card className=" ">
                 <CardHeader className="pb-1 pt-2 px-3">
                   <CardTitle className="text-white text-sm flex items-center gap-2">
                     <Eye className="h-4 w-4 text-[#4DA6FF]" /> 360° Live Preview
@@ -564,14 +564,14 @@ export const AISketchPage = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-2">
-                  <div ref={viewerRef} className="w-full h-[350px] lg:h-[420px] bg-[#0F1923] rounded-lg overflow-hidden border border-[#2A3A4C]" data-testid="3d-viewer" />
+                  <div ref={viewerRef} className="w-full h-[350px] lg:h-[420px]  rounded-lg overflow-hidden border " data-testid="3d-viewer" />
                   <p className="text-slate-600 text-[9px] mt-1 text-center">Ляв бутон: Въртене | Десен бутон: Местене | Скрол: Zoom</p>
                 </CardContent>
               </Card>
             </div>
 
             {/* Structure Panel */}
-            <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
+            <Card className="  mb-3">
               <CardContent className="px-3 py-3">
                 <StructurePanel els={els} selIdx={selIdx} scale={scale}
                   onSelect={setSelIdx} onDelete={deleteEl} onUpdate={updateEl}
@@ -582,7 +582,7 @@ export const AISketchPage = () => {
 
             {/* Cost Estimate */}
             {objCount > 0 && (
-              <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
+              <Card className="  mb-3">
                 <CardContent className="px-3 py-3">
                   <CostEstimate els={els} scale={scale} region={region} onRegionChange={setRegion} />
                 </CardContent>
@@ -590,7 +590,7 @@ export const AISketchPage = () => {
             )}
 
             {/* Export Buttons — always visible */}
-            <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
+            <Card className="  mb-3">
               <CardContent className="px-3 py-3 space-y-2">
                 <div className="flex gap-2">
                   <Button size="sm" className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white text-xs h-10 font-bold"
@@ -611,40 +611,40 @@ export const AISketchPage = () => {
 
             {/* Contract Dialog */}
             {showContract && (
-              <Card className="bg-[#253545] border-[#FF8C42]/30 mb-3">
+              <Card className=" border-[#FF8C42]/30 mb-3">
                 <CardHeader className="pb-2 pt-3 px-3">
                   <CardTitle className="text-white text-sm flex items-center justify-between">
                     <span>Договор за строителство</span>
-                    <button onClick={() => setShowContract(false)} className="text-slate-500 hover:text-white"><X className="h-4 w-4" /></button>
+                    <button onClick={() => setShowContract(false)} className="theme-text-subtle hover:text-white"><X className="h-4 w-4" /></button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="px-3 pb-3">
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     <div>
-                      <label className="text-[9px] text-slate-500 block mb-0.5">Изпълнител (фирма)</label>
+                      <label className="text-[9px] theme-text-subtle block mb-0.5">Изпълнител (фирма)</label>
                       <Input value={contractData.company_name} onChange={e => setContractData(p => ({ ...p, company_name: e.target.value }))}
-                        placeholder="Име на фирма" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-company" />
+                        placeholder="Име на фирма" className="h-7 text-xs   text-white" data-testid="contract-company" />
                     </div>
                     <div>
-                      <label className="text-[9px] text-slate-500 block mb-0.5">БУЛСТАТ</label>
+                      <label className="text-[9px] theme-text-subtle block mb-0.5">БУЛСТАТ</label>
                       <Input value={contractData.company_bulstat} onChange={e => setContractData(p => ({ ...p, company_bulstat: e.target.value }))}
-                        placeholder="БУЛСТАТ" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-bulstat" />
+                        placeholder="БУЛСТАТ" className="h-7 text-xs   text-white" data-testid="contract-bulstat" />
                     </div>
                     <div>
-                      <label className="text-[9px] text-slate-500 block mb-0.5">Възложител (клиент)</label>
+                      <label className="text-[9px] theme-text-subtle block mb-0.5">Възложител (клиент)</label>
                       <Input value={contractData.client_name} onChange={e => setContractData(p => ({ ...p, client_name: e.target.value }))}
-                        placeholder="Име на клиент" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-client" />
+                        placeholder="Име на клиент" className="h-7 text-xs   text-white" data-testid="contract-client" />
                     </div>
                     <div>
-                      <label className="text-[9px] text-slate-500 block mb-0.5">ЕГН/БУЛСТАТ</label>
+                      <label className="text-[9px] theme-text-subtle block mb-0.5">ЕГН/БУЛСТАТ</label>
                       <Input value={contractData.client_egn} onChange={e => setContractData(p => ({ ...p, client_egn: e.target.value }))}
-                        placeholder="ЕГН/БУЛСТАТ" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-egn" />
+                        placeholder="ЕГН/БУЛСТАТ" className="h-7 text-xs   text-white" data-testid="contract-egn" />
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="text-[9px] text-slate-500 block mb-0.5">Адрес на обекта</label>
+                    <label className="text-[9px] theme-text-subtle block mb-0.5">Адрес на обекта</label>
                     <Input value={contractData.address} onChange={e => setContractData(p => ({ ...p, address: e.target.value }))}
-                      placeholder="Адрес на обекта" className="h-7 text-xs bg-[#1E2A38] border-[#3A4A5C] text-white" data-testid="contract-address" />
+                      placeholder="Адрес на обекта" className="h-7 text-xs   text-white" data-testid="contract-address" />
                   </div>
                   <Button className="w-full bg-[#4DA6FF] hover:bg-[#3B8FE0] text-white h-8 text-xs"
                     onClick={exportContract} data-testid="generate-contract-pdf">
@@ -661,7 +661,7 @@ export const AISketchPage = () => {
           <div className="space-y-4">
             {!uploadRes ? (
               <>
-                <Card className="bg-[#253545] border-[#3A4A5C]">
+                <Card className=" ">
                   <CardContent className="pt-4">
                     <div className="grid grid-cols-3 gap-3">
                       {[0, 1, 2].map(idx => (
@@ -677,14 +677,14 @@ export const AISketchPage = () => {
                             </div>
                           ) : (
                             <button onClick={() => fileRefs[idx].current?.click()}
-                              className="aspect-square w-full rounded-lg border-2 border-dashed border-[#3A4A5C] hover:border-[#FF8C42]/50 flex flex-col items-center justify-center gap-1 bg-[#1E2A38]/50"
-                              data-testid={`sketch-upload-btn-${idx}`}><Upload className="h-5 w-5 text-slate-500" /><span className="text-slate-500 text-[10px]">{idx + 1}</span></button>
+                              className="aspect-square w-full rounded-lg border-2 border-dashed  hover:border-[#FF8C42]/50 flex flex-col items-center justify-center gap-1 /50"
+                              data-testid={`sketch-upload-btn-${idx}`}><Upload className="h-5 w-5 theme-text-subtle" /><span className="theme-text-subtle text-[10px]">{idx + 1}</span></button>
                           )}
                         </div>
                       ))}
                     </div>
                     <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Бележки..."
-                      className="bg-[#1E2A38] border-[#3A4A5C] text-white min-h-[60px] text-sm mt-3" data-testid="sketch-notes" />
+                      className="  text-white min-h-[60px] text-sm mt-3" data-testid="sketch-notes" />
                   </CardContent>
                 </Card>
                 <Button className="w-full bg-[#FF8C42] hover:bg-[#e67a30] text-white h-11" onClick={handleAnalyze}
@@ -694,7 +694,7 @@ export const AISketchPage = () => {
               </>
             ) : (
               <div className="space-y-4">
-                <Card className="bg-[#253545] border-[#3A4A5C]">
+                <Card className=" ">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-white text-sm flex items-center gap-2"><Eye className="h-4 w-4 text-[#4DA6FF]" />360 3D</CardTitle>
@@ -705,16 +705,16 @@ export const AISketchPage = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div ref={glbViewerRef} className="w-full h-[400px] bg-[#0F1923] rounded-lg overflow-hidden border border-[#2A3A4C]" data-testid="3d-viewer" />
+                    <div ref={glbViewerRef} className="w-full h-[400px]  rounded-lg overflow-hidden border " data-testid="3d-viewer" />
                   </CardContent>
                 </Card>
                 {uploadRes.summary && (
-                  <Card className="bg-[#253545] border-[#3A4A5C]">
+                  <Card className=" ">
                     <CardContent className="pt-4">
                       <div className="grid grid-cols-4 gap-3">
                         {[{ v: uploadRes.summary.walls_detected, l: 'Стени', c: '#FF8C42' }, { v: uploadRes.summary.stairs_detected, l: 'Стълби', c: '#4DA6FF' }, { v: uploadRes.summary.dimensions_found, l: 'OCR', c: '#28A745' }, { v: uploadRes.summary.floor_area_sqm || '-', l: 'м2', c: '#8C56FF' }].map((s, i) => (
-                          <div key={i} className="bg-[#1E2A38] rounded-lg p-2.5 text-center">
-                            <p className="text-lg font-bold" style={{ color: s.c }}>{s.v}</p><p className="text-slate-500 text-[9px]">{s.l}</p>
+                          <div key={i} className=" rounded-lg p-2.5 text-center">
+                            <p className="text-lg font-bold" style={{ color: s.c }}>{s.v}</p><p className="theme-text-subtle text-[9px]">{s.l}</p>
                           </div>
                         ))}
                       </div>

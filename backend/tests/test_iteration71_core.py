@@ -8,7 +8,7 @@ import os
 import uuid
 from datetime import datetime
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://temdom-launch.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://ai-designer-final.preview.emergentagent.com')
 
 class TestHealthEndpoints:
     """Health and basic API endpoint tests"""

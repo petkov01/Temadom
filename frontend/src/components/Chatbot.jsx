@@ -76,14 +76,14 @@ export const Chatbot = ({ user }) => {
       {/* Chat window */}
       {open && (
         <div 
-          className="fixed bottom-36 right-4 md:bottom-20 md:right-6 z-[100] w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-[#1E2A38] rounded-2xl shadow-2xl border border-[#3A4A5C] flex flex-col overflow-hidden"
+          className="fixed bottom-36 right-4 md:bottom-20 md:right-6 z-[100] w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)]  rounded-2xl shadow-2xl border  flex flex-col overflow-hidden"
           data-testid="chatbot-window"
         >
           {/* Header */}
-          <div className="bg-[#0F1923] text-white px-4 py-3 flex items-center justify-between flex-shrink-0 border-b border-[#2A3A4C]">
+          <div className=" text-white px-4 py-3 flex items-center justify-between flex-shrink-0 border-b ">
             <div>
               <p className="font-semibold text-sm" data-testid="chatbot-title">{t('chatbot_title')}</p>
-              <p className="text-xs text-slate-400">{t('chatbot_subtitle')}</p>
+              <p className="text-xs theme-text-muted">{t('chatbot_subtitle')}</p>
             </div>
             <button
               onClick={() => setOpen(false)}
@@ -102,7 +102,7 @@ export const Chatbot = ({ user }) => {
                   className={`max-w-[80%] px-3 py-2 rounded-xl text-sm leading-relaxed ${
                     msg.role === 'user'
                       ? 'bg-[#FF8C42] text-white rounded-br-sm'
-                      : 'bg-[#253545] text-slate-200 rounded-bl-sm'
+                      : ' text-slate-200 rounded-bl-sm'
                   }`}
                   data-testid={`chatbot-msg-${msg.role}-${i}`}
                 >
@@ -112,7 +112,7 @@ export const Chatbot = ({ user }) => {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-[#253545] text-slate-400 px-3 py-2 rounded-xl rounded-bl-sm text-sm flex items-center gap-2">
+                <div className=" theme-text-muted px-3 py-2 rounded-xl rounded-bl-sm text-sm flex items-center gap-2">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   {t('chatbot_sending')}
                 </div>
@@ -122,7 +122,7 @@ export const Chatbot = ({ user }) => {
           </div>
 
           {/* Input */}
-          <div className="border-t border-[#3A4A5C] px-3 py-2 flex-shrink-0">
+          <div className="border-t  px-3 py-2 flex-shrink-0">
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -132,7 +132,7 @@ export const Chatbot = ({ user }) => {
                 placeholder={t('chatbot_placeholder')}
                 disabled={loading}
                 data-testid="chatbot-input"
-                className="flex-1 text-sm bg-[#253545] border border-[#3A4A5C] rounded-lg px-3 py-2 outline-none text-white placeholder-slate-500 focus:border-[#FF8C42] transition-colors"
+                className="flex-1 text-sm  border  rounded-lg px-3 py-2 outline-none text-white placeholder-slate-500 focus:border-[#FF8C42] transition-colors"
               />
               <button
                 onClick={sendMessage}

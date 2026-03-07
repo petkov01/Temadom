@@ -87,7 +87,7 @@ const AnalyticsDashboard = () => {
             <h1 className="text-xl font-bold">TemaDom Аналитикс</h1>
             <Badge className="bg-green-600 animate-pulse"><Activity className="h-3 w-3 mr-1" /> Live</Badge>
           </div>
-          <span className="text-slate-400 text-sm">Последна актуализация: {new Date().toLocaleTimeString('bg-BG')}</span>
+          <span className="theme-text-muted text-sm">Последна актуализация: {new Date().toLocaleTimeString('bg-BG')}</span>
         </div>
       </div>
 
@@ -104,7 +104,7 @@ const AnalyticsDashboard = () => {
               <CardContent className="p-4">
                 <div className={`${m.color} mb-2`}>{m.icon}</div>
                 <p className="text-2xl font-bold text-white">{m.value}</p>
-                <p className="text-xs text-slate-500">{m.label}</p>
+                <p className="text-xs theme-text-subtle">{m.label}</p>
               </CardContent>
             </Card>
           ))}
@@ -116,21 +116,21 @@ const AnalyticsDashboard = () => {
             <CardContent className="p-4">
               <Users className="h-5 w-5 text-blue-600 mb-2" />
               <p className="text-2xl font-bold">{data.total_users}</p>
-              <p className="text-xs text-slate-500">Общо потребители</p>
+              <p className="text-xs theme-text-subtle">Общо потребители</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
               <Users className="h-5 w-5 text-[#FF8C42] mb-2" />
               <p className="text-2xl font-bold">{data.total_companies}</p>
-              <p className="text-xs text-slate-500">Фирми</p>
+              <p className="text-xs theme-text-subtle">Фирми</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
               <Users className="h-5 w-5 text-green-600 mb-2" />
               <p className="text-2xl font-bold">{data.total_clients}</p>
-              <p className="text-xs text-slate-500">Клиенти</p>
+              <p className="text-xs theme-text-subtle">Клиенти</p>
             </CardContent>
           </Card>
         </div>
@@ -143,11 +143,11 @@ const AnalyticsDashboard = () => {
               <div className="space-y-2">
                 {data.top_pages?.map((p, i) => (
                   <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
-                    <span className="text-sm text-slate-300 truncate flex-1">{p.path}</span>
+                    <span className="text-sm theme-text-muted truncate flex-1">{p.path}</span>
                     <Badge variant="outline" className="text-xs ml-2">{p.views} посещения</Badge>
                   </div>
                 ))}
-                {(!data.top_pages || data.top_pages.length === 0) && <p className="text-sm text-slate-400">Няма данни</p>}
+                {(!data.top_pages || data.top_pages.length === 0) && <p className="text-sm theme-text-muted">Няма данни</p>}
               </div>
             </CardContent>
           </Card>
@@ -161,12 +161,12 @@ const AnalyticsDashboard = () => {
                   <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
                     <div>
                       <span className="text-sm font-medium text-white">{e.event_name}</span>
-                      {e.metadata && <span className="text-xs text-slate-500 ml-2">{JSON.stringify(e.metadata).substring(0, 40)}</span>}
+                      {e.metadata && <span className="text-xs theme-text-subtle ml-2">{JSON.stringify(e.metadata).substring(0, 40)}</span>}
                     </div>
-                    <span className="text-xs text-slate-400">{new Date(e.created_at).toLocaleTimeString('bg-BG')}</span>
+                    <span className="text-xs theme-text-muted">{new Date(e.created_at).toLocaleTimeString('bg-BG')}</span>
                   </div>
                 ))}
-                {(!data.recent_events || data.recent_events.length === 0) && <p className="text-sm text-slate-400">Няма данни</p>}
+                {(!data.recent_events || data.recent_events.length === 0) && <p className="text-sm theme-text-muted">Няма данни</p>}
               </div>
             </CardContent>
           </Card>
@@ -178,19 +178,19 @@ const AnalyticsDashboard = () => {
           <CardContent>
             <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
               {data.top_regions?.map((r, i) => (
-                <div key={i} className="flex items-center justify-between bg-[#1E2A38] rounded-lg p-3">
-                  <span className="text-sm font-medium text-slate-300">{r.region}</span>
+                <div key={i} className="flex items-center justify-between  rounded-lg p-3">
+                  <span className="text-sm font-medium theme-text-muted">{r.region}</span>
                   <Badge className="bg-[#FF8C42]/10 text-[#FF8C42] text-xs">{r.count}</Badge>
                 </div>
               ))}
-              {(!data.top_regions || data.top_regions.length === 0) && <p className="text-sm text-slate-400">Няма данни</p>}
+              {(!data.top_regions || data.top_regions.length === 0) && <p className="text-sm theme-text-muted">Няма данни</p>}
             </div>
           </CardContent>
         </Card>
 
         {/* GA4 + Hotjar placeholder */}
-        <Card className="bg-[#1E2A38] border-dashed">
-          <CardContent className="p-6 text-center text-slate-500">
+        <Card className=" border-dashed">
+          <CardContent className="p-6 text-center theme-text-subtle">
             <p className="font-semibold mb-2">Google Analytics 4 & Hotjar</p>
             <p className="text-sm">За да активирате GA4 и Hotjar, добавете вашите ID-та в <code className="bg-slate-200 px-1 rounded">/app/frontend/public/index.html</code></p>
             <p className="text-xs mt-2">GA4: Заменете <code>G-XXXXXXXXXX</code> с вашия Measurement ID</p>

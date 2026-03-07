@@ -82,7 +82,7 @@ export const ReadyProjectsPage = () => {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
             Проекти от <span className="text-[#28A745]">общността</span>
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base max-w-xl mx-auto">
+          <p className="theme-text-muted text-sm sm:text-base max-w-xl mx-auto">
             Клиенти споделят своите проекти — AI и ръчни. Харесвай, коментирай, споделяй и намери вдъхновение за своя ремонт.
           </p>
         </div>
@@ -92,7 +92,7 @@ export const ReadyProjectsPage = () => {
           <div className="text-center py-16" data-testid="empty-state">
             <Image className="h-16 w-16 text-slate-600 mx-auto mb-4" />
             <h3 className="text-white font-bold text-lg mb-2">Все още няма проекти</h3>
-            <p className="text-slate-500 text-sm mb-6">Бъдете първи! Качете проект от AI Sketch или Помещения.</p>
+            <p className="theme-text-subtle text-sm mb-6">Бъдете първи! Качете проект от AI Sketch или Помещения.</p>
             <div className="flex gap-3 justify-center">
               <Button className="bg-[#FF8C42] text-white" onClick={() => window.location.href = '/ai-sketch'}>
                 AI Sketch
@@ -105,7 +105,7 @@ export const ReadyProjectsPage = () => {
         ) : (
           <div className="space-y-6">
             {projects.map((project) => (
-              <Card key={project.id} className="bg-[#253545] border-[#3A4A5C] overflow-hidden" data-testid={`project-${project.id}`}>
+              <Card key={project.id} className="  overflow-hidden" data-testid={`project-${project.id}`}>
                 {/* Author */}
                 <div className="px-5 pt-4 pb-2 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#FF8C42]/20 flex items-center justify-center text-[#FF8C42] font-bold text-sm">
@@ -113,7 +113,7 @@ export const ReadyProjectsPage = () => {
                   </div>
                   <div>
                     <p className="text-white text-sm font-medium">{project.author_name || 'Анонимен'}</p>
-                    <p className="text-slate-500 text-xs">{project.created_at ? new Date(project.created_at).toLocaleDateString('bg-BG') : ''}</p>
+                    <p className="theme-text-subtle text-xs">{project.created_at ? new Date(project.created_at).toLocaleDateString('bg-BG') : ''}</p>
                   </div>
                   {project.source && (
                     <Badge className="ml-auto bg-[#8C56FF]/20 text-[#8C56FF] border-[#8C56FF]/30 text-xs">{project.source}</Badge>
@@ -123,12 +123,12 @@ export const ReadyProjectsPage = () => {
                 {/* Title & Description */}
                 <div className="px-5 pb-3">
                   <h3 className="text-white font-bold text-base">{project.title}</h3>
-                  {project.description && <p className="text-slate-400 text-sm mt-1">{project.description}</p>}
+                  {project.description && <p className="theme-text-muted text-sm mt-1">{project.description}</p>}
                 </div>
 
                 {/* Images */}
                 {project.images && project.images.length > 0 && (
-                  <div className="bg-[#0F1923]">
+                  <div className="">
                     {project.images.length === 1 ? (
                       <img src={project.images[0]} alt={project.title} className="w-full max-h-[400px] object-contain" />
                     ) : (
@@ -142,10 +142,10 @@ export const ReadyProjectsPage = () => {
                 )}
 
                 {/* Actions: Like, Comment, Share */}
-                <div className="px-5 py-3 flex items-center gap-6 border-t border-[#3A4A5C]">
+                <div className="px-5 py-3 flex items-center gap-6 border-t ">
                   <button
                     onClick={() => handleLike(project.id)}
-                    className={`flex items-center gap-1.5 text-sm transition-colors ${project.liked_by_user ? 'text-red-400' : 'text-slate-400 hover:text-red-400'}`}
+                    className={`flex items-center gap-1.5 text-sm transition-colors ${project.liked_by_user ? 'text-red-400' : 'theme-text-muted hover:text-red-400'}`}
                     data-testid={`like-${project.id}`}
                   >
                     <Heart className={`h-5 w-5 ${project.liked_by_user ? 'fill-current' : ''}`} />
@@ -153,7 +153,7 @@ export const ReadyProjectsPage = () => {
                   </button>
                   <button
                     onClick={() => setExpandedComments(prev => ({ ...prev, [project.id]: !prev[project.id] }))}
-                    className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-[#4DA6FF] transition-colors"
+                    className="flex items-center gap-1.5 text-sm theme-text-muted hover:text-[#4DA6FF] transition-colors"
                     data-testid={`toggle-comments-${project.id}`}
                   >
                     <MessageCircle className="h-5 w-5" />
@@ -161,7 +161,7 @@ export const ReadyProjectsPage = () => {
                   </button>
                   <button
                     onClick={() => handleShare(project)}
-                    className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-[#28A745] transition-colors"
+                    className="flex items-center gap-1.5 text-sm theme-text-muted hover:text-[#28A745] transition-colors"
                     data-testid={`share-${project.id}`}
                   >
                     <Share2 className="h-5 w-5" />
@@ -171,7 +171,7 @@ export const ReadyProjectsPage = () => {
 
                 {/* Comments Section */}
                 {expandedComments[project.id] && (
-                  <div className="px-5 pb-4 border-t border-[#3A4A5C]">
+                  <div className="px-5 pb-4 border-t ">
                     {project.comments && project.comments.length > 0 && (
                       <div className="space-y-3 py-3 max-h-60 overflow-y-auto">
                         {project.comments.map((c, i) => (
@@ -181,7 +181,7 @@ export const ReadyProjectsPage = () => {
                             </div>
                             <div>
                               <p className="text-white text-xs font-medium">{c.author || 'Анонимен'} <span className="text-slate-600 font-normal">{c.created_at ? new Date(c.created_at).toLocaleDateString('bg-BG') : ''}</span></p>
-                              <p className="text-slate-300 text-sm">{c.text}</p>
+                              <p className="theme-text-muted text-sm">{c.text}</p>
                             </div>
                           </div>
                         ))}
@@ -193,7 +193,7 @@ export const ReadyProjectsPage = () => {
                         value={commentInputs[project.id] || ''}
                         onChange={(e) => setCommentInputs(prev => ({ ...prev, [project.id]: e.target.value }))}
                         onKeyDown={(e) => e.key === 'Enter' && handleComment(project.id)}
-                        className="bg-[#0F1923] border-[#3A4A5C] text-white text-sm flex-1"
+                        className="  text-white text-sm flex-1"
                         data-testid={`comment-input-${project.id}`}
                       />
                       <Button

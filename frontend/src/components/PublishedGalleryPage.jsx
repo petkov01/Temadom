@@ -57,7 +57,7 @@ const ShareButtons = ({ projectId, title }) => {
         <svg className="h-4 w-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm5.654 8.22l-1.85 8.708c-.14.617-.504.768-.102.48l-2.848-2.1-1.375 1.324c-.152.152-.28.28-.574.28l.204-2.904 5.28-4.772c.23-.204-.05-.318-.356-.114l-6.528 4.11-2.812-.878c-.612-.192-.624-.612.128-.906l10.996-4.238c.508-.184.954.124.786.91z"/></svg>
         Telegram
       </Button>
-      <Button size="sm" variant="outline" className="border-[#3A4A5C] text-slate-300 hover:bg-[#253545] text-xs" onClick={handleCopyLink} data-testid="share-copy-link">
+      <Button size="sm" variant="outline" className=" theme-text-muted hover: text-xs" onClick={handleCopyLink} data-testid="share-copy-link">
         <Copy className="h-3.5 w-3.5 mr-1.5" /> Копирай линк
       </Button>
     </div>
@@ -111,15 +111,15 @@ export const PublishedGalleryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E2A38] py-8" data-testid="published-gallery-page">
+    <div className="min-h-screen  py-8" data-testid="published-gallery-page">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-[#8C56FF]/15 border border-[#8C56FF]/30 rounded-full px-4 py-2 mb-4">
             <Sparkles className="h-5 w-5 text-[#8C56FF]" />
             <span className="font-medium text-sm text-[#8C56FF]">AI ГАЛЕРИЯ</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Публикувани AI проекти</h1>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold theme-text mb-3">Публикувани AI проекти</h1>
+          <p className="theme-text-muted max-w-2xl mx-auto">
             Разгледайте реални проекти, генерирани от AI Дизайнера. Вижте "преди" и "след" снимки и изтеглете PDF с количествени сметки.
           </p>
         </div>
@@ -134,14 +134,14 @@ export const PublishedGalleryPage = () => {
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1,2,3,4,5,6].map(i => (
-              <Card key={i} className="h-64 animate-pulse bg-[#253545] border-[#3A4A5C]" />
+              <Card key={i} className="h-64 animate-pulse  " />
             ))}
           </div>
         ) : projects.length === 0 ? (
-          <Card className="p-12 text-center bg-[#253545] border-[#3A4A5C]">
-            <Image className="h-12 w-12 mx-auto mb-4 text-slate-500" />
-            <h3 className="text-xl font-semibold text-slate-300 mb-2">Все още няма публикувани проекти</h3>
-            <p className="text-slate-500">Бъдете първите! Генерирайте дизайн и го публикувайте.</p>
+          <Card className="p-12 text-center  ">
+            <Image className="h-12 w-12 mx-auto mb-4 theme-text-subtle" />
+            <h3 className="text-xl font-semibold theme-text-muted mb-2">Все още няма публикувани проекти</h3>
+            <p className="theme-text-subtle">Бъдете първите! Генерирайте дизайн и го публикувайте.</p>
           </Card>
         ) : (
           <>
@@ -149,7 +149,7 @@ export const PublishedGalleryPage = () => {
               {projects.map(project => (
                 <Card 
                   key={project.id} 
-                  className="overflow-hidden hover:shadow-lg hover:shadow-[#8C56FF]/10 transition-all cursor-pointer group bg-[#253545] border-[#3A4A5C]"
+                  className="overflow-hidden hover:shadow-lg hover:shadow-[#8C56FF]/10 transition-all cursor-pointer group  "
                   onClick={() => openProject(project.id)}
                   data-testid={`gallery-card-${project.id}`}
                 >
@@ -174,12 +174,12 @@ export const PublishedGalleryPage = () => {
                     </div>
                   </div>
                   <CardContent className="p-4">
-                    <h3 className="font-semibold text-white text-sm mb-1">{project.room_type || 'AI Дизайн'}</h3>
+                    <h3 className="font-semibold theme-text text-sm mb-1">{project.room_type || 'AI Дизайн'}</h3>
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {project.style && <Badge variant="outline" className="text-[10px] border-[#3A4A5C] text-slate-400">{project.style}</Badge>}
-                      {project.material_class && <Badge variant="outline" className="text-[10px] border-[#3A4A5C] text-slate-400">{project.material_class}</Badge>}
+                      {project.style && <Badge variant="outline" className="text-[10px]  theme-text-muted">{project.style}</Badge>}
+                      {project.material_class && <Badge variant="outline" className="text-[10px]  theme-text-muted">{project.material_class}</Badge>}
                     </div>
-                    <div className="flex items-center justify-between text-xs text-slate-500">
+                    <div className="flex items-center justify-between text-xs theme-text-subtle">
                       <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {project.views || 0}</span>
                       <span>{project.generated_images?.length || 0} варианта</span>
                       <button 
@@ -201,11 +201,11 @@ export const PublishedGalleryPage = () => {
 
             {totalPages > 1 && (
               <div className="flex justify-center gap-3 mt-8">
-                <Button variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="border-[#3A4A5C] text-slate-300">
+                <Button variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className=" theme-text-muted">
                   <ChevronLeft className="h-4 w-4 mr-1" /> Назад
                 </Button>
-                <span className="flex items-center px-4 text-slate-400 text-sm">Стр. {page} от {totalPages}</span>
-                <Button variant="outline" disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="border-[#3A4A5C] text-slate-300">
+                <span className="flex items-center px-4 theme-text-muted text-sm">Стр. {page} от {totalPages}</span>
+                <Button variant="outline" disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className=" theme-text-muted">
                   Напред <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>
@@ -215,26 +215,26 @@ export const PublishedGalleryPage = () => {
 
         {/* Project Detail Modal */}
         <Dialog open={!!selectedProject || detailLoading} onOpenChange={() => { setSelectedProject(null); setDetailLoading(false); }}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#1E2A38] border-[#3A4A5C]">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto  ">
             {detailLoading ? (
               <div className="py-12 text-center">
                 <Loader2 className="h-8 w-8 text-[#8C56FF] animate-spin mx-auto mb-3" />
-                <p className="text-slate-400">Зареждане...</p>
+                <p className="theme-text-muted">Зареждане...</p>
               </div>
             ) : selectedProject ? (
               <div className="space-y-6">
                 <DialogTitle className="sr-only">Детайли на проект</DialogTitle>
                 <div>
-                  <h2 className="text-xl font-bold text-white">{selectedProject.room_type || 'AI Дизайн проект'}</h2>
+                  <h2 className="text-xl font-bold theme-text">{selectedProject.room_type || 'AI Дизайн проект'}</h2>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {selectedProject.style && <Badge className="bg-[#FF8C42]/10 text-[#FF8C42]">{selectedProject.style}</Badge>}
                     {selectedProject.material_class && <Badge className="bg-[#4DA6FF]/10 text-[#4DA6FF]">{selectedProject.material_class}</Badge>}
                     {selectedProject.dimensions && (
-                      <Badge variant="outline" className="border-[#3A4A5C] text-slate-400">
+                      <Badge variant="outline" className=" theme-text-muted">
                         {selectedProject.dimensions.width}m x {selectedProject.dimensions.length}m x {selectedProject.dimensions.height}m
                       </Badge>
                     )}
-                    <Badge variant="outline" className="border-[#3A4A5C] text-slate-400">
+                    <Badge variant="outline" className=" theme-text-muted">
                       <Eye className="h-3 w-3 mr-1" /> {selectedProject.views || 0} прегледа
                     </Badge>
                   </div>
@@ -243,15 +243,15 @@ export const PublishedGalleryPage = () => {
                 {/* Before/After */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-slate-400 text-xs mb-2 uppercase tracking-wider font-medium">Преди (Оригинал)</p>
+                    <p className="theme-text-muted text-xs mb-2 uppercase tracking-wider font-medium">Преди (Оригинал)</p>
                     {selectedProject.before_images?.map((img, i) => (
-                      <div key={i} className="rounded-lg overflow-hidden border border-[#3A4A5C] mb-2">
+                      <div key={i} className="rounded-lg overflow-hidden border  mb-2">
                         <img src={img} alt={`Before ${i+1}`} className="w-full" />
                       </div>
                     ))}
                     {(!selectedProject.before_images || selectedProject.before_images.length === 0) && (
-                      <div className="h-40 bg-[#253545] rounded-lg flex items-center justify-center border border-[#3A4A5C]">
-                        <p className="text-slate-500 text-sm">Няма оригинални снимки</p>
+                      <div className="h-40  rounded-lg flex items-center justify-center border ">
+                        <p className="theme-text-subtle text-sm">Няма оригинални снимки</p>
                       </div>
                     )}
                   </div>
@@ -259,11 +259,11 @@ export const PublishedGalleryPage = () => {
                     <p className="text-[#FF8C42] text-xs mb-2 uppercase tracking-wider font-medium">След (AI Дизайн)</p>
                     {selectedProject.generated_images?.map((gen, gi) => (
                       <div key={gi} className="mb-3">
-                        <p className="text-slate-500 text-[10px] mb-1">Вариант {gi + 1}</p>
+                        <p className="theme-text-subtle text-[10px] mb-1">Вариант {gi + 1}</p>
                         {gen.angles?.map((ang, ai) => (
                           <div key={ai} className="rounded-lg overflow-hidden border border-[#FF8C42]/30 mb-1">
                             <img src={`data:image/png;base64,${ang.image_base64}`} alt={`V${gi+1} A${ai+1}`} className="w-full" />
-                            <p className="text-center text-[10px] text-slate-500 py-1">{ang.angle_label}</p>
+                            <p className="text-center text-[10px] theme-text-subtle py-1">{ang.angle_label}</p>
                           </div>
                         ))}
                         {!gen.angles && gen.image_base64 && (
@@ -278,7 +278,7 @@ export const PublishedGalleryPage = () => {
 
                 {/* Materials summary */}
                 {selectedProject.materials?.materials?.length > 0 && (
-                  <Card className="bg-[#253545] border-[#3A4A5C]">
+                  <Card className=" ">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-white text-sm flex items-center gap-2">
                         <FileText className="h-4 w-4 text-[#FF8C42]" />
@@ -287,8 +287,8 @@ export const PublishedGalleryPage = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 gap-3 text-sm mb-3">
-                        <div><span className="text-slate-400">Материали:</span> <span className="text-white font-medium">{selectedProject.materials.total_estimate_bgn || selectedProject.materials.total_estimate || '-'}</span></div>
-                        <div><span className="text-slate-400">Труд:</span> <span className="text-white font-medium">{selectedProject.materials.labor_estimate_bgn || selectedProject.materials.labor_estimate || '-'}</span></div>
+                        <div><span className="theme-text-muted">Материали:</span> <span className="text-white font-medium">{selectedProject.materials.total_estimate_bgn || selectedProject.materials.total_estimate || '-'}</span></div>
+                        <div><span className="theme-text-muted">Труд:</span> <span className="text-white font-medium">{selectedProject.materials.labor_estimate_bgn || selectedProject.materials.labor_estimate || '-'}</span></div>
                       </div>
                       <div className="text-lg font-bold text-[#28A745]">
                         ОБЩА СТОЙНОСТ: {selectedProject.materials.grand_total_bgn || selectedProject.materials.grand_total || '-'}
@@ -318,7 +318,7 @@ export const PublishedGalleryPage = () => {
 
                 {/* Social Share */}
                 <div className="pt-2">
-                  <p className="text-slate-500 text-xs text-center mb-2 uppercase tracking-wider">Споделете проекта</p>
+                  <p className="theme-text-subtle text-xs text-center mb-2 uppercase tracking-wider">Споделете проекта</p>
                   <ShareButtons projectId={selectedProject.id} title={selectedProject.room_type || 'AI Дизайн'} />
                 </div>
               </div>

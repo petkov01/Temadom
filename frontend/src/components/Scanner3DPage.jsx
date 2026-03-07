@@ -215,8 +215,8 @@ const UploadStep = ({ photos, setPhotos, onComplete }) => {
           <Camera className="h-4 w-4 text-[#8C56FF]" />
           <span className="text-xs font-medium text-[#8C56FF]">СТЪПКА 1: КАЧЕТЕ СНИМКИ</span>
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">Заснемете помещението от 3 ъгъла</h2>
-        <p className="text-slate-400 text-sm max-w-lg mx-auto">
+        <h2 className="text-xl font-bold theme-text mb-2">Заснемете помещението от 3 ъгъла</h2>
+        <p className="theme-text-muted text-sm max-w-lg mx-auto">
           Снимайте стаята от ляво, фронтално и от дясно. AI ще създаде 360° панорама от вашите снимки.
         </p>
       </div>
@@ -233,7 +233,7 @@ const UploadStep = ({ photos, setPhotos, onComplete }) => {
               data-testid={`upload-input-${i}`}
             />
             {photos[i] ? (
-              <div className="relative aspect-[4/3] rounded-xl overflow-hidden border-2 border-[#8C56FF]/50 bg-[#253545]">
+              <div className="relative aspect-[4/3] rounded-xl overflow-hidden border-2 border-[#8C56FF]/50 ">
                 <img src={photos[i].url} alt={labels[i]} className="w-full h-full object-cover" />
                 <div className="absolute top-2 left-2">
                   <Badge className="bg-[#8C56FF] text-white text-xs">{labels[i]}</Badge>
@@ -254,7 +254,7 @@ const UploadStep = ({ photos, setPhotos, onComplete }) => {
             ) : (
               <button
                 onClick={() => fileRefs[i].current?.click()}
-                className="aspect-[4/3] w-full rounded-xl border-2 border-dashed border-[#3A4A5C] hover:border-[#8C56FF]/50 bg-[#253545]/50 hover:bg-[#253545] transition-all flex flex-col items-center justify-center gap-3 group"
+                className="aspect-[4/3] w-full rounded-xl border-2 border-dashed hover:border-[#8C56FF]/50 transition-all flex flex-col items-center justify-center gap-3 group"
                 data-testid={`upload-btn-${i}`}
               >
                 <div className="w-14 h-14 rounded-full bg-[#8C56FF]/15 flex items-center justify-center text-3xl font-bold text-[#8C56FF]/60 group-hover:text-[#8C56FF] transition-colors">
@@ -262,9 +262,9 @@ const UploadStep = ({ photos, setPhotos, onComplete }) => {
                 </div>
                 <div className="text-center">
                   <p className="text-white font-medium text-sm">{labels[i]}</p>
-                  <p className="text-slate-500 text-xs">{descriptions[i]}</p>
+                  <p className="theme-text-subtle text-xs">{descriptions[i]}</p>
                 </div>
-                <Upload className="h-4 w-4 text-slate-500 group-hover:text-[#8C56FF] transition-colors" />
+                <Upload className="h-4 w-4 theme-text-subtle group-hover:text-[#8C56FF] transition-colors" />
               </button>
             )}
           </div>
@@ -285,9 +285,9 @@ const UploadStep = ({ photos, setPhotos, onComplete }) => {
       </div>
 
       {/* Tips */}
-      <div className="bg-[#0F1923] rounded-xl border border-[#2A3A4C] p-4 mt-4">
+      <div className=" rounded-xl border  p-4 mt-4">
         <p className="text-xs font-medium text-[#FF8C42] mb-2">Съвети за по-добър резултат:</p>
-        <ul className="text-xs text-slate-400 space-y-1.5">
+        <ul className="text-xs theme-text-muted space-y-1.5">
           <li className="flex items-start gap-2"><CheckCircle className="h-3 w-3 text-[#28A745] mt-0.5 flex-shrink-0" /> Снимайте при дневна светлина за най-добро качество</li>
           <li className="flex items-start gap-2"><CheckCircle className="h-3 w-3 text-[#28A745] mt-0.5 flex-shrink-0" /> Дръжте камерата на нивото на очите</li>
           <li className="flex items-start gap-2"><CheckCircle className="h-3 w-3 text-[#28A745] mt-0.5 flex-shrink-0" /> Включете 50% припокриване между снимките</li>
@@ -303,13 +303,13 @@ const SwapPanel = ({ activeHotspot, selections, setSelections, onClose }) => {
   if (!category) return null;
 
   return (
-    <div className="absolute right-4 top-4 w-72 bg-[#1E2A38]/95 backdrop-blur-md border border-[#3A4A5C] rounded-xl shadow-2xl z-20 overflow-hidden" data-testid="swap-panel">
-      <div className="bg-[#0F1923] px-4 py-3 flex items-center justify-between border-b border-[#2A3A4C]">
+    <div className="absolute right-4 top-4 w-72 /95 backdrop-blur-md border  rounded-xl shadow-2xl z-20 overflow-hidden" data-testid="swap-panel">
+      <div className=" px-4 py-3 flex items-center justify-between border-b ">
         <div className="flex items-center gap-2">
           <span className="text-lg">{category.icon}</span>
           <h3 className="text-white font-semibold text-sm">{category.label}</h3>
         </div>
-        <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors" data-testid="close-swap-panel">
+        <button onClick={onClose} className="theme-text-muted hover:text-white transition-colors" data-testid="close-swap-panel">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -323,7 +323,7 @@ const SwapPanel = ({ activeHotspot, selections, setSelections, onClose }) => {
               className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all text-left ${
                 isSelected
                   ? 'bg-[#FF8C42]/20 border border-[#FF8C42]/50'
-                  : 'bg-[#253545]/50 border border-transparent hover:border-[#3A4A5C] hover:bg-[#253545]'
+                  : 'border border-transparent hover:opacity-80'
               }`}
               data-testid={`swap-option-${opt.id}`}
             >
@@ -333,7 +333,7 @@ const SwapPanel = ({ activeHotspot, selections, setSelections, onClose }) => {
               />
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-medium ${isSelected ? 'text-[#FF8C42]' : 'text-white'}`}>{opt.name}</p>
-                <p className="text-xs text-slate-400">{opt.price} EUR</p>
+                <p className="text-xs theme-text-muted">{opt.price} EUR</p>
               </div>
               {isSelected && <CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" />}
             </button>
@@ -352,7 +352,7 @@ const ResultsSummary = ({ selections, onPDF, onShare, onSave, projectId }) => {
   if (selected.length === 0) return null;
 
   return (
-    <div className="bg-[#0F1923] rounded-xl border border-[#2A3A4C] p-5" data-testid="results-summary">
+    <div className=" rounded-xl border  p-5" data-testid="results-summary">
       <h3 className="text-white font-bold text-base mb-4">Избрани елементи</h3>
       <div className="space-y-3 mb-4">
         {selected.map(([key, opt]) => {
@@ -363,7 +363,7 @@ const ResultsSummary = ({ selections, onPDF, onShare, onSave, projectId }) => {
                 <span className="text-sm">{cat?.icon}</span>
                 <div>
                   <p className="text-white text-sm font-medium">{cat?.label}</p>
-                  <p className="text-slate-500 text-xs">{opt.name}</p>
+                  <p className="theme-text-subtle text-xs">{opt.name}</p>
                 </div>
               </div>
               <span className="text-[#FF8C42] font-bold text-sm">{opt.price} EUR</span>
@@ -371,8 +371,8 @@ const ResultsSummary = ({ selections, onPDF, onShare, onSave, projectId }) => {
           );
         })}
       </div>
-      <div className="flex items-center justify-between pt-3 border-t border-[#2A3A4C]">
-        <span className="text-slate-400 text-sm">Общо:</span>
+      <div className="flex items-center justify-between pt-3 border-t ">
+        <span className="theme-text-muted text-sm">Общо:</span>
         <span className="text-white font-bold text-lg">{total.toLocaleString()} EUR</span>
       </div>
 
@@ -407,13 +407,13 @@ const ResultsSummary = ({ selections, onPDF, onShare, onSave, projectId }) => {
         </Button>
       </div>
       {projectId && (
-        <div className="mt-3 flex items-center gap-2 bg-[#253545] rounded-lg p-3 border border-[#3A4A5C]">
+        <div className="mt-3 flex items-center gap-2  rounded-lg p-3 border ">
           <Link2 className="h-4 w-4 text-[#8C56FF] flex-shrink-0" />
-          <span className="text-slate-400 text-xs">Линк за споделяне:</span>
+          <span className="theme-text-muted text-xs">Линк за споделяне:</span>
           <code className="text-[#8C56FF] text-xs flex-1 truncate">{`${window.location.origin}/3d-scanner/${projectId}`}</code>
           <button
             onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/3d-scanner/${projectId}`); toast.success('Линкът е копиран'); }}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="theme-text-muted hover:text-white transition-colors"
             data-testid="copy-link-btn"
           >
             <Copy className="h-3.5 w-3.5" />
@@ -550,9 +550,9 @@ export const Scanner3DPage = () => {
   }, [selections]);
 
   return (
-    <div className="min-h-screen bg-[#1E2A38]" data-testid="scanner-3d-page">
+    <div className="min-h-screen " data-testid="scanner-3d-page">
       {/* Header */}
-      <div className="bg-gradient-to-b from-[#0F1923] to-[#1E2A38] border-b border-[#2A3A4C]">
+      <div className="bg-gradient-to-b from-[#0F1923] to-[#1E2A38] border-b ">
         <div className="max-w-6xl mx-auto px-4 py-8 text-center">
           <div className="inline-flex items-center gap-2 bg-[#8C56FF]/15 border border-[#8C56FF]/30 rounded-full px-5 py-2 mb-5">
             <Move3D className="h-4 w-4 text-[#8C56FF]" />
@@ -561,7 +561,7 @@ export const Scanner3DPage = () => {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-3">
             360° Виртуален <span className="text-[#8C56FF]">3D модел</span>
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
+          <p className="theme-text-muted text-sm sm:text-base max-w-2xl mx-auto">
             Качете 3 снимки на помещението и получете интерактивен 3D модел. 
             Сменяйте мебели, плочки и оборудване с едно кликване.
           </p>
@@ -578,7 +578,7 @@ export const Scanner3DPage = () => {
                 <Move3D className="h-8 w-8 text-[#8C56FF] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
               </div>
               <p className="text-white font-medium mt-6">Генериране на 3D модел...</p>
-              <p className="text-slate-500 text-sm mt-1">Обработка на снимките и създаване на панорама</p>
+              <p className="theme-text-subtle text-sm mt-1">Обработка на снимките и създаване на панорама</p>
             </div>
           ) : (
             <UploadStep photos={photos} setPhotos={setPhotos} onComplete={handleGenerate} />
@@ -592,7 +592,7 @@ export const Scanner3DPage = () => {
                 <Badge className="bg-[#28A745]/20 text-[#28A745] border-[#28A745]/30">
                   <Eye className="h-3 w-3 mr-1" /> 3D Преглед
                 </Badge>
-                <span className="text-slate-500 text-xs flex items-center gap-1">
+                <span className="theme-text-subtle text-xs flex items-center gap-1">
                   <MousePointer className="h-3 w-3" /> Плъзнете за въртене | Scroll за мащаб
                 </span>
               </div>
@@ -600,7 +600,7 @@ export const Scanner3DPage = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleReset}
-                className="border-[#3A4A5C] text-slate-300 hover:bg-[#253545]"
+                className=" theme-text-muted hover:"
                 data-testid="reset-btn"
               >
                 <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Нов проект
@@ -610,7 +610,7 @@ export const Scanner3DPage = () => {
             {/* 3D Canvas + Swap Panel */}
             <div className="relative">
               <div
-                className="w-full rounded-2xl overflow-hidden border border-[#3A4A5C] bg-black"
+                className="w-full rounded-2xl overflow-hidden border  bg-black"
                 style={{ height: 'min(65vh, 550px)' }}
                 data-testid="canvas-3d"
               >
@@ -655,8 +655,8 @@ export const Scanner3DPage = () => {
                       activeHotspot === hs.id
                         ? 'bg-[#FF8C42] text-white'
                         : sel
-                        ? 'bg-[#253545] text-[#FF8C42] border border-[#FF8C42]/30'
-                        : 'bg-[#253545] text-slate-300 border border-[#3A4A5C] hover:border-[#FF8C42]/30'
+                        ? ' text-[#FF8C42] border border-[#FF8C42]/30'
+                        : ' theme-text-muted border  hover:border-[#FF8C42]/30'
                     }`}
                     data-testid={`chip-${hs.id}`}
                   >

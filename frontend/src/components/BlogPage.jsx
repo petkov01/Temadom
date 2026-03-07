@@ -51,7 +51,7 @@ const BlogPage = () => {
               ? <>{`Blog about construction & `}<span className="text-orange-400">renovations</span></>
               : <>Блог за строителство и <span className="text-orange-400">ремонти</span></>}
           </h1>
-          <p className="text-slate-300 max-w-2xl mx-auto">
+          <p className="max-w-2xl mx-auto" style={{ color: 'var(--theme-text-muted)' }}>
             {isEn 
               ? 'Current prices, tips and guides for construction and renovations in Bulgaria 2026.'
               : 'Актуални цени, съвети и ръководства за строителство и ремонти в България 2026.'}
@@ -69,7 +69,7 @@ const BlogPage = () => {
         </div>
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--theme-text-subtle)' }} />
             <Input placeholder={isEn ? 'Search article...' : 'Търси статия...'} value={search} onChange={e => setSearch(e.target.value)} className="pl-10" data-testid="blog-search" />
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -82,7 +82,7 @@ const BlogPage = () => {
           </div>
         </div>
 
-        <p className="text-sm text-slate-500 mb-4">{filtered.length} {isEn ? 'articles' : 'статии'}</p>
+        <p className="text-sm mb-4" style={{ color: 'var(--theme-text-subtle)' }}>{filtered.length} {isEn ? 'articles' : 'статии'}</p>
 
         <div className="grid md:grid-cols-2 gap-4">
           {filtered.map(article => (
@@ -94,12 +94,12 @@ const BlogPage = () => {
                       {article.category ? catLabels[article.category] || article.category : typeLabels[article.type]}
                     </Badge>
                     {article.readTime && (
-                      <span className="text-xs text-slate-400 flex items-center gap-1"><Clock className="h-3 w-3" /> {article.readTime}</span>
+                      <span className="text-xs flex items-center gap-1" style={{ color: 'var(--theme-text-subtle)' }}><Clock className="h-3 w-3" /> {article.readTime}</span>
                     )}
-                    <span className="text-xs text-slate-400 flex items-center gap-1"><Calendar className="h-3 w-3" /> 2026</span>
+                    <span className="text-xs flex items-center gap-1" style={{ color: 'var(--theme-text-subtle)' }}><Calendar className="h-3 w-3" /> 2026</span>
                   </div>
-                  <h2 className="font-bold text-white mb-2 line-clamp-2">{article.title}</h2>
-                  <p className="text-sm text-slate-400 line-clamp-2">{article.description}</p>
+                  <h2 className="font-bold mb-2 line-clamp-2" style={{ color: 'var(--theme-text)' }}>{article.title}</h2>
+                  <p className="text-sm line-clamp-2" style={{ color: 'var(--theme-text-muted)' }}>{article.description}</p>
                   <div className="mt-3 flex items-center text-[#FF8C42] text-sm font-medium">
                     Прочети повече <ArrowRight className="h-3 w-3 ml-1" />
                   </div>

@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://temdom-launch.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://ai-designer-final.preview.emergentagent.com')
 
 class TestAIDesignerPhotoGenerate:
     """Test the photo-generate endpoint still works"""
