@@ -259,11 +259,15 @@ const Navbar = () => {
 
   return (
     <nav className="glass-nav sticky top-0 z-50">
-      {/* Top: Compact navigation bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center" style={{ height: '40px' }}>
-          {/* Left: Nav links (desktop) */}
-          <div className="hidden lg:flex items-center gap-1">
+        <div className="flex justify-between items-center relative" style={{ height: '44px' }}>
+          {/* Logo top-left in taskbar */}
+          <Link to="/" className="absolute top-1 left-0 z-10" data-testid="logo-link">
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-9 lg:h-9 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
+          </Link>
+
+          {/* Left: Nav links (desktop) - shifted right for logo */}
+          <div className="hidden lg:flex items-center gap-1 ml-12">
             <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
               Главна
             </Link>
@@ -412,7 +416,7 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="lg:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-2 ml-11">
             <ThemeToggle />
             <div className="relative" ref={mobileLangRef}>
               <button
@@ -450,13 +454,6 @@ const Navbar = () => {
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
-        </div>
-
-        {/* Centered Logo below task bar */}
-        <div className="flex justify-center" style={{ padding: '0 0 12px 0' }}>
-          <Link to="/" data-testid="logo-link">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-16 lg:h-[64px] w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 4px 12px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
-          </Link>
         </div>
       </div>
 
