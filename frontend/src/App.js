@@ -550,50 +550,83 @@ const LiveCounter = () => {
   const freeLeft = Math.max(0, stats.free_slots.total - stats.free_slots.used);
 
   return (
-    <div className={`fixed top-[110px] right-4 z-40 hidden md:block transition-all duration-300 ${show ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`} data-testid="live-counter">
-      <button onClick={() => setShow(!show)} className="absolute -left-7 top-2 rounded-l-lg px-1.5 py-2 transition-colors" style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', color: 'var(--theme-text-muted)' }} data-testid="live-counter-toggle">
-        {show ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
-      </button>
-      <div className={`backdrop-blur-lg rounded-xl p-3 min-w-[160px] shadow-xl ${pulse ? 'ring-2 ring-[#28A745]/50' : ''}`} style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', transition: 'box-shadow 0.5s' }}>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28A745] opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#28A745]"></span></span>
-            <span className="text-[#28A745] text-xs font-bold tabular-nums">{stats.online || 1}</span>
-            <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>онлайн</span>
-          </div>
-          <div className="h-px my-0.5" style={{ background: 'var(--theme-nav-border)' }} />
-          <div className="flex items-center gap-2">
-            <Users className="h-3.5 w-3.5 text-[#A8D5BA]" />
-            <span className={`text-xs font-bold tabular-nums ${pulse ? 'text-[#A8D5BA]' : ''}`} style={{ color: pulse ? undefined : 'var(--theme-text)', transition: 'color 0.5s' }}>{(stats.clients || 0).toLocaleString()}</span>
-            <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>клиенти</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Building2 className="h-3.5 w-3.5 text-[#B8D0E8]" />
-            <span className="text-xs font-bold tabular-nums" style={{ color: 'var(--theme-text)' }}>{stats.companies || 0}</span>
-            <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>фирми</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Wrench className="h-3.5 w-3.5 text-[#E8DAB2]" />
-            <span className="text-xs font-bold tabular-nums" style={{ color: 'var(--theme-text)' }}>{stats.masters || 0}</span>
-            <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>майстори</span>
-          </div>
-          <div className="h-px my-0.5" style={{ background: 'var(--theme-nav-border)' }} />
-          <div className="flex items-center gap-2">
-            <Zap className="h-3.5 w-3.5 text-[#28A745]" />
-            <div className="flex-1">
-              <div className="flex justify-between items-center">
-                <span className="text-[#28A745] text-[10px] font-bold">{freeLeft} FREE</span>
-                <span className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>{stats.free_slots.used}/{stats.free_slots.total}</span>
-              </div>
-              <div className="h-1 rounded-full mt-0.5 overflow-hidden" style={{ background: 'var(--theme-bg-secondary)' }}>
-                <div className="h-full bg-[#28A745] rounded-full transition-all duration-1000"
-                  style={{ width: `${(stats.free_slots.used / stats.free_slots.total) * 100}%` }} />
+    <>
+      {/* Desktop: Fixed sidebar (same as before) */}
+      <div className={`fixed top-[110px] right-4 z-40 hidden md:block transition-all duration-300 ${show ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`} data-testid="live-counter">
+        <button onClick={() => setShow(!show)} className="absolute -left-7 top-2 rounded-l-lg px-1.5 py-2 transition-colors" style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', color: 'var(--theme-text-muted)' }} data-testid="live-counter-toggle">
+          {show ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        </button>
+        <div className={`backdrop-blur-lg rounded-xl p-3 min-w-[160px] shadow-xl ${pulse ? 'ring-2 ring-[#28A745]/50' : ''}`} style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', transition: 'box-shadow 0.5s' }}>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28A745] opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#28A745]"></span></span>
+              <span className="text-[#28A745] text-xs font-bold tabular-nums">{stats.online || 1}</span>
+              <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>онлайн</span>
+            </div>
+            <div className="h-px my-0.5" style={{ background: 'var(--theme-nav-border)' }} />
+            <div className="flex items-center gap-2">
+              <Users className="h-3.5 w-3.5 text-[#A8D5BA]" />
+              <span className={`text-xs font-bold tabular-nums ${pulse ? 'text-[#A8D5BA]' : ''}`} style={{ color: pulse ? undefined : 'var(--theme-text)', transition: 'color 0.5s' }}>{(stats.clients || 0).toLocaleString()}</span>
+              <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>клиенти</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Building2 className="h-3.5 w-3.5 text-[#B8D0E8]" />
+              <span className="text-xs font-bold tabular-nums" style={{ color: 'var(--theme-text)' }}>{stats.companies || 0}</span>
+              <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>фирми</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Wrench className="h-3.5 w-3.5 text-[#E8DAB2]" />
+              <span className="text-xs font-bold tabular-nums" style={{ color: 'var(--theme-text)' }}>{stats.masters || 0}</span>
+              <span className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>майстори</span>
+            </div>
+            <div className="h-px my-0.5" style={{ background: 'var(--theme-nav-border)' }} />
+            <div className="flex items-center gap-2">
+              <Zap className="h-3.5 w-3.5 text-[#28A745]" />
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-[#28A745] text-[10px] font-bold">{freeLeft} FREE</span>
+                  <span className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>{stats.free_slots.used}/{stats.free_slots.total}</span>
+                </div>
+                <div className="h-1 rounded-full mt-0.5 overflow-hidden" style={{ background: 'var(--theme-bg-secondary)' }}>
+                  <div className="h-full bg-[#28A745] rounded-full transition-all duration-1000"
+                    style={{ width: `${(stats.free_slots.used / stats.free_slots.total) * 100}%` }} />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Mobile: Compact bottom bar */}
+      <div className="fixed bottom-16 left-3 right-14 z-40 md:hidden rounded-full shadow-lg" data-testid="live-counter-mobile">
+        <div className="backdrop-blur-lg px-4 py-2.5 flex items-center justify-between gap-3 rounded-full"
+          style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
+          <div className="flex items-center gap-1.5">
+            <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28A745] opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-[#28A745]"></span></span>
+            <span className="text-[#28A745] text-[10px] font-bold">{stats.online || 1}</span>
+            <span className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>онлайн</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <Users className="h-3 w-3 text-[#A8D5BA]" />
+              <span className="text-[10px] font-bold" style={{ color: 'var(--theme-text)' }}>{stats.clients || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Building2 className="h-3 w-3 text-[#B8D0E8]" />
+              <span className="text-[10px] font-bold" style={{ color: 'var(--theme-text)' }}>{stats.companies || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Wrench className="h-3 w-3 text-[#E8DAB2]" />
+              <span className="text-[10px] font-bold" style={{ color: 'var(--theme-text)' }}>{stats.masters || 0}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            <Zap className="h-3 w-3 text-[#28A745]" />
+            <span className="text-[#28A745] text-[9px] font-bold">{freeLeft} FREE</span>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

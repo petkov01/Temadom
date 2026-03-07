@@ -105,6 +105,37 @@ def make_affiliate_url(url: str, store_name: str = "") -> str:
     separator = "&" if "?" in url else "?"
     return f"{url}{separator}{param}={ref}{extra}"
 
+# ==================== SUBSCRIPTION PLAN LIMITS ====================
+PLAN_LIMITS = {
+    "basic":   {"offers_per_month": 5,  "pdf_contracts": False, "ai_sketches": False, "quantitative_estimates": False, "telegram_notifications": False, "priority_display": False, "team_members": 1},
+    "pro":     {"offers_per_month": 999, "pdf_contracts": True,  "ai_sketches": True,  "quantitative_estimates": True,  "telegram_notifications": True,  "priority_display": True,  "team_members": 1},
+    "premium": {"offers_per_month": 999, "pdf_contracts": True,  "ai_sketches": True,  "quantitative_estimates": True,  "telegram_notifications": True,  "priority_display": True,  "team_members": 5},
+}
+
+async def check_plan_feature(user: dict, feature: str) -> dict:
+    """Check if a user's subscription plan allows a specific feature.
+    Returns {"allowed": True/False, "plan": "basic/pro/premium", "reason": "..."}
+    """
+    plan = user.get("subscription_plan") or "basic"
+    limits = PLAN_LIMITS.get(plan, PLAN_LIMITS["basic"])
+    if feature == "offers":
+        # Count offers this month
+        month_start = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        count = await db.community_offers.count_documents({
+            "company_id": user["id"],
+            "created_at": {"$gte": month_start.isoformat()}
+        })
+        max_offers = limits["offers_per_month"]
+        if count >= max_offers:
+            return {"allowed": False, "plan": plan, "reason": f"Лимитът от {max_offers} оферти/месец за план {plan.upper()} е достигнат. Надградете до ПРО за неограничени оферти.", "current": count, "max": max_offers}
+        return {"allowed": True, "plan": plan, "remaining": max_offers - count}
+    elif feature in ("pdf_contracts", "ai_sketches", "quantitative_estimates", "telegram_notifications"):
+        allowed = limits.get(feature, False)
+        if not allowed:
+            return {"allowed": False, "plan": plan, "reason": f"Функцията '{feature}' не е достъпна за план {plan.upper()}. Надградете до ПРО или PREMIUM."}
+        return {"allowed": True, "plan": plan}
+    return {"allowed": True, "plan": plan}
+
 # Categories for construction/renovation
 CATEGORIES = [
     {"id": "electricity", "name": "Електричество", "icon": "Zap"},
@@ -2277,6 +2308,41 @@ async def simulate_subscription_expiry(user: dict = Depends(get_current_user)):
         {"$set": {"subscription_expires": expired_time}}
     )
     return {"message": "Абонаментът е симулиран като изтекъл. Изчакайте до 1 час за автоматично деактивиране, или извикайте /api/subscriptions/run-check."}
+
+
+@api_router.get("/subscriptions/check-feature/{feature}")
+async def check_feature_access(feature: str, user: dict = Depends(get_current_user)):
+    """Check if user's plan allows a specific feature"""
+    check = await check_plan_feature(user, feature)
+    return check
+
+@api_router.get("/subscriptions/my-limits")
+async def get_my_limits(user: dict = Depends(get_current_user)):
+    """Get current user's plan limits and usage"""
+    plan = user.get("subscription_plan") or "basic"
+    limits = PLAN_LIMITS.get(plan, PLAN_LIMITS["basic"])
+    # Count offers this month
+    month_start = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    offers_this_month = await db.community_offers.count_documents({
+        "company_id": user["id"],
+        "created_at": {"$gte": month_start.isoformat()}
+    })
+    return {
+        "plan": plan,
+        "plan_name": {"basic": "БАЗОВ", "pro": "ПРО", "premium": "PREMIUM"}.get(plan, plan),
+        "limits": limits,
+        "usage": {"offers_this_month": offers_this_month},
+        "features": {
+            "offers": {"current": offers_this_month, "max": limits["offers_per_month"], "remaining": max(0, limits["offers_per_month"] - offers_this_month)},
+            "pdf_contracts": limits["pdf_contracts"],
+            "ai_sketches": limits["ai_sketches"],
+            "quantitative_estimates": limits["quantitative_estimates"],
+            "telegram_notifications": limits["telegram_notifications"],
+            "priority_display": limits["priority_display"],
+            "team_members": limits["team_members"],
+        }
+    }
+
 
 @api_router.post("/subscriptions/run-check")
 async def run_subscription_check():
@@ -5409,8 +5475,13 @@ async def leaderboard_companies(period: str = "all"):
 @api_router.post("/community/offers")
 async def create_offer(request: Request, user: dict = Depends(get_current_user)):
     """A company creates an offer on a project post"""
-    if user.get("user_type") not in ("company", "firm"):
+    if user.get("user_type") not in ("company", "firm", "master"):
         raise HTTPException(status_code=403, detail="Само фирми могат да правят оферти")
+
+    # Check subscription plan limits for offers
+    check = await check_plan_feature(user, "offers")
+    if not check["allowed"]:
+        raise HTTPException(status_code=403, detail=check["reason"])
 
     data = await request.json()
     post_id = data.get("post_id", "")
