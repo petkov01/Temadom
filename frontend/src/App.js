@@ -259,11 +259,11 @@ const Navbar = () => {
   return (
     <nav className="glass-nav sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-[110px] lg:h-32">
+        <div className="flex justify-between h-[140px] lg:h-44">
           {/* Left: Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
-              <img src="/logo-temadom.png" alt="TemaDom" className="h-24 lg:h-28 w-auto" style={{ filter: 'drop-shadow(0 0 14px rgba(246, 195, 106, 0.8))' }} />
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-32 lg:h-40 w-auto" style={{ filter: 'drop-shadow(0 0 18px rgba(246, 195, 106, 0.85))' }} />
             </Link>
           </div>
 
@@ -936,7 +936,7 @@ const LandingPage = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24 flex flex-col items-center">
           {/* Logo */}
           <div className="mb-8 animate-slideUp">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-64 md:h-80 w-auto mx-auto animate-float" style={{ filter: 'drop-shadow(0 0 28px rgba(246, 195, 106, 0.9))' }} />
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-[28rem] md:h-[36rem] w-auto mx-auto animate-float" style={{ filter: 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' }} />
           </div>
 
           {/* Counter badge */}
