@@ -153,21 +153,37 @@ async def check_plan_feature(user: dict, feature: str) -> dict:
 
 # Categories for construction/renovation
 CATEGORIES = [
-    {"id": "electricity", "name": "Електричество", "icon": "Zap"},
-    {"id": "plumbing", "name": "ВиК", "icon": "Droplets"},
-    {"id": "painting", "name": "Боядисване", "icon": "Paintbrush"},
-    {"id": "concrete", "name": "Бетон", "icon": "Boxes"},
-    {"id": "reinforcement", "name": "Арматура", "icon": "Grid3x3"},
-    {"id": "tiling", "name": "Фаянс и теракота", "icon": "LayoutGrid"},
-    {"id": "flooring", "name": "Подови настилки", "icon": "Square"},
-    {"id": "roofing", "name": "Покриви", "icon": "Home"},
-    {"id": "windows", "name": "Дограма", "icon": "AppWindow"},
-    {"id": "hvac", "name": "Отопление и климатизация", "icon": "Thermometer"},
-    {"id": "insulation", "name": "Изолация", "icon": "Layers"},
-    {"id": "demolition", "name": "Събаряне", "icon": "Hammer"},
-    {"id": "masonry", "name": "Зидария", "icon": "BrickWall"},
-    {"id": "carpentry", "name": "Дърводелство", "icon": "Axe"},
-    {"id": "general", "name": "Общо строителство", "icon": "Building2"}
+    {"id": "electricity", "name": "Електричество", "icon": "Zap", "section": "renovation"},
+    {"id": "plumbing", "name": "ВиК", "icon": "Droplets", "section": "renovation"},
+    {"id": "painting", "name": "Боядисване", "icon": "Paintbrush", "section": "renovation"},
+    {"id": "concrete", "name": "Бетон", "icon": "Boxes", "section": "both"},
+    {"id": "reinforcement", "name": "Арматура", "icon": "Grid3x3", "section": "both"},
+    {"id": "tiling", "name": "Фаянс и теракота", "icon": "LayoutGrid", "section": "renovation"},
+    {"id": "flooring", "name": "Подови настилки", "icon": "Square", "section": "renovation"},
+    {"id": "roofing", "name": "Покриви", "icon": "Home", "section": "both"},
+    {"id": "windows", "name": "Дограма", "icon": "AppWindow", "section": "both"},
+    {"id": "hvac", "name": "Отопление и климатизация", "icon": "Thermometer", "section": "both"},
+    {"id": "insulation", "name": "Изолация", "icon": "Layers", "section": "both"},
+    {"id": "demolition", "name": "Събаряне", "icon": "Hammer", "section": "renovation"},
+    {"id": "masonry", "name": "Зидария", "icon": "BrickWall", "section": "both"},
+    {"id": "carpentry", "name": "Дърводелство", "icon": "Axe", "section": "both"},
+    {"id": "general", "name": "Общо строителство", "icon": "Building2", "section": "both"},
+    {"id": "foundation", "name": "Основи и фундаменти", "icon": "Landmark", "section": "construction"},
+    {"id": "structural", "name": "Конструкция (носеща)", "icon": "Building", "section": "construction"},
+    {"id": "exterior", "name": "Фасади и облицовки", "icon": "PanelTop", "section": "construction"},
+    {"id": "landscaping", "name": "Озеленяване и двор", "icon": "TreePine", "section": "construction"},
+    {"id": "infrastructure", "name": "Инфраструктура", "icon": "Route", "section": "construction"},
+    {"id": "turnkey", "name": "До ключ", "icon": "Key", "section": "construction"},
+]
+
+PROPERTY_TYPES = [
+    {"id": "house", "name": "Къща"},
+    {"id": "apartment_building", "name": "Кооперация / Жилищна сграда"},
+    {"id": "warehouse", "name": "Хале / Склад"},
+    {"id": "office", "name": "Офис сграда"},
+    {"id": "commercial", "name": "Търговски обект"},
+    {"id": "villa", "name": "Вила"},
+    {"id": "other", "name": "Друго"},
 ]
 
 # Bulgaria's 28 regions (области) - 2 free firm slots each = 56 total
@@ -420,8 +436,11 @@ async def get_avatar(user_id: str):
 # ============== CATEGORIES ROUTES ==============
 
 @api_router.get("/categories")
-async def get_categories():
-    return {"categories": CATEGORIES}
+async def get_categories(section: Optional[str] = None):
+    cats = CATEGORIES
+    if section and section != "all":
+        cats = [c for c in CATEGORIES if c.get("section") in [section, "both"]]
+    return {"categories": cats, "property_types": PROPERTY_TYPES}
 
 # ============== PROJECTS ROUTES ==============
 
@@ -458,16 +477,25 @@ async def get_projects(
     category: Optional[str] = None,
     city: Optional[str] = None,
     search: Optional[str] = None,
+    section_type: Optional[str] = None,
+    property_type: Optional[str] = None,
     page: int = 1,
     limit: int = 12,
     user: Optional[dict] = Depends(get_optional_user)
 ):
     query = {"status": "active"}
     
+    if section_type:
+        if section_type == "renovation":
+            query["section_type"] = {"$in": ["renovation", None]}
+        else:
+            query["section_type"] = section_type
     if category:
         query["category"] = category
     if city:
         query["city"] = {"$regex": city, "$options": "i"}
+    if property_type:
+        query["property_type"] = property_type
     if search:
         query["$or"] = [
             {"title": {"$regex": search, "$options": "i"}},
@@ -2955,35 +2983,52 @@ async def generate_photo_design(
 
                 logging.info(f"Photo Designer: Vision detected '{detected_room}' for photo {idx+1} (user said: {room_type_name})")
 
-                # Step 1b: Generate 3D render with PRECISE room-aware prompt
-                render_prompt = f"""Photorealistic 3D interior design render of a {detected_room} ({room_type_name}).
+                # Step 1b: Generate 3D render using IMAGE EDIT (preserves architecture 1:1)
+                render_prompt = f"""ARCHITECTURAL RENOVATION — transform this EXACT room into a {style_desc} interior.
 
-CRITICAL — THIS IS A {detected_room.upper()}! Generate ONLY a {detected_room}!
-Visible elements: {elements}
-{f"Layout: {layout_desc}" if layout_desc else ""}
-{f"Current colors: {colors}" if colors else ""}
-{f"Camera angle: {camera_angle}" if camera_angle else ""}
+ABSOLUTE RULES — DO NOT VIOLATE:
+1. Keep the IDENTICAL room geometry, walls, proportions, and shape
+2. Keep windows and doors in EXACTLY the same positions and sizes
+3. Keep the same camera angle and perspective
+4. ONLY change: wall finishes, floor material, ceiling, furniture, lighting fixtures
+5. DO NOT add or remove any structural elements (walls, columns, windows, doors)
 
-Room dimensions: {width}m x {length}m, ceiling height {height}m.
-KEEP the EXACT same room shape, proportions and camera perspective.
+RENOVATION:
+- Room: {detected_room} ({room_type_name}), {width}m x {length}m, height {height}m
+- Style: {style_desc}
+{f"- Client notes: {reno_instruction}" if notes else "- Apply complete modern renovation with high-quality finishes"}
+- Replace old materials with modern {style_desc} finishes
+- Add stylish furniture and decor matching the {style_desc} aesthetic
+- Professional interior photography lighting, ultra-realistic, 8K quality"""
 
-RENOVATION STYLE: {style_desc}
-{f"Notes: {reno_instruction}" if notes else "Apply modern renovation with high-quality finishes."}
+                # Decode original photo bytes for image_edit
+                original_photo_bytes = base64.b64decode(photo_b64)
 
-IMPORTANT RULES:
-- This MUST be a {detected_room}, NOT any other room type
-- Keep all structural elements (walls, doors, windows) in same positions
-- Replace old finishes with new modern materials matching {style_desc} style
-- Professional interior photography, natural lighting, 8K quality"""
-
-                async def run_image_gen(prompt=render_prompt):
-                    return await image_gen.generate_images(
+                async def run_image_edit(prompt=render_prompt, img_bytes=original_photo_bytes):
+                    import litellm as litellm_module
+                    proxy_url = "https://integrations.emergentagent.com/llm"
+                    result = await litellm_module.aimage_edit(
+                        image=img_bytes,
                         prompt=prompt,
                         model="gpt-image-1",
-                        number_of_images=1
+                        n=1,
+                        quality="medium",
+                        api_key=EMERGENT_LLM_KEY,
+                        api_base=proxy_url,
                     )
+                    # Extract image bytes from response
+                    img_data_list = []
+                    for img_obj in result.data:
+                        if hasattr(img_obj, 'b64_json') and img_obj.b64_json:
+                            img_data_list.append(base64.b64decode(img_obj.b64_json))
+                        elif hasattr(img_obj, 'url') and img_obj.url:
+                            import aiohttp
+                            async with aiohttp.ClientSession() as session:
+                                async with session.get(img_obj.url) as resp:
+                                    img_data_list.append(await resp.read())
+                    return img_data_list
 
-                img_result = await retry_with_backoff(run_image_gen, max_retries=3, base_delay=3)
+                img_result = await retry_with_backoff(run_image_edit, max_retries=3, base_delay=3)
                 if img_result and len(img_result) > 0:
                     img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
                     renders.append({
@@ -3788,45 +3833,47 @@ Respond in JSON:
 
         for i in range(variants_count):
             variant_angles = []
+            # Use first image as reference for image_edit
+            first_image_bytes = base64.b64decode(cleaned_images[0])
+            
             for angle_idx, (angle_desc, angle_label) in enumerate(camera_angles):
                 try:
-                    strict_prompt = f"""ARCHITECTURAL RENOVATION — EXACT SAME ROOM, only surfaces and finishes changed.
+                    strict_prompt = f"""ARCHITECTURAL RENOVATION — transform this EXACT room. Only change surfaces, finishes, and furniture.
 
-=== ROOM ARCHITECTURE (DO NOT CHANGE) ===
-Room: {room_type_name}, {room_width}m x {room_length}m, height {room_height}m
-Shape: {room_analysis.get('shape', 'rectangular')}
-Walls: {walls_desc or 'standard rectangular layout'}
-Windows: {windows_desc or 'as described'}
-Doors: {doors_desc or 'as described'}
-Camera: {angle_desc}
+Room: {room_type_name}, {room_width}m x {room_length}m, height {room_height}m.
+{angle_desc}.
 
-=== DETAILED ROOM DESCRIPTION (PRESERVE EXACTLY) ===
-{room_desc}
-
-=== RENOVATION TO APPLY ===
-{reno_instruction}
+RENOVATION: {reno_instruction}
 Style: {style_desc}. Materials: {material_desc}.
 
-=== ABSOLUTE RULES ===
+ABSOLUTE RULES:
 1. IDENTICAL room geometry — same walls, same proportions, same shape
 2. Windows and doors in EXACTLY the same positions and sizes
-3. Same camera perspective and room proportions
-4. ONLY change: wall colors/textures, floor material, ceiling finish, furniture style, lighting fixtures
-5. DO NOT add structural elements (walls, columns, alcoves) that don't exist
-6. DO NOT remove structural elements (windows, doors, load-bearing walls)
-7. Keep the SAME number of windows and doors in the SAME positions
-8. Furniture placement must follow the same logical layout
-9. Ultra-realistic professional interior photography, natural lighting, 8K quality"""
+3. ONLY change: wall colors/textures, floor material, ceiling, furniture, lighting
+4. DO NOT add or remove structural elements
+5. Ultra-realistic professional interior photography, 8K quality"""
 
-                    img_result = await image_gen.generate_images(
+                    import litellm as litellm_module
+                    proxy_url = "https://integrations.emergentagent.com/llm"
+                    edit_result = await litellm_module.aimage_edit(
+                        image=first_image_bytes,
                         prompt=strict_prompt,
                         model="gpt-image-1",
-                        number_of_images=1,
-                        quality="high"
+                        n=1,
+                        quality="high",
+                        api_key=EMERGENT_LLM_KEY,
+                        api_base=proxy_url,
                     )
 
-                    if img_result and len(img_result) > 0:
-                        img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
+                    if edit_result and edit_result.data:
+                        img_obj = edit_result.data[0]
+                        if hasattr(img_obj, 'b64_json') and img_obj.b64_json:
+                            img_b64 = img_obj.b64_json
+                        elif hasattr(img_obj, 'url') and img_obj.url:
+                            import aiohttp as aio_http
+                            async with aio_http.ClientSession() as session:
+                                async with session.get(img_obj.url) as resp:
+                                    img_b64 = base64.b64encode(await resp.read()).decode('utf-8')
                         variant_angles.append({
                             "angle": angle_idx + 1,
                             "angle_label": angle_label,

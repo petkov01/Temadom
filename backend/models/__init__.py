@@ -79,12 +79,19 @@ class ProjectCreate(BaseModel):
     description: str
     category: str
     city: str
+    section_type: str = "renovation"  # "renovation" or "construction"
     address: Optional[str] = None
     budget_min: Optional[float] = None
     budget_max: Optional[float] = None
     deadline: Optional[str] = None
     images: List[str] = []
     estimated_budget: Optional[float] = None
+    # Construction-specific fields
+    property_type: Optional[str] = None  # house, apartment_building, warehouse, office, commercial
+    land_area: Optional[float] = None  # sq meters
+    building_area: Optional[float] = None  # sq meters
+    floors: Optional[int] = None
+    construction_notes: Optional[str] = None
 
 class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -96,12 +103,18 @@ class Project(BaseModel):
     description: str
     category: str
     city: str
+    section_type: str = "renovation"
     address: Optional[str] = None
     budget_min: Optional[float] = None
     budget_max: Optional[float] = None
     deadline: Optional[str] = None
     images: List[str] = []
     estimated_budget: Optional[float] = None
+    property_type: Optional[str] = None
+    land_area: Optional[float] = None
+    building_area: Optional[float] = None
+    floors: Optional[int] = None
+    construction_notes: Optional[str] = None
     status: str = "active"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     views: int = 0

@@ -9,7 +9,7 @@ import {
   MapPin, Phone, Mail, Lock, Eye, Calendar, Euro, User, LogOut, Menu, X, 
   ChevronRight, CheckCircle, AlertCircle, Clock, ArrowRight, Shield, Users, Award, Check, Calculator, Camera, ChevronLeft, Image, MessageSquare,
   FolderSearch, BookOpen, Briefcase, FileText, HardHat, Info, ClipboardList, BarChart3, Wrench,
-  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, ArrowLeft, Trophy, Palette
+  ChevronDown, Globe, Sparkles, FileDown, Megaphone, ShoppingCart, Play, ArrowLeft, Trophy, Palette, Ruler, Upload
 } from 'lucide-react';
 import { AIDesignerPage } from '@/components/AIDesignerPage';
 import { FeedbackPage } from '@/components/FeedbackPage';
@@ -613,7 +613,7 @@ const LiveCounter = () => {
       </div>
 
       {/* Mobile: Compact bottom bar */}
-      <div className="fixed bottom-[68px] left-3 right-16 z-40 md:hidden rounded-full shadow-lg" data-testid="live-counter-mobile">
+      <div className="fixed bottom-[68px] left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm z-40 md:hidden rounded-full shadow-lg" data-testid="live-counter-mobile">
         <div className="backdrop-blur-lg px-4 py-2.5 flex items-center justify-between gap-3 rounded-full"
           style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
           <div className="flex items-center gap-1.5">
@@ -1442,6 +1442,7 @@ const ProjectCard = ({ project }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const isConstruction = project.section_type === 'construction';
   
   return (
     <Card 
@@ -1462,8 +1463,13 @@ const ProjectCard = ({ project }) => {
       
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start mb-2">
-          <div className="flex items-center gap-2">
-            <Badge className="bg-[#FF8C42]/10 text-[#FF8C42]">{project.category_name}</Badge>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge className={isConstruction ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#FF8C42]/10 text-[#FF8C42]'}>{project.category_name}</Badge>
+            {isConstruction && project.property_type && (
+              <Badge className="bg-[#3B82F6]/10 text-[#3B82F6] text-[10px]">
+                {PROPERTY_TYPE_LABELS[project.property_type] || project.property_type}
+              </Badge>
+            )}
             {project.images && project.images.length > 0 && (
               <span className="text-xs flex items-center gap-1" style={{ color: 'var(--theme-text-muted)' }}>
                 <Image className="h-3 w-3" /> {project.images.length}
@@ -1486,6 +1492,15 @@ const ProjectCard = ({ project }) => {
             <MapPin className="h-4 w-4" />
             <span>{project.city}</span>
           </div>
+          
+          {/* Construction-specific details */}
+          {isConstruction && (project.land_area || project.building_area || project.floors) && (
+            <div className="flex flex-wrap gap-3 text-xs" style={{ color: 'var(--theme-text-muted)' }}>
+              {project.land_area && <span className="flex items-center gap-1"><Ruler className="h-3 w-3" /> Парцел: {project.land_area} м²</span>}
+              {project.building_area && <span className="flex items-center gap-1"><Building2 className="h-3 w-3" /> РЗП: {project.building_area} м²</span>}
+              {project.floors && <span className="flex items-center gap-1"><Layers className="h-3 w-3" /> {project.floors} ет.</span>}
+            </div>
+          )}
           
           {/* Show estimated budget if available */}
           {project.estimated_budget && (
@@ -1514,7 +1529,7 @@ const ProjectCard = ({ project }) => {
         
         <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: '1px solid var(--theme-border)' }}>
           <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{project.views} {t('projects_views')}</span>
-          <span className="text-[#FF8C42] text-sm font-medium group-hover:underline">
+          <span className={`text-sm font-medium group-hover:underline ${isConstruction ? 'text-[#10B981]' : 'text-[#FF8C42]'}`}>
             {t('projects_details')}
           </span>
         </div>
@@ -1524,14 +1539,22 @@ const ProjectCard = ({ project }) => {
 };
 
 // ============== PROJECTS LIST PAGE ==============
+const PROPERTY_TYPE_LABELS = {
+  house: 'Къща', apartment_building: 'Кооперация', warehouse: 'Хале / Склад',
+  office: 'Офис сграда', commercial: 'Търговски обект', villa: 'Вила', other: 'Друго'
+};
+
 const ProjectsPage = () => {
   const [projects, setProjects] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [propertyTypes, setPropertyTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [category, setCategory] = useState(searchParams.get('category') || '');
   const [city, setCity] = useState(searchParams.get('city') || '');
+  const [propertyType, setPropertyType] = useState('');
+  const [sectionType, setSectionType] = useState(searchParams.get('section') || 'renovation');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { token } = useAuth();
@@ -1544,6 +1567,8 @@ const ProjectsPage = () => {
       if (search) params.set('search', search);
       if (category) params.set('category', category);
       if (city) params.set('city', city);
+      if (sectionType) params.set('section_type', sectionType);
+      if (propertyType) params.set('property_type', propertyType);
       params.set('page', page);
       
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
@@ -1554,20 +1579,35 @@ const ProjectsPage = () => {
       toast.error('Грешка при зареждане на проектите');
     }
     setLoading(false);
-  }, [search, category, city, page, token]);
+  }, [search, category, city, page, token, sectionType, propertyType]);
 
   useEffect(() => {
-    axios.get(`${API}/categories`).then(res => setCategories(res.data.categories));
-  }, []);
+    axios.get(`${API}/categories?section=${sectionType}`).then(res => {
+      setCategories(res.data.categories);
+      setPropertyTypes(res.data.property_types || []);
+    });
+  }, [sectionType]);
 
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
 
+  const handleSectionChange = (newSection) => {
+    setSectionType(newSection);
+    setCategory('');
+    setPropertyType('');
+    setPage(1);
+    setSearch('');
+    const params = new URLSearchParams();
+    params.set('section', newSection);
+    setSearchParams(params);
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
     const params = new URLSearchParams();
+    params.set('section', sectionType);
     if (search) params.set('search', search);
     if (category) params.set('category', category);
     if (city) params.set('city', city);
@@ -1577,21 +1617,82 @@ const ProjectsPage = () => {
   return (
     <div className="min-h-screen py-8" style={{ background: 'var(--theme-bg-secondary)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>{t('projects_title')}</h1>
           <p style={{ color: 'var(--theme-text-muted)' }}>{t('projects_subtitle')}</p>
         </div>
 
+        {/* Section Tabs: Ремонти / Строителство */}
+        <div className="flex gap-1 p-1 rounded-xl mb-6" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}
+          data-testid="projects-section-tabs">
+          <button
+            onClick={() => handleSectionChange('renovation')}
+            className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${sectionType === 'renovation' ? 'shadow-md' : 'hover:opacity-80'}`}
+            style={{
+              background: sectionType === 'renovation' ? '#F97316' : 'transparent',
+              color: sectionType === 'renovation' ? 'white' : 'var(--theme-text-muted)'
+            }}
+            data-testid="section-renovation-tab">
+            <Paintbrush className="h-4 w-4" />
+            Ремонти
+          </button>
+          <button
+            onClick={() => handleSectionChange('construction')}
+            className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${sectionType === 'construction' ? 'shadow-md' : 'hover:opacity-80'}`}
+            style={{
+              background: sectionType === 'construction' ? '#10B981' : 'transparent',
+              color: sectionType === 'construction' ? 'white' : 'var(--theme-text-muted)'
+            }}
+            data-testid="section-construction-tab">
+            <Building2 className="h-4 w-4" />
+            Строителство
+          </button>
+        </div>
+
+        {/* Section description */}
+        <div className="mb-6 p-4 rounded-xl" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
+          {sectionType === 'renovation' ? (
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[#F97316]/15 flex items-center justify-center flex-shrink-0">
+                <Paintbrush className="h-5 w-5 text-[#F97316]" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--theme-text)' }}>Проекти за ремонт</h3>
+                <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
+                  Ремонт на съществуващи помещения — бани, кухни, холове, спални. Боядисване, подови настилки, ВиК, ел. инсталации и др.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[#10B981]/15 flex items-center justify-center flex-shrink-0">
+                <Building2 className="h-5 w-5 text-[#10B981]" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--theme-text)' }}>Проекти за ново строителство</h3>
+                <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
+                  Изграждане на нови къщи, кооперации, халета, офис сгради и търговски обекти. Цялостно строителство от основи до ключ.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
         <PageInstructions
-          title="Проекти за ремонт и строителство"
-          description="Тук намирате реални проекти от клиенти"
-          steps={['Разгледайте списъка с проекти', 'Използвайте филтри за категория и град', 'Кликнете върху проект за пълни детайли', 'Свържете се с клиента безплатно']}
+          title={sectionType === 'renovation' ? 'Проекти за ремонт' : 'Проекти за ново строителство'}
+          description={sectionType === 'renovation' ? 'Тук намирате реални проекти за ремонт от клиенти' : 'Тук намирате проекти за ново строителство — къщи, кооперации, халета'}
+          steps={sectionType === 'renovation' 
+            ? ['Разгледайте списъка с ремонтни проекти', 'Използвайте филтри за категория и град', 'Кликнете върху проект за пълни детайли', 'Свържете се с клиента безплатно']
+            : ['Разгледайте строителните проекти', 'Филтрирайте по тип имот (къща, хале, кооперация)', 'Вижте детайлите за площ и етажи', 'Свържете се с клиента директно']
+          }
           benefits={['Безплатен достъп до всички проекти', 'Директен контакт с клиенти', 'Филтриране по категория и локация']}
           tips={['Проверявайте редовно за нови проекти', 'Настройте Telegram нотификации за нови проекти']}
           videoUrl="https://temadom.com/videos/projects"
         />
+
+        {/* Filters */}
         <Card className="p-4 mb-8">
-          <form onSubmit={handleSearch} className="grid md:grid-cols-4 gap-4">
+          <form onSubmit={handleSearch} className={`grid gap-4 ${sectionType === 'construction' ? 'md:grid-cols-5' : 'md:grid-cols-4'}`}>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} />
               <Input 
@@ -1614,6 +1715,20 @@ const ProjectsPage = () => {
                 ))}
               </SelectContent>
             </Select>
+
+            {sectionType === 'construction' && (
+              <Select value={propertyType} onValueChange={setPropertyType}>
+                <SelectTrigger data-testid="property-type-filter">
+                  <SelectValue placeholder="Тип имот" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Всички типове</SelectItem>
+                  {propertyTypes.map(pt => (
+                    <SelectItem key={pt.id} value={pt.id}>{pt.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             
             <Input 
               placeholder={t('projects_city')} 
@@ -3190,12 +3305,19 @@ const ClientDashboard = () => {
     description: '',
     category: '',
     city: '',
+    section_type: 'renovation',
     budget_min: '',
     budget_max: '',
     images: [],
-    estimated_budget: null
+    estimated_budget: null,
+    property_type: '',
+    land_area: '',
+    building_area: '',
+    floors: '',
+    construction_notes: ''
   });
   const [submitting, setSubmitting] = useState(false);
+  const [propertyTypes, setPropertyTypes] = useState([]);
   const imageInputRef = React.useRef(null);
 
   useEffect(() => {
@@ -3212,6 +3334,7 @@ const ClientDashboard = () => {
         ]);
         setProjects(projRes.data.projects);
         setCategories(catsRes.data.categories);
+        setPropertyTypes(catsRes.data.property_types || []);
       } catch (err) {
         toast.error(t('common_error'));
       }
@@ -3259,12 +3382,15 @@ const ClientDashboard = () => {
         ...newProject,
         budget_min: newProject.budget_min ? parseFloat(newProject.budget_min) : null,
         budget_max: newProject.budget_max ? parseFloat(newProject.budget_max) : null,
-        estimated_budget: newProject.estimated_budget
+        estimated_budget: newProject.estimated_budget,
+        land_area: newProject.land_area ? parseFloat(newProject.land_area) : null,
+        building_area: newProject.building_area ? parseFloat(newProject.building_area) : null,
+        floors: newProject.floors ? parseInt(newProject.floors) : null,
       };
       await axios.post(`${API}/projects`, data, { headers: { Authorization: `Bearer ${token}` } });
       toast.success(t('cd_project_created'));
       setCreateDialogOpen(false);
-      setNewProject({ title: '', description: '', category: '', city: '', budget_min: '', budget_max: '', images: [], estimated_budget: null });
+      setNewProject({ title: '', description: '', category: '', city: '', section_type: 'renovation', budget_min: '', budget_max: '', images: [], estimated_budget: null, property_type: '', land_area: '', building_area: '', floors: '', construction_notes: '' });
       
       // Refresh projects
       const res = await axios.get(`${API}/my-projects`, { headers: { Authorization: `Bearer ${token}` } });
@@ -3356,15 +3482,66 @@ const ClientDashboard = () => {
             </DialogHeader>
 
             <div className="space-y-4 py-4">
+              {/* Section Type Toggle */}
+              <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewProject(d => ({ ...d, section_type: 'renovation', category: '', property_type: '' }));
+                    axios.get(`${API}/categories?section=renovation`).then(res => setCategories(res.data.categories));
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${newProject.section_type === 'renovation' ? 'shadow-md' : ''}`}
+                  style={{
+                    background: newProject.section_type === 'renovation' ? '#F97316' : 'transparent',
+                    color: newProject.section_type === 'renovation' ? 'white' : 'var(--theme-text-muted)'
+                  }}
+                  data-testid="create-section-renovation">
+                  <Paintbrush className="h-3.5 w-3.5" />
+                  Ремонт
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewProject(d => ({ ...d, section_type: 'construction', category: '', property_type: '' }));
+                    axios.get(`${API}/categories?section=construction`).then(res => setCategories(res.data.categories));
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${newProject.section_type === 'construction' ? 'shadow-md' : ''}`}
+                  style={{
+                    background: newProject.section_type === 'construction' ? '#10B981' : 'transparent',
+                    color: newProject.section_type === 'construction' ? 'white' : 'var(--theme-text-muted)'
+                  }}
+                  data-testid="create-section-construction">
+                  <Building2 className="h-3.5 w-3.5" />
+                  Строителство
+                </button>
+              </div>
+
               <div>
                 <Label>{t('cl_title')} *</Label>
                 <Input 
-                  placeholder={t('cl_title_placeholder')}
+                  placeholder={newProject.section_type === 'construction' ? 'Напр. Строителство на къща 120 м²' : t('cl_title_placeholder')}
                   value={newProject.title}
                   onChange={(e) => setNewProject(d => ({ ...d, title: e.target.value }))}
                   data-testid="project-title-input"
                 />
               </div>
+
+              {/* Property type for construction */}
+              {newProject.section_type === 'construction' && (
+                <div>
+                  <Label>Тип имот *</Label>
+                  <Select value={newProject.property_type} onValueChange={(v) => setNewProject(d => ({ ...d, property_type: v }))}>
+                    <SelectTrigger data-testid="property-type-select">
+                      <SelectValue placeholder="Изберете тип имот" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {propertyTypes.map(pt => (
+                        <SelectItem key={pt.id} value={pt.id}>{pt.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div>
                 <Label>{t('cl_category')} *</Label>
@@ -3373,7 +3550,7 @@ const ClientDashboard = () => {
                     <SelectValue placeholder={t('cl_select_cat')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map(cat => (
+                    {categories.filter(c => c.section === newProject.section_type || c.section === 'both').map(cat => (
                       <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                     ))}
                   </SelectContent>
@@ -3390,10 +3567,48 @@ const ClientDashboard = () => {
                 />
               </div>
 
+              {/* Construction-specific fields */}
+              {newProject.section_type === 'construction' && (
+                <div className="p-3 rounded-lg space-y-3" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Building2 className="h-3.5 w-3.5 text-[#10B981]" />
+                    <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Детайли за строителство</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <Label className="text-[11px]">Парцел (м²)</Label>
+                      <Input type="number" placeholder="500" value={newProject.land_area}
+                        onChange={(e) => setNewProject(d => ({ ...d, land_area: e.target.value }))}
+                        data-testid="land-area-input" />
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">РЗП (м²)</Label>
+                      <Input type="number" placeholder="120" value={newProject.building_area}
+                        onChange={(e) => setNewProject(d => ({ ...d, building_area: e.target.value }))}
+                        data-testid="building-area-input" />
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">Етажи</Label>
+                      <Input type="number" placeholder="2" min="1" max="20" value={newProject.floors}
+                        onChange={(e) => setNewProject(d => ({ ...d, floors: e.target.value }))}
+                        data-testid="floors-input" />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-[11px]">Допълнителни бележки за строителството</Label>
+                    <Textarea placeholder="Опишете специфичните изисквания за строителството..."
+                      value={newProject.construction_notes}
+                      onChange={(e) => setNewProject(d => ({ ...d, construction_notes: e.target.value }))}
+                      rows={2} className="text-xs"
+                      data-testid="construction-notes-input" />
+                  </div>
+                </div>
+              )}
+
               <div>
                 <Label>{t('cl_description')} *</Label>
                 <Textarea 
-                  placeholder={t('cl_desc_placeholder')}
+                  placeholder={newProject.section_type === 'construction' ? 'Опишете подробно строителния проект — какво искате да бъде изградено, специални изисквания...' : t('cl_desc_placeholder')}
                   value={newProject.description}
                   onChange={(e) => setNewProject(d => ({ ...d, description: e.target.value }))}
                   rows={4}

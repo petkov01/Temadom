@@ -39,6 +39,8 @@ const PACKAGES = [
 
 const PHOTO_LABELS = ['Общ план', 'Ъгъл 1', 'Ъгъл 2'];
 
+const EST_TIME_PER_ROOM = 90; // seconds per room
+
 const emptyRoom = () => ({
   id: Date.now() + Math.random(),
   roomType: 'living_room',
@@ -242,7 +244,11 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
         </div>
 
         {/* Photo upload grid */}
-        <div className="grid grid-cols-3 gap-2">
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <Label className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Снимки на помещението</Label>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
           {PHOTO_LABELS.map((label, pIdx) => (
             <div key={pIdx}>
               <Label className="text-[10px] mb-1 block text-center" style={{ color: 'var(--theme-text-subtle)' }}>{label}</Label>
@@ -256,18 +262,30 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
                   </button>
                 </div>
               ) : (
-                <button onClick={() => refs.current[pIdx]?.click()}
-                  className="w-full aspect-video rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 hover:border-[#F97316]/40 transition-colors"
-                  style={{ borderColor: 'var(--theme-border)' }}
-                  data-testid={`upload-photo-${index}-${pIdx}`}>
-                  <Camera className="h-5 w-5" style={{ color: 'var(--theme-text-subtle)' }} />
-                  <span className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>Снимка</span>
-                </button>
+                <div className="space-y-1">
+                  <button onClick={() => refs.current[pIdx]?.click()}
+                    className="w-full aspect-video rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 hover:border-[#F97316]/40 transition-colors"
+                    style={{ borderColor: 'var(--theme-border)' }}
+                    data-testid={`upload-photo-${index}-${pIdx}`}>
+                    <Upload className="h-4 w-4" style={{ color: 'var(--theme-text-subtle)' }} />
+                    <span className="text-[9px]" style={{ color: 'var(--theme-text-subtle)' }}>Галерия</span>
+                  </button>
+                  <button onClick={() => refs.current[pIdx + 10]?.click()}
+                    className="w-full py-1.5 rounded-lg text-[9px] font-bold flex items-center justify-center gap-1 transition-colors hover:bg-[#F97316]/10"
+                    style={{ background: 'var(--theme-bg-surface)', color: '#F97316', border: '1px solid var(--theme-border)' }}
+                    data-testid={`capture-photo-${index}-${pIdx}`}>
+                    <Camera className="h-3 w-3" />
+                    Снимай
+                  </button>
+                </div>
               )}
               <input ref={el => refs.current[pIdx] = el} type="file" accept="image/*" className="hidden"
                 onChange={e => { handlePhoto(pIdx, e.target.files?.[0]); e.target.value = ''; }} />
+              <input ref={el => refs.current[pIdx + 10] = el} type="file" accept="image/*" capture="environment" className="hidden"
+                onChange={e => { handlePhoto(pIdx, e.target.files?.[0]); e.target.value = ''; }} />
             </div>
           ))}
+          </div>
         </div>
 
         {/* Notes */}
@@ -530,7 +548,7 @@ export const AIDesignerPage = () => {
                   <div className="w-full" data-testid="progress-bar">
                     <div className="flex justify-between items-end mb-2">
                       <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
-                      {pct < 30 ? 'Анализ на снимките...' : pct < 60 ? 'Търсене на реални продукти от магазини...' : pct < 85 ? 'Генериране на 3D рендери...' : 'Финализиране на бюджета...'}
+                      {pct < 20 ? 'Качване и анализ на снимките...' : pct < 45 ? 'AI обработва архитектурата на стаята...' : pct < 70 ? 'Генериране на 3D рендер (запазване на архитектурата 1:1)...' : pct < 90 ? 'Търсене на реални продукти от магазини...' : 'Финализиране на бюджета...'}
                     </span>
                       <span className="text-[#F97316] font-black text-2xl">{Math.round(pct)}%</span>
                     </div>
@@ -550,27 +568,50 @@ export const AIDesignerPage = () => {
                       </div>
                     </div>
                   )}
-                  <div className="flex items-center justify-center gap-3 mt-6">
-                    <Loader2 className="h-6 w-6 animate-spin text-[#F97316]" />
-                    <span className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
-                      {rooms.length > 1 ? `Генериране на ${rooms.filter(r => r.photos.some(p => p)).length} помещения...` : 'Генериране на 3D рендери...'}
-                    </span>
+                  <div className="flex flex-col items-center gap-2 mt-6">
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="h-6 w-6 animate-spin text-[#F97316]" />
+                      <span className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
+                        {rooms.length > 1 ? `Генериране на ${rooms.filter(r => r.photos.some(p => p)).length} помещения...` : 'Генериране на 3D рендер...'}
+                      </span>
+                    </div>
+                    <div className="text-center mt-1">
+                      <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>
+                        {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, '0')}
+                      </span>
+                      <span className="text-[10px] ml-2" style={{ color: 'var(--theme-text-muted)' }}>
+                        / прибл. {rooms.filter(r => r.photos.some(p => p)).length * 2}-{rooms.filter(r => r.photos.some(p => p)).length * 3} мин
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             ) : (
-              <Button className="w-full h-16 text-lg font-black shadow-xl rounded-xl"
-                style={{
-                  background: rooms.some(r => r.photos.some(p => p)) ? 'linear-gradient(135deg, #F97316, #EA580C)' : 'var(--theme-bg-surface)',
-                  color: rooms.some(r => r.photos.some(p => p)) ? 'white' : 'var(--theme-text-muted)',
-                  boxShadow: rooms.some(r => r.photos.some(p => p)) ? '0 0 40px rgba(249,115,22,0.3)' : 'none',
-                }}
-                onClick={handleGenerate}
-                disabled={!rooms.some(r => r.photos.some(p => p))}
-                data-testid="generate-btn">
-                <Camera className="mr-3 h-6 w-6" />
-                ГЕНЕРИРАЙ 3D — {pkg.price} EUR
-              </Button>
+              <div className="space-y-2">
+                {/* Estimated time info */}
+                {rooms.some(r => r.photos.some(p => p)) && (
+                  <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-xs"
+                    style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }}
+                    data-testid="estimated-time">
+                    <Loader2 className="h-3.5 w-3.5" />
+                    <span>Приблизително време: <strong style={{ color: 'var(--theme-text)' }}>
+                      {rooms.filter(r => r.photos.some(p => p)).length * 2}-{rooms.filter(r => r.photos.some(p => p)).length * 3} минути
+                    </strong> за {rooms.filter(r => r.photos.some(p => p)).length} {rooms.filter(r => r.photos.some(p => p)).length === 1 ? 'помещение' : 'помещения'}</span>
+                  </div>
+                )}
+                <Button className="w-full h-16 text-lg font-black shadow-xl rounded-xl"
+                  style={{
+                    background: rooms.some(r => r.photos.some(p => p)) ? 'linear-gradient(135deg, #F97316, #EA580C)' : 'var(--theme-bg-surface)',
+                    color: rooms.some(r => r.photos.some(p => p)) ? 'white' : 'var(--theme-text-muted)',
+                    boxShadow: rooms.some(r => r.photos.some(p => p)) ? '0 0 40px rgba(249,115,22,0.3)' : 'none',
+                  }}
+                  onClick={handleGenerate}
+                  disabled={!rooms.some(r => r.photos.some(p => p))}
+                  data-testid="generate-btn">
+                  <Camera className="mr-3 h-6 w-6" />
+                  ГЕНЕРИРАЙ 3D — {pkg.price} EUR
+                </Button>
+              </div>
             )}
           </div>
         ) : (
