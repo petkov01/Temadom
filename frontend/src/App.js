@@ -274,10 +274,10 @@ const Navbar = () => {
             <ThemeToggle />
           </div>
 
-          {/* Center: Logo (absolute center) */}
+          {/* Center: Logo (absolute center, fills taskbar height) */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <Link to="/" data-testid="nav-center-logo">
-              <img src="/logo-temadom.png" alt="TemaDom" className="h-10 sm:h-12 w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246,195,106,0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.2)) brightness(0.85) contrast(1.15)' }} />
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-[56px] w-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246,195,106,0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.2)) brightness(0.85) contrast(1.15)' }} />
             </Link>
           </div>
 
