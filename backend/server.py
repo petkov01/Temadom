@@ -3038,6 +3038,7 @@ RENOVATION:
                 original_photo_bytes = base64.b64decode(photo_b64)
                 
                 # Compress image if too large (reduce to max 1MB for faster processing)
+                import io
                 from PIL import Image as PILImage
                 img_pil = PILImage.open(io.BytesIO(original_photo_bytes))
                 if img_pil.width > 1024 or img_pil.height > 1024:
@@ -3084,25 +3085,30 @@ RENOVATION:
                 logging.error(f"Photo Designer render {idx+1} error: {img_err}")
             return None
 
-        # Run ALL photos in parallel
+        # Run ALL photos + product scraping IN PARALLEL (they are independent)
         import asyncio as aio_module
-        logging.info(f"Photo Designer: Processing {len(photos_b64)} photos IN PARALLEL")
-        parallel_results = await aio_module.gather(
-            *[process_single_photo(i, p) for i, p in enumerate(photos_b64)]
+        from services.scraper import get_products_for_room, format_products_for_prompt
+
+        async def scrape_products_task():
+            try:
+                logging.info(f"Photo Designer: Scraping real products for {room_type} (budget: {budget_eur}€)")
+                result = await get_products_for_room(room_type, int(budget_eur), db=db)
+                logging.info(f"Photo Designer: Found {sum(len(v) for v in result.values())} products in {len(result)} categories")
+                return result
+            except Exception as scrape_err:
+                logging.warning(f"Photo Designer: Scraping failed, using fallback: {scrape_err}")
+                return {}
+
+        logging.info(f"Photo Designer: Processing {len(photos_b64)} photos + scraping IN PARALLEL")
+        photo_tasks = [process_single_photo(i, p) for i, p in enumerate(photos_b64)]
+        all_results = await aio_module.gather(
+            aio_module.gather(*photo_tasks),
+            scrape_products_task()
         )
+        parallel_results = all_results[0]
+        real_products_by_category = all_results[1]
         renders = [r for r in parallel_results if r is not None]
         logging.info(f"Photo Designer: {len(renders)}/{len(photos_b64)} renders completed")
-
-        # Step 2: Scrape REAL products from Bulgarian stores
-        from services.scraper import get_products_for_room, format_products_for_prompt
-        logging.info(f"Photo Designer: Scraping real products for {room_type} (budget: {budget_eur}€)")
-        
-        real_products_by_category = {}
-        try:
-            real_products_by_category = await get_products_for_room(room_type, int(budget_eur), db=db)
-            logging.info(f"Photo Designer: Found {sum(len(v) for v in real_products_by_category.values())} products in {len(real_products_by_category)} categories")
-        except Exception as scrape_err:
-            logging.warning(f"Photo Designer: Scraping failed, using fallback: {scrape_err}")
 
         # Build the real products context for GPT
         real_products_context = format_products_for_prompt(real_products_by_category, int(budget_eur)) if real_products_by_category else ""
@@ -3901,14 +3907,15 @@ Respond in JSON:
             doors_desc = "; ".join([f"door on {d.get('wall','')} at {d.get('position','')}" for d in room_analysis["doors"]])
         camera_pos = room_analysis.get("camera_position", "from entrance looking inward")
 
-        for i in range(variants_count):
-            variant_angles = []
-            # Use first image as reference for image_edit
-            first_image_bytes = base64.b64decode(cleaned_images[0])
-            
-            for angle_idx, (angle_desc, angle_label) in enumerate(camera_angles):
-                try:
-                    strict_prompt = f"""ARCHITECTURAL RENOVATION — transform this EXACT room. Only change surfaces, finishes, and furniture.
+        import asyncio as aio_gen
+        import litellm as litellm_module
+        proxy_url = "https://integrations.emergentagent.com/llm"
+        first_image_bytes = base64.b64decode(cleaned_images[0])
+
+        async def generate_single_angle(variant_idx, angle_idx, angle_desc, angle_label):
+            """Generate a single camera angle — runs in parallel."""
+            try:
+                strict_prompt = f"""ARCHITECTURAL RENOVATION — transform this EXACT room. Only change surfaces, finishes, and furniture.
 
 Room: {room_type_name}, {room_width}m x {room_length}m, height {room_height}m.
 {angle_desc}.
@@ -3923,36 +3930,45 @@ ABSOLUTE RULES:
 4. DO NOT add or remove structural elements
 5. Ultra-realistic professional interior photography, 8K quality"""
 
-                    import litellm as litellm_module
-                    proxy_url = "https://integrations.emergentagent.com/llm"
-                    edit_result = await litellm_module.aimage_edit(
-                        image=first_image_bytes,
-                        prompt=strict_prompt,
-                        model="gpt-image-1",
-                        n=1,
-                        quality="high",
-                        api_key=EMERGENT_LLM_KEY,
-                        api_base=proxy_url,
-                    )
+                edit_result = await litellm_module.aimage_edit(
+                    image=first_image_bytes,
+                    prompt=strict_prompt,
+                    model="gpt-image-1",
+                    n=1,
+                    quality="high",
+                    api_key=EMERGENT_LLM_KEY,
+                    api_base=proxy_url,
+                )
 
-                    if edit_result and edit_result.data:
-                        img_obj = edit_result.data[0]
-                        if hasattr(img_obj, 'b64_json') and img_obj.b64_json:
-                            img_b64 = img_obj.b64_json
-                        elif hasattr(img_obj, 'url') and img_obj.url:
-                            import aiohttp as aio_http
-                            async with aio_http.ClientSession() as session:
-                                async with session.get(img_obj.url) as resp:
-                                    img_b64 = base64.b64encode(await resp.read()).decode('utf-8')
-                        variant_angles.append({
-                            "angle": angle_idx + 1,
-                            "angle_label": angle_label,
-                            "image_base64": img_b64
-                        })
-                except Exception as img_err:
-                    logging.error(f"IA Designer image gen error variant {i+1} angle {angle_idx+1}: {img_err}")
-                    continue
+                if edit_result and edit_result.data:
+                    img_obj = edit_result.data[0]
+                    img_b64 = None
+                    if hasattr(img_obj, 'b64_json') and img_obj.b64_json:
+                        img_b64 = img_obj.b64_json
+                    elif hasattr(img_obj, 'url') and img_obj.url:
+                        import aiohttp as aio_http
+                        async with aio_http.ClientSession() as session:
+                            async with session.get(img_obj.url) as resp:
+                                img_b64 = base64.b64encode(await resp.read()).decode('utf-8')
+                    if img_b64:
+                        return {"variant": variant_idx, "angle": angle_idx + 1, "angle_label": angle_label, "image_base64": img_b64}
+            except Exception as img_err:
+                logging.error(f"IA Designer image gen error variant {variant_idx+1} angle {angle_idx+1}: {img_err}")
+            return None
 
+        # Launch ALL angles for ALL variants in parallel
+        all_angle_tasks = []
+        for i in range(variants_count):
+            for angle_idx, (angle_desc, angle_label) in enumerate(camera_angles):
+                all_angle_tasks.append(generate_single_angle(i, angle_idx, angle_desc, angle_label))
+
+        logging.info(f"IA Designer: Generating {len(all_angle_tasks)} angles IN PARALLEL")
+        all_angle_results = await aio_gen.gather(*all_angle_tasks)
+
+        # Group results by variant
+        for i in range(variants_count):
+            variant_angles = [r for r in all_angle_results if r and r["variant"] == i]
+            variant_angles.sort(key=lambda x: x["angle"])
             if variant_angles:
                 generated_images.append({
                     "variant": i + 1,
