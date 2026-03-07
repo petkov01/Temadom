@@ -42,11 +42,18 @@ TemaDom е уеб платформа за строителство и ремон
   - Replaced all hardcoded dark colors (#253545, #1E2A38, #0F1923, border-#3A4A5C) with CSS variables
   - Theme utility classes: .theme-text, .theme-text-muted, .theme-text-subtle, .theme-bg-surface etc.
   - Pages redesigned: LandingPage, LoginPage, RegisterPage, ClientDashboard, CompanyDashboard, ProjectsPage, SubscriptionsPage, AdsPage, AboutPage, ServicesPage, PriceCalculator, BlogPage, BlogArticle, RegionalPage, PricesByRegionPage, AIChartPage, AISketchPage, Scanner3DPage, PublishedGalleryPage, ReadyProjectsPage, PortfolioGallery, FeedbackButton, Chatbot, TermsPage, CommunityPage, ProfilePage
-- **Logo enhancement**: 3x bigger logo with golden glow drop-shadow effect
-  - Navbar: h-14/h-16 with drop-shadow(0 0 10px rgba(246, 195, 106, 0.6))
-  - Hero: h-20/h-28 with enhanced glow
+- **Logo enhancement**: Massive logo with golden glow drop-shadow effect
+  - Navbar: h-32/h-40 with drop-shadow(0 0 18px rgba(246, 195, 106, 0.85))
+  - Hero: h-[28rem]/h-[36rem] with intense glow
   - Footer/Login: h-14 with subtle glow
-- **Testing**: 100% frontend pass rate (iteration_75)
+- **P1: Subscription Audit (DONE)**: Verified end-to-end flow - activate, status check, feature access, limits
+- **P1: Chat Enhancements (DONE)**: 
+  - Online status heartbeat (30s interval) with green dot in conversation list + chat header
+  - Typing indicators (bouncing dots animation, 3s debounce)
+  - Read receipts (Check/CheckCheck icons, blue for read)
+  - is_online field added to conversations API response
+- **P1: Scraping Expansion (DONE)**: 21 stores total including HomeMax, Bauhaus, Jysk, Technomarket, IKEA, etc.
+- **Testing**: 100% pass rate - backend 19/19, frontend 100% (iteration_76)
 
 ## Architecture
 ```
@@ -65,10 +72,10 @@ frontend/
 
 ## Prioritized Backlog
 
-### P1 (High)
-- Subscription feature audit (verify all plan features work end-to-end)
-- User-to-user messaging enhancements (online status, typing indicators frontend)
-- Add more e-commerce stores to scraping service
+### P1 (High) - COMPLETED
+- ~~Subscription feature audit~~ ✅ Verified end-to-end
+- ~~Chat enhancements (online status, typing, read receipts)~~ ✅
+- ~~Scraping expansion (21 stores)~~ ✅
 
 ### P2 (Medium)
 - Backend refactoring (break up server.py into route modules)
