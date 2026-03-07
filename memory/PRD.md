@@ -4,51 +4,39 @@
 
 ## Core Features — ALL WORKING
 1. **3D Photo Designer v9.3** — GPT-4o-mini Vision + gpt-image-1 renders
-   - Room dimensions, free text budget input (EUR)
-   - 3 budget tiers (Иконом/Среден/Премиум) with real store search URLs
-   - **AFFILIATE tracking** on all material links (utm_source=temadom)
-   - Image compression <2MB, retry with backoff, 300s timeout
+   - Free text budget (EUR), retry with backoff, image resize <2MB
+   - 3 budget tiers with REAL affiliate search URLs to 9 stores
    - /api/test-ai diagnostic endpoint
 
-2. **AI Product Search** — Photo → 21 Bulgarian stores
-   - All product URLs include **affiliate tracking**
+2. **Landing Page Showcase** — 5 REAL AI-generated projects
+   - Bathroom (2,000 EUR), Living Room (3,500 EUR), Bedroom (2,790 EUR), Kitchen (4,497 EUR), Kids Room (2,295 EUR)
+   - Before/After photos (real AI renders from the 3D Designer)
+   - 3 top materials per room with affiliate links
+   - CTA buttons: СНИМАЙ БАНЯ/ХОЛ/СПАЛНЯ/КУХНЯ/ДЕТСКА
+   - Quick room selection buttons
+   - Images in /app/frontend/public/showcase/
 
-3. **Community Feed v3** — Posts, images, project linking, firm offers
-   - **Auto-detect** product keywords (плочки, мивка, etc.) and store names
-   - Generates **affiliate link pills** automatically under posts
-   - Non-intrusive pill design with ExternalLink icon
+3. **Affiliate Monetization** — Auto-applied everywhere
+   - 9 stores: Praktiker, Jysk, Mr.Bricolage, HomeMax, Bauhaus, eMAG, IKEA, Teknoimpex, Technomarket
+   - Budget materials, Product Search, Community posts (auto-detect)
+   - Configurable ref IDs in AFFILIATE_CONFIG
 
-4. **Affiliate Monetization System**
-   - Centralized AFFILIATE_CONFIG with ref_id per store
-   - make_affiliate_url() adds tracking to ALL store URLs
-   - Stores: Praktiker, Jysk, Mr.Bricolage, HomeMax, Bauhaus, eMAG, IKEA, Teknoimpex, Technomarket
-   - Auto-applied in: Budget materials, Product Search, Community posts
-   - Format: `?utm_source=temadom&utm_medium=affiliate&utm_campaign=temadom`
+4. **Subscription Plan Enforcement**
+   - БАЗОВ: 5 offers/month, no PDF/AI sketches
+   - ПРО/PREMIUM: Unlimited offers, all features
+   - /api/subscriptions/my-limits, /api/subscriptions/check-feature
 
-5. **Leaderboard** — Dual ranking: Clients + Firms
-6. **Notifications** — Bell icon, auto-triggered
-7. **Stripe Payments** — 17 packages
-8. **Referral System** — Auto rewards, milestones
-9. **CAD System** — 2D plans with cost estimation
-10. **Auth** — JWT, AuthGate (mandatory login)
-11. **Tracking** — GA + FB Pixel + PostHog
+5. **Live Counter** — Desktop sidebar + Mobile bottom bar
+   - Online count, clients, firms, masters, FREE slots
 
-## Latest Changes (2026-03-07)
-- Added AFFILIATE_CONFIG with make_affiliate_url() for monetization
-- Community posts auto-detect product/store mentions → affiliate pills
-- All budget material URLs, product search URLs include affiliate tracking
-- Budget changed to free text input + "materials only" info
-- GPT-4o-mini for faster Vision, retry with backoff, image resize
+6. **AI Product Search** — Photo → 21 stores, affiliate links
+7. **Community Feed v3** — Auto affiliate pills on product mentions
+8. **Leaderboard, Notifications, Referrals, Stripe, CAD, Auth, Tracking**
 
 ## Post-Launch Backlog
 - P1: Backend refactoring (server.py monolith → modular routers)
-- P1: Mobile responsiveness polish
-- P1: Real scraping (currently placeholder/MOCKED)
+- P1: Mobile responsiveness polish (all pages)
+- P1: Real scraping service (currently placeholder/MOCKED)
 - P2: Company catalog & portfolios
 - P2: Direct messaging
 - P2: Job ads module
-
-## Affiliate Config (editable in server.py)
-- Default ref_id: "temadom"
-- To update: Edit AFFILIATE_CONFIG in server.py (~line 82)
-- Each store has configurable param name and ref value
