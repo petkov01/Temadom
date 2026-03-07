@@ -3115,15 +3115,22 @@ async def _process_photo_design(
         expected_elements = ROOM_ELEMENT_MAP.get(room_type, "мебели, декор")
 
         # Helper: retry with exponential backoff
-        async def retry_with_backoff(coro_fn, max_retries=3, base_delay=2):
+        async def retry_with_backoff(coro_fn, max_retries=6, base_delay=1):
             for attempt in range(max_retries):
                 try:
+                    if attempt > 0:
+                        update_task_progress(task_id, min(20 + attempt * 8, 55), f"Опит {attempt+1}/{max_retries}... моля, изчакайте")
                     return await coro_fn()
                 except Exception as e:
+                    err_str = str(e)
+                    if "Budget has been exceeded" in err_str:
+                        logging.error(f"LLM Budget exceeded — cannot retry")
+                        raise
                     if attempt == max_retries - 1:
                         raise
-                    delay = base_delay * (2 ** attempt)
+                    delay = min(base_delay * (2 ** attempt), 16)
                     logging.warning(f"Retry {attempt+1}/{max_retries} after error: {e}. Waiting {delay}s...")
+                    update_task_progress(task_id, min(20 + attempt * 6, 50), f"API повторен опит {attempt+1}... ({delay}с)")
                     await aio.sleep(delay)
 
         # Process ALL photos in PARALLEL for maximum speed
@@ -3191,7 +3198,7 @@ Output: photorealistic, professional interior photography."""
                                     img_data_list.append(await resp.read())
                     return img_data_list
 
-                img_result = await retry_with_backoff(run_image_edit, max_retries=4, base_delay=3)
+                img_result = await retry_with_backoff(run_image_edit, max_retries=5, base_delay=2)
                 if img_result and len(img_result) > 0:
                     img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
                     logging.info(f"Photo Designer: render {idx+1} ({label}) generated OK")
@@ -3459,9 +3466,15 @@ Output: photorealistic, professional interior photography."""
         logging.info(f"Photo Designer: Task {task_id} completed successfully")
 
     except Exception as e:
-        logging.error(f"Photo Designer error (task {task_id}): {e}")
-        _tasks[task_id]["status"] = "error"
-        _tasks[task_id]["error"] = f"Грешка при обработка: {str(e)}"
+        err_msg = str(e)
+        if "Budget has been exceeded" in err_msg:
+            logging.error(f"Photo Designer (task {task_id}): LLM Budget exceeded")
+            _tasks[task_id]["status"] = "error"
+            _tasks[task_id]["error"] = "Бюджетът за AI е изчерпан. Моля, добавете баланс от Profile → Universal Key → Add Balance"
+        else:
+            logging.error(f"Photo Designer error (task {task_id}): {e}")
+            _tasks[task_id]["status"] = "error"
+            _tasks[task_id]["error"] = f"Грешка при обработка: {err_msg}"
 
 
 @api_router.get("/ai-designer/my-projects")

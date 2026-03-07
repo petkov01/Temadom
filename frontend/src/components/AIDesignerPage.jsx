@@ -472,7 +472,8 @@ export const AIDesignerPage = () => {
       setResults({ rooms: allRoomResults });
       toast.success(`${allRoomResults.length} помещени${allRoomResults.length === 1 ? 'е' : 'я'} генерирани!`);
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Грешка при генериране');
+      const msg = err.message || err.response?.data?.detail || 'Грешка при генериране';
+      toast.error(msg, { duration: 8000 });
     }
 
     clearInterval(timerRef.current);
