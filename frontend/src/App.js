@@ -933,14 +933,14 @@ const LandingPage = () => {
           <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full blur-[140px] translate-y-1/4 -translate-x-1/4" style={{ background: 'rgba(255,138,0,0.04)' }} />
           <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" style={{ background: 'rgba(16,185,129,0.03)' }} />
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24 flex flex-col items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
           {/* Logo */}
-          <div className="mb-8 animate-slideUp">
+          <div className="mb-2 animate-slideUp">
             <img src="/logo-temadom.png" alt="TemaDom" className="h-[28rem] md:h-[36rem] w-auto mx-auto animate-float" style={{ filter: 'drop-shadow(0 0 36px rgba(246, 195, 106, 0.95))' }} />
           </div>
 
           {/* Counter badge */}
-          <div className="mb-8 animate-slideUp stagger-1" data-testid="hero-counter">
+          <div className="mb-4 animate-slideUp stagger-1" data-testid="hero-counter">
             <div className="inline-flex items-center gap-3 rounded-full px-6 py-3 glass" 
               style={{ border: `1px solid rgba(246,195,106,0.15)` }}>
               <span className="text-3xl font-black tabular-nums gradient-text-gold">{slotsUsed}</span>
