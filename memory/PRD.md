@@ -18,16 +18,13 @@ TemaDom е уеб платформа за строителство и ремон
 - gpt-4o-mini for budget (10x cheaper), LLM Cache, Static Fallback Budget
 
 ### Phase 9 (Mar 7, 2026) - Landing Page Redesign
-- **Navbar**: No logo in corner. Hamburger left + ThemeToggle. Center: Начало | Как работи ▾ | Партньори ▾ | ЧЗВ | Обява ▾. Right: Още, BG, Вход, "Твоят проект" gold button
-- **Hero Logo**: LARGE centered (h-64 sm:h-80 md:h-[26rem]) with golden glow
-- **BEFORE/AFTER showcase**: Side-by-side with gold arrow + ПРЕДИ/СЛЕД labels
-- **Headline**: "Ремонт без стрес — AI проектиране"
-- **CTA**: Gold gradient "КАЧИ СНИМКИ НА ПОМЕЩЕНИЕТО"
-- **Room tabs**: Баня | Кухня | Хол
-- **FAQ section**: 6 items with accordion
-- **Animations**: hero-fade, hero-scale-in, arrow-pulse
-- **1 снимка** instead of 3 (simplified UX)
-- **AI Prompt**: Improved Bulgarian prompt preserving architecture 1:1
+- Navbar: No logo, hamburger left, nav center (Начало, Как работи, Партньори, ЧЗВ, Обява), "Твоят проект" gold button right
+- Hero: LARGE centered logo (h-[26rem]) + AI-generated ПРЕДИ/СЛЕД bathroom images (SAME room)
+- CTA: Gold "КАЧИ СНИМКИ НА ПОМЕЩЕНИЕТО" + Room tabs (Баня/Кухня/Хол)
+- FAQ: 6 accordion items
+- Footer: Removed "Свържете се с най-добрите..." text (footer_desc = "")
+- "1 снимка" instead of "3 снимки" everywhere
+- AI prompt improved for 1:1 architecture preservation in Bulgarian
 - All prices in EUR
 - Testing: iteration_82 — 24/24 (100%)
 

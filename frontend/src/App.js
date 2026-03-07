@@ -948,7 +948,7 @@ const LandingPage = () => {
             <div className="ba-showcase p-3 md:p-4 rounded-2xl" style={{ background: dark ? 'rgba(22,26,35,0.6)' : 'rgba(255,255,255,0.5)', border: `1px solid ${dark ? 'rgba(212,162,58,0.15)' : 'rgba(0,0,0,0.08)'}` }}>
               {/* Before image */}
               <div className="ba-image">
-                <img src="/showcase/before_bathroom.jpg" alt="Преди ремонт" />
+                <img src="/showcase/before_bathroom.jpg?v=2" alt="Преди ремонт" />
                 <span className="ba-label left-3" style={{ background: 'rgba(0,0,0,0.65)', color: '#fff', border: '1px solid rgba(212,162,58,0.4)' }}>ПРЕДИ</span>
               </div>
 
@@ -966,7 +966,7 @@ const LandingPage = () => {
 
               {/* After image */}
               <div className="ba-image">
-                <img src="/showcase/after_bathroom.jpg" alt="След AI дизайн" />
+                <img src="/showcase/after_bathroom.jpg?v=2" alt="След AI дизайн" />
                 <span className="ba-label right-3" style={{ background: 'linear-gradient(135deg, #d4a23a, #f6c36a)', color: '#0f1115' }}>СЛЕД</span>
               </div>
             </div>

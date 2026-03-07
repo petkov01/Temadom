@@ -51,7 +51,7 @@ const translations = {
 
     // Footer
     footer_tagline: "Ремонт и строителство",
-    footer_desc: "Свържете се с най-добрите майстори и фирми за вашите строителни проекти.",
+    footer_desc: "",
     footer_clients: "За клиенти", footer_publish: "Публикувай проект",
     footer_find_company: "Намери фирма", footer_services: "Услуги",
     footer_calculator: "Калкулатор", footer_professions_guide: "Наръчник за професии",
