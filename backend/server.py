@@ -75,7 +75,7 @@ PAYMENT_PACKAGES = {
     "premium_6": {"amount": 339.00, "currency": "eur", "type": "subscription", "name": "PREMIUM — 6 месеца", "months": 6},
     "premium_12": {"amount": 569.00, "currency": "eur", "type": "subscription", "name": "PREMIUM — 12 месеца", "months": 12},
     "design_1room": {"amount": 69.00, "currency": "eur", "type": "one_time", "name": "3D Дизайн — 1 стая"},
-    "design_2room": {"amount": 129.00, "currency": "eur", "type": "one_time", "name": "3D Дизайн — 2 стаи"},
+    "design_2room": {"amount": 119.00, "currency": "eur", "type": "one_time", "name": "3D Дизайн — 2 стаи"},
     "design_5room": {"amount": 199.00, "currency": "eur", "type": "one_time", "name": "3D Дизайн — 5 стаи"},
 }
 
