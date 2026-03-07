@@ -259,43 +259,55 @@ const Navbar = () => {
 
   return (
     <nav className="glass-nav sticky top-0 z-50" data-testid="main-navbar">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center relative taskbar-container">
-          {/* Logo - left */}
-          <Link to="/" className="flex-shrink-0" data-testid="logo-link">
-            <img src="/logo-temadom.png?v=96" alt="TemaDom" id="nav-logo" className="object-contain logo-glow taskbar-logo" style={{ filter: dark ? 'drop-shadow(0 0 8px rgba(246, 195, 106, 0.6))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.15)) brightness(0.85) contrast(1.15)' }} />
-          </Link>
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex items-center relative" style={{ height: '56px' }}>
+          {/* Left: Hamburger + refresh icon (like reference) */}
+          <div className="flex items-center gap-2">
+            <button 
+              className="p-1.5 rounded-lg transition-all hover:bg-[rgba(246,195,106,0.08)]"
+              style={{ color: 'var(--theme-text-muted)' }}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              data-testid="nav-hamburger-btn"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+            <ThemeToggle />
+          </div>
+
+          {/* Center: Navigation links (desktop) */}
+          <div className="hidden lg:flex items-center gap-1 ml-6">
+            <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
+              Начало
+            </Link>
+            <a href="#how-it-works" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-how-works">
+              Как работи <ChevronDown className="h-3 w-3 opacity-50" />
+            </a>
+            <Link to="/companies" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
+              Партньори <ChevronDown className="h-3 w-3 opacity-50" />
+            </Link>
+            <a href="#faq" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-faq">
+              Често задавани въпроси
+            </a>
+            <Link to="/ads" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
+              Обява <ChevronDown className="h-3 w-3 opacity-50" />
+            </Link>
+
+          </div>
 
           {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Right: Everything else */}
-          <div className="hidden lg:flex items-center gap-1">
-            <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
-              Начало
-            </Link>
-            <a href="#how-it-works" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-how-works">
-              Как работи
-            </a>
-            <Link to="/companies" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
-              Партньори
-            </Link>
-            <a href="#faq" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-faq">
-              ЧЗВ
-            </a>
-            <Link to="/ads" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
-              Обява
-            </Link>
-
+          {/* Right: Lang + Auth + Твоят проект */}
+          <div className="hidden lg:flex items-center gap-1.5">
             {/* More dropdown */}
             <div className="relative" ref={moreRef}>
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
+                className="px-2 py-1.5 text-sm font-medium rounded-lg transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]"
                 style={{ color: 'var(--theme-text-muted)' }}
                 data-testid="nav-more-btn"
               >
-                <ChevronDown className={`taskbar-icon transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
                 Още
               </button>
               {moreOpen && (
@@ -417,8 +429,8 @@ const Navbar = () => {
             )}
           </div>
 
+          {/* Mobile: only lang switcher (hamburger is already on left) */}
           <div className="lg:hidden flex items-center gap-1">
-            <ThemeToggle />
             <div className="relative" ref={mobileLangRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
@@ -446,14 +458,6 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            <button 
-              className="p-1"
-              style={{ color: 'var(--theme-text-muted)' }}
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              data-testid="mobile-menu-btn"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
           </div>
         </div>
       </div>
@@ -934,9 +938,9 @@ const LandingPage = () => {
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 pt-6 md:pt-10 flex flex-col items-center">
-          {/* Centered Hero Logo */}
-          <div className="hero-scale-in mb-2">
-            <img src="/logo-temadom.png" alt="TemaDom" className="h-48 sm:h-56 md:h-72 w-auto mx-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 30px rgba(246, 195, 106, 0.8))' : 'drop-shadow(0 4px 16px rgba(0,0,0,0.25)) brightness(0.85) contrast(1.15)' }} />
+          {/* Centered Hero Logo — LARGE like reference (1/3 viewport) */}
+          <div className="hero-scale-in mb-4">
+            <img src="/logo-temadom.png" alt="TemaDom" className="h-64 sm:h-80 md:h-[26rem] w-auto mx-auto logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 40px rgba(246, 195, 106, 0.9))' : 'drop-shadow(0 4px 20px rgba(0,0,0,0.3)) brightness(0.85) contrast(1.15)' }} />
           </div>
 
           {/* BEFORE / AFTER Showcase */}
@@ -975,7 +979,7 @@ const LandingPage = () => {
           </h1>
 
           <p className="text-sm md:text-base text-center mb-6 max-w-xl hero-fade-3" style={{ color: muted }}>
-            Качи 3 снимки → получи реалистичен 3D проект + бюджет
+            Качи снимка → получи реалистичен 3D проект + бюджет
           </p>
 
           {/* Primary CTA — Gold gradient button */}
@@ -1242,7 +1246,7 @@ const LandingPage = () => {
           <p className="text-center mb-10 text-sm" style={{ color: muted }}>3 лесни стъпки до вашия нов интериор</p>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: '1', title: 'Снимайте помещението', desc: 'Качете 1-3 снимки на стаята, която искате да обновите. AI анализира точната архитектура — стени, прозорци, врати, размери.', icon: Camera, color: '#c9953a' },
+              { step: '1', title: 'Снимайте помещението', desc: 'Качете 1 снимка на стаята, която искате да обновите. AI анализира точната архитектура — стени, прозорци, врати, размери.', icon: Camera, color: '#c9953a' },
               { step: '2', title: 'Изберете стил и материали', desc: 'Изберете от 10 стила (модерен, скандинавски, лофт...) и клас материали. Опишете какво точно искате да промените.', icon: Palette, color: '#3B82F6' },
               { step: '3', title: 'Получете 3D рендер + бюджет', desc: 'AI генерира реалистичен дизайн, който запазва ТОЧНАТА архитектура. Получавате бюджет с цени и директни линкове към 9 магазина.', icon: Check, color: '#10B981' },
             ].map((s, i) => (
@@ -1267,9 +1271,9 @@ const LandingPage = () => {
           <p className="text-center mb-10 text-sm" style={{ color: muted }}>Реалистичен 1:1 проект на вашето помещение</p>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['3 снимки → 3D рендери', '4 ъгъла рендер', '10 стила', 'Пред/След сравнение', 'Бюджет + линкове'], color: accent, popular: false },
-              { name: '2 ПОМЕЩЕНИЯ', price: '119', rooms: '2', features: ['2 помещения', '3 снимки на помещение', '10 стила за всяко', 'Пред/След рендер', 'Бюджет + директни линкове'], color: '#10B981', popular: true },
-              { name: 'АПАРТАМЕНТ', price: '199', rooms: '3-5', features: ['До 5 помещения', '3 снимки на помещение', 'Пълен бюджет', 'Всички стилове', 'Приоритетна обработка'], color: '#8B5CF6', popular: false },
+              { name: '1 ПОМЕЩЕНИЕ', price: '69', rooms: '1', features: ['1 снимка → 3D рендер', '4 ъгъла рендер', '10 стила', 'Пред/След сравнение', 'Бюджет + линкове'], color: accent, popular: false },
+              { name: '2 ПОМЕЩЕНИЯ', price: '119', rooms: '2', features: ['2 помещения', '1 снимка на помещение', '10 стила за всяко', 'Пред/След рендер', 'Бюджет + директни линкове'], color: '#10B981', popular: true },
+              { name: 'АПАРТАМЕНТ', price: '199', rooms: '3-5', features: ['До 5 помещения', '1 снимка на помещение', 'Пълен бюджет', 'Всички стилове', 'Приоритетна обработка'], color: '#8B5CF6', popular: false },
             ].map((plan, i) => (
               <div key={i} className={`rounded-2xl p-6 text-center border backdrop-blur-lg relative transition-transform hover:scale-105 ${plan.popular ? 'ring-2' : ''}`}
                 style={{ background: dark ? 'rgba(30,41,59,0.6)' : 'rgba(255,255,255,0.8)', borderColor: plan.popular ? plan.color : border, ...(plan.popular ? { boxShadow: `0 0 40px ${plan.color}20` } : {}) }}
@@ -1454,7 +1458,7 @@ const LandingPage = () => {
           <p className="text-center mb-10 text-sm" style={{ color: muted }}>Всичко, което трябва да знаете за TemaDom</p>
           <div className="space-y-3">
             {[
-              { q: 'Как работи AI дизайнерът?', a: 'Качвате 1-3 снимки на помещението. AI анализира точната архитектура — стени, ъгли, прозорци, врати — и генерира реалистичен 3D дизайн, който запазва ТОЧНАТА архитектура на вашата стая.' },
+              { q: 'Как работи AI дизайнерът?', a: 'Качвате 1 снимка на помещението. AI анализира точната архитектура — стени, ъгли, прозорци, врати — и генерира реалистичен 3D дизайн, който запазва ТОЧНАТА архитектура на вашата стая.' },
               { q: 'Колко струва AI проектирането?', a: 'Цените започват от 69 EUR за 1 помещение. Получавате 3D рендер + детайлен бюджет с цени и линкове към реални магазини в България.' },
               { q: 'Колко време отнема генерирането?', a: 'AI генерацията отнема около 30-60 секунди за едно помещение. Получавате резултата директно в браузъра.' },
               { q: 'Мога ли да променя стила?', a: 'Да! Предлагаме 10+ стила — модерен, скандинавски, лофт, минимализъм, класически и други. Може да опишете и допълнителни предпочитания.' },
@@ -4181,10 +4185,10 @@ const SubscriptionsPage = () => {
 
         {/* AI Video Designer module */}
         <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--theme-text)' }}>3D Photo Designer</h2>
-        <p className="text-sm mb-6" style={{ color: 'var(--theme-text-muted)' }}>Качете 3 снимки на помещение → AI генерира 3D ремонт + бюджет с директни линкове.</p>
+        <p className="text-sm mb-6" style={{ color: 'var(--theme-text-muted)' }}>Качете снимка на помещение → AI генерира 3D ремонт + бюджет с директни линкове.</p>
         <div className="grid md:grid-cols-3 gap-4 max-w-3xl">
           {[
-            { name: '1 помещение', price: '69 EUR', features: ['3 снимки → 3D рендери', 'Бюджет + линкове', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
+            { name: '1 помещение', price: '69 EUR', features: ['1 снимка → 3D рендер', 'Бюджет + линкове', 'Списък материали', 'ПРЕДИ/СЛЕД сравнение'] },
             { name: '2 помещения', price: '119 EUR', features: ['2 видеа → 8 ъгъла', 'PDF за всяко помещение', 'Обща сметка', 'ПРЕДИ/СЛЕД за всяка стая'], popular: true },
             { name: 'Апартамент', price: '199 EUR', features: ['До 5 видеа → 20 ъгъла', 'PDF за всяко помещение', 'Пълна сметка + 3D', 'Приоритетна обработка'] },
           ].map((plan, i) => (
