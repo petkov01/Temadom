@@ -3119,25 +3119,30 @@ async def _process_photo_design(
         async def process_single_photo(idx, photo_b64):
             label = photo_labels[idx] if idx < len(photo_labels) else f"Снимка {idx+1}"
             try:
-                render_prompt = f"""You are an interior renovation AI. Edit ONLY the surfaces and furniture in this photo.
+                render_prompt = f"""RENOVATION VISUALIZATION — edit this photo to show a renovated version.
 
-CRITICAL — PRESERVE EXACTLY AS-IS:
-- The EXACT room shape, walls, ceiling, floor plan
-- ALL window positions, sizes, and proportions  
-- ALL door positions, sizes, and proportions
-- The EXACT camera angle and perspective — do NOT rotate or shift the viewpoint
-- The room type is {room_type_name} — the result MUST remain a {room_type_name}, NOT any other room type
+WHAT YOU MUST NOT CHANGE (keep pixel-perfect):
+- The room's shape, size, and proportions
+- The exact position of every wall, corner, and ceiling  
+- The exact position and size of every window and door
+- The camera angle, perspective, and field of view
+- The position of fixed plumbing (toilet, sink, bathtub/shower if visible)
+- The position of the water heater/boiler if visible
 
-CHANGE ONLY THESE:
-- Wall paint/tiles/texture → modern {style_desc} materials
-- Floor material → matching {style_desc} flooring
-- Replace old furniture with new {style_desc} furniture for a {room_type_name}
-- Update lighting fixtures
-- Add appropriate decor for a {room_type_name}
-{f"- Client request: {reno_instruction}" if notes else ""}
+THIS IS A {room_type_name.upper()}. The result MUST look like a {room_type_name}, NOT a kitchen or any other room.
 
-Room dimensions: {width}m x {length}m, height {height}m.
-Output: photorealistic interior photography, 8K quality, professional lighting."""
+WHAT TO CHANGE:
+- Replace wall tiles/paint with modern {style_desc} finishes
+- Replace floor tiles with matching {style_desc} flooring  
+- Update the sink, faucet, and mirror to modern {style_desc} versions (same positions)
+- Replace/add modern furniture appropriate for a {room_type_name}
+- Add modern lighting fixtures
+- Clean and declutter the space
+{f"- Specific request: {reno_instruction}" if notes else ""}
+
+Room: {width}m x {length}m, height {height}m.
+Style: {style_desc}.
+Output: photorealistic, professional interior photography."""
 
                 original_photo_bytes = base64.b64decode(photo_b64)
                 
@@ -3241,11 +3246,19 @@ Output: photorealistic interior photography, 8K quality, professional lighting."
 
         # System prompt: Use real products when available
         budget_system = f"""Ти си експерт по строителни материали в България. Клиентът има бюджет от {budget_eur}€.
+Помещението е {room_type_name}.
 
 Генерирай БЮДЖЕТ с 3 варианта (Иконом, Среден, Премиум) СПРЯМО БЮДЖЕТА на клиента:
 - Иконом: до {int(int(budget_eur)*0.6)}€ (60% от бюджета)
 - Среден: до {budget_eur}€ (100% от бюджета)  
 - Премиум: до {int(int(budget_eur)*1.5)}€ (150% от бюджета)
+
+КРИТИЧНИ ПРАВИЛА:
+1. Всички имена на продукти ТРЯБВА да са на БЪЛГАРСКИ език
+2. search_query ТРЯБВА да е на БЪЛГАРСКИ (напр. "плочки за баня", "смесител за мивка", НЕ на английски или друг език)
+3. Продуктите ТРЯБВА да съответстват на типа помещение ({room_type_name})
+4. За {room_type_name} включи САМО релевантни продукти (напр. за баня: плочки, смесител, мивка, вана/душ, бойлер, огледало)
+5. НЕ включвай продукти за друг тип помещение
 
 """
         if real_products_context:
@@ -3341,9 +3354,17 @@ Output: photorealistic interior photography, 8K quality, professional lighting."
                     mat["product_url"] = make_affiliate_url(existing_url, mat.get("store", ""))
                     mat["verified"] = True
                 else:
-                    # Not a real product — generate search URL
+                    # Not a real product — generate search URL with BULGARIAN terms
                     store = mat.get("store", "")
-                    search_q = mat.get("search_query", mat.get("name", ""))
+                    search_q = mat.get("search_query", "")
+                    # Fallback: use product name if search_query is empty or non-Bulgarian
+                    if not search_q or len(search_q) < 3:
+                        search_q = mat.get("name", "")
+                    # Sanitize: keep only Cyrillic, Latin, numbers, spaces
+                    import re as re_sanitize
+                    search_q = re_sanitize.sub(r'[^\w\sа-яА-ЯёЁ]', '', search_q).strip()
+                    if not search_q:
+                        search_q = room_type_name  # fallback to room type
                     encoded_q = url_quote(search_q, safe='')
                     base_url = STORE_SEARCH_URLS.get(store, "")
                     if base_url:
