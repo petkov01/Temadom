@@ -1086,7 +1086,7 @@ const LandingPage = () => {
               },
               {
                 room: 'ХОЛ + КУХНЯ', roomId: 'combo', dims: '2 помещения', tierTotal: 6200, price: '119', tier: '2 помещения', color: '#8B5CF6',
-                before: '/showcase/before_living.jpg', after: '/showcase/after_kitchen.jpg',
+                before: '/showcase/before_kitchen.jpg', after: '/showcase/after_kitchen.jpg',
                 products: [
                   { name: 'Ламинат 10мм Дъб', price: '400', store: 'HomeMax', url: 'https://www.homemax.bg/catalogsearch/result/?q=%D0%BB%D0%B0%D0%BC%D0%B8%D0%BD%D0%B0%D1%82+10%D0%BC%D0%BC&ref=temadom' },
                   { name: 'Кухненски шкафове MDF', price: '2,000', store: 'Mr.Bricolage', url: 'https://www.mr-bricolage.bg/search?q=%D0%BA%D1%83%D1%85%D0%BD%D0%B5%D0%BD%D1%81%D0%BA%D0%B8+%D1%88%D0%BA%D0%B0%D1%84&ref=temadom' },
