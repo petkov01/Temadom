@@ -11,8 +11,16 @@ from datetime import datetime, timezone, timedelta
 from urllib.parse import quote as url_quote
 from typing import Optional
 
-from playwright.async_api import async_playwright
-from bs4 import BeautifulSoup
+try:
+    from playwright.async_api import async_playwright
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
+
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None
 
 logger = logging.getLogger(__name__)
 
@@ -24,16 +32,23 @@ _browser_lock = asyncio.Lock()
 
 async def get_browser():
     global _browser, _playwright
+    if not PLAYWRIGHT_AVAILABLE:
+        logger.warning("Playwright not available, scraping disabled")
+        return None
     async with _browser_lock:
         if _browser and _browser.is_connected():
             return _browser
-        _playwright = await async_playwright().start()
-        _browser = await _playwright.chromium.launch(
-            headless=True,
-            args=["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
-        )
-        logger.info("Playwright browser launched")
-        return _browser
+        try:
+            _playwright = await async_playwright().start()
+            _browser = await _playwright.chromium.launch(
+                headless=True,
+                args=["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
+            )
+            logger.info("Playwright browser launched")
+            return _browser
+        except Exception as e:
+            logger.error(f"Failed to launch Playwright: {e}")
+            return None
 
 
 async def close_browser():

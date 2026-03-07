@@ -20,9 +20,15 @@ from emergentintegrations.llm.openai.image_generation import OpenAIImageGenerati
 import json as json_module
 import re as re_module
 import base64
-import cv2
 import tempfile
-import numpy as np
+
+# Lazy imports for heavy libraries
+try:
+    import cv2
+    import numpy as np
+except ImportError:
+    cv2 = None
+    np = None
 
 # Import shared config
 from config import (
@@ -76,6 +82,15 @@ PAYMENT_PACKAGES = {
 # Create the main app
 app = FastAPI(title="Maistori Marketplace API")
 api_router = APIRouter(prefix="/api")
+
+# ==================== HEALTH CHECK ====================
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
+@app.get("/api/health")
+async def api_health_check():
+    return {"status": "ok"}
 
 # ==================== AFFILIATE CONFIG ====================
 # Affiliate ref parameters for each store (monetization)
@@ -4557,7 +4572,11 @@ async def download_project_materials_pdf(project_id: str):
 
 # ============== AI SKETCH ANALYSIS (CV/OCR Pipeline) ==============
 
-from cv_pipeline import process_sketch
+try:
+    from cv_pipeline import process_sketch
+except ImportError:
+    async def process_sketch(*args, **kwargs):
+        raise HTTPException(status_code=503, detail="CV pipeline not available")
 
 @api_router.post("/ai-sketch/analyze")
 async def analyze_sketch(request: Request):
@@ -5813,7 +5832,10 @@ app.include_router(telegram_router)
 
 @app.on_event("startup")
 async def start_background_tasks():
-    asyncio.create_task(check_subscriptions_background())
+    try:
+        asyncio.create_task(check_subscriptions_background())
+    except Exception as e:
+        logging.warning(f"Failed to start subscription check: {e}")
     # Create TTL index for product cache
     try:
         await db.product_cache.create_index("expires_at", expireAfterSeconds=0)
