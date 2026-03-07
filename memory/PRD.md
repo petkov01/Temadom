@@ -11,6 +11,8 @@ TemaDom е уеб платформа за строителство и ремон
 5. Multi-language support (BG, EN)
 6. Free chat between all users
 7. AI-powered suggestion analysis
+8. Google Social Login
+9. Telegram bot notifications for firms
 
 ## What's Been Implemented
 
@@ -18,87 +20,74 @@ TemaDom е уеб платформа за строителство и ремон
 - Full auth system (register, login, JWT)
 - Company/Master profiles and portfolio
 - Project posting and management
-- Price calculator with AI analysis
-- Subscription system with Stripe integration
+- Price calculator
+- Subscription system with Stripe
 - AI Designer with GPT-4o-mini and gpt-image-1
 - Real product scraping from Videnov via Playwright
 - CAD viewer with "Download as PNG"
 - Blog, Community pages
-- Multi-language support
-- Theme toggle (dark/light)
-- Live counter and regional stats
-- ScrollToTop component
-- Mobile responsive layout
+- Multi-language, Theme toggle, ScrollToTop, Mobile layout
 
-### Phase 3 (Feb 2026)
-- Merged "Фирми и Майстори" page with tabs (Всички/Фирми/Майстори)
-- Removed duplicate "Фирми" from dropdown menu
+### Phase 3 (Feb 2026 - Session 1)
+- Merged "Фирми и Майстори" page with tabs
+- Removed dropdown duplicate
 - Cleaned all fake data from MongoDB
-- Beta notice on registration "Платформата е нова!"
-- Suggestions system with voting (API + UI)
-- Public pages (/companies, /feedback) - no login required
-- Fixed broken BULGARIA_REGIONS_LIST duplicate
+- Beta notice on registration
+- Suggestions system with voting
+- Public pages (/companies, /feedback)
 
-### Phase 3.5 (Feb 2026)
-- **Free Chat System** - user search/discovery, new conversation, message polling
-- **AI Suggestion Analysis** - GPT-4o-mini analyzes suggestions, generates recommendations
-- **Enhanced Scraping** - Mr.Bricolage, Praktiker, eMAG now with Playwright scrapers
-- Added extraction functions for Praktiker and eMAG stores
+### Phase 3.5 (Feb 2026 - Session 2)
+- **Free Chat System** with user search/discovery
+- **AI Suggestion Analysis** via GPT-4o-mini
+- **Enhanced Scraping** - Mr.Bricolage, Praktiker, eMAG with Playwright
+
+### Phase 4 (Feb 2026 - Session 3 - Current)
+- **Designer registration removed** - only Client/Company/Master
+- **Google Social Login** via Emergent Auth (auth.emergentagent.com)
+- **Telegram bot webhook configured** and bot-info endpoint
+- **New kitchen showcase image** generated and replaced
+- **Text contrast fixes** across all pages (slate colors → theme vars)
+- **Registration Google button** for client accounts
 
 ## Architecture
 ```
 /app/
 ├── backend/
-│   ├── server.py          # Main FastAPI (conversations, messages, suggestions/analyze, users/search)
-│   ├── config.py
-│   ├── routes/             # google_auth.py, telegram.py, payments.py, products.py
+│   ├── server.py          # Main FastAPI (5700+ lines)
+│   ├── routes/
+│   │   ├── google_auth.py # Emergent Google Auth
+│   │   ├── telegram.py    # Telegram bot routes
+│   │   ├── payments.py    # Stripe
+│   │   └── products.py    # Scraper API
 │   └── services/
-│       ├── scraper.py      # Playwright scraping (Videnov, Mr.Bricolage, Praktiker, eMAG + search URLs)
-│       └── telegram.py
+│       ├── scraper.py     # Playwright (Videnov, Mr.Bricolage, Praktiker, eMAG)
+│       └── telegram.py    # Telegram service
 └── frontend/
     └── src/
-        ├── App.js          # Main app, all pages
-        ├── components/
-        │   ├── ChatPage.jsx       # Enhanced with user search & new conversation
-        │   ├── FeedbackPage.jsx   # Feedback + Suggestions + AI Analysis
-        │   └── ScrollToTop.jsx
-        └── i18n/
+        ├── App.js          # Main app, all pages (3900+ lines)
+        └── components/
+            ├── ChatPage.jsx       # User search + chat
+            └── FeedbackPage.jsx   # Feedback + Suggestions + AI Analysis
 ```
 
 ## Prioritized Backlog
 
-### P0 (Critical) - None
-
 ### P1 (High)
-- Google Social Login (needs OAuth Client ID/Secret)
-- Telegram Notifications end-to-end testing
-- Landing page showcase slider improvements
-- Text contrast fixes across all pages
-- Full AI Designer flow test
-- Login bug investigation
+- Full AI Designer flow test (multi-room, apartment)
+- Mobile responsiveness polish
+- Subscription feature verification
 
 ### P2 (Medium)
-- Mobile responsiveness polish
-- Backend refactoring (break up server.py)
-- Subscription feature verification
+- Backend refactoring (break up server.py monolith)
+- SEO optimization
 
 ### P3 (Low/Future)
 - Company catalog & portfolios
 - Job ads module
-- SEO optimization
-
-## Key API Endpoints
-- GET /api/users/search?q= - Search users (auth required)
-- POST/GET /api/messages - Send/get messages
-- GET /api/conversations - List conversations
-- POST /api/suggestions/analyze - AI analysis
-- GET /api/suggestions/analysis - Get latest analysis
-- POST/GET /api/feedback, /api/suggestions
-- GET /api/companies - Firms & Masters directory
 
 ## 3rd Party Integrations
 - OpenAI GPT-4o-mini & gpt-image-1 (Emergent LLM Key)
 - Stripe (test keys)
 - Playwright (web scraping)
-- Google OAuth (needs credentials)
-- Telegram Bot API (configured)
+- Google OAuth via Emergent Auth
+- Telegram Bot API
