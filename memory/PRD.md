@@ -8,9 +8,12 @@ TemaDom е уеб платформа за строителство и ремон
 2. Subscription model (БАЗОВ/ПРО/PREMIUM) via Stripe
 3. Firm/Master directory with search and filters
 4. Community features (feedback, suggestions, blog)
-5. Multi-language support (BG, EN, etc.)
+5. Multi-language support (BG, EN)
+6. Free chat between all users
+7. AI-powered suggestion analysis
 
 ## What's Been Implemented
+
 ### Phase 1-2 (Complete)
 - Full auth system (register, login, JWT)
 - Company/Master profiles and portfolio
@@ -27,79 +30,75 @@ TemaDom е уеб платформа за строителство и ремон
 - ScrollToTop component
 - Mobile responsive layout
 
-### Phase 3 (Current Session - Feb 2026)
-- **Merged Firms & Masters page** - /companies now shows unified view with tabs (Всички/Фирми/Майстори)
-- **Removed duplicate "Фирми"** from dropdown navigation menu
-- **Cleaned all fake data** from MongoDB (test users, companies, profiles)
-- **Beta notice on registration** - "Платформата е нова!" with link to feedback
-- **Suggestions system** - New API endpoints + UI tab on /feedback page
-- **Public pages** - /companies and /feedback accessible without login
-- **Fixed broken BULGARIA_REGIONS_LIST** duplicate declaration
-- **Google OAuth** backend routes (needs client ID/secret to activate)
-- **Telegram bot** integration setup (bot token configured)
+### Phase 3 (Feb 2026)
+- Merged "Фирми и Майстори" page with tabs (Всички/Фирми/Майстори)
+- Removed duplicate "Фирми" from dropdown menu
+- Cleaned all fake data from MongoDB
+- Beta notice on registration "Платформата е нова!"
+- Suggestions system with voting (API + UI)
+- Public pages (/companies, /feedback) - no login required
+- Fixed broken BULGARIA_REGIONS_LIST duplicate
+
+### Phase 3.5 (Feb 2026)
+- **Free Chat System** - user search/discovery, new conversation, message polling
+- **AI Suggestion Analysis** - GPT-4o-mini analyzes suggestions, generates recommendations
+- **Enhanced Scraping** - Mr.Bricolage, Praktiker, eMAG now with Playwright scrapers
+- Added extraction functions for Praktiker and eMAG stores
 
 ## Architecture
 ```
 /app/
 ├── backend/
-│   ├── server.py          # Main FastAPI monolith
-│   ├── config.py          # Shared config
-│   ├── routes/
-│   │   ├── google_auth.py # Google OAuth (needs credentials)
-│   │   ├── telegram.py    # Telegram bot routes
-│   │   ├── notifications.py
-│   │   ├── payments.py
-│   │   └── products.py    # Product scraper API
+│   ├── server.py          # Main FastAPI (conversations, messages, suggestions/analyze, users/search)
+│   ├── config.py
+│   ├── routes/             # google_auth.py, telegram.py, payments.py, products.py
 │   └── services/
-│       ├── scraper.py     # Playwright scraping
-│       └── telegram.py    # Telegram service
+│       ├── scraper.py      # Playwright scraping (Videnov, Mr.Bricolage, Praktiker, eMAG + search URLs)
+│       └── telegram.py
 └── frontend/
     └── src/
-        ├── App.js         # Main app with all pages
-        ├── components/    # Feature pages
-        └── i18n/          # Translations
+        ├── App.js          # Main app, all pages
+        ├── components/
+        │   ├── ChatPage.jsx       # Enhanced with user search & new conversation
+        │   ├── FeedbackPage.jsx   # Feedback + Suggestions + AI Analysis
+        │   └── ScrollToTop.jsx
+        └── i18n/
 ```
 
 ## Prioritized Backlog
 
-### P0 (Critical)
-- None currently
+### P0 (Critical) - None
 
-### P1 (High Priority)
-- Google Social Login activation (needs client credentials)
-- Telegram Notifications testing (end-to-end flow)
+### P1 (High)
+- Google Social Login (needs OAuth Client ID/Secret)
+- Telegram Notifications end-to-end testing
 - Landing page showcase slider improvements
 - Text contrast fixes across all pages
-- Full AI Designer flow test (multi-room, apartment)
+- Full AI Designer flow test
 - Login bug investigation
 
 ### P2 (Medium)
-- Add new Bulgarian stores to scraping service
 - Mobile responsiveness polish
-- Backend refactoring (break up server.py monolith)
-- Subscription feature verification (all plan features working)
+- Backend refactoring (break up server.py)
+- Subscription feature verification
 
 ### P3 (Low/Future)
 - Company catalog & portfolios
-- Direct user-to-user messaging
 - Job ads module
 - SEO optimization
 
 ## Key API Endpoints
-- POST/GET /api/feedback - User feedback with ratings
-- POST/GET /api/suggestions - Platform improvement suggestions
-- POST /api/suggestions/{id}/vote - Upvote suggestions
-- GET /api/companies - List firms/masters with filters
-- POST /api/auth/register, /api/auth/login - Authentication
-- GET /api/stats/live - Real-time platform statistics
-
-## Database
-- MongoDB at localhost:27017, DB: test_database
-- Collections: users, company_profiles, feedback, suggestions, projects, etc.
+- GET /api/users/search?q= - Search users (auth required)
+- POST/GET /api/messages - Send/get messages
+- GET /api/conversations - List conversations
+- POST /api/suggestions/analyze - AI analysis
+- GET /api/suggestions/analysis - Get latest analysis
+- POST/GET /api/feedback, /api/suggestions
+- GET /api/companies - Firms & Masters directory
 
 ## 3rd Party Integrations
-- OpenAI (GPT-4o-mini, gpt-image-1) via Emergent LLM Key
-- Stripe (test keys) for subscriptions
-- Playwright for web scraping
-- Google OAuth (configured, needs credentials)
-- Telegram Bot API (token configured)
+- OpenAI GPT-4o-mini & gpt-image-1 (Emergent LLM Key)
+- Stripe (test keys)
+- Playwright (web scraping)
+- Google OAuth (needs credentials)
+- Telegram Bot API (configured)
