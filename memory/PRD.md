@@ -15,42 +15,47 @@ TemaDom е уеб платформа за строителство и ремон
 - Telegram bot, Blog, Community, Multi-language
 
 ### Phase 7 (Mar 7, 2026) - AI Designer Speed & Mobile Fix
-- **Async Task System**: POST -> task_id immediately (<2s), frontend polls every 3s
-- **Separated polling from result**: Polling returns ~150 bytes (no base64)
-- **Parallel Processing**: Photos + product scraping via `asyncio.gather`
+- Async Task System: POST -> task_id, frontend polls every 3s
+- Parallel Processing via asyncio.gather
+- DB split: designs + design_renders collections
 
 ### Phase 8 (Mar 7, 2026) - AI Designer Cost & Reliability
-- **Safe LlmChat Import**: try/except with `_LLM_AVAILABLE` flag
-- **gpt-4o-mini for budget**: 10x cheaper ($0.15/M vs $3.75/M tokens)
-- **LLM Response Cache**: MD5-based in-memory cache (200 entries)
-- **Static Fallback Budget**: BG_ROOM_PRICES for bathroom/kitchen/living_room/bedroom
-- **Budget Fallback on Error**: Returns static budget + original photos instead of crashing
-- **Frontend Fallback Notice**: Orange banner when budget is from static data
+- Safe LlmChat Import with _LLM_AVAILABLE flag
+- gpt-4o-mini for budget (10x cheaper)
+- LLM Response Cache (MD5, 200 entries)
+- Static Fallback Budget: BG_ROOM_PRICES for bathroom/kitchen/living_room/bedroom
+- Frontend Fallback Notice
 
-### Phase 8b (Mar 7, 2026) - Compact Taskbar
-- **Desktop**: 42px height, 36px logo, 14px icons, compact spacing
-- **Mobile**: 32px height, 24px logo, 12px icons
-- **CSS classes**: .taskbar-container, .taskbar-logo, .taskbar-icon
-- Responsive breakpoint at 1023px (lg)
+### Phase 9 (Mar 7, 2026) - Landing Page Redesign + AI Prompt
+- **Complete landing page redesign** matching reference image
+- **Navbar**: Начало | Как работи | Партньори | ЧЗВ | Обява | Още + "Твоят проект" gold button
+- **Logo**: 98px desktop / 72px mobile, taskbar 110px/84px
+- **Hero**: Centered logo → BEFORE/AFTER showcase → Gold arrow → ПРЕДИ/СЛЕД labels
+- **CTA**: "КАЧИ СНИМКИ НА ПОМЕЩЕНИЕТО" gold gradient button
+- **Room tabs**: Баня | Кухня | Хол
+- **FAQ section**: 6 accordion items with <details> elements
+- **Animations**: hero-fade-1..5, hero-scale-in, arrow-pulse, shimmer
+- **AI Prompt**: Improved Bulgarian prompt preserving room architecture 1:1
+- **All prices in EUR**
+- **Testing**: iteration_82 — 24/24 frontend tests passed (100%)
 
 ## Key API Endpoints
-- `POST /api/ai-designer/photo-generate` -> `{task_id}` immediately
-- `GET /api/ai-designer/task/{task_id}` -> lightweight progress (150 bytes)
-- `GET /api/ai-designer/result/{design_id}` -> full result with base64 renders
-- `POST /api/ai-designer/generate` -> parallelized camera angles
+- POST /api/ai-designer/photo-generate -> {task_id}
+- GET /api/ai-designer/task/{task_id} -> progress
+- GET /api/ai-designer/result/{design_id} -> full result
 
 ## Prioritized Backlog
-### P2 (Medium)
-- Refactor server.py (6000+ lines) into route modules
+### P2
+- Refactor server.py (6200+ lines) into route modules
 - Refactor App.js (4270+ lines) into page files
-- SEO optimization, Company catalog & portfolio
-- Job ads module for firms
+- Company catalog & portfolio pages
+- Job ads module
 
-### P3 (Future)
-- Refactor ai_designer_service.py into smaller modules
-- Facebook login, Advanced analytics
+### P3
+- Refactor ai_designer_service into smaller modules
+- Facebook login, Advanced analytics, SEO
 
 ## 3rd Party Integrations
 - OpenAI GPT-4o-mini & gpt-image-1 (Emergent LLM Key)
-- Stripe (test keys), Playwright, Google OAuth (Emergent Auth)
-- Telegram Bot API, litellm.aimage_edit
+- Stripe (test keys), Google OAuth (Emergent Auth)
+- Telegram Bot API
