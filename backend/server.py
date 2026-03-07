@@ -124,7 +124,7 @@ def make_affiliate_url(url: str, store_name: str = "") -> str:
 PLAN_LIMITS = {
     "basic":   {"offers_per_month": 5,  "pdf_contracts": False, "ai_sketches": False, "quantitative_estimates": False, "telegram_notifications": False, "priority_display": False, "team_members": 1},
     "pro":     {"offers_per_month": 999, "pdf_contracts": True,  "ai_sketches": True,  "quantitative_estimates": True,  "telegram_notifications": True,  "priority_display": True,  "team_members": 1},
-    "premium": {"offers_per_month": 999, "pdf_contracts": True,  "ai_sketches": True,  "quantitative_estimates": True,  "telegram_notifications": True,  "priority_display": True,  "team_members": 5},
+    "premium": {"offers_per_month": 999, "pdf_contracts": True,  "ai_sketches": True,  "quantitative_estimates": True,  "telegram_notifications": True,  "priority_display": True,  "team_members": 5, "custom_pdf": True, "api_access": True},
 }
 
 async def check_plan_feature(user: dict, feature: str) -> dict:

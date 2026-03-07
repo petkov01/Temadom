@@ -167,7 +167,7 @@ SUBSCRIPTION_PLANS = {
         },
         "designer_3": {
             "name": "2-3 помещения",
-            "price": "129 EUR",
+            "price": "119 EUR",
             "features": [
                 "До 3 помещения",
                 "4 снимки на помещение",
