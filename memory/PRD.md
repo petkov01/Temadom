@@ -3,14 +3,16 @@
 ## Status: PRODUCTION READY
 
 ## Core Features — ALL WORKING
-1. **3D Photo Designer v9.2** — GPT-4o-mini Vision (faster!) + gpt-image-1 renders
+1. **3D Photo Designer v9.3** — GPT-4o-mini Vision + gpt-image-1 renders
    - Room dimensions (Дължина/Ширина/Височина)
-   - Budget: 1,000 / 2,500 / 5,000 EUR
+   - Free text budget input (EUR) — client types own amount
+   - Info: "Само за материали и обзавеждане (без труд/монтаж)"
    - Download PNG + Fullscreen per render
    - Multi-room packages: 69/129/199 EUR
    - Image compression to <2MB (frontend + backend PIL)
    - Retry with exponential backoff (3 retries)
    - 5 min timeout (300s)
+   - /api/test-ai diagnostic endpoint
 
 2. **AI Product Search** — Photo to 21 Bulgarian stores with EUR prices + share
 
@@ -31,19 +33,16 @@
 10. **Tracking** — Google Analytics + Facebook Pixel + PostHog
 
 ## Latest Changes (2026-03-07)
-- GPT-4o Vision timeout fixes:
-  1. Vision model changed to gpt-4o-mini (faster analysis)
-  2. Image resize to <2MB via PIL on backend + canvas compression on frontend
-  3. Retry with exponential backoff (3 retries, 2s/3s base delay)
-  4. Frontend timeout set to 300s (5 minutes)
-  5. Base64 upload confirmed (not URL)
-- Fixed ProductSearchPage.jsx JSX syntax error (broken fragment)
-- Budget values: 1,000 / 2,500 / 5,000 EUR
+- Budget: Changed from preset buttons to free text input (min 100 EUR)
+- Budget info text: "Само за материали и обзавеждане (без труд/монтаж)"
+- Added /api/test-ai diagnostic endpoint for AI health checks
+- GPT-4o Vision timeout fixes (gpt-4o-mini, retry, resize, 300s timeout)
+- Fixed ProductSearchPage.jsx JSX syntax error
 
 ## Post-Launch Backlog (Priority)
 - P1: Backend refactoring (server.py monolith to modular routers)
 - P1: Mobile responsiveness polish
-- P1: Real scraping for 21 stores (currently placeholder)
+- P1: Real scraping for 21 stores (currently placeholder/MOCKED)
 - P2: Company catalog & portfolios
 - P2: Direct user-to-user messaging
 - P2: Job ads module
