@@ -3191,7 +3191,7 @@ Output: photorealistic, professional interior photography."""
                                     img_data_list.append(await resp.read())
                     return img_data_list
 
-                img_result = await retry_with_backoff(run_image_edit, max_retries=2, base_delay=2)
+                img_result = await retry_with_backoff(run_image_edit, max_retries=4, base_delay=3)
                 if img_result and len(img_result) > 0:
                     img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
                     logging.info(f"Photo Designer: render {idx+1} ({label}) generated OK")

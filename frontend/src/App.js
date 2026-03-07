@@ -258,13 +258,13 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="glass-nav sticky top-0 z-50">
+    <nav className="glass-nav sticky top-0 z-50 overflow-visible">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-36 lg:h-40">
+        <div className="flex justify-between h-20 lg:h-24">
           {/* Left: Logo */}
-          <div className="flex items-end pb-1">
-            <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
-              <img src="/logo-temadom.png" alt="TemaDom" className="h-48 lg:h-52 w-auto object-contain logo-glow -mt-6" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
+          <div className="flex items-start">
+            <Link to="/" className="flex items-center gap-2.5 -mt-2" data-testid="logo-link">
+              <img src="/logo-temadom.png" alt="TemaDom" className="h-48 lg:h-52 w-auto object-contain logo-glow" style={{ filter: dark ? 'drop-shadow(0 0 12px rgba(246, 195, 106, 0.7))' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(0.85) contrast(1.15)' }} />
             </Link>
           </div>
 
