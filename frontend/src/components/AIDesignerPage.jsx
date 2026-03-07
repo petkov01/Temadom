@@ -687,10 +687,10 @@ export const AIDesignerPage = () => {
                                         <span className="text-xs font-black text-[#F97316]">{mat.price_eur} EUR</span>
                                         {mat.product_url && mat.product_url.startsWith('http') ? (
                                           <a href={mat.product_url} target="_blank" rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold text-white hover:opacity-90 transition-opacity"
+                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[10px] font-bold text-white hover:opacity-90 transition-all hover:scale-105"
                                             style={{ background: ti === 0 ? '#10B981' : ti === 1 ? '#F97316' : '#8B5CF6' }}
                                             data-testid={`material-link-${ri}-${ti}-${mi}`}>
-                                            <Store className="h-2.5 w-2.5" /> {mat.store || 'Магазин'}
+                                            <ExternalLink className="h-2.5 w-2.5" /> Търси в {mat.store || 'Магазин'}
                                           </a>
                                         ) : mat.store ? (
                                           <span className="text-[10px] px-2 py-1 rounded-md font-bold" style={{ background: 'var(--theme-bg-surface)', color: 'var(--theme-text-muted)' }}>

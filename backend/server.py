@@ -2855,7 +2855,19 @@ IMPORTANT RULES:
                 logging.error(f"Photo Designer render {idx+1} error: {img_err}")
                 continue
 
-        # Step 2: Generate budget with 3 tiers and DIRECT product links
+        # Step 2: Generate budget with 3 tiers and REAL search links to stores
+        # Store search URL patterns (verified working)
+        STORE_SEARCH_URLS = {
+            "Praktiker": "https://praktiker.bg/search?q=",
+            "Mr.Bricolage": "https://mr-bricolage.bg/search?q=",
+            "Jysk": "https://jysk.bg/search?q=",
+            "HomeMax": "https://www.home-max.bg/search/?q=",
+            "Bauhaus": "https://bauhaus.bg/search/",
+            "eMAG": "https://www.emag.bg/search/",
+            "IKEA": "https://www.ikea.bg/search/?q=",
+            "Teknoimpex": "https://teknoimpex.bg/search?q=",
+        }
+
         budget_chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"photo-budget-{uuid.uuid4()}",
@@ -2866,11 +2878,10 @@ IMPORTANT RULES:
 - Среден: до {budget_eur}€ (100% от бюджета)  
 - Премиум: до {int(int(budget_eur)*1.5)}€ (150% от бюджета)
 
-Всеки вариант трябва да има ДИРЕКТНИ ЛИНКОВЕ към реални продукти от български магазини.
+За всеки материал задай КОНКРЕТНА КЛЮЧОВА ДУМА ЗА ТЪРСЕНЕ (search_query), по която клиентът може да го намери в магазина.
 
-ЗАДЪЛЖИТЕЛНИ МАГАЗИНИ:
-- Praktiker (praktiker.bg), Jysk (jysk.bg), Mr.Bricolage (mrbricolage.bg)
-- IKEA (ikea.bg), Teknoimpex (teknoimpex.bg), Bauhaus (bauhaus.bg), HomeMax (homemax.bg)
+МАГАЗИНИ (избери 1 за всеки материал):
+- Praktiker, Mr.Bricolage, Jysk, HomeMax, Bauhaus, eMAG
 
 Отговори САМО в JSON:
 {{
@@ -2881,14 +2892,12 @@ IMPORTANT RULES:
       "total_eur": 0,
       "materials": [
         {{
-          "name": "Плочки 60x60 сиви",
+          "name": "Гранитогрес 60x60 сив",
           "category": "Настилки",
           "quantity": "15 m²",
           "price_eur": 0,
           "store": "Praktiker",
-          "product_url": "https://praktiker.bg/bg/...",
-          "product_id": "12345",
-          "available": true
+          "search_query": "гранитогрес 60x60 сив"
         }}
       ]
     }},
@@ -2905,7 +2914,7 @@ IMPORTANT RULES:
             text=f"""Генерирай бюджет за ремонт на {room_type_name} ({width}м x {length}м x {height}м).
 БЮДЖЕТ: {budget_eur}€. Стил: {style_desc}. {f'Бележки: {notes}' if notes else ''}
 3 ВАРИАНТА: Иконом до {int(int(budget_eur)*0.6)}€, Среден до {budget_eur}€, Премиум до {int(int(budget_eur)*1.5)}€.
-Всеки с 8-12 материала с ДИРЕКТНИ ЛИНКОВЕ."""
+Всеки с 8-12 материала. За всеки материал задай search_query за магазина."""
         )
         budget_response = await budget_chat.send_message(budget_msg)
 
@@ -2918,6 +2927,28 @@ IMPORTANT RULES:
                 budget_data = json_module.loads(budget_response)
         except Exception:
             budget_data = {"budget_tiers": [], "labor_estimate_eur": 0}
+
+        # Post-process: Generate REAL search URLs from search_query + store
+        from urllib.parse import quote as url_quote
+        for tier in budget_data.get("budget_tiers", []):
+            for mat in tier.get("materials", []):
+                store = mat.get("store", "")
+                search_q = mat.get("search_query", mat.get("name", ""))
+                encoded_q = url_quote(search_q, safe='')
+                real_url = STORE_SEARCH_URLS.get(store, "")
+                if real_url:
+                    mat["product_url"] = f"{real_url}{encoded_q}"
+                else:
+                    # Fallback to eMAG search
+                    mat["product_url"] = f"https://www.emag.bg/search/{encoded_q}"
+                    if not store:
+                        mat["store"] = "eMAG"
+                # Remove any AI-hallucinated URLs
+                if "product_id" in mat:
+                    del mat["product_id"]
+                if "available" in mat:
+                    del mat["available"]
+        logging.info(f"Photo Designer: Budget generated with real search URLs")
 
         # Save project to DB
         design_id = str(uuid.uuid4())
