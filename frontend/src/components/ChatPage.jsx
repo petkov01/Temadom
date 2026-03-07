@@ -186,6 +186,11 @@ const ChatPage = () => {
           </Button>
         </div>
 
+        {/* Info bar */}
+        <div className="mb-4 p-3 rounded-xl border text-xs" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }} data-testid="chat-info">
+          Пишете директно на фирми, майстори или клиенти. Търсете по име с бутона "Нов разговор". Можете да прикачвате снимки за по-ясна комуникация.
+        </div>
+
         <div className="grid md:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
           {/* Conversations sidebar */}
           <Card className="md:col-span-1 overflow-hidden flex flex-col" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)' }}>

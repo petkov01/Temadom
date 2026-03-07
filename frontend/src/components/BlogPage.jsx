@@ -60,6 +60,13 @@ const BlogPage = () => {
       </section>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Info bar */}
+        <div className="mb-6 p-4 rounded-xl border" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)' }} data-testid="blog-info">
+          <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
+            Полезни статии за строителство, ремонти и интериорен дизайн. Научете актуални цени за материали, 
+            съвети от професионалисти и ръководства стъпка по стъпка за вашия проект.
+          </p>
+        </div>
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />

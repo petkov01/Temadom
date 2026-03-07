@@ -506,6 +506,11 @@ export const CommunityPage = () => {
           <p className="text-sm mt-1" style={{ color: 'var(--theme-text-muted)' }}>Споделяйте проекти, задавайте въпроси, свързвайте се</p>
         </div>
 
+        {/* Info bar */}
+        <div className="mb-4 p-3 rounded-xl border text-xs" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }} data-testid="community-info">
+          Споделете ПРЕДИ/СЛЕД снимки от вашия ремонт, задайте въпрос на общността, или покажете готов проект. Публикувайте оферти за материали и услуги. Харесвайте и коментирайте чужди публикации.
+        </div>
+
         {/* New post */}
         {token && <div className="mb-4"><NewPostForm onPost={handleNewPost} /></div>}
 

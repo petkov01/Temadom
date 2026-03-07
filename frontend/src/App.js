@@ -259,7 +259,7 @@ const Navbar = () => {
   return (
     <nav style={{ background: 'var(--theme-nav-bg)', borderBottom: '1px solid var(--theme-nav-border)' }} className="sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-[110px]">
+        <div className="flex justify-between h-[70px] lg:h-[110px]">
           {/* Left: Logo - prominent and left-corner */}
           <div className="flex items-center -ml-4 lg:-ml-8">
             <Link to="/" className="flex items-center pt-1" data-testid="logo-link">
@@ -268,7 +268,7 @@ const Navbar = () => {
           </div>
 
           {/* Right: Nav links + Language + Auth */}
-          <div className="hidden md:flex items-center gap-3 lg:gap-4">
+          <div className="hidden lg:flex items-center gap-3 lg:gap-4">
             <Link to="/" className="text-sm font-medium transition-colors hover:text-[#FF8C42]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
               Главна
             </Link>
@@ -416,7 +416,7 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="md:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-2">
             <ThemeToggle />
             <div className="relative" ref={mobileLangRef}>
               <button
@@ -458,7 +458,7 @@ const Navbar = () => {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden animate-slideDown" style={{ background: 'var(--theme-nav-bg)', borderTop: '1px solid var(--theme-nav-border)' }}>
+        <div className="lg:hidden animate-slideDown" style={{ background: 'var(--theme-nav-bg)', borderTop: '1px solid var(--theme-nav-border)' }}>
           <div className="px-4 py-4 space-y-3">
             {/* Mobile Live Counter */}
             <MobileLiveStats />
@@ -567,7 +567,7 @@ const LiveCounter = () => {
   return (
     <>
       {/* Desktop: Fixed sidebar (same as before) */}
-      <div className={`fixed top-[110px] right-4 z-40 hidden md:block transition-all duration-300 ${show ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`} data-testid="live-counter">
+      <div className={`fixed top-[110px] right-4 z-40 hidden lg:block transition-all duration-300 ${show ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`} data-testid="live-counter">
         <button onClick={() => setShow(!show)} className="absolute -left-7 top-2 rounded-l-lg px-1.5 py-2 transition-colors" style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', color: 'var(--theme-text-muted)' }} data-testid="live-counter-toggle">
           {show ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
         </button>
@@ -613,7 +613,7 @@ const LiveCounter = () => {
       </div>
 
       {/* Mobile: Compact bottom bar */}
-      <div className="fixed bottom-16 left-3 right-14 z-40 md:hidden rounded-full shadow-lg" data-testid="live-counter-mobile">
+      <div className="fixed bottom-[68px] left-3 right-16 z-40 md:hidden rounded-full shadow-lg" data-testid="live-counter-mobile">
         <div className="backdrop-blur-lg px-4 py-2.5 flex items-center justify-between gap-3 rounded-full"
           style={{ background: 'var(--theme-nav-bg)', border: '1px solid var(--theme-nav-border)', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
           <div className="flex items-center gap-1.5">
@@ -1064,7 +1064,7 @@ const LandingPage = () => {
                 data-testid="showcase-next">
                 <ChevronRight className="h-5 w-5" />
               </button>
-              <div ref={showcaseRef} className="flex gap-6 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div ref={showcaseRef} className="flex gap-4 md:gap-6 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {[
               {
                 room: 'БАНЯ', roomId: 'bathroom', dims: '3.5 x 3.0м', tierTotal: 2000, price: '69', tier: '1 помещение', color: '#F97316',
@@ -1121,7 +1121,7 @@ const LandingPage = () => {
                 ],
               },
             ].map((proj, i) => (
-              <div key={i} className="flex-shrink-0 w-[320px] snap-center rounded-2xl overflow-hidden border transition-all hover:shadow-xl group"
+              <div key={i} className="flex-shrink-0 w-[280px] sm:w-[320px] snap-center rounded-2xl overflow-hidden border transition-all hover:shadow-xl group"
                 style={{ background: bgCard, borderColor: border }}
                 data-testid={`showcase-card-${i}`}>
                 {/* Before / After images */}

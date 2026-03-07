@@ -33,7 +33,7 @@ const STYLES = [
 
 const PACKAGES = [
   { id: 1, label: '1 помещение', price: 69, maxRooms: 1 },
-  { id: 2, label: '2 помещения', price: 129, maxRooms: 2 },
+  { id: 2, label: '2 помещения', price: 119, maxRooms: 2 },
   { id: 3, label: 'Апартамент', price: 199, maxRooms: 5 },
 ];
 
@@ -455,6 +455,28 @@ export const AIDesignerPage = () => {
           <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
             Качи снимки + размери + бюджет → получи 3x PNG рендери
           </p>
+        </div>
+
+        {/* How it works info */}
+        <div className="mb-6 p-4 rounded-xl border" style={{ background: 'var(--theme-card-bg)', borderColor: 'var(--theme-border)' }} data-testid="designer-how-it-works">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs" style={{ color: 'var(--theme-text-muted)' }}>
+            <div className="flex items-start gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#F97316]/15 text-[#F97316] text-[10px] font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <p><strong style={{ color: 'var(--theme-text)' }}>Качете снимки</strong> — 1-3 снимки от различни ъгли на помещението</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#3B82F6]/15 text-[#3B82F6] text-[10px] font-bold flex items-center justify-center flex-shrink-0">2</span>
+              <p><strong style={{ color: 'var(--theme-text)' }}>Въведете размери</strong> — дължина, ширина и височина за точен мащаб</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#8B5CF6]/15 text-[#8B5CF6] text-[10px] font-bold flex items-center justify-center flex-shrink-0">3</span>
+              <p><strong style={{ color: 'var(--theme-text)' }}>Изберете стил</strong> — модерен, скандинавски, лофт и още 7 стила</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#10B981]/15 text-[#10B981] text-[10px] font-bold flex items-center justify-center flex-shrink-0">4</span>
+              <p><strong style={{ color: 'var(--theme-text)' }}>Получете 3D дизайн</strong> — реалистичен рендер + бюджет с цени от 9 магазина</p>
+            </div>
+          </div>
         </div>
 
         {!results ? (

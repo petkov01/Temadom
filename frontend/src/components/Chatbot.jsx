@@ -67,7 +67,7 @@ export const Chatbot = ({ user }) => {
         <button
           onClick={() => setOpen(true)}
           data-testid="chatbot-open-btn"
-          className="fixed bottom-20 right-6 z-[100] w-14 h-14 rounded-full bg-[#FF8C42] hover:bg-[#e67a30] text-white shadow-lg shadow-[#FF8C42]/20 flex items-center justify-center transition-transform hover:scale-110"
+          className="fixed bottom-36 right-4 md:bottom-20 md:right-6 z-[100] w-14 h-14 rounded-full bg-[#FF8C42] hover:bg-[#e67a30] text-white shadow-lg shadow-[#FF8C42]/20 flex items-center justify-center transition-transform hover:scale-110"
         >
           <MessageSquare className="h-6 w-6" />
         </button>
@@ -76,7 +76,7 @@ export const Chatbot = ({ user }) => {
       {/* Chat window */}
       {open && (
         <div 
-          className="fixed bottom-20 right-6 z-[100] w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-[#1E2A38] rounded-2xl shadow-2xl border border-[#3A4A5C] flex flex-col overflow-hidden"
+          className="fixed bottom-36 right-4 md:bottom-20 md:right-6 z-[100] w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-[#1E2A38] rounded-2xl shadow-2xl border border-[#3A4A5C] flex flex-col overflow-hidden"
           data-testid="chatbot-window"
         >
           {/* Header */}

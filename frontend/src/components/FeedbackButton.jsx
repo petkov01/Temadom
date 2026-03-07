@@ -38,7 +38,7 @@ export const FeedbackButton = () => {
       {/* Floating button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-40 bg-[#8C56FF] hover:bg-[#7a44ee] text-white rounded-full p-3.5 shadow-lg shadow-[#8C56FF]/30 transition-all hover:scale-110"
+        className="fixed bottom-[130px] left-4 md:bottom-6 md:left-6 z-40 bg-[#8C56FF] hover:bg-[#7a44ee] text-white rounded-full p-3.5 shadow-lg shadow-[#8C56FF]/30 transition-all hover:scale-110"
         data-testid="feedback-btn"
       >
         <MessageSquare className="h-5 w-5" />

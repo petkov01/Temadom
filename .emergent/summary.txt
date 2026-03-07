@@ -1,406 +1,143 @@
 <analysis>**original_problem_statement:**
-The user wants to finalize their TemaDom web application for launch. The core goal is to enhance user experience, add key integrations, and fix several outstanding bugs and UI inconsistencies.
+The user wants to finalize their TemaDom web application for launch. The initial goal was a major UI/UX overhaul, adding Google Social Login and Telegram notifications, and fixing various bugs.
 
-PRODUCT REQUIREMENTS:
-1.  **UI/UX Overhaul:**
-    *   **Landing Page Showcase:** Replace the static 3x2 grid of projects with a more dynamic horizontal slider/carousel. Replace the unappealing kitchen project image with a better, full-kitchen render.
-    *   **Navigation Bug:** Fix the issue where navigating to a new page doesn't scroll the user to the top, forcing them to scroll up manually.
-    *   **Public Access:** Ensure main pages (Landing, Community, etc.) are visible to non-logged-in users instead of redirecting to the registration page.
-    *   **Contrast Issues:** Fix all instances of light-colored text on light backgrounds to improve readability.
-2.  **Feature Integrations:**
-    *   **Social Login:** Implement Google Social Login for regular users (not firms).
-    *   **Telegram Notifications:** Integrate a Telegram bot () to send notifications. Firms should be able to connect their accounts to receive alerts.
-3.  **Functionality & Business Logic:**
-    *   **Subscription Change:** Modify the free promotional offer for the first 56 registered firms from 1 year to 6 months.
-    *   **Login Bug:** Investigate and fix a reported error that sometimes occurs during user login.
-    *   **Scraping Expansion:** Add new Bulgarian e-commerce stores to the web scraping service.
-4.  **Testing & Verification:**
-    *   **AI Designer Test:** The user wants a comprehensive test of the AI Designer for multi-room and full-apartment scenarios, including a screenshot of the results.
-    *   **Subscription Feature Check:** The user re-emphasized that all features listed in the subscription plans must be fully implemented and working.
+The project has since evolved based on user feedback. The current high-priority tasks are:
+1.  **AI Designer Accuracy:** Fix the AI Designer to ensure the generated after images are architecturally identical to the user-uploaded before images. The user wants to see a test proving this works.
+2.  **Showcase & Pricing Update:** Update the landing page showcase with new, more accurate project examples and correct the pricing tiers for design services to €69 (1 room), €119 (2 rooms), and €199 (full apartment).
+3.  **User Guidance:** Add How it works informational sections to all key pages to improve user experience.
+4.  **Mobile Responsiveness:** Ensure the entire application is fully responsive and functions correctly on mobile devices.
+5.  **Deployment:** The application was failing to deploy. The user has requested to fix all deployment-related issues.
+6.  **Scraping Expansion:** Add more e-commerce stores to the product scraping service.
+7.  **User-to-User Messaging:** Enhance the existing chat system.
+
+PRODUCT REQUIREMENTS (from last user interaction):
+-   Start working on the first 4 tasks immediately: re-deploy (user-triggered action), test the AI designer with a real photo, add info sections, and improve mobile responsiveness.
 
 **User's preferred language**: Bulgarian (Български). The next agent MUST respond in Bulgarian.
 
 **what currently exists?**
-The application is a full-stack React/FastAPI/MongoDB project.
-- **AI Designer:** A core feature that uses  and . It was recently upgraded to use a real-time scraping service () to pull actual product data (name, price, direct URL) from the Videnov e-commerce site for furniture. For other materials, it falls back to generating search links.
-- **Subscription Model:** A Stripe-integrated subscription system is in place with backend logic () to enforce feature limits based on a firm's plan (БАЗОВ, ПРО, PREMIUM).
-- **Backend Architecture:** The backend is still largely a monolith (), although new routes for products and services have been added in separate files. A new  file handles the web scraping logic. The backend is currently **broken** and fails to start.
-- **Frontend:** The frontend includes a  with a subscription dashboard, a  with a project showcase, and the . Several fixes were attempted, including a  component and making routes public.
+The application is a full-stack React/FastAPI/MongoDB project. It features an AI Interior Designer (using  and ), a Stripe-integrated subscription model, and a real-time product scraper using Playwright.
+
+The agent has just completed a major effort to fix critical deployment errors. This involved:
+-   Adding  and  endpoints required by the production environment.
+-   Refactoring the backend to lazy-load heavy libraries (, , ) that were causing startup timeouts.
+-   Adding missing dependencies (, ) to .
+-   Removing hardcoded default values from configuration files to ensure the application fails fast if environment variables are missing in production.
+
+The agent has also started implementing the user's latest requests by adding How it works sections to several pages and attempting to fix mobile responsiveness issues by adjusting CSS breakpoints.
 
 **Last working item**:
-- **Last item agent was working:** The agent was attempting a large, parallel implementation of multiple user requests. The most critical part was adding Google Social Login. The agent first tried to use a non-existent  class, which failed. The subsequent attempt to implement it manually using  and other libraries has introduced errors that prevent the backend service from starting. The agent was also setting up Telegram bot integration and various UI fixes at the same time.
-- **Status:** BLOCKED
-- **Agent Testing Done:** N
-- **Which testing method agent to use?** backend testing agent. The first priority is to get the backend service running again. After fixing the startup error, both frontend and backend testing will be required to verify all the partially implemented features.
-- **User Testing Done:** N
+-   **Last item agent was working:** The agent was executing a 4-part task list from the user. The agent has already added informational sections to several pages and made code changes to improve mobile responsiveness. The agent was in the process of testing the AI Designer's core functionality by uploading a real user image () to verify if the recently improved prompts produce architecturally accurate results.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N (The agent was about to perform the test).
+-   **Which testing method agent to use?** Frontend testing agent. First, use the screenshot tool with a specified mobile width (e.g., ) to verify the mobile responsiveness fixes. After running the AI Designer test, take a screenshot of the generated result. Finally, run a full  to check for any regressions before finishing.
+-   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Backend Fails to Start Due to Faulty Google Auth Implementation (P0 - BLOCKER)**
-  - **Description**: The backend service is down. Logs indicate an issue related to the newly added Google OAuth implementation in . The server cannot start, blocking all further development and testing.
-  - **Attempted fixes**: The agent tried to use  and then a manual implementation with , both of which have failed.
-  - **Next debug checklist**:
-    1.  Examine the backend supervisor logs (==> /var/log/supervisor/backend.err.log <==
-    return runner.run(main)
-           ^^^^^^^^^^^^^^^^
-  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
-    return self._loop.run_until_complete(task)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
-    return future.result()
-           ^^^^^^^^^^^^^^^
-  File "/root/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
-    config.load()
-  File "/root/.venv/lib/python3.11/site-packages/uvicorn/config.py", line 467, in load
-    self.loaded_app = import_from_string(self.app)
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/.venv/lib/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
-    module = importlib.import_module(module_str)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
-  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
-  File "/app/backend/server.py", line 5637, in <module>
-    from routes.telegram import router as telegram_router
-  File "/app/backend/routes/telegram.py", line 14, in <module>
-    async def telegram_webhook(request: Request):
-                                        ^^^^^^^
-NameError: name 'Request' is not defined
-INFO:     Stopping reloader process [12173]
-INFO:     Will watch for changes in these directories: ['/app/backend']
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-INFO:     Started reloader process [12288] using WatchFiles
-Process SpawnProcess-1:
-Traceback (most recent call last):
-  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
-    self.run()
-  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
-    self._target(*self._args, **self._kwargs)
-  File "/root/.venv/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 76, in subprocess_started
-    target(sockets=sockets)
-  File "/root/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 61, in run
-    return asyncio.run(self.serve(sockets=sockets))
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
-    return runner.run(main)
-           ^^^^^^^^^^^^^^^^
-  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
-    return self._loop.run_until_complete(task)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
-    return future.result()
-           ^^^^^^^^^^^^^^^
-  File "/root/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
-    config.load()
-  File "/root/.venv/lib/python3.11/site-packages/uvicorn/config.py", line 467, in load
-    self.loaded_app = import_from_string(self.app)
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/.venv/lib/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
-    module = importlib.import_module(module_str)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
-  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
-  File "/app/backend/server.py", line 5637, in <module>
-    from routes.telegram import router as telegram_router
-  File "/app/backend/routes/telegram.py", line 14, in <module>
-    async def telegram_webhook(request: Request):
-                                        ^^^^^^^
-NameError: name 'Request' is not defined
-WARNING:  WatchFiles detected changes in 'routes/telegram.py'. Reloading...
-INFO:     Stopping reloader process [12288]
-INFO:     Will watch for changes in these directories: ['/app/backend']
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-INFO:     Started reloader process [12359] using WatchFiles
-INFO:     Started server process [12361]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-/root/.venv/lib/python3.11/site-packages/jwt/api_jwt.py:153: InsecureKeyLengthWarning: The HMAC key is 31 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
-  return self._jws.encode(
-WARNING:  WatchFiles detected changes in 'server.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [12361]
-WARNING:  WatchFiles detected changes in 'server.py'. Reloading...
-INFO:     Started server process [12493]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     Will watch for changes in these directories: ['/app/backend']
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-INFO:     Started reloader process [42] using WatchFiles
-
-==> /var/log/supervisor/backend.out.log <==
-INFO:     10.64.128.6:48374 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:55700 - "POST /api/analytics/track HTTP/1.1" 200 OK
-INFO:     10.64.131.171:55700 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:43734 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     10.64.131.171:55716 - "POST /api/analytics/track HTTP/1.1" 200 OK
-INFO:     10.64.131.171:55716 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     10.64.128.6:51098 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:48404 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     10.64.128.6:48374 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
-INFO:     10.64.131.171:55716 - "GET /api/ai-designer/my-projects HTTP/1.1" 200 OK
-INFO:     10.64.128.6:48390 - "GET /api/referrals/status HTTP/1.1" 200 OK
-INFO:     10.64.128.6:51098 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:48404 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     10.64.128.6:48374 - "GET /api/ai-designer/my-projects HTTP/1.1" 200 OK
-INFO:     10.64.131.171:55716 - "GET /api/referrals/status HTTP/1.1" 200 OK
-INFO:     10.64.131.171:43734 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
-INFO:     10.64.131.171:43734 - "GET /api/subscriptions/my-limits HTTP/1.1" 200 OK
-INFO:     10.64.128.6:48374 - "GET /api/payments/history HTTP/1.1" 200 OK
-INFO:     10.64.131.171:55716 - "GET /api/subscriptions/my HTTP/1.1" 200 OK
-INFO:     10.64.131.171:55716 - "GET /api/subscriptions/my-limits HTTP/1.1" 200 OK
-INFO:     10.64.128.6:48374 - "GET /api/payments/history HTTP/1.1" 200 OK
-INFO:     10.64.131.171:43734 - "GET /api/subscriptions/my HTTP/1.1" 200 OK
-INFO:     10.64.128.6:48374 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/auth/login HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "GET /api/subscriptions/plans HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/subscriptions/plans HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/subscriptions/my HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/subscriptions/my HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/subscriptions/my-limits HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "GET /api/subscriptions/my-limits HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "GET /api/subscriptions/my-limits HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/subscriptions/check-feature/pdf_contracts HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/subscriptions/check-feature/pdf_contracts HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "GET /api/subscriptions/check-feature/offers HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/subscriptions/my HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "GET /api/subscriptions/my HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/auth/login HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/subscriptions/my-limits HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/subscriptions/my-limits HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "GET /api/subscriptions/my-limits HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/auth/login HTTP/1.1" 200 OK
-INFO:     10.64.131.171:39136 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:34292 - "POST /api/subscriptions/activate HTTP/1.1" 200 OK
-INFO:     10.64.131.171:47498 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:57004 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:59136 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:46490 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:35250 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:36884 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:42414 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:43256 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:49820 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:56024 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:37830 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:37830 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:49770 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:60176 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:43712 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:35192 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:42650 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:44204 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:48384 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:44578 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:35202 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:38916 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:38926 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:56968 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:49584 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:41716 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:48840 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:56648 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:57636 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:57636 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:57636 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:56648 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.131.171:41620 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:46298 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:50170 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:50170 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.131.171:52568 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:53806 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:57624 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:54794 - "GET /api/stats/live HTTP/1.1" 200 OK
-INFO:     10.64.128.6:55990 - "POST /api/heartbeat HTTP/1.1" 200 OK
-INFO:     10.64.128.6:33378 - "GET /api/telegram/bot-info HTTP/1.1" 200 OK
-INFO:     10.64.131.171:53578 - "GET /api/auth/google/login HTTP/1.1" 503 Service Unavailable
-INFO:     10.64.131.171:53578 - "POST /api/auth/login HTTP/1.1" 200 OK) to identify the exact import or configuration error.
-    2.  Review the code in  and its registration in .
-    3.  Simplify or temporarily comment out the Google Auth code to confirm it's the root cause and get the server running.
-    4.  Re-implement the Google Auth flow correctly, ensuring all dependencies are properly installed and configured in the  file. Use the  for a reliable implementation plan.
-  - **Why fix this issue and what will be achieved with the fix?**: This is the highest priority. The application is completely non-functional until the backend can start. Fixing this will unblock all other development tasks.
-  - **Status**: IN PROGRESS
-  - **Is recurring issue?** N
-  - **Should Test frontend/backend/both after fix?** Backend
-  - **Blocked on other issue:** None. This is the primary blocker.
-
-- **Issue 2: User Login Bug (P1)**
-  - **Description**: The user reported intermittent errors during the standard email/password login process. The previous agent suspected this might be related to users without a  (e.g., future social login users) and added a check in the  endpoint.
-  - **Next debug checklist**:
-    1.  Once the backend is running, thoroughly test the login endpoint () with valid, invalid, and edge-case credentials.
-    2.  Verify if the check  correctly handles users created via social auth without breaking the standard login.
-  - **Why fix this issue and what will be achieved with the fix?**: A reliable login is fundamental for user access and trust.
-  - **Status**: NOT STARTED
-  - **Is recurring issue?** Y
-  - **Should Test frontend/backend/both after fix?** Backend
-  - **Blocked on other issue:** Issue 1
-
-- **Issue 3: Frontend Text Contrast (P2)**
-  - **Description**: The user reported multiple pages have light text on a light background, making them difficult to read.
-  - **Next debug checklist**:
-    1.  Systematically review all pages in the application.
-    2.  Identify components with poor color contrast.
-    3.  Adjust the CSS in the relevant  or  files to ensure all text meets accessibility standards (e.g., dark text on light backgrounds).
-  - **Why fix this issue and what will be achieved with the fix?**: Improves usability and professionalism of the site.
-  - **Status**: NOT STARTED
-  - **Should Test frontend/backend/both after fix?** Frontend
-  - **Blocked on other issue:** None (can be worked on once the app is viewable).
+-   **Issue 1: Mobile Responsiveness Layout is Broken (P1)**
+    -   **Description**: The application's layout is not rendering correctly on mobile viewports. The most significant issue is that the desktop navigation bar is displayed instead of the mobile hamburger menu, making the site unusable on small screens.
+    -   **Attempted fixes**: The agent changed several Tailwind CSS class breakpoints from  to  in  and other components, assuming this would correct the issue. However, this has not been visually confirmed with a proper mobile-sized screenshot.
+    -   **Next debug checklist**:
+        1.  Take a screenshot with a specific mobile width: .
+        2.  Inspect . Verify that the  class is correctly applied to the mobile menu button and  is applied to the desktop navigation container.
+        3.  If the issue persists, the breakpoint logic in Tailwind CSS is likely incorrect and needs to be reverted or adjusted. The  breakpoint should be sufficient.
+    -   **Why fix this issue and what will be achieved with the fix?**: A functional mobile layout is critical for user accessibility and a professional appearance.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Frontend
+    -   **Blocked on other issue:** None
 
 **In progress Task List**:
-- **Task 1: Complete Google Social Login Integration (P1)**
-  - **Description**: Implement Google Social Login for regular users.
-  - **Where to resume**: The backend implementation is broken and needs to be fixed (see Issue 1). The frontend has a non-functional  component and needs  to be correctly implemented in .
-  - **What will be achieved with this?**: Provides users a convenient alternative to email/password registration.
-  - **Status**: IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** Both
-  - **Blocked on something:** Issue 1
-
-- **Task 2: Complete Telegram Notifications Integration (P1)**
-  - **Description**: Allow firms to connect their Telegram account to receive bot notifications.
-  - **Where to resume**: The backend has a , routes (), and a webhook set. The frontend has a  component in . The end-to-end flow needs to be tested and debugged. The bot's  command needs to correctly return the chat ID for saving.
-  - **What will be achieved with this?**: Adds a requested B2B feature for instant firm notifications.
-  - **Status**: IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** Both
-  - **Blocked on something:** Issue 1
-
-- **Task 3: Complete Landing Page Showcase UI (P1)**
-  - **Description**: Convert the project showcase from a grid to a horizontal slider and replace a specific image.
-  - **Where to resume**: The agent attempted to convert the grid in  to a flexbox-based carousel. The HTML structure was modified, but the CSS for horizontal scrolling and scrollbar hiding needs to be implemented and verified. A new kitchen project image needs to be generated and added.
-  - **What will be achieved with this?**: Implements the user's requested design change for the landing page.
-  - **Status**: IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** Frontend
-  - **Blocked on something:** None (can be worked on once the app is viewable).
-
-- **Task 4: Complete Backend Refactoring (P2)**
-  - **Description**: The monolithic  file needs to be broken down into a modular, router-based structure.
-  - **Where to resume**: Continue migrating endpoint logic from  into the corresponding files within .
-  - **What will be achieved with this?** A stable, maintainable, and scalable backend.
-  - **Status:** IN PROGRESS (Paused)
-  - **Should Test frontend/backend/both after fix?** Backend
-  - **Blocked on something:** Higher priority tasks.
+-   **Task 1: Test and Verify AI Designer Architectural Accuracy (P0 - BLOCKER)**
+    -   **Description**: The user's primary concern is that the AI Designer must maintain the exact wall, window, and door structure from the before image. The agent has already updated the AI prompts to enforce this. The next step is to run a live test.
+    -   **Where to resume**: The agent has uploaded a test image to . The next action is to navigate to the AI Designer page, use this image, run the generation process, and capture a screenshot of the output to send to the user.
+    -   **What will be achieved with this?**: This will validate the core value proposition of the AI Designer and directly address the user's main concern.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Frontend (Screenshot of the result is sufficient).
+    -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
-- **Upcoming Tasks:**
-    - **P1: Add New Stores to Scraping Service**: Research and implement scrapers for new Bulgarian e-commerce sites requested by the user.
-    - **P1: Full AI Designer Flow Test**: Test the multi-room and apartment generation flows and provide a screenshot to the user.
-    - **P1: Mobile Responsiveness Polish**: Conduct a full review of all pages to ensure a flawless mobile experience.
-- **Future Tasks:**
-    - **P2: Company Catalog & Portfolios**: Build dedicated pages for registered firms to showcase their work.
-    - **P2: Direct User-to-User Messaging**: Implement a private messaging system.
-    - **P2: Job Ads Module**: Create a section for firms to post job openings.
+-   **Upcoming Tasks:**
+    -   **P1: Add New Stores to Scraping Service**: Implement scrapers for additional Bulgarian e-commerce sites as requested by the user.
+    -   **P1: Subscription Feature Check**: The user previously mentioned that all features listed in the subscription plans must be fully implemented. A full audit is needed.
+-   **Future Tasks:**
+    -   **P2: Company Catalog & Portfolios**: Build dedicated pages for registered firms to showcase their work.
+    -   **P2: Job Ads Module**: Create a section for firms to post job openings.
 
 **Completed work in this session**
-- **Real-time Product Scraping (V1):** The AI Designer now successfully integrates with a Playwright-based scraper to fetch real products (name, price, direct URL) from Videnov.
-- **Frontend Verified Product UI:** The AI designer page now displays a Verified badge and direct links for scraped products, distinguishing them from generic search links.
-- **AI Blueprint Analysis Removal:** The feature was successfully removed from the Price Calculator page and the corresponding backend logic was deleted.
-- **CAD Download as Image:** A Download as PNG button was successfully added to the CAD viewer page.
-- **Subscription Feature Polish:** The frontend UI on the profile and subscription pages was improved to clearly show the user's current plan and usage limits.
-- **UI & Routing Foundation:**
-  - The free offer period was changed from 1 year to **6 months** on the landing page.
-  - A  component was created to fix the page navigation scroll issue.
-  - App routes were made public to allow access for non-logged-in users.
+-   **Deployment Failure Resolved:** Fixed multiple backend startup issues that were causing production deployments to fail, including adding health check endpoints, lazy-loading heavy libraries, and correcting missing dependencies in .
+-   **Google Social Login Implemented:** Successfully integrated Emergent-managed Google Auth for user login and registration.
+-   **Designer Role Removed:** Removed the Designer user type from the registration flow and all related backend logic.
+-   **Фирми и Майстори Page Unified:** Merged the Companies and Find a Master pages into a single, tabbed interface for better UX.
+-   **Database Cleanup:** Wrote and executed scripts to remove all fake/test users and companies, cleaning the database for launch.
+-   **AI-Powered Suggestion Analysis:** Implemented a backend endpoint and frontend UI for an admin to analyze user feedback using GPT.
+-   **Scraper Enhancements:** Enabled Playwright-based scraping for Mr.Bricolage, Praktiker, and eMAG.
+-   **Chat User Search:** Added a search feature to the chat page to allow users to find and start conversations with other users.
+-   **Landing Page Overhaul:**
+    -   Updated the showcase with new project categories and correct pricing (€69/€119/€199).
+    -   Added a How it works section to explain the AI Designer process.
+    -   Replaced the placeholder kitchen image with a higher-quality generated one.
+-   **AI Prompt Engineering:** Rewrote image generation prompts to focus on strict architectural accuracy.
+-   **UI Contrast & Polish:** Fixed widespread text contrast issues by replacing hardcoded colors with theme-aware CSS variables.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Web Scraping:** Using **Playwright** for browser automation to scrape product data from JavaScript-heavy e-commerce sites.
-- **API Integration:** Google OAuth2 for social login, Telegram Bot API for notifications.
-- **Backend Architecture:** Modularization using FastAPI's  to break up the  monolith.
-- **Frontend State Management:** Using React Context () to manage user authentication state, now being extended for social login.
-
-**key DB schema**
--   **users**: Now requires fields for social authentication like . A field like  will be needed for firms connecting to the notification bot.
-
-**changes in tech stack**
--   **Added (Backend):** , , .
--   **Added (Frontend):**  (for CAD download).
+-   **Deployment Debugging:** Using health check endpoints, lazy loading heavy dependencies (, ), and ensuring  is complete are critical for successful containerized deployments.
+-   **AI Prompt Engineering:** Refining prompts for  and  to enforce strict constraints (like architectural fidelity) is a key technique for controlling generative AI output.
+-   **Mobile Responsiveness:** Using Tailwind CSS responsive breakpoints (, , ) to create adaptive layouts. The interaction between these breakpoints is the likely source of the current mobile UI bug.
+-   **Emergent-managed Google Auth:** A simplified social login integration that relies on handling a redirect with a  passed in the URL hash.
 
 **All files of reference**
--   : **(CRITICAL)** The source of the current backend crash.
--   : Main application file, registers all routers. Check logs for errors originating here.
--    & : Files for the Telegram integration.
--   : Contains routing logic (public vs. private).
--   : Core for handling user login state.
--   : Contains the showcase slider that needs to be fixed.
--   : Contains the UI for connecting a Telegram account.
-
-**Areas that need refactoring**:
-- **CRITICAL**: The Google Auth implementation in  is broken and needs to be rewritten or fixed immediately.
-- **HIGH**: The  monolith remains a major source of technical debt.
-
-**key api endpoints**
--   : (New, Broken) Initiates the Google OAuth flow.
--   : (New, Broken) Handles the callback from Google.
--   : (New) Generates a unique token for a firm to connect their Telegram.
--   : (New) Endpoint for the Telegram bot to post updates (e.g.,  command).
--   : (Working) Endpoint that triggers the product scraper.
+-   : Contains the new  endpoint and lazy-loading logic that fixed the deployment.
+-   : Now contains  and , which are critical for production.
+-   : Contains the updated, stricter prompts for the AI designer.
+-   : **(CRITICAL)** The file containing the likely cause of the mobile responsiveness bug.
+-   : Contains the updated showcase, pricing, and How it works sections.
+-   : The page where the critical AI designer test will be performed.
 
 **Critical Info for New Agent**
--   **Your first and only priority is to fix the backend.** The application is completely down. The root cause is the newly added Google Authentication code. Investigate the logs, isolate the problem in , and implement a stable solution. It is highly recommended to use  for the Google Auth integration to ensure it's done correctly.
--   The previous agent attempted to implement too many features at once, leading to the current broken state. Adopt an incremental approach. Fix the backend, then address the remaining user requests one by one, testing each change before moving on.
--   The user's language is **Bulgarian**. All communication must be in Bulgarian.
+-   **Your first priority is to complete the AI Designer test.** Use the image at , run the designer, and get a result. This is the user's most important pending request.
+-   **The second priority is to fix the mobile navigation.** The changes made by the previous agent ( breakpoints) likely broke the layout. Use the screenshot tool with a specified mobile width () to reproduce the bug, then investigate and fix the Tailwind classes in .
+-   **Always respond in Bulgarian.** The user is highly engaged and provides clear instructions in Bulgarian.
+-   The deployment issues have been addressed, so you can focus on feature implementation and bug fixing.
 
 **documents and test reports created in this job**
--  and  were created, with the last one showing a 100% pass rate *before* the changes that broke the backend were introduced.
+-   Multiple  files were generated, with the latest runs showing a 100% pass rate after the deployment fixes were implemented.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (Summary):** Provided a long list of new requirements and bug fixes for the final push before launch.
-2.  **Requests include:** Fix landing page showcase, fix scroll-to-top bug, make pages public, change subscription offer to 6 months, fix login bug, add social login, add Telegram notifications, fix text contrast, add new scraper targets.
-3.  **Agent:** Acknowledged the list and created a comprehensive plan.
-4.  **User:** Agreed with the plan and provided the Telegram bot token and details.
-5.  **Agent:** Began working on all tasks in parallel, starting with quick fixes.
-6.  **Agent:** Implemented code for Google Auth, Telegram, and multiple UI fixes simultaneously.
-7.  **Agent:** Encountered a  for a non-existent  class.
-8.  **Agent:** Attempted a manual implementation of Google Auth.
-9.  **Agent:** The backend started failing, and the agent was in the process of debugging when the session ended.
+1.  **User:** My deployment is failing, please analyze the logs and fix it.
+2.  **Agent:** Fixed deployment issues by adding health checks, lazy-loading modules, and adding missing dependencies.
+3.  **User:** What is your next task?
+4.  **Agent:** Proposed a plan: 1. You re-deploy. 2. Test AI Designer with a real photo. 3. Add info sections to pages. 4. Improve mobile responsiveness.
+5.  **User:** Start with the first 4 tasks.
+6.  **Agent:** Started working on tasks 2-4 in parallel.
+7.  **User:** (Earlier) I want the AI to generate new project examples that are architecturally accurate.
+8.  **Agent:** (Earlier) Improved AI prompts for accuracy and updated the landing page showcase with new pricing and info.
+9.  **User:** (Earlier) I want to remove the designer registration option.
+10. **Agent:** (Earlier) Removed the designer role from frontend and backend.
 
 **Project Health Check:**
--   **Broken:** The backend service fails to start, making the entire application non-functional.
+-   **Broken:** The mobile UI is broken.
+-   **Mocked:** None.
 
 **3rd Party Integrations**
 -   **OpenAI GPT-4o-mini & gpt-image-1:** (Uses Emergent LLM Key) For AI designer.
 -   **Stripe:** (Uses test keys) For subscriptions.
 -   **Playwright:** For web scraping.
--   **Google OAuth:** (In progress, Broken) For social login.
--   **Telegram Bot API:** (In progress) For firm notifications.
+-   **Emergent-managed Google Auth:** For social login.
+-   **Telegram Bot API:** For firm notifications.
 
 **Testing status**
--   Testing agent used after significant changes: YES. The last successful run was before the current backend-breaking changes.
+-   Testing agent used after significant changes: YES. The last run passed 100% after deployment fixes.
 -   Troubleshoot agent used after agent stuck in loop: NO
 -   Test files created: None.
--   Known regressions: The entire backend is down.
+-   Known regressions: Mobile navigation is broken.
 
 **Credentials to test flow:**
--   Register a new user via the website's registration page once the backend is running.
+-   Use the website's registration form or Google Social Login to create a test user.
 -   Telegram Bot Token is in .
 
 **What agent forgot to execute**
-- The agent didn't necessarily forget tasks but created a major blocker by attempting a complex integration (Google Auth) without a robust, incremental plan, leading to a complete service failure. The tasks of adding new scraper targets and fixing all text-contrast issues were not started.</analysis>
+-   The agent has not yet visually verified the mobile responsiveness fixes. The assumption that the  breakpoint was correct without a confirming screenshot has left a critical bug in the UI.</analysis>

@@ -3,7 +3,7 @@
 import requests
 import json
 
-BASE_URL = "https://ui-polish-52.preview.emergentagent.com/api"
+BASE_URL = "https://temdom-launch.preview.emergentagent.com/api"
 
 def test_portfolio_endpoints():
     # Login as company to get token
