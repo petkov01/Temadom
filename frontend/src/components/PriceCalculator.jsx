@@ -871,7 +871,7 @@ const PriceCalculator = () => {
                         {calculation.total.toFixed(0)} €
                       </p>
                       <p className="text-lg text-orange-400 font-semibold mt-1">
-                        ≈ {(calculation.total * 1.95).toFixed(0)} лв.
+                        {calculation.total.toFixed(0)} EUR
                       </p>
                     </div>
 
@@ -949,7 +949,7 @@ const PriceCalculator = () => {
           <div className="flex items-center justify-between max-w-lg mx-auto">
             <div>
               <p className="text-xs text-slate-400">ОБЩА ЦЕНА</p>
-              <p className="text-2xl font-bold">{calculation.total.toFixed(0)} € <span className="text-sm text-orange-400 font-normal">≈ {(calculation.total * 1.95).toFixed(0)} лв.</span></p>
+              <p className="text-2xl font-bold">{calculation.total.toFixed(0)} EUR</p>
             </div>
             <span className="text-xs text-slate-400">{calculation.items.filter(i => i.quantity > 0).length} дейности</span>
           </div>

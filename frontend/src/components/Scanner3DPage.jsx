@@ -333,7 +333,7 @@ const SwapPanel = ({ activeHotspot, selections, setSelections, onClose }) => {
               />
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-medium ${isSelected ? 'text-[#FF8C42]' : 'text-white'}`}>{opt.name}</p>
-                <p className="text-xs text-slate-400">{opt.price} лв.</p>
+                <p className="text-xs text-slate-400">{opt.price} EUR</p>
               </div>
               {isSelected && <CheckCircle className="h-4 w-4 text-[#FF8C42] flex-shrink-0" />}
             </button>
@@ -366,14 +366,14 @@ const ResultsSummary = ({ selections, onPDF, onShare, onSave, projectId }) => {
                   <p className="text-slate-500 text-xs">{opt.name}</p>
                 </div>
               </div>
-              <span className="text-[#FF8C42] font-bold text-sm">{opt.price} лв.</span>
+              <span className="text-[#FF8C42] font-bold text-sm">{opt.price} EUR</span>
             </div>
           );
         })}
       </div>
       <div className="flex items-center justify-between pt-3 border-t border-[#2A3A4C]">
         <span className="text-slate-400 text-sm">Общо:</span>
-        <span className="text-white font-bold text-lg">{total.toLocaleString()} лв.</span>
+        <span className="text-white font-bold text-lg">{total.toLocaleString()} EUR</span>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">

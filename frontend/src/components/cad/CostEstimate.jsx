@@ -21,7 +21,7 @@ export const CostEstimate = ({ els, scale, region, onRegionChange }) => {
     <div data-testid="cost-estimate">
       <div className="flex items-center justify-between mb-2">
         <span className="text-white text-sm font-medium">Авто-сметка</span>
-        <span className="text-[#28A745] text-xs font-bold">{totalEur.toLocaleString()} EUR / {totalBgn.toLocaleString()} BGN</span>
+        <span className="text-[#28A745] text-xs font-bold">{totalEur.toLocaleString()} EUR</span>
       </div>
 
       {/* Region selector */}
@@ -55,7 +55,7 @@ export const CostEstimate = ({ els, scale, region, onRegionChange }) => {
               <th className="text-right py-1 font-medium">Ед.</th>
               <th className="text-right py-1 font-medium">Цена</th>
               <th className="text-right py-1 font-medium">Сума EUR</th>
-              <th className="text-right py-1 font-medium">Сума BGN</th>
+              <th className="text-right py-1 font-medium">Сума EUR</th>
             </tr>
           </thead>
           <tbody>
@@ -78,7 +78,7 @@ export const CostEstimate = ({ els, scale, region, onRegionChange }) => {
                   <td className="text-right py-1 text-slate-500">{it.unit}</td>
                   <td className="text-right py-1">{it.price} EUR</td>
                   <td className="text-right py-1 text-[#FF8C42] font-medium">{it.total.toLocaleString()}</td>
-                  <td className="text-right py-1 text-[#4DA6FF]">{(it.total * EUR_TO_BGN).toFixed(0)}</td>
+                  <td className="text-right py-1 text-[#4DA6FF]">{it.total.toFixed(0)}</td>
                 </tr>
               );
             })}
@@ -88,7 +88,7 @@ export const CostEstimate = ({ els, scale, region, onRegionChange }) => {
               <td></td>
               <td colSpan={4} className="py-2">ОБЩО</td>
               <td className="text-right py-2 text-[#FF8C42]">{totalEur.toLocaleString()} EUR</td>
-              <td className="text-right py-2 text-[#4DA6FF]">{totalBgn.toLocaleString()} BGN</td>
+              <td className="text-right py-2 text-[#4DA6FF]">{totalEur.toLocaleString()} EUR</td>
             </tr>
           </tfoot>
         </table>

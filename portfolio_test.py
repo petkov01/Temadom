@@ -3,7 +3,7 @@
 import requests
 import json
 
-BASE_URL = "https://interior-vision-79.preview.emergentagent.com/api"
+BASE_URL = "https://interior-ai-dev-1.preview.emergentagent.com/api"
 
 def test_portfolio_endpoints():
     # Login as company to get token

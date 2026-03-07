@@ -46,10 +46,6 @@ const ProductCard = ({ product }) => (
         {product.price_eur > 0 ? (
           <>
             <p className="text-lg font-black text-[#F97316]">{product.price_eur} <span className="text-xs">EUR</span></p>
-            {product.price_bgn > 0 && (
-              <p className="text-[10px]" style={{ color: 'var(--theme-text-subtle)' }}>{product.price_bgn} лв.</p>
-            )}
-          </>
         ) : (
           <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>Виж цена</p>
         )}

@@ -182,7 +182,7 @@ const BlogArticle = () => {
                     <th className="p-3 text-left">Област</th>
                     <th className="p-3 text-center">Само труд (EUR/{profession.unit})</th>
                     <th className="p-3 text-center">Труд + материали (EUR/{profession.unit})</th>
-                    <th className="p-3 text-center">Труд + материали (BGN/{profession.unit})</th>
+                    <th className="p-3 text-center">Труд + материали (EUR/{profession.unit})</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -208,7 +208,7 @@ const BlogArticle = () => {
                     <th className="p-3 text-center">Единица</th>
                     <th className="p-3 text-center">Само труд (EUR)</th>
                     <th className="p-3 text-center">Труд + материали (EUR)</th>
-                    <th className="p-3 text-center">Труд + мат. (BGN)</th>
+                    <th className="p-3 text-center">Труд + мат. (EUR)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -268,7 +268,7 @@ const BlogArticle = () => {
               'Изберете вашата област за точни регионални цени',
               'Изберете качество (Икономичен, Стандартен, Премиум)',
               'Изберете дали включва материали или само труд',
-              'Получете моментална калкулация в EUR и BGN',
+              'Получете моментална калкулация в EUR',
               'Изтеглете PDF оферта за сравнение с реални оферти'
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-3">

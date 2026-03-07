@@ -64,7 +64,7 @@ const RegionalPage = () => {
                   <th className="p-3 text-center">Единица</th>
                   <th className="p-3 text-center">Само труд (EUR)</th>
                   <th className="p-3 text-center">Труд + мат. (EUR)</th>
-                  <th className="p-3 text-center">Труд + мат. (BGN)</th>
+                  <th className="p-3 text-center">Труд + мат. (EUR)</th>
                 </tr>
               </thead>
               <tbody>

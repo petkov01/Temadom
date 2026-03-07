@@ -38,9 +38,9 @@ const PACKAGES = [
 ];
 
 const BUDGETS = [
-  { value: 2000, label: '2,000 лв' },
-  { value: 5000, label: '5,000 лв' },
-  { value: 10000, label: '10,000 лв' },
+  { value: 1000, label: '1,000 EUR' },
+  { value: 2500, label: '2,500 EUR' },
+  { value: 5000, label: '5,000 EUR' },
 ];
 
 const PHOTO_LABELS = ['Общ план', 'Ъгъл 1', 'Ъгъл 2'];
@@ -226,7 +226,7 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
         {/* BUDGET CHECKBOXES */}
         <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
           <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-[#F97316] font-black text-sm">лв</span>
+            <span className="text-[#F97316] font-black text-sm">EUR</span>
             <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Бюджет</span>
           </div>
           <div className="flex gap-2">
@@ -333,7 +333,7 @@ export const AIDesignerPage = () => {
         fd.append('style', room.style);
         fd.append('room_type', room.roomType);
         fd.append('notes', room.notes);
-        fd.append('budget_eur', String(Math.round(room.budget / 1.96)));
+        fd.append('budget_eur', String(room.budget));
         fd.append('width', room.length);
         fd.append('length', room.width);
         fd.append('height', room.height);
@@ -506,7 +506,7 @@ export const AIDesignerPage = () => {
                   )}
                   {roomResult.budgetBgn && (
                     <span className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
-                      {roomResult.budgetBgn.toLocaleString()} лв
+                      {roomResult.budgetBgn.toLocaleString()} EUR
                     </span>
                   )}
                 </div>
@@ -564,7 +564,7 @@ export const AIDesignerPage = () => {
                 {roomResult.budget?.summary && (
                   <div className="p-3 rounded-lg text-xs" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)', color: 'var(--theme-text-muted)' }}
                     data-testid={`budget-info-${ri}`}>
-                    <p className="font-bold mb-1" style={{ color: 'var(--theme-text)' }}>Бюджет: {roomResult.budgetBgn?.toLocaleString()} лв</p>
+                    <p className="font-bold mb-1" style={{ color: 'var(--theme-text)' }}>Бюджет: {roomResult.budgetBgn?.toLocaleString()} EUR</p>
                     <p>{roomResult.budget.summary}</p>
                   </div>
                 )}

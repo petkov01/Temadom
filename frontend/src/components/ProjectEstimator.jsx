@@ -238,7 +238,7 @@ const ProjectEstimator = ({ onEstimateChange, initialCity = '' }) => {
                 <div className="bg-slate-900 text-white rounded-lg p-4 text-center">
                   <p className="text-sm text-slate-400 mb-1">Приблизителна оценка</p>
                   <p className="text-2xl font-bold">{estimate} €</p>
-                  <p className="text-sm text-slate-400">≈ {Math.round(estimate * 1.95)} лв.</p>
+                  <p className="text-sm text-slate-400">EUR</p>
                 </div>
               )}
 

@@ -13,7 +13,7 @@ import os
 import uuid
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://interior-vision-79.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://interior-ai-dev-1.preview.emergentagent.com').rstrip('/')
 
 # ===== Auth Fixtures =====
 
