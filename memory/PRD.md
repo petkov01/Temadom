@@ -37,31 +37,28 @@ TemaDom е уеб платформа за строителство и ремон
 - **Mobile responsiveness**: Bottom bar centered, chatbot/feedback repositioned
 - **Backend pricing fix**: design_2room corrected from 129 to 119 EUR
 
-### Phase 6 (Mar 7, 2026 - Current)
+### Phase 6 (Mar 7, 2026)
 - **Complete UI/UX Redesign**: Full dark/light theme with CSS variables
-  - Replaced all hardcoded dark colors (#253545, #1E2A38, #0F1923, border-#3A4A5C) with CSS variables
+  - Replaced all hardcoded dark colors with CSS variables
   - Theme utility classes: .theme-text, .theme-text-muted, .theme-text-subtle, .theme-bg-surface etc.
   - Pages redesigned: LandingPage, LoginPage, RegisterPage, ClientDashboard, CompanyDashboard, ProjectsPage, SubscriptionsPage, AdsPage, AboutPage, ServicesPage, PriceCalculator, BlogPage, BlogArticle, RegionalPage, PricesByRegionPage, AIChartPage, AISketchPage, Scanner3DPage, PublishedGalleryPage, ReadyProjectsPage, PortfolioGallery, FeedbackButton, Chatbot, TermsPage, CommunityPage, ProfilePage
 - **Logo enhancement**: Massive logo with golden glow drop-shadow effect
-  - Navbar: h-32/h-40 with drop-shadow(0 0 18px rgba(246, 195, 106, 0.85))
-  - Hero: h-[28rem]/h-[36rem] with intense glow
-  - Footer/Login: h-14 with subtle glow
-- **P1: Subscription Audit (DONE)**: Verified end-to-end flow - activate, status check, feature access, limits
-- **P1: Chat Enhancements (DONE)**: 
-  - Online status heartbeat (30s interval) with green dot in conversation list + chat header
-  - Typing indicators (bouncing dots animation, 3s debounce)
-  - Read receipts (Check/CheckCheck icons, blue for read)
-  - is_online field added to conversations API response
-- **P1: Scraping Expansion (DONE)**: 21 stores total including HomeMax, Bauhaus, Jysk, Technomarket, IKEA, etc.
-### Launch Readiness (Mar 7, 2026)
-- **FULL TEST PASSED**: 27/27 backend + 100% frontend
-- All subscription prices verified: basic=15€, pro=35€, premium=75€, designer_3=119€
-- PDF calculator with TemaDom logo (no orange header)
-- PDF contract fully in Bulgarian Cyrillic with editable fields (deadline, payment terms, warranty)
-- Chat: online status, typing indicators, read receipts all working
-- 21+ stores in product scraper
-- Mobile responsive, dark/light theme working
-- **STATUS: READY FOR LAUNCH**
+- **P1: Subscription Audit (DONE)**: Verified end-to-end flow
+- **P1: Chat Enhancements (DONE)**: Online status, typing indicators, read receipts
+- **P1: Scraping Expansion (DONE)**: 21 stores total
+- **Editable Contract PDF**: Bulgarian Cyrillic, editable fields
+- **Calculation PDF Redesign**: Logo-based header instead of orange
+- **Content Cleanup**: Removed "TemaDom" from internal page titles
+
+### Phase 7 (Mar 7, 2026) - AI Designer Speed Fix
+- **CRITICAL FIX: AI Designer Performance**
+  - Root cause: Sequential processing of photos + scraping + budget generation
+  - Fix 1: `/photo-generate` — photos + product scraping now run IN PARALLEL via `asyncio.gather`
+  - Fix 2: `/generate` — all 4 camera angles run IN PARALLEL instead of sequentially
+  - Fix 3: Fixed `io` module scope bug in `process_single_photo`
+  - **Result: Generation time reduced from 7+ minutes to ~41 seconds (90%+ improvement)**
+- **Theme Context Fix**: Verified `useTheme` hook works correctly across all components in both light/dark modes
+- **Testing**: 100% pass rate — 10/10 backend, all frontend tests passed (iteration_78)
 
 ## Architecture
 ```
@@ -80,13 +77,15 @@ frontend/
 
 ## Prioritized Backlog
 
-### P1 (High) - COMPLETED
-- ~~Subscription feature audit~~ ✅ Verified end-to-end
-- ~~Chat enhancements (online status, typing, read receipts)~~ ✅
+### P1 (High) - ALL COMPLETED
+- ~~Subscription feature audit~~ ✅
+- ~~Chat enhancements~~ ✅
 - ~~Scraping expansion (21 stores)~~ ✅
+- ~~AI Designer speed fix~~ ✅ (41s from 7+ mins)
 
 ### P2 (Medium)
 - Backend refactoring (break up server.py into route modules)
+- Frontend refactoring (extract pages from App.js into separate files)
 - SEO optimization
 - Company catalog & portfolio pages
 
