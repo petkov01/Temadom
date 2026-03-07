@@ -402,6 +402,23 @@ export const AISketchPage = () => {
     const a = document.createElement('a'); a.href = url; a.download = `temadom-${uploadRes.id || 'model'}.glb`; a.click(); URL.revokeObjectURL(url);
   };
 
+  const downloadAsImage = useCallback(() => {
+    const canvasEl = document.querySelector('[data-testid="cad-canvas"]');
+    if (!canvasEl) { toast.error('Няма чертеж за сваляне'); return; }
+    try {
+      const dataUrl = canvasEl.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `temadom-plan-${new Date().toISOString().slice(0,10)}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      toast.success('Изображението е свалено!');
+    } catch (err) {
+      toast.error('Грешка при сваляне на изображение');
+    }
+  }, []);
+
   const shareProject = () => {
     if (!uploadRes?.id) return;
     navigator.clipboard.writeText(`${window.location.origin}/ai-sketch?id=${uploadRes.id}`).then(() => toast.success('Линк копиран!'));
@@ -572,9 +589,9 @@ export const AISketchPage = () => {
               </Card>
             )}
 
-            {/* PDF Export Buttons — always visible */}
+            {/* Export Buttons — always visible */}
             <Card className="bg-[#253545] border-[#3A4A5C] mb-3">
-              <CardContent className="px-3 py-3">
+              <CardContent className="px-3 py-3 space-y-2">
                 <div className="flex gap-2">
                   <Button size="sm" className="flex-1 bg-[#FF8C42] hover:bg-[#e67a30] text-white text-xs h-10 font-bold"
                     onClick={exportPlanPdf} data-testid="export-plan-pdf">
@@ -585,6 +602,10 @@ export const AISketchPage = () => {
                     <FileText className="mr-1.5 h-4 w-4" /> PDF Договор
                   </Button>
                 </div>
+                <Button size="sm" className="w-full bg-[#28A745] hover:bg-[#22943e] text-white text-xs h-10 font-bold"
+                  onClick={downloadAsImage} data-testid="download-cad-image">
+                  <Download className="mr-1.5 h-4 w-4" /> Свали като изображение (PNG)
+                </Button>
               </CardContent>
             </Card>
 

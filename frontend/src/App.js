@@ -3646,16 +3646,22 @@ const SubscriptionsPage = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [plans, setPlans] = useState({});
+  const [currentSub, setCurrentSub] = useState(null);
 
   useEffect(() => {
     axios.get(`${API}/subscriptions/plans`).then(res => setPlans(res.data.plans)).catch(() => {});
-  }, []);
+    if (token) {
+      axios.get(`${API}/subscriptions/my`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => setCurrentSub(res.data)).catch(() => {});
+    }
+  }, [token]);
 
   const handleActivate = async (plan) => {
     if (!user) { navigate('/login'); return; }
     try {
       await axios.post(`${API}/subscriptions/activate`, { plan }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Абонаментът е активиран!');
+      setCurrentSub(prev => ({ ...prev, subscription_active: true, subscription_plan: plan }));
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Грешка');
     }
@@ -3714,7 +3720,12 @@ const SubscriptionsPage = () => {
             const cfg = planConfig[key] || planConfig.basic;
             return (
               <Card key={key} className={`relative bg-[#253545] border-[#3A4A5C] overflow-hidden ${cfg.ring}`} data-testid={`plan-${key}`}>
-                {cfg.badge && (
+                {currentSub?.subscription_active && currentSub?.subscription_plan === key && (
+                  <div className="bg-emerald-500 text-white text-center text-xs py-1.5 font-bold tracking-wider">
+                    ТЕКУЩ ПЛАН
+                  </div>
+                )}
+                {cfg.badge && !(currentSub?.subscription_active && currentSub?.subscription_plan === key) && (
                   <div className="text-white text-center text-xs py-2 font-bold tracking-wider" style={{ backgroundColor: cfg.color }}>
                     {cfg.badge}
                   </div>
@@ -3755,9 +3766,15 @@ const SubscriptionsPage = () => {
                       ))}
                     </div>
                   )}
-                  <Button className="w-full text-white font-bold" style={{ backgroundColor: cfg.color }} onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
-                    Избери {plan.name}
-                  </Button>
+                  {currentSub?.subscription_active && currentSub?.subscription_plan === key ? (
+                    <Button className="w-full bg-emerald-600 text-white font-bold cursor-default" disabled data-testid={`activate-${key}`}>
+                      <CheckCircle className="mr-2 h-4 w-4" /> Активен
+                    </Button>
+                  ) : (
+                    <Button className="w-full text-white font-bold" style={{ backgroundColor: cfg.color }} onClick={() => handleActivate(key)} data-testid={`activate-${key}`}>
+                      {currentSub?.subscription_active ? 'Смени план' : `Избери ${plan.name}`}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             );

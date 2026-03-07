@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Mail, Building2, Hash, Calendar, Shield, Edit2, Save, LogOut, Camera, CreditCard,
   Bookmark, Eye, Trash2, Share2, Settings, Image as ImageIcon, MapPin, Globe, FileText, ExternalLink,
-  Gift, Copy, CheckCircle, MessageCircle, Phone } from 'lucide-react';
+  Gift, Copy, CheckCircle, MessageCircle, Phone, Lock, Zap, BarChart3, Users as UsersIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,116 @@ const PLAN_DISPLAY = {
   basic: { name: 'БАЗОВ', color: '#4DA6FF', price: 15 },
   pro: { name: 'ПРО', color: '#F97316', price: 35 },
   premium: { name: 'PREMIUM', color: '#8B5CF6', price: 75 },
+};
+
+const FEATURE_LABELS = {
+  pdf_contracts: { label: 'PDF Договори', icon: FileText },
+  ai_sketches: { label: 'AI Скици', icon: Zap },
+  quantitative_estimates: { label: 'Количествени сметки', icon: BarChart3 },
+  telegram_notifications: { label: 'Telegram известия', icon: MessageCircle },
+  priority_display: { label: 'Приоритетно показване', icon: Eye },
+  team_members: { label: 'Членове на екип', icon: UsersIcon },
+};
+
+const SubscriptionDashboard = ({ token }) => {
+  const [limits, setLimits] = useState(null);
+  const [sub, setSub] = useState(null);
+
+  useEffect(() => {
+    const headers = { Authorization: `Bearer ${token}` };
+    Promise.all([
+      axios.get(`${API}/subscriptions/my-limits`, { headers }).then(r => r.data).catch(() => null),
+      axios.get(`${API}/subscriptions/my`, { headers }).then(r => r.data).catch(() => null),
+    ]).then(([l, s]) => { setLimits(l); setSub(s); });
+  }, [token]);
+
+  if (!limits) return null;
+
+  const plan = limits.plan || 'basic';
+  const planInfo = PLAN_DISPLAY[plan] || PLAN_DISPLAY.basic;
+  const offers = limits.features?.offers || {};
+  const daysLeft = sub?.days_remaining || 0;
+
+  return (
+    <Card className="mb-4" style={{ background: 'var(--theme-card-bg)', border: `1px solid ${planInfo.color}30` }}
+      data-testid="subscription-dashboard">
+      <CardContent className="p-4 space-y-4">
+        {/* Plan header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: `${planInfo.color}15` }}>
+              <Shield className="h-5 w-5" style={{ color: planInfo.color }} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>План:</span>
+                <Badge className="text-xs font-bold" style={{ background: `${planInfo.color}15`, color: planInfo.color }}>
+                  {planInfo.name}
+                </Badge>
+              </div>
+              {sub?.subscription_active && (
+                <p className="text-[10px] mt-0.5" style={{ color: 'var(--theme-text-muted)' }}>
+                  {daysLeft > 0 ? `Остават ${daysLeft} дни` : 'Изтича днес'}
+                </p>
+              )}
+            </div>
+          </div>
+          {plan !== 'premium' && (
+            <a href="/subscriptions" className="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
+              style={{ background: `${(PLAN_DISPLAY[plan === 'basic' ? 'pro' : 'premium']).color}15`,
+                       color: (PLAN_DISPLAY[plan === 'basic' ? 'pro' : 'premium']).color }}
+              data-testid="upgrade-plan-link">
+              Надгради
+            </a>
+          )}
+        </div>
+
+        {/* Offers usage */}
+        <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-surface)' }}>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium" style={{ color: 'var(--theme-text-muted)' }}>Оферти този месец</span>
+            <span className="text-xs font-bold" style={{ color: planInfo.color }}>
+              {offers.current || 0} / {offers.max >= 999 ? '∞' : offers.max || 5}
+            </span>
+          </div>
+          <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--theme-border)' }}>
+            <div className="h-full rounded-full transition-all" style={{
+              width: `${offers.max >= 999 ? 5 : Math.min(100, ((offers.current || 0) / (offers.max || 5)) * 100)}%`,
+              background: planInfo.color
+            }} />
+          </div>
+          {offers.max < 999 && (
+            <p className="text-[10px] mt-1" style={{ color: 'var(--theme-text-subtle)' }}>
+              Остават {offers.remaining || 0} оферти
+            </p>
+          )}
+        </div>
+
+        {/* Features grid */}
+        <div className="grid grid-cols-2 gap-2">
+          {Object.entries(FEATURE_LABELS).map(([key, { label, icon: Icon }]) => {
+            const val = limits.features?.[key];
+            const isEnabled = val === true || (typeof val === 'number' && val > 1);
+            return (
+              <div key={key} className="flex items-center gap-2 p-2 rounded-lg text-xs"
+                style={{ background: 'var(--theme-bg-surface)', opacity: isEnabled ? 1 : 0.5 }}
+                data-testid={`feature-${key}`}>
+                {isEnabled ? (
+                  <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />
+                ) : (
+                  <Lock className="h-3.5 w-3.5 flex-shrink-0 text-red-400" />
+                )}
+                <span style={{ color: 'var(--theme-text-muted)' }}>{label}</span>
+                {typeof val === 'number' && val > 1 && (
+                  <span className="ml-auto font-bold" style={{ color: planInfo.color }}>до {val}</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
 };
 
 const PaymentSection = () => {
@@ -253,7 +363,12 @@ const ProfilePage = () => {
               {isCompany ? 'Фирма' : 'Клиент'}
             </Badge>
             {profile.subscription_active && (
-              <Badge className="bg-[#10B981]/15 text-[#10B981] text-xs">PREMIUM</Badge>
+              <Badge className="text-xs" style={{
+                background: `${(PLAN_DISPLAY[profile.subscription_plan] || PLAN_DISPLAY.basic).color}15`,
+                color: (PLAN_DISPLAY[profile.subscription_plan] || PLAN_DISPLAY.basic).color
+              }} data-testid="plan-badge">
+                {(PLAN_DISPLAY[profile.subscription_plan] || PLAN_DISPLAY.basic).name}
+              </Badge>
             )}
             {profile.city && (
               <Badge variant="outline" className="text-xs" style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }}>
@@ -463,6 +578,8 @@ const ProfilePage = () => {
 
           {/* TAB: Payments */}
           <TabsContent value="payments">
+            {/* Subscription Dashboard */}
+            {isCompany && <SubscriptionDashboard token={token} />}
             <PaymentSection />
           </TabsContent>
 

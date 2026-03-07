@@ -341,6 +341,7 @@ async def get_me(user: dict = Depends(get_current_user)):
         "website": user.get("website"),
         "user_type": user["user_type"],
         "subscription_active": user.get("subscription_active", False),
+        "subscription_plan": user.get("subscription_plan", "basic"),
         "subscription_expires": user.get("subscription_expires"),
         "purchased_leads": user.get("purchased_leads", []),
         "free_leads_used": user.get("free_leads_used", 0),
