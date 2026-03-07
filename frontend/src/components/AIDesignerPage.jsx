@@ -283,6 +283,59 @@ const RoomUploadCard = ({ room, index, total, onUpdate, onRemove }) => {
   );
 };
 
+/* ---- Image compression to <2MB ---- */
+const compressImage = (file, maxSizeMB = 2) => {
+  return new Promise((resolve) => {
+    if (file.size <= maxSizeMB * 1024 * 1024) { resolve(file); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        const maxDim = 1920;
+        if (width > maxDim || height > maxDim) {
+          const ratio = Math.min(maxDim / width, maxDim / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        let quality = 0.7;
+        const tryCompress = () => {
+          canvas.toBlob((blob) => {
+            if (blob.size > maxSizeMB * 1024 * 1024 && quality > 0.3) {
+              quality -= 0.1;
+              tryCompress();
+            } else {
+              resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+            }
+          }, 'image/jpeg', quality);
+        };
+        tryCompress();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+/* ---- Retry with exponential backoff ---- */
+const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 2000) => {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (attempt === maxRetries - 1) throw err;
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.warn(`Retry ${attempt + 1}/${maxRetries} after ${delay}ms...`, err.message);
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+};
+
 /* ============ MAIN PAGE ============ */
 export const AIDesignerPage = () => {
   const [pkg, setPkg] = useState(PACKAGES[0]);
@@ -329,7 +382,13 @@ export const AIDesignerPage = () => {
         if (!room.photos.some(p => p !== null)) continue;
 
         const fd = new FormData();
-        room.photos.forEach((p, i) => { if (p) fd.append(`photo${i + 1}`, p); });
+        // Compress photos to <2MB before upload
+        for (let i = 0; i < room.photos.length; i++) {
+          if (room.photos[i]) {
+            const compressed = await compressImage(room.photos[i], 2);
+            fd.append(`photo${i + 1}`, compressed);
+          }
+        }
         fd.append('style', room.style);
         fd.append('room_type', room.roomType);
         fd.append('notes', room.notes);
@@ -339,11 +398,14 @@ export const AIDesignerPage = () => {
         fd.append('height', room.height);
         if (token) fd.append('authorization', `Bearer ${token}`);
 
-        const res = await axios.post(`${API}/ai-designer/photo-generate`, fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          timeout: 600000,
-          onUploadProgress: (e) => { if (e.total) setUploadPct(Math.round((e.loaded / e.total) * 100)); },
-        });
+        // Retry with exponential backoff + 5 min timeout
+        const res = await retryWithBackoff(async () => {
+          return await axios.post(`${API}/ai-designer/photo-generate`, fd, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            timeout: 300000, // 5 minutes
+            onUploadProgress: (e) => { if (e.total) setUploadPct(Math.round((e.loaded / e.total) * 100)); },
+          });
+        }, 3, 2000);
 
         const roomName = ROOM_TYPES.find(r => r.id === room.roomType)?.name || 'Помещение';
         allRoomResults.push({

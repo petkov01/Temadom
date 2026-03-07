@@ -2666,6 +2666,28 @@ async def generate_photo_design(
             photo_bytes = await photo.read()
             if len(photo_bytes) > 10 * 1024 * 1024:
                 raise HTTPException(status_code=400, detail="Снимката е твърде голяма (макс. 10MB)")
+            # Resize to <2MB for faster Vision API processing
+            if len(photo_bytes) > 2 * 1024 * 1024:
+                try:
+                    from PIL import Image as PILImage
+                    import io
+                    img = PILImage.open(io.BytesIO(photo_bytes))
+                    # Resize keeping aspect ratio, max 1920px
+                    max_dim = 1920
+                    if img.width > max_dim or img.height > max_dim:
+                        ratio = min(max_dim / img.width, max_dim / img.height)
+                        new_size = (int(img.width * ratio), int(img.height * ratio))
+                        img = img.resize(new_size, PILImage.LANCZOS)
+                    # Compress as JPEG with quality reduction
+                    buf = io.BytesIO()
+                    quality = 70
+                    if img.mode == 'RGBA':
+                        img = img.convert('RGB')
+                    img.save(buf, format='JPEG', quality=quality)
+                    photo_bytes = buf.getvalue()
+                    logging.info(f"Photo resized: {len(photo_bytes)} bytes")
+                except Exception as resize_err:
+                    logging.warning(f"Photo resize failed, using original: {resize_err}")
             photos_b64.append(base64.b64encode(photo_bytes).decode('utf-8'))
 
     if not photos_b64:
@@ -2681,7 +2703,7 @@ async def generate_photo_design(
     reno_instruction = notes or "complete renovation with modern finishes"
 
     try:
-        # Step 1: Use GPT-4o Vision to analyze EACH photo — identify room, elements, layout
+        # Step 1: Use GPT-4o-mini Vision to analyze EACH photo — identify room, elements, layout
         image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
         renders = []
 
@@ -2698,18 +2720,31 @@ async def generate_photo_design(
         }
         expected_elements = ROOM_ELEMENT_MAP.get(room_type, "мебели, декор")
 
+        # Helper: retry with exponential backoff
+        async def retry_with_backoff(coro_fn, max_retries=3, base_delay=2):
+            for attempt in range(max_retries):
+                try:
+                    return await coro_fn()
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        raise
+                    delay = base_delay * (2 ** attempt)
+                    logging.warning(f"Retry {attempt+1}/{max_retries} after error: {e}. Waiting {delay}s...")
+                    await aio.sleep(delay)
+
         for idx, photo_b64 in enumerate(photos_b64):
             label = photo_labels[idx] if idx < len(photo_labels) else f"Снимка {idx+1}"
             try:
-                # Step 1a: Vision analysis of the uploaded photo
-                vision_chat = LlmChat(
-                    api_key=EMERGENT_LLM_KEY,
-                    session_id=f"photo-vision-{uuid.uuid4()}",
-                    system_message=f"""Ти си експерт по интериорен дизайн. Анализирай ТОЧНО какво виждаш на снимката.
+                # Step 1a: Vision analysis of the uploaded photo (gpt-4o-mini — faster!)
+                async def run_vision(photo_data=photo_b64, room_type_n=room_type_name, exp_elem=expected_elements):
+                    vision_chat = LlmChat(
+                        api_key=EMERGENT_LLM_KEY,
+                        session_id=f"photo-vision-{uuid.uuid4()}",
+                        system_message=f"""Ти си експерт по интериорен дизайн. Анализирай ТОЧНО какво виждаш на снимката.
 
 ЗАДАЧА: Опиши подробно помещението на снимката.
-Клиентът казва, че това е: {room_type_name}
-Очаквани елементи за {room_type_name}: {expected_elements}
+Клиентът казва, че това е: {room_type_n}
+Очаквани елементи за {room_type_n}: {exp_elem}
 
 Отговори САМО в JSON:
 {{"room_type": "bathroom/kitchen/living_room/bedroom/...",
@@ -2721,13 +2756,15 @@ async def generate_photo_design(
 "dimensions_estimate": "приблизително 3x2 метра",
 "condition": "стара/нова/за ремонт",
 "camera_angle": "от вратата/от ъгъла/фронтално"}}"""
-                ).with_model("openai", "gpt-4o")
+                    ).with_model("openai", "gpt-4o-mini")
 
-                vision_msg = UserMessage(
-                    text=f"Анализирай тази снимка. Клиентът твърди, че е {room_type_name}. Потвърди или коригирай. Опиши ВСИЧКИ видими елементи.",
-                    file_contents=[ImageContent(image_base64=photo_b64)]
-                )
-                vision_response = await vision_chat.send_message(vision_msg)
+                    vision_msg = UserMessage(
+                        text=f"Анализирай тази снимка. Клиентът твърди, че е {room_type_n}. Потвърди или коригирай. Опиши ВСИЧКИ видими елементи.",
+                        file_contents=[ImageContent(image_base64=photo_data)]
+                    )
+                    return await vision_chat.send_message(vision_msg)
+
+                vision_response = await retry_with_backoff(run_vision, max_retries=3, base_delay=2)
 
                 # Parse vision analysis
                 room_analysis = {}
@@ -2767,11 +2804,14 @@ IMPORTANT RULES:
 - Replace old finishes with new modern materials matching {style_desc} style
 - Professional interior photography, natural lighting, 8K quality"""
 
-                img_result = await image_gen.generate_images(
-                    prompt=render_prompt,
-                    model="gpt-image-1",
-                    number_of_images=1
-                )
+                async def run_image_gen(prompt=render_prompt):
+                    return await image_gen.generate_images(
+                        prompt=prompt,
+                        model="gpt-image-1",
+                        number_of_images=1
+                    )
+
+                img_result = await retry_with_backoff(run_image_gen, max_retries=3, base_delay=3)
                 if img_result and len(img_result) > 0:
                     img_b64 = base64.b64encode(img_result[0]).decode('utf-8')
                     renders.append({

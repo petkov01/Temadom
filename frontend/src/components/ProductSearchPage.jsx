@@ -44,7 +44,6 @@ const ProductCard = ({ product }) => (
       </div>
       <div className="text-right flex-shrink-0">
         {product.price_eur > 0 ? (
-          <>
             <p className="text-lg font-black text-[#F97316]">{product.price_eur} <span className="text-xs">EUR</span></p>
         ) : (
           <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>Виж цена</p>
