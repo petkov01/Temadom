@@ -13,7 +13,7 @@ import os
 import uuid
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://room-render-staging.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://temdom-ready.preview.emergentagent.com').rstrip('/')
 
 # ===== Auth Fixtures =====
 

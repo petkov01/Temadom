@@ -65,7 +65,7 @@
     "frontend": "100% (All UI flows verified)"
   },
   "test_credentials": {
-    "backend_url": "https://room-render-staging.preview.emergentagent.com",
+    "backend_url": "https://temdom-ready.preview.emergentagent.com",
     "test_user": {
       "email": "testclient72@temadom.bg",
       "password": "TestPass123!",
