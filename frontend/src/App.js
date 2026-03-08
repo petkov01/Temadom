@@ -286,17 +286,14 @@ const Navbar = () => {
             <Link to="/" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-home">
               Начало
             </Link>
-            <a href="#how-it-works" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-how-works">
-              Как работи <ChevronDown className="h-3 w-3 opacity-50" />
-            </a>
-            <Link to="/companies" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
-              Партньори <ChevronDown className="h-3 w-3 opacity-50" />
+            <Link to="/companies" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-companies">
+              Фирми и Майстори
             </Link>
-            <a href="#faq" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-faq">
-              Често задавани въпроси
-            </a>
-            <Link to="/ads" className="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1 hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
-              Обява <ChevronDown className="h-3 w-3 opacity-50" />
+            <Link to="/ads" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-ads">
+              Обяви
+            </Link>
+            <Link to="/calculator" className="px-3 py-2 text-sm font-medium rounded-lg transition-all hover:text-[var(--theme-gold)] hover:bg-[rgba(246,195,106,0.06)]" style={{ color: 'var(--theme-text-muted)' }} data-testid="nav-calculator">
+              Калкулатор
             </Link>
 
           </div>

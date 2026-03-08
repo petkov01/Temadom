@@ -226,9 +226,9 @@ def make_affiliate_url(url: str, store_name: str = "") -> str:
 
 # ==================== SUBSCRIPTION PLAN LIMITS ====================
 PLAN_LIMITS = {
-    "basic":   {"offers_per_month": 5,  "pdf_contracts": False, "ai_sketches": False, "quantitative_estimates": False, "telegram_notifications": False, "priority_display": False, "team_members": 1},
-    "pro":     {"offers_per_month": 999, "pdf_contracts": True,  "ai_sketches": True,  "quantitative_estimates": True,  "telegram_notifications": True,  "priority_display": True,  "team_members": 1},
-    "premium": {"offers_per_month": 999, "pdf_contracts": True,  "ai_sketches": True,  "quantitative_estimates": True,  "telegram_notifications": True,  "priority_display": True,  "team_members": 5, "custom_pdf": True, "api_access": True},
+    "basic":   {"offers_per_month": 5,  "pdf_contracts": False, "ai_sketches": False, "quantitative_estimates": False, "telegram_notifications": False, "priority_display": False, "team_members": 1, "max_photos": 10},
+    "pro":     {"offers_per_month": 999, "pdf_contracts": True,  "ai_sketches": True,  "quantitative_estimates": True,  "telegram_notifications": True,  "priority_display": True,  "team_members": 1, "max_photos": 50},
+    "premium": {"offers_per_month": 999, "pdf_contracts": True,  "ai_sketches": True,  "quantitative_estimates": True,  "telegram_notifications": True,  "priority_display": True,  "team_members": 5, "custom_pdf": True, "api_access": True, "max_photos": 999},
 }
 
 async def check_plan_feature(user: dict, feature: str) -> dict:
@@ -688,7 +688,17 @@ async def get_companies(
     skip = (page - 1) * limit
     total = await db.company_profiles.count_documents(query)
     
-    companies = await db.company_profiles.find(query, {"_id": 0}).sort("rating", -1).skip(skip).limit(limit).to_list(limit)
+    # Priority sort: premium → pro → basic → free, then by rating
+    PLAN_SORT_ORDER = {"premium": 0, "pro": 1, "basic": 2, "free": 3, "none": 4}
+    companies = await db.company_profiles.find(query, {"_id": 0}).sort([
+        ("subscription_plan_order", 1),
+        ("rating", -1)
+    ]).skip(skip).limit(limit).to_list(limit)
+    
+    # If subscription_plan_order field doesn't exist, sort in Python
+    if companies and "subscription_plan_order" not in companies[0]:
+        companies = await db.company_profiles.find(query, {"_id": 0}).sort("rating", -1).skip(skip).limit(limit).to_list(limit)
+        companies.sort(key=lambda c: (PLAN_SORT_ORDER.get(c.get("subscription_plan", "none"), 4), -(c.get("rating", 0) or 0)))
     
     return {
         "companies": companies,
@@ -724,6 +734,15 @@ async def update_company_profile(
     # Update allowed fields only
     allowed_fields = ["company_name", "description", "categories", "city", "address", "website", "logo_url", "portfolio_images"]
     update_data = {k: v for k, v in profile_data.items() if k in allowed_fields}
+    
+    # Enforce photo limit per plan
+    if "portfolio_images" in update_data:
+        plan = user.get("subscription_plan", "basic")
+        limits = PLAN_LIMITS.get(plan, PLAN_LIMITS["basic"])
+        max_photos = limits.get("max_photos", 10)
+        photos = update_data["portfolio_images"]
+        if isinstance(photos, list) and len(photos) > max_photos:
+            raise HTTPException(status_code=400, detail=f"Вашият план ({plan}) позволява до {max_photos} снимки. Надградете плана за повече.")
     
     await db.company_profiles.update_one(
         {"user_id": user["id"]},
@@ -2776,9 +2795,9 @@ def _set_cached(prompt_text: str, response):
 BG_ROOM_PRICES = {
     "bathroom": {
         "economy": [
-            {"name": "PVC шкаф + мивка за баня", "category": "Мебели", "quantity": "1 бр.", "price_eur": 145, "store": "HomeMax", "search_query": "шкаф мивка баня", "verified": False},
-            {"name": "Смесител за мивка", "category": "ВиК", "quantity": "1 бр.", "price_eur": 45, "store": "Praktiker", "search_query": "смесител за мивка", "verified": False},
-            {"name": "Душ комплект", "category": "ВиК", "quantity": "1 бр.", "price_eur": 55, "store": "Mr.Bricolage", "search_query": "душ комплект", "verified": False},
+            {"name": "PVC шкаф + мивка за баня", "category": "Мебели", "quantity": "1 бр.", "price_eur": 145, "store": "Makenzi", "search_query": "шкаф мивка баня", "verified": False},
+            {"name": "Смесител за мивка", "category": "ВиК", "quantity": "1 бр.", "price_eur": 45, "store": "Keramo-BG", "search_query": "смесител за мивка", "verified": False},
+            {"name": "Душ комплект", "category": "ВиК", "quantity": "1 бр.", "price_eur": 55, "store": "BaniaStil", "search_query": "душ комплект", "verified": False},
             {"name": "Тоалетна чиния с казанче", "category": "Санитария", "quantity": "1 бр.", "price_eur": 89, "store": "Praktiker", "search_query": "тоалетна чиния", "verified": False},
             {"name": "Плочки за под 33x33", "category": "Настилки", "quantity": "8 m²", "price_eur": 72, "store": "Bauhaus", "search_query": "плочки за баня под", "verified": False},
             {"name": "Фаянс за стени 25x40", "category": "Облицовки", "quantity": "15 m²", "price_eur": 105, "store": "Praktiker", "search_query": "фаянс за баня", "verified": False},
@@ -2786,9 +2805,9 @@ BG_ROOM_PRICES = {
             {"name": "LED осветление за баня", "category": "Осветление", "quantity": "1 бр.", "price_eur": 25, "store": "Praktiker", "search_query": "осветление баня", "verified": False},
         ],
         "medium": [
-            {"name": "Мебелен комплект за баня с мивка", "category": "Мебели", "quantity": "1 бр.", "price_eur": 289, "store": "HomeMax", "search_query": "мебели за баня комплект", "verified": False},
-            {"name": "Термостатен смесител", "category": "ВиК", "quantity": "1 бр.", "price_eur": 89, "store": "Praktiker", "search_query": "термостатен смесител", "verified": False},
-            {"name": "Душ кабина 90x90", "category": "ВиК", "quantity": "1 бр.", "price_eur": 199, "store": "Bauhaus", "search_query": "душ кабина", "verified": False},
+            {"name": "Мебелен комплект за баня с мивка", "category": "Мебели", "quantity": "1 бр.", "price_eur": 289, "store": "Makenzi", "search_query": "мебели за баня комплект", "verified": False},
+            {"name": "Термостатен смесител", "category": "ВиК", "quantity": "1 бр.", "price_eur": 89, "store": "Keramo-BG", "search_query": "термостатен смесител", "verified": False},
+            {"name": "Душ кабина 90x90", "category": "ВиК", "quantity": "1 бр.", "price_eur": 199, "store": "BaniaMechta", "search_query": "душ кабина", "verified": False},
             {"name": "Тоалетна чиния окачена", "category": "Санитария", "quantity": "1 бр.", "price_eur": 159, "store": "Praktiker", "search_query": "окачена тоалетна", "verified": False},
             {"name": "Гранитогрес за под 60x60", "category": "Настилки", "quantity": "8 m²", "price_eur": 136, "store": "Bauhaus", "search_query": "гранитогрес баня", "verified": False},
             {"name": "Керамични плочки за стени", "category": "Облицовки", "quantity": "15 m²", "price_eur": 195, "store": "Mr.Bricolage", "search_query": "плочки стени баня", "verified": False},
@@ -2810,7 +2829,7 @@ BG_ROOM_PRICES = {
     },
     "kitchen": {
         "economy": [
-            {"name": "Кухненски шкафове комплект 2м", "category": "Мебели", "quantity": "1 к-т", "price_eur": 299, "store": "HomeMax", "search_query": "кухненски шкафове", "verified": False},
+            {"name": "Кухненски шкафове комплект 2м", "category": "Мебели", "quantity": "1 к-т", "price_eur": 299, "store": "Videnov", "search_query": "кухненски шкафове", "verified": False},
             {"name": "Кухненски плот ламинат", "category": "Мебели", "quantity": "2 м", "price_eur": 65, "store": "Praktiker", "search_query": "кухненски плот", "verified": False},
             {"name": "Смесител за кухня", "category": "ВиК", "quantity": "1 бр.", "price_eur": 39, "store": "Praktiker", "search_query": "смесител кухня", "verified": False},
             {"name": "Мивка за кухня инокс", "category": "ВиК", "quantity": "1 бр.", "price_eur": 49, "store": "Mr.Bricolage", "search_query": "мивка кухня инокс", "verified": False},
@@ -2958,6 +2977,11 @@ def _build_static_fallback_budget(room_type: str, budget_eur: int, room_type_nam
                 "HomeMax": f"https://www.homemax.bg/catalogsearch/result/?q={sq}",
                 "Bauhaus": f"https://www.bauhaus.bg/catalogsearch/result/?q={sq}",
                 "eMAG": f"https://www.emag.bg/search/{sq}",
+                "Makenzi": f"https://makenzi.bg/catalogsearch/result/?q={sq}",
+                "BaniaMechta": f"https://baniamechta.com/?s={sq}",
+                "Keramo-BG": f"https://keramo-bg.com/?s={sq}",
+                "BaniaStil": f"https://baniastil.com/?s={sq}",
+                "Videnov": f"https://videnov.bg/search?keyword={sq}",
             }
             mat["product_url"] = store_urls.get(store, f"https://www.emag.bg/search/{sq}")
             materials.append(mat)
@@ -3522,6 +3546,10 @@ async def _process_photo_design(
             "IKEA": "https://www.ikea.bg/search/?q=",
             "Videnov": "https://videnov.bg/search?keyword=",
             "Praktis": "https://praktis.bg/search?q=",
+            "Makenzi": "https://makenzi.bg/catalogsearch/result/?q=",
+            "BaniaMechta": "https://baniamechta.com/?s=",
+            "Keramo-BG": "https://keramo-bg.com/?s=",
+            "BaniaStil": "https://baniastil.com/?s=",
         }
 
         # System prompt: Use real products when available
