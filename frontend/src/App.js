@@ -322,8 +322,8 @@ const Navbar = () => {
                   <Link to="/room-scan" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-room-scan">
                     <Camera className="h-4 w-4 text-[var(--theme-gold)]" /> 3D Photo Designer
                   </Link>
-                  <Link to="/ready-projects" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-ready-projects">
-                    <FolderSearch className="h-4 w-4" /> Готови проекти
+                  <Link to="/projects" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-projects-link">
+                    <FolderSearch className="h-4 w-4" /> Проекти
                   </Link>
                   <div className="my-1 mx-3 gold-line"></div>
                   <Link to="/subscriptions" className="flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-lg mx-1 hover:bg-[rgba(246,195,106,0.06)] transition-colors" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMoreOpen(false)} data-testid="nav-subscriptions">
@@ -487,8 +487,8 @@ const Navbar = () => {
             <Link to="/room-scan" className="block py-2 flex items-center gap-2 hover:text-[#8C56FF]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-room-scan">
               <Camera className="h-4 w-4" /> 3D Photo Designer
             </Link>
-            <Link to="/ready-projects" className="block py-2 flex items-center gap-2 hover:text-[#28A745]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-ready-projects">
-              <FolderSearch className="h-4 w-4" /> Готови проекти
+            <Link to="/projects?tab=create" className="block py-2 flex items-center gap-2 hover:text-[#28A745]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)} data-testid="mobile-nav-create-project">
+              <Paintbrush className="h-4 w-4" /> Създай проект
             </Link>
             <Link to="/subscriptions" className="block py-2 flex items-center gap-2 hover:text-[#d4a43a]" style={{ color: 'var(--theme-text-muted)' }} onClick={() => setMobileMenuOpen(false)}>
               <ShoppingCart className="h-4 w-4" /> Абонаменти
@@ -685,7 +685,7 @@ const Footer = () => {
             <li><Link to="/subscriptions" className="hover:text-[#d4a43a] transition-colors">Абонаменти</Link></li>
             <li><Link to="/ai-sketch" className="hover:text-[#d4a43a] transition-colors">AI Sketch</Link></li>
             <li><Link to="/room-scan" className="hover:text-[#d4a43a] transition-colors">Помещения</Link></li>
-            <li><Link to="/ready-projects" className="hover:text-[#d4a43a] transition-colors">Готови проекти</Link></li>
+            <li><Link to="/projects?tab=create" className="hover:text-[#d4a43a] transition-colors">Създай проект</Link></li>
           </ul>
         </div>
         <div>
@@ -1636,8 +1636,26 @@ const ProjectsPage = () => {
   const [sectionType, setSectionType] = useState(searchParams.get('section') || 'renovation');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const imageInputRef = React.useRef(null);
+
+  // Main tab: browse or create
+  const activeTab = searchParams.get('tab') || 'browse';
+  const setActiveTab = (tab) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', tab);
+    setSearchParams(params);
+  };
+
+  // Create project form state
+  const [newProject, setNewProject] = useState({
+    title: '', description: '', category: '', city: '', section_type: 'renovation',
+    budget_min: '', budget_max: '', images: [], estimated_budget: null,
+    property_type: '', land_area: '', building_area: '', floors: '', construction_notes: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
@@ -1668,8 +1686,18 @@ const ProjectsPage = () => {
   }, [sectionType]);
 
   useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
+    if (activeTab === 'browse') fetchProjects();
+  }, [fetchProjects, activeTab]);
+
+  // Also fetch categories when switching to create tab
+  useEffect(() => {
+    if (activeTab === 'create') {
+      axios.get(`${API}/categories?section=${newProject.section_type}`).then(res => {
+        setCategories(res.data.categories);
+        setPropertyTypes(res.data.property_types || []);
+      });
+    }
+  }, [activeTab, newProject.section_type]);
 
   const handleSectionChange = (newSection) => {
     setSectionType(newSection);
@@ -1678,6 +1706,7 @@ const ProjectsPage = () => {
     setPage(1);
     setSearch('');
     const params = new URLSearchParams();
+    params.set('tab', 'browse');
     params.set('section', newSection);
     setSearchParams(params);
   };
@@ -1686,11 +1715,57 @@ const ProjectsPage = () => {
     e.preventDefault();
     setPage(1);
     const params = new URLSearchParams();
+    params.set('tab', 'browse');
     params.set('section', sectionType);
     if (search) params.set('search', search);
     if (category) params.set('category', category);
     if (city) params.set('city', city);
     setSearchParams(params);
+  };
+
+  const handleImageUpload = (files) => {
+    const remainingSlots = 10 - newProject.images.length;
+    const filesToProcess = Array.from(files).slice(0, remainingSlots);
+    const newImages = filesToProcess.map(file => new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    }));
+    Promise.all(newImages).then(images => {
+      setNewProject(prev => ({ ...prev, images: [...prev.images, ...images].slice(0, 10) }));
+    });
+  };
+
+  const removeImage = (index) => {
+    setNewProject(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+  };
+
+  const handleCreateProject = async () => {
+    if (!user) { toast.error('Моля, влезте в профила си'); navigate('/login'); return; }
+    if (user.user_type !== 'client') { toast.error('Само клиенти могат да създават проекти'); return; }
+    if (!newProject.title || !newProject.description || !newProject.category || !newProject.city) {
+      toast.error(t('cd_fill_required')); return;
+    }
+    setSubmitting(true);
+    try {
+      const data = {
+        ...newProject,
+        budget_min: newProject.budget_min ? parseFloat(newProject.budget_min) : null,
+        budget_max: newProject.budget_max ? parseFloat(newProject.budget_max) : null,
+        estimated_budget: newProject.estimated_budget,
+        land_area: newProject.land_area ? parseFloat(newProject.land_area) : null,
+        building_area: newProject.building_area ? parseFloat(newProject.building_area) : null,
+        floors: newProject.floors ? parseInt(newProject.floors) : null,
+      };
+      await axios.post(`${API}/projects`, data, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success(t('cd_project_created'));
+      setNewProject({ title: '', description: '', category: '', city: '', section_type: 'renovation', budget_min: '', budget_max: '', images: [], estimated_budget: null, property_type: '', land_area: '', building_area: '', floors: '', construction_notes: '' });
+      setActiveTab('browse');
+      fetchProjects();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('common_error'));
+    }
+    setSubmitting(false);
   };
 
   return (
@@ -1701,170 +1776,316 @@ const ProjectsPage = () => {
           <p style={{ color: 'var(--theme-text-muted)' }}>{t('projects_subtitle')}</p>
         </div>
 
-        {/* Section Tabs: Ремонти / Строителство */}
-        <div className="flex gap-1 p-1 rounded-xl mb-6" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}
-          data-testid="projects-section-tabs">
+        {/* Main Tabs: Browse / Create */}
+        <div className="flex gap-2 mb-6" data-testid="projects-main-tabs">
           <button
-            onClick={() => handleSectionChange('renovation')}
-            className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${sectionType === 'renovation' ? 'shadow-md' : 'hover:opacity-80'}`}
+            onClick={() => setActiveTab('browse')}
+            className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'browse' ? 'shadow-lg' : 'hover:opacity-80'}`}
             style={{
-              background: sectionType === 'renovation' ? '#c9953a' : 'transparent',
-              color: sectionType === 'renovation' ? 'white' : 'var(--theme-text-muted)'
+              background: activeTab === 'browse' ? 'var(--theme-gold, #c9953a)' : 'var(--theme-card-bg)',
+              color: activeTab === 'browse' ? 'white' : 'var(--theme-text-muted)',
+              border: activeTab === 'browse' ? 'none' : '1px solid var(--theme-border)'
             }}
-            data-testid="section-renovation-tab">
+            data-testid="tab-browse-projects"
+          >
+            <FolderSearch className="h-4 w-4" />
+            Разгледай проекти
+          </button>
+          <button
+            onClick={() => { if (!user) { toast.error('Моля, влезте в профила си'); navigate('/login'); return; } setActiveTab('create'); }}
+            className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'create' ? 'shadow-lg' : 'hover:opacity-80'}`}
+            style={{
+              background: activeTab === 'create' ? '#10B981' : 'var(--theme-card-bg)',
+              color: activeTab === 'create' ? 'white' : 'var(--theme-text-muted)',
+              border: activeTab === 'create' ? 'none' : '1px solid var(--theme-border)'
+            }}
+            data-testid="tab-create-project"
+          >
             <Paintbrush className="h-4 w-4" />
-            Ремонти
-          </button>
-          <button
-            onClick={() => handleSectionChange('construction')}
-            className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${sectionType === 'construction' ? 'shadow-md' : 'hover:opacity-80'}`}
-            style={{
-              background: sectionType === 'construction' ? '#10B981' : 'transparent',
-              color: sectionType === 'construction' ? 'white' : 'var(--theme-text-muted)'
-            }}
-            data-testid="section-construction-tab">
-            <Building2 className="h-4 w-4" />
-            Строителство
+            Създай проект
           </button>
         </div>
 
-        {/* Section description */}
-        <div className="mb-6 p-4 rounded-xl" style={{ background: 'var(--theme-card-bg)', border: '1px solid var(--theme-border)' }}>
-          {sectionType === 'renovation' ? (
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#c9953a]/15 flex items-center justify-center flex-shrink-0">
-                <Paintbrush className="h-5 w-5 text-[#c9953a]" />
-              </div>
-              <div>
-                <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--theme-text)' }}>Проекти за ремонт</h3>
-                <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
-                  Ремонт на съществуващи помещения — бани, кухни, холове, спални. Боядисване, подови настилки, ВиК, ел. инсталации и др.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#10B981]/15 flex items-center justify-center flex-shrink-0">
-                <Building2 className="h-5 w-5 text-[#10B981]" />
-              </div>
-              <div>
-                <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--theme-text)' }}>Проекти за ново строителство</h3>
-                <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
-                  Изграждане на нови къщи, кооперации, халета, офис сгради и търговски обекти. Цялостно строителство от основи до ключ.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <PageInstructions
-          title={sectionType === 'renovation' ? 'Проекти за ремонт' : 'Проекти за ново строителство'}
-          description={sectionType === 'renovation' ? 'Тук намирате реални проекти за ремонт от клиенти' : 'Тук намирате проекти за ново строителство — къщи, кооперации, халета'}
-          steps={sectionType === 'renovation' 
-            ? ['Разгледайте списъка с ремонтни проекти', 'Използвайте филтри за категория и град', 'Кликнете върху проект за пълни детайли', 'Свържете се с клиента безплатно']
-            : ['Разгледайте строителните проекти', 'Филтрирайте по тип имот (къща, хале, кооперация)', 'Вижте детайлите за площ и етажи', 'Свържете се с клиента директно']
-          }
-          benefits={['Безплатен достъп до всички проекти', 'Директен контакт с клиенти', 'Филтриране по категория и локация']}
-          tips={['Проверявайте редовно за нови проекти', 'Настройте Telegram нотификации за нови проекти']}
-          videoUrl="https://temadom.com/videos/projects"
-        />
-
-        {/* Filters */}
-        <Card className="p-4 mb-8">
-          <form onSubmit={handleSearch} className={`grid gap-4 ${sectionType === 'construction' ? 'md:grid-cols-5' : 'md:grid-cols-4'}`}>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} />
-              <Input 
-                placeholder={t('projects_search')} 
-                className="pl-10"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                data-testid="search-input"
-              />
-            </div>
-            
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger data-testid="category-filter">
-                <SelectValue placeholder={t('projects_all_cat')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('projects_all_cat')}</SelectItem>
-                {categories.map(cat => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {sectionType === 'construction' && (
-              <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger data-testid="property-type-filter">
-                  <SelectValue placeholder="Тип имот" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Всички типове</SelectItem>
-                  {propertyTypes.map(pt => (
-                    <SelectItem key={pt.id} value={pt.id}>{pt.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            
-            <Input 
-              placeholder={t('projects_city')} 
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              data-testid="city-filter"
-            />
-            
-            <Button type="submit" className="bg-[#d4a43a] hover:bg-[#b8922e]" data-testid="search-btn">
-              <Filter className="mr-2 h-4 w-4" /> {t('projects_filter')}
-            </Button>
-          </form>
-        </Card>
-
-        {/* Results */}
-        {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1,2,3,4,5,6].map(i => (
-              <Card key={i} className="h-64 animate-pulse" style={{ background: 'var(--theme-bg-surface)' }} />
-            ))}
-          </div>
-        ) : projects.length === 0 ? (
-          <Card className="p-12 text-center">
-            <Boxes className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--theme-text-muted)' }} />
-            <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--theme-text)' }}>{t('projects_empty')}</h3>
-            <p style={{ color: 'var(--theme-text-muted)' }}>{t('projects_empty_sub')}</p>
-          </Card>
-        ) : (
+        {/* ===== BROWSE TAB ===== */}
+        {activeTab === 'browse' && (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map(project => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
+            {/* Section Tabs: Ремонти / Строителство */}
+            <div className="flex gap-1 p-1 rounded-xl mb-6" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}
+              data-testid="projects-section-tabs">
+              <button
+                onClick={() => handleSectionChange('renovation')}
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${sectionType === 'renovation' ? 'shadow-md' : 'hover:opacity-80'}`}
+                style={{
+                  background: sectionType === 'renovation' ? '#c9953a' : 'transparent',
+                  color: sectionType === 'renovation' ? 'white' : 'var(--theme-text-muted)'
+                }}
+                data-testid="section-renovation-tab">
+                <Paintbrush className="h-4 w-4" />
+                Ремонти
+              </button>
+              <button
+                onClick={() => handleSectionChange('construction')}
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${sectionType === 'construction' ? 'shadow-md' : 'hover:opacity-80'}`}
+                style={{
+                  background: sectionType === 'construction' ? '#10B981' : 'transparent',
+                  color: sectionType === 'construction' ? 'white' : 'var(--theme-text-muted)'
+                }}
+                data-testid="section-construction-tab">
+                <Building2 className="h-4 w-4" />
+                Строителство
+              </button>
             </div>
-            
-            {totalPages > 1 && (
-              <div className="flex justify-center gap-2 mt-8">
-                <Button 
-                  variant="outline" 
-                  disabled={page === 1}
-                  onClick={() => setPage(p => p - 1)}
-                >
-                  {t('projects_prev')}
+
+            {/* Filters */}
+            <Card className="p-4 mb-8">
+              <form onSubmit={handleSearch} className={`grid gap-4 ${sectionType === 'construction' ? 'md:grid-cols-5' : 'md:grid-cols-4'}`}>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--theme-text-muted)' }} />
+                  <Input 
+                    placeholder={t('projects_search')} 
+                    className="pl-10"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    data-testid="search-input"
+                  />
+                </div>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger data-testid="category-filter">
+                    <SelectValue placeholder={t('projects_all_cat')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('projects_all_cat')}</SelectItem>
+                    {categories.map(cat => (
+                      <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {sectionType === 'construction' && (
+                  <Select value={propertyType} onValueChange={setPropertyType}>
+                    <SelectTrigger data-testid="property-type-filter">
+                      <SelectValue placeholder="Тип имот" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Всички типове</SelectItem>
+                      {propertyTypes.map(pt => (
+                        <SelectItem key={pt.id} value={pt.id}>{pt.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                <Input 
+                  placeholder={t('projects_city')} 
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  data-testid="city-filter"
+                />
+                <Button type="submit" className="bg-[#d4a43a] hover:bg-[#b8922e]" data-testid="search-btn">
+                  <Filter className="mr-2 h-4 w-4" /> {t('projects_filter')}
                 </Button>
-                <span className="flex items-center px-4" style={{ color: 'var(--theme-text-muted)' }}>
-                  {t('projects_page')} {page} {t('projects_of')} {totalPages}
-                </span>
-                <Button 
-                  variant="outline" 
-                  disabled={page === totalPages}
-                  onClick={() => setPage(p => p + 1)}
-                >
-                  {t('projects_next')}
-                </Button>
+              </form>
+            </Card>
+
+            {/* Results */}
+            {loading ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1,2,3,4,5,6].map(i => (
+                  <Card key={i} className="h-64 animate-pulse" style={{ background: 'var(--theme-bg-surface)' }} />
+                ))}
               </div>
+            ) : projects.length === 0 ? (
+              <Card className="p-12 text-center">
+                <Boxes className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--theme-text-muted)' }} />
+                <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--theme-text)' }}>{t('projects_empty')}</h3>
+                <p style={{ color: 'var(--theme-text-muted)' }}>{t('projects_empty_sub')}</p>
+              </Card>
+            ) : (
+              <>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {projects.map(project => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex justify-center gap-2 mt-8">
+                    <Button variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+                      {t('projects_prev')}
+                    </Button>
+                    <span className="flex items-center px-4" style={{ color: 'var(--theme-text-muted)' }}>
+                      {t('projects_page')} {page} {t('projects_of')} {totalPages}
+                    </span>
+                    <Button variant="outline" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>
+                      {t('projects_next')}
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </>
+        )}
+
+        {/* ===== CREATE TAB ===== */}
+        {activeTab === 'create' && (
+          <Card className="p-6 sm:p-8" data-testid="create-project-section">
+            <div className="max-w-2xl mx-auto space-y-6">
+              <div className="text-center mb-2">
+                <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--theme-text)' }}>Създай нов проект</h2>
+                <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>Опишете какво търсите и фирмите ще се свържат с вас</p>
+              </div>
+
+              {/* Section Type Toggle */}
+              <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
+                <button type="button"
+                  onClick={() => setNewProject(d => ({ ...d, section_type: 'renovation', category: '', property_type: '' }))}
+                  className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${newProject.section_type === 'renovation' ? 'shadow-md' : ''}`}
+                  style={{ background: newProject.section_type === 'renovation' ? '#c9953a' : 'transparent', color: newProject.section_type === 'renovation' ? 'white' : 'var(--theme-text-muted)' }}
+                  data-testid="create-section-renovation">
+                  <Paintbrush className="h-3.5 w-3.5" /> Ремонт
+                </button>
+                <button type="button"
+                  onClick={() => setNewProject(d => ({ ...d, section_type: 'construction', category: '', property_type: '' }))}
+                  className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${newProject.section_type === 'construction' ? 'shadow-md' : ''}`}
+                  style={{ background: newProject.section_type === 'construction' ? '#10B981' : 'transparent', color: newProject.section_type === 'construction' ? 'white' : 'var(--theme-text-muted)' }}
+                  data-testid="create-section-construction">
+                  <Building2 className="h-3.5 w-3.5" /> Строителство
+                </button>
+              </div>
+
+              <div>
+                <Label>{t('cl_title')} *</Label>
+                <Input placeholder={newProject.section_type === 'construction' ? 'Напр. Строителство на къща 120 м²' : t('cl_title_placeholder')}
+                  value={newProject.title} onChange={(e) => setNewProject(d => ({ ...d, title: e.target.value }))}
+                  data-testid="project-title-input" />
+              </div>
+
+              {newProject.section_type === 'construction' && (
+                <div>
+                  <Label>Тип имот *</Label>
+                  <Select value={newProject.property_type} onValueChange={(v) => setNewProject(d => ({ ...d, property_type: v }))}>
+                    <SelectTrigger data-testid="property-type-select"><SelectValue placeholder="Изберете тип имот" /></SelectTrigger>
+                    <SelectContent>
+                      {propertyTypes.map(pt => <SelectItem key={pt.id} value={pt.id}>{pt.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              <div>
+                <Label>{t('cl_category')} *</Label>
+                <Select value={newProject.category} onValueChange={(v) => setNewProject(d => ({ ...d, category: v }))}>
+                  <SelectTrigger data-testid="project-category-select"><SelectValue placeholder={t('cl_select_cat')} /></SelectTrigger>
+                  <SelectContent>
+                    {categories.filter(c => c.section === newProject.section_type || c.section === 'both').map(cat => (
+                      <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>{t('cl_city_label')} *</Label>
+                <Input placeholder={t('cl_city_placeholder')} value={newProject.city}
+                  onChange={(e) => setNewProject(d => ({ ...d, city: e.target.value }))}
+                  data-testid="project-city-input" />
+              </div>
+
+              {newProject.section_type === 'construction' && (
+                <div className="p-4 rounded-xl space-y-3" style={{ background: 'var(--theme-bg-surface)', border: '1px solid var(--theme-border)' }}>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Building2 className="h-3.5 w-3.5 text-[#10B981]" />
+                    <span className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>Детайли за строителство</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <Label className="text-[11px]">Парцел (м²)</Label>
+                      <Input type="number" placeholder="500" value={newProject.land_area}
+                        onChange={(e) => setNewProject(d => ({ ...d, land_area: e.target.value }))} data-testid="land-area-input" />
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">РЗП (м²)</Label>
+                      <Input type="number" placeholder="120" value={newProject.building_area}
+                        onChange={(e) => setNewProject(d => ({ ...d, building_area: e.target.value }))} data-testid="building-area-input" />
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">Етажи</Label>
+                      <Input type="number" placeholder="2" min="1" max="20" value={newProject.floors}
+                        onChange={(e) => setNewProject(d => ({ ...d, floors: e.target.value }))} data-testid="floors-input" />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-[11px]">Допълнителни бележки</Label>
+                    <Textarea placeholder="Опишете специфичните изисквания..." value={newProject.construction_notes}
+                      onChange={(e) => setNewProject(d => ({ ...d, construction_notes: e.target.value }))}
+                      rows={2} className="text-xs" data-testid="construction-notes-input" />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <Label>{t('cl_description')} *</Label>
+                <Textarea placeholder={newProject.section_type === 'construction' ? 'Опишете подробно строителния проект...' : t('cl_desc_placeholder')}
+                  value={newProject.description} onChange={(e) => setNewProject(d => ({ ...d, description: e.target.value }))}
+                  rows={4} data-testid="project-description-input" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>{t('cl_min_budget')}</Label>
+                  <Input type="number" placeholder="1000" value={newProject.budget_min}
+                    onChange={(e) => setNewProject(d => ({ ...d, budget_min: e.target.value }))} />
+                </div>
+                <div>
+                  <Label>{t('cl_max_budget')}</Label>
+                  <Input type="number" placeholder="5000" value={newProject.budget_max}
+                    onChange={(e) => setNewProject(d => ({ ...d, budget_max: e.target.value }))} />
+                </div>
+              </div>
+
+              {/* Image Upload */}
+              <div>
+                <Label className="flex items-center gap-2 mb-3"><Camera className="h-4 w-4" /> {t('cl_photos')}</Label>
+                <p className="text-xs mb-3" style={{ color: 'var(--theme-text-muted)' }}>{t('cl_photos_desc')}</p>
+                <div className="flex flex-wrap gap-2">
+                  {newProject.images.map((img, idx) => (
+                    <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden group">
+                      <img src={img} alt={`Снимка ${idx + 1}`} className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => removeImage(idx)}
+                        className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <X className="h-5 w-5 text-white" />
+                      </button>
+                      <span className="absolute bottom-0 right-0 bg-black/60 text-white text-xs px-1">{idx + 1}</span>
+                    </div>
+                  ))}
+                  {newProject.images.length < 10 && (
+                    <button type="button" onClick={() => imageInputRef.current?.click()}
+                      className="w-20 h-20 border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-colors hover:border-[#c9953a] hover:text-[#c9953a]"
+                      style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-text-muted)' }}>
+                      <Camera className="h-5 w-5 mb-1" /><span className="text-xs">{t('cl_add_photo')}</span>
+                    </button>
+                  )}
+                  <input ref={imageInputRef} type="file" accept="image/*" multiple className="hidden"
+                    onChange={(e) => handleImageUpload(e.target.files)} />
+                </div>
+                {newProject.images.length > 0 && (
+                  <p className="text-xs mt-2" style={{ color: 'var(--theme-text-muted)' }}>{newProject.images.length} {t('cl_of_10')}</p>
+                )}
+              </div>
+
+              {/* Budget Estimator */}
+              <ProjectEstimator initialCity={newProject.city}
+                onEstimateChange={(estimate) => setNewProject(d => ({ ...d, estimated_budget: estimate }))} />
+
+              {/* Submit */}
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" className="flex-1" onClick={() => setActiveTab('browse')} data-testid="cancel-create-btn">
+                  Отказ
+                </Button>
+                <Button className="flex-1 bg-[#10B981] hover:bg-[#0d9668] text-white font-bold"
+                  onClick={handleCreateProject} disabled={submitting} data-testid="submit-project-btn">
+                  {submitting ? 'Създаване...' : 'Публикувай проект'}
+                </Button>
+              </div>
+            </div>
+          </Card>
         )}
       </div>
     </div>
@@ -4256,7 +4477,7 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/auth/callback" element={<GoogleAuthCallback />} />
-                <Route path="/projects" element={<AuthGate><ProjectsPage /></AuthGate>} />
+                <Route path="/projects" element={<ProjectsPage />} />
                 <Route path="/projects/:id" element={<AuthGate><ProjectDetailPage /></AuthGate>} />
                 <Route path="/companies" element={<CompaniesPage />} />
                 <Route path="/companies/:id" element={<CompanyDetailPage />} />
